@@ -37,7 +37,7 @@ export function MissionSelector({
         <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 mb-6">
           <h2 className="text-cyan-400 font-semibold mb-4 flex items-center">
             <i className="fas fa-clipboard-list mr-2"></i>
-            MISSION CATEGORIES
+            TASK CATEGORIES
           </h2>
           
           <div className="space-y-2">
@@ -119,7 +119,7 @@ export function MissionSelector({
         <div className="bg-slate-800 border border-slate-600 rounded-lg p-4">
           <h3 className="text-slate-300 font-semibold mb-4 flex items-center">
             <i className="fas fa-tasks mr-2"></i>
-            {selectedCategory ? `${selectedCategory} MISSIONS` : 'MISSION QUEUE'}
+            {selectedCategory ? `${selectedCategory} TASKS` : 'TASK QUEUE'}
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -171,9 +171,9 @@ export function MissionSelector({
           
           {selectedCategoryMissions.length === 0 && (
             <div className="text-center py-8">
-              <div className="text-slate-400 text-lg mb-2">No missions available</div>
+              <div className="text-slate-400 text-lg mb-2">No tasks available</div>
               <div className="text-slate-500 text-sm">
-                {selectedCategory ? 'Select a different category or increase your rank' : 'Complete missions to unlock more'}
+                {selectedCategory ? 'Select a different category or increase your rank' : 'Complete tasks to unlock more'}
               </div>
             </div>
           )}

@@ -19,9 +19,9 @@ export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
           
           <div className="space-y-4">
             <div className="bg-slate-900 border border-slate-600 rounded p-4">
-              <h3 className="text-green-400 font-semibold mb-2">Welcome, Cadet!</h3>
+              <h3 className="text-green-400 font-semibold mb-2">Welcome, Cadet Wyatt!</h3>
               <p className="text-slate-300 text-sm leading-relaxed">
-                You are now part of the <span className="text-cyan-400 font-semibold">US Space Force Operations Center</span> where computers crunch numbers, but humans perceive the bigger picture. Your mission: study pattern transformations and solve critical operational puzzles to keep our missions running smoothly.
+                You are now part of the <span className="text-cyan-400 font-semibold">US Space Force Operations Center</span> where computers do math, but we need humans to perceive the bigger picture. Let's start you with some basic tasks to make you a useful member of the team. This training will take you all the way to the highest enlisted rank: <span className="text-amber-400 font-semibold">Chief Master Sergeant of the Space Force!</span>
               </p>
             </div>
             
@@ -41,7 +41,7 @@ export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
             onClick={onClose}
             className="w-full bg-cyan-400 hover:bg-blue-500 text-slate-900 font-semibold py-3 px-6"
           >
-            ENTER MISSION CONTROL
+            ENTER OPERATIONS CENTER
           </Button>
         </div>
       </DialogContent>

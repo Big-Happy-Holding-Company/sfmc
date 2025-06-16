@@ -5,6 +5,7 @@ import { OnboardingModal } from "@/components/game/OnboardingModal";
 import { Header } from "@/components/game/Header";
 import { MissionSelector } from "@/components/game/MissionSelector";
 import { Timer } from "@/components/game/Timer";
+import { SpeedTimer } from "@/components/game/SpeedTimer";
 import { InteractiveGrid } from "@/components/game/InteractiveGrid";
 import { ResultModal } from "@/components/game/ResultModal";
 import { Button } from "@/components/ui/button";
@@ -88,7 +89,7 @@ export default function MissionControl() {
   const handleSelectTask = (task: Task) => {
     setCurrentTask(task);
     setStartTime(Date.now());
-    setIsTimerActive(!!task.timeLimit);
+    setIsTimerActive(true); // Always start timer for speed tracking
     
     // Initialize empty grid
     const emptyGrid = Array(task.gridSize).fill(null).map(() => 
