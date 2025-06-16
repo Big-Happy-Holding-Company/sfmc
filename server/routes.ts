@@ -268,9 +268,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           correct: true,
           basePoints: task.basePoints,
           speedBonus,
+          hintPenalty,
           totalPoints: points,
           newRank,
           rankUp: newRankLevel > player.rankLevel,
+          hintsUsed,
         });
       } else {
         res.json({

@@ -48,16 +48,18 @@ export default function MissionControl() {
 
   // Validate solution mutation
   const validateSolutionMutation = useMutation({
-    mutationFn: async ({ playerId, taskId, solution, timeElapsed }: {
+    mutationFn: async ({ playerId, taskId, solution, timeElapsed, hintsUsed }: {
       playerId: number;
       taskId: string;
       solution: string[][];
       timeElapsed?: number;
+      hintsUsed?: number;
     }) => {
       const response = await apiRequest("POST", `/api/players/${playerId}/validate-solution`, {
         taskId,
         solution,
         timeElapsed,
+        hintsUsed,
       });
       return response.json();
     },
@@ -126,7 +128,7 @@ export default function MissionControl() {
   };
 
   const handleUseHint = () => {
-    if (!currentTask || !currentTask.hints) return;
+    if (!currentTask || !currentTask.hints || !Array.isArray(currentTask.hints)) return;
     
     const nextHintIndex = currentHintIndex + 1;
     if (nextHintIndex < currentTask.hints.length) {
@@ -257,6 +259,45 @@ export default function MissionControl() {
                     </div>
                   ))}
                 </div>
+                
+                {/* Hints Section */}
+                {currentTask.hints && Array.isArray(currentTask.hints) && currentTask.hints.length > 0 && (
+                  <div className="bg-slate-800 border border-yellow-500 rounded p-4 mb-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-yellow-400 font-semibold flex items-center">
+                        <i className="fas fa-lightbulb mr-2"></i>
+                        MISSION HINTS ({hintsUsed}/{currentTask.hints.length})
+                      </h3>
+                      {currentHintIndex < currentTask.hints.length - 1 && (
+                        <Button
+                          onClick={handleUseHint}
+                          size="sm"
+                          className="bg-yellow-500 hover:bg-yellow-600 text-slate-900"
+                        >
+                          <i className="fas fa-lightbulb mr-1"></i>
+                          GET HINT (-10% POINTS)
+                        </Button>
+                      )}
+                    </div>
+                    
+                    {currentHintIndex >= 0 && (
+                      <div className="space-y-2">
+                        {currentTask.hints.slice(0, currentHintIndex + 1).map((hint, index) => (
+                          <div key={index} className="bg-slate-700 p-3 rounded border-l-4 border-yellow-400">
+                            <div className="text-xs text-yellow-400 mb-1">HINT {index + 1}</div>
+                            <div className="text-slate-200 text-sm">{hint}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {currentHintIndex === -1 && (
+                      <div className="text-slate-400 text-sm italic">
+                        Click "GET HINT" to reveal mission guidance. Each hint reduces your final score by 10%.
+                      </div>
+                    )}
+                  </div>
+                )}
                 
                 {/* Interactive Test Grid */}
                 <div className="bg-slate-900 border border-amber-400 rounded p-4">

@@ -3,10 +3,12 @@ export interface GameResult {
   correct: boolean;
   basePoints?: number;
   speedBonus?: number;
+  hintPenalty?: number;
   totalPoints?: number;
   newRank?: string;
   rankUp?: boolean;
   attempts?: number;
+  hintsUsed?: number;
 }
 
 export interface TimerState {
