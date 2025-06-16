@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { SPACE_EMOJIS } from "@/constants/spaceEmojis";
+import { SPACE_EMOJIS, EMOJI_SET_INFO } from "@/constants/spaceEmojis";
 import type { EmojiSet } from "@/constants/spaceEmojis";
 import { cn } from "@/lib/utils";
 
@@ -53,8 +53,35 @@ export function InteractiveGrid({
     onGridChange?.(emptyGrid);
   };
 
+  const emojiSetInfo = EMOJI_SET_INFO[emojiSet];
+
   return (
     <div className="space-y-4">
+      {/* Emoji Set Information */}
+      <div className="bg-slate-800 border border-slate-600 rounded p-3 mb-4">
+        <div className="text-center mb-3">
+          <h4 className="text-cyan-400 font-semibold text-sm">{emojiSetInfo.name}</h4>
+          <p className="text-slate-400 text-xs">{emojiSetInfo.description}</p>
+        </div>
+        
+        {/* Available Emojis Palette */}
+        <div className="flex flex-wrap justify-center gap-1 bg-slate-900 p-2 rounded">
+          {emojis.map((emoji, index) => (
+            <div
+              key={index}
+              className="w-8 h-8 flex items-center justify-center bg-slate-700 rounded text-sm border border-slate-600"
+              title={`Click cells to cycle through these emojis (${index})`}
+            >
+              {emoji}
+            </div>
+          ))}
+        </div>
+        <p className="text-center text-xs text-slate-500 mt-2">
+          Click grid cells to cycle through these symbols
+        </p>
+      </div>
+
+      {/* Interactive Grid */}
       <div 
         className="grid gap-1 bg-slate-800 p-2 rounded mx-auto w-fit"
         style={{ gridTemplateColumns: `repeat(${gridSize}, 1fr)` }}

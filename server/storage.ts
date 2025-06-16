@@ -218,8 +218,9 @@ export class MemStorage implements IStorage {
   }
 
   private initializeDefaultTasks() {
-    // Initialize with sample tasks for each category
+    // Initialize with authentic ARC-style tasks using proper emoji sets
     const defaultTasks: InsertTask[] = [
+      // O2 SENSOR CHECK TASKS - Using status_main emoji set
       {
         id: "OS-001",
         title: "Oxygen Sensor Calibration",
@@ -245,14 +246,34 @@ export class MemStorage implements IStorage {
         emojiSet: "status_main"
       },
       {
-        id: "PL-001",
-        title: "Pre-Launch Sequence Alpha",
-        description: "Critical pre-launch systems require pattern verification. Analyze the command sequences and complete the missing pattern.",
-        category: "🚀 Pre-Launch Ops",
+        id: "OS-002",
+        title: "Atmospheric Pressure Check",
+        description: "Secondary oxygen sensors need recalibration. Mirror the diagnostic pattern to restore proper atmospheric readings.",
+        category: "🛡️ O₂ Sensor Check",
+        difficulty: "Basic",
+        gridSize: 2,
+        timeLimit: null,
+        basePoints: 400,
+        requiredRankLevel: 1,
+        examples: [
+          {
+            input: [["🔴", "🟢"], ["🔵", "🟡"]],
+            output: [["🟡", "🔵"], ["🟢", "🔴"]]
+          }
+        ],
+        testInput: [["🟣", "🟠"], ["⬛", "🔴"]],
+        testOutput: [["🔴", "⬛"], ["🟠", "🟣"]],
+        emojiSet: "status_main"
+      },
+      {
+        id: "OS-003",
+        title: "Life Support Diagnostics",
+        description: "Critical life support systems require advanced pattern analysis. Complete the 3x3 oxygen flow calibration.",
+        category: "🛡️ O₂ Sensor Check",
         difficulty: "Intermediate",
         gridSize: 3,
         timeLimit: null,
-        basePoints: 750,
+        basePoints: 650,
         requiredRankLevel: 2,
         examples: [
           {
@@ -260,20 +281,20 @@ export class MemStorage implements IStorage {
             output: [["🟣", "⬛", "🔵"], ["⬛", "🟢", "⬛"], ["🔴", "⬛", "🟡"]]
           }
         ],
-        testInput: [["🟠", "⬛", "🟢"], ["⬛", "🔵", "⬛"], ["🟣", "⬛", "🟡"]],
-        testOutput: [["🟡", "⬛", "🟣"], ["⬛", "🔵", "⬛"], ["🟢", "⬛", "🟠"]],
+        testInput: [["🟠", "⬛", "🔴"], ["⬛", "🟢", "⬛"], ["🔵", "⬛", "🟡"]],
+        testOutput: [["🟡", "⬛", "🔵"], ["⬛", "🟢", "⬛"], ["🔴", "⬛", "🟠"]],
         emojiSet: "status_main"
       },
       {
-        id: "FS-001",
-        title: "Fuel Matrix Diagnostics",
-        description: "Advanced fuel mixture calculations require precise pattern matching. Complete the complex transformation sequence.",
-        category: "⚡ Fuel Systems",
+        id: "OS-004",
+        title: "Emergency O₂ Protocol",
+        description: "Emergency oxygen systems detected anomalies. Execute advanced pattern correction under time pressure.",
+        category: "🛡️ O₂ Sensor Check",
         difficulty: "Advanced",
         gridSize: 4,
-        timeLimit: 300,
-        basePoints: 1500,
-        requiredRankLevel: 5,
+        timeLimit: 240,
+        basePoints: 1200,
+        requiredRankLevel: 4,
         examples: [
           {
             input: [["🟡", "⬛", "🔴", "⬛"], ["⬛", "🟢", "⬛", "🔵"], ["🟣", "⬛", "🟠", "⬛"], ["⬛", "🟤", "⬛", "⚪"]],
@@ -283,6 +304,228 @@ export class MemStorage implements IStorage {
         testInput: [["🔴", "⬛", "🟢", "⬛"], ["⬛", "🟣", "⬛", "🟡"], ["🔵", "⬛", "🟠", "⬛"], ["⬛", "⚪", "⬛", "🟤"]],
         testOutput: [["🟤", "⬛", "⚪", "⬛"], ["⬛", "🟠", "⬛", "🔵"], ["🟡", "⬛", "🟣", "⬛"], ["⬛", "🟢", "⬛", "🔴"]],
         emojiSet: "status_main"
+      },
+
+      // PRE-LAUNCH OPS TASKS - Using tech_set1 emoji set for authentic space equipment
+      {
+        id: "PL-001",
+        title: "Pre-Launch Sequence Alpha",
+        description: "Critical pre-launch systems require pattern verification. Study the radar and equipment positioning patterns.",
+        category: "🚀 Pre-Launch Ops",
+        difficulty: "Basic",
+        gridSize: 2,
+        timeLimit: null,
+        basePoints: 450,
+        requiredRankLevel: 1,
+        examples: [
+          {
+            input: [["🛩️", "⬛"], ["⬛", "📡"]],
+            output: [["📡", "⬛"], ["⬛", "🛩️"]]
+          },
+          {
+            input: [["🔭", "⚡"], ["⬛", "⬛"]],
+            output: [["⬛", "⬛"], ["⚡", "🔭"]]
+          }
+        ],
+        testInput: [["🔋", "⬛"], ["💻", "⬛"]],
+        testOutput: [["⬛", "💻"], ["⬛", "🔋"]],
+        emojiSet: "tech_set1"
+      },
+      {
+        id: "PL-002",
+        title: "Launch Pad Systems Check",
+        description: "Launch pad systems require sequential verification. Analyze the equipment transformation sequence.",
+        category: "🚀 Pre-Launch Ops",
+        difficulty: "Intermediate",
+        gridSize: 3,
+        timeLimit: null,
+        basePoints: 750,
+        requiredRankLevel: 2,
+        examples: [
+          {
+            input: [["🛩️", "⬛", "📡"], ["⬛", "🔭", "⬛"], ["⚡", "⬛", "🔋"]],
+            output: [["🔋", "⬛", "⚡"], ["⬛", "🔭", "⬛"], ["📡", "⬛", "🛩️"]]
+          }
+        ],
+        testInput: [["💻", "⬛", "📱"], ["⬛", "🖥️", "⬛"], ["⌨️", "⬛", "🔭"]],
+        testOutput: [["🔭", "⬛", "⌨️"], ["⬛", "🖥️", "⬛"], ["📱", "⬛", "💻"]],
+        emojiSet: "tech_set1"
+      },
+      {
+        id: "PL-003",
+        title: "Rocket Engine Alignment",
+        description: "Main engine thrust vectors need calibration. Complete the complex equipment alignment pattern.",
+        category: "🚀 Pre-Launch Ops",
+        difficulty: "Advanced",
+        gridSize: 4,
+        timeLimit: 180,
+        basePoints: 1400,
+        requiredRankLevel: 4,
+        examples: [
+          {
+            input: [["🛩️", "⬛", "📡", "⬛"], ["⬛", "🔭", "⬛", "⚡"], ["🔋", "⬛", "💻", "⬛"], ["⬛", "📱", "⬛", "🖥️"]],
+            output: [["🖥️", "⬛", "📱", "⬛"], ["⬛", "💻", "⬛", "🔋"], ["⚡", "⬛", "🔭", "⬛"], ["⬛", "📡", "⬛", "🛩️"]]
+          }
+        ],
+        testInput: [["⌨️", "⬛", "🔭", "⬛"], ["⬛", "📡", "⬛", "🛩️"], ["⚡", "⬛", "💻", "⬛"], ["⬛", "🔋", "⬛", "📱"]],
+        testOutput: [["📱", "⬛", "🔋", "⬛"], ["⬛", "💻", "⬛", "⚡"], ["🛩️", "⬛", "📡", "⬛"], ["⬛", "🔭", "⬛", "⌨️"]],
+        emojiSet: "tech_set1"
+      },
+
+      // FUEL SYSTEMS TASKS - Using tech_set2 emoji set for mechanical equipment
+      {
+        id: "FS-001",
+        title: "Basic Fuel Flow Check",
+        description: "Primary fuel lines showing irregular flow patterns. Study the mechanical component patterns.",
+        category: "⚡ Fuel Systems",
+        difficulty: "Basic",
+        gridSize: 2,
+        timeLimit: null,
+        basePoints: 500,
+        requiredRankLevel: 1,
+        examples: [
+          {
+            input: [["⚙️", "⬛"], ["⬛", "🔧"]],
+            output: [["🔧", "⬛"], ["⬛", "⚙️"]]
+          },
+          {
+            input: [["🔨", "🛠️"], ["⬛", "⬛"]],
+            output: [["⬛", "⬛"], ["🛠️", "🔨"]]
+          }
+        ],
+        testInput: [["⚛️", "⬛"], ["🎛️", "⬛"]],
+        testOutput: [["⬛", "🎛️"], ["⬛", "⚛️"]],
+        emojiSet: "tech_set2"
+      },
+      {
+        id: "FS-002",
+        title: "Fuel Mixture Analysis",
+        description: "Fuel mixture ratios require adjustment. Follow the mechanical transformation pattern.",
+        category: "⚡ Fuel Systems",
+        difficulty: "Intermediate",
+        gridSize: 3,
+        timeLimit: null,
+        basePoints: 800,
+        requiredRankLevel: 3,
+        examples: [
+          {
+            input: [["⚙️", "⬛", "🔧"], ["⬛", "🔨", "⬛"], ["🛠️", "⬛", "⚛️"]],
+            output: [["⚛️", "⬛", "🛠️"], ["⬛", "🔨", "⬛"], ["🔧", "⬛", "⚙️"]]
+          }
+        ],
+        testInput: [["🖱️", "⬛", "📺"], ["⬛", "📻", "⬛"], ["🎛️", "⬛", "⚙️"]],
+        testOutput: [["⚙️", "⬛", "🎛️"], ["⬛", "📻", "⬛"], ["📺", "⬛", "🖱️"]],
+        emojiSet: "tech_set2"
+      },
+      {
+        id: "FS-003",
+        title: "Fuel Matrix Diagnostics",
+        description: "Advanced fuel mixture calculations require precise pattern matching. Complete the complex mechanical sequence.",
+        category: "⚡ Fuel Systems",
+        difficulty: "Advanced",
+        gridSize: 4,
+        timeLimit: 300,
+        basePoints: 1500,
+        requiredRankLevel: 5,
+        examples: [
+          {
+            input: [["⚙️", "⬛", "🔧", "⬛"], ["⬛", "🔨", "⬛", "🛠️"], ["⚛️", "⬛", "🖱️", "⬛"], ["⬛", "📺", "⬛", "📻"]],
+            output: [["📻", "⬛", "📺", "⬛"], ["⬛", "🖱️", "⬛", "⚛️"], ["🛠️", "⬛", "🔨", "⬛"], ["⬛", "🔧", "⬛", "⚙️"]]
+          }
+        ],
+        testInput: [["🎛️", "⬛", "⚙️", "⬛"], ["⬛", "🔧", "⬛", "🔨"], ["🛠️", "⬛", "⚛️", "⬛"], ["⬛", "🖱️", "⬛", "📺"]],
+        testOutput: [["📺", "⬛", "🖱️", "⬛"], ["⬛", "⚛️", "⬛", "🛠️"], ["🔨", "⬛", "🔧", "⬛"], ["⬛", "⚙️", "⬛", "🎛️"]],
+        emojiSet: "tech_set2"
+      },
+
+      // NAVIGATION TASKS - Using nav_alerts emoji set
+      {
+        id: "NAV-001",
+        title: "Navigation Vector Check",
+        description: "Navigation systems require directional calibration. Study the arrow transformation patterns.",
+        category: "🧭 Navigation",
+        difficulty: "Basic",
+        gridSize: 2,
+        timeLimit: null,
+        basePoints: 420,
+        requiredRankLevel: 1,
+        examples: [
+          {
+            input: [["⬆️", "⬛"], ["⬛", "⬇️"]],
+            output: [["⬇️", "⬛"], ["⬛", "⬆️"]]
+          },
+          {
+            input: [["⬅️", "➡️"], ["⬛", "⬛"]],
+            output: [["⬛", "⬛"], ["➡️", "⬅️"]]
+          }
+        ],
+        testInput: [["↗️", "⬛"], ["🧭", "⬛"]],
+        testOutput: [["⬛", "🧭"], ["⬛", "↗️"]],
+        emojiSet: "nav_alerts"
+      },
+      {
+        id: "NAV-002",
+        title: "Compass Alignment Protocol",
+        description: "Advanced navigation requires complex directional transformations. Analyze the compass pattern.",
+        category: "🧭 Navigation",
+        difficulty: "Intermediate",
+        gridSize: 3,
+        timeLimit: null,
+        basePoints: 720,
+        requiredRankLevel: 2,
+        examples: [
+          {
+            input: [["⬆️", "⬛", "⬇️"], ["⬛", "🧭", "⬛"], ["⬅️", "⬛", "➡️"]],
+            output: [["➡️", "⬛", "⬅️"], ["⬛", "🧭", "⬛"], ["⬇️", "⬛", "⬆️"]]
+          }
+        ],
+        testInput: [["↗️", "⬛", "↖️"], ["⬛", "🧭", "⬛"], ["↘️", "⬛", "↙️"]],
+        testOutput: [["↙️", "⬛", "↘️"], ["⬛", "🧭", "⬛"], ["↖️", "⬛", "↗️"]],
+        emojiSet: "nav_alerts"
+      },
+
+      // CELESTIAL OBSERVATION TASKS - Using celestial_set1 emoji set
+      {
+        id: "CEL-001",
+        title: "Planetary Alignment Check",
+        description: "Celestial bodies require observation and pattern analysis for navigation calibration.",
+        category: "🌍 Celestial Obs",
+        difficulty: "Intermediate",
+        gridSize: 3,
+        timeLimit: null,
+        basePoints: 850,
+        requiredRankLevel: 3,
+        examples: [
+          {
+            input: [["🌍", "⬛", "🌎"], ["⬛", "🌏", "⬛"], ["🌕", "⬛", "🌖"]],
+            output: [["🌖", "⬛", "🌕"], ["⬛", "🌏", "⬛"], ["🌎", "⬛", "🌍"]]
+          }
+        ],
+        testInput: [["🌗", "⬛", "🌘"], ["⬛", "🌑", "⬛"], ["🌒", "⬛", "🌍"]],
+        testOutput: [["🌍", "⬛", "🌒"], ["⬛", "🌑", "⬛"], ["🌘", "⬛", "🌗"]],
+        emojiSet: "celestial_set1"
+      },
+
+      // STELLAR NAVIGATION TASKS - Using celestial_set2 emoji set
+      {
+        id: "STAR-001",
+        title: "Stellar Navigation Array",
+        description: "Deep space navigation requires stellar pattern recognition and complex transformations.",
+        category: "⭐ Stellar Nav",
+        difficulty: "Advanced",
+        gridSize: 4,
+        timeLimit: 360,
+        basePoints: 1800,
+        requiredRankLevel: 6,
+        examples: [
+          {
+            input: [["☀️", "⬛", "⭐", "⬛"], ["⬛", "🌟", "⬛", "✨"], ["💫", "⬛", "🌠", "⬛"], ["⬛", "🪐", "⬛", "🌓"]],
+            output: [["🌓", "⬛", "🪐", "⬛"], ["⬛", "🌠", "⬛", "💫"], ["✨", "⬛", "🌟", "⬛"], ["⬛", "⭐", "⬛", "☀️"]]
+          }
+        ],
+        testInput: [["🌔", "⬛", "☀️", "⬛"], ["⬛", "⭐", "⬛", "🌟"], ["✨", "⬛", "💫", "⬛"], ["⬛", "🌠", "⬛", "🪐"]],
+        testOutput: [["🪐", "⬛", "🌠", "⬛"], ["⬛", "💫", "⬛", "✨"], ["🌟", "⬛", "⭐", "⬛"], ["⬛", "☀️", "⬛", "🌔"]],
+        emojiSet: "celestial_set2"
       }
     ];
 
