@@ -18,7 +18,7 @@ import type { EmojiSet } from "@/constants/spaceEmojis";
 export default function MissionControl() {
   // State management
   const [showOnboarding, setShowOnboarding] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string>("🛡️ O₂ Sensor Check");
+
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
   const [playerGrid, setPlayerGrid] = useState<string[][]>([]);
@@ -201,8 +201,6 @@ export default function MissionControl() {
             player={activePlayer}
             missions={tasks}
             onSelectMission={handleSelectTask}
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
           />
         ) : (
           <div className="space-y-6">
