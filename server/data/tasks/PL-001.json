@@ -22,8 +22,8 @@
   "testInput": [["🔋", "⬛"], ["💻", "⬛"]],
   "testOutput": [["⬛", "💻"], ["⬛", "🔋"]],
   "hints": [
-    "Observe how the equipment symbols change positions.",
-    "The pattern is a diagonal swap of non-black items.",
-    "Equipment in top-left moves to bottom-right and vice versa."
+    "Look at how equipment positions change between input and output.",
+    "The transformation swaps elements diagonally across the grid.",
+    "Each non-empty cell moves to the opposite diagonal position."
   ]
 }

@@ -120,12 +120,7 @@ export class MemStorage implements IStorage {
     const id = this.currentPlayerId++;
     const now = new Date();
     const player: Player = {
-      userId: insertPlayer.userId || null,
-      rank: insertPlayer.rank || "Specialist 1",
-      rankLevel: insertPlayer.rankLevel || 1,
-      totalPoints: insertPlayer.totalPoints || 0,
-      completedMissions: insertPlayer.completedMissions || 0,
-      currentTask: insertPlayer.currentTask || null,
+      ...insertPlayer,
       id,
       createdAt: now,
       updatedAt: now,
@@ -172,8 +167,15 @@ export class MemStorage implements IStorage {
   }
 
   async createTask(task: InsertTask): Promise<Task> {
-    this.tasks.set(task.id, task);
-    return task;
+    const fullTask: Task = {
+      ...task,
+      timeLimit: task.timeLimit ?? null,
+      requiredRankLevel: task.requiredRankLevel ?? 1,
+      emojiSet: task.emojiSet ?? 'status_main',
+      hints: task.hints ?? []
+    };
+    this.tasks.set(task.id, fullTask);
+    return fullTask;
   }
 
   // Player task progress
@@ -186,7 +188,7 @@ export class MemStorage implements IStorage {
 
   async getPlayerTasks(playerId: number): Promise<PlayerTask[]> {
     return Array.from(this.playerTasks.values()).filter(
-      (pt) => pt.playerId === playerId,
+      (playerTask) => playerTask.playerId === playerId,
     );
   }
 
@@ -195,17 +197,11 @@ export class MemStorage implements IStorage {
   ): Promise<PlayerTask> {
     const id = this.currentPlayerTaskId++;
     const playerTask: PlayerTask = {
+      ...insertPlayerTask,
       id,
-      playerId: insertPlayerTask.playerId!,
-      taskId: insertPlayerTask.taskId!,
-      completed: insertPlayerTask.completed || false,
-      attempts: insertPlayerTask.attempts || 0,
-      bestTime: insertPlayerTask.bestTime || null,
-      pointsEarned: insertPlayerTask.pointsEarned || 0,
-      lastAttemptAt: new Date(),
     };
     this.playerTasks.set(
-      `${playerTask.playerId}-${playerTask.taskId}`,
+      `${insertPlayerTask.playerId}-${insertPlayerTask.taskId}`,
       playerTask,
     );
     return playerTask;
@@ -223,7 +219,6 @@ export class MemStorage implements IStorage {
     const updatedPlayerTask: PlayerTask = {
       ...playerTask,
       ...updates,
-      lastAttemptAt: new Date(),
     };
     this.playerTasks.set(key, updatedPlayerTask);
     return updatedPlayerTask;
@@ -243,7 +238,7 @@ export class MemStorage implements IStorage {
       createdAt: now,
       updatedAt: now,
     };
-    this.gameStates.set(gameState.playerId!, gameState);
+    this.gameStates.set(insertGameState.playerId!, gameState);
     return gameState;
   }
 
@@ -281,575 +276,6 @@ export class MemStorage implements IStorage {
       // Fallback to prevent empty task list
       console.log('Falling back to empty task list - add JSON files to server/data/tasks/');
     }
-  }
-
-  private initializeDefaultTasks() {
-    // Legacy method - now replaced by JSON task loading
-    console.log('Legacy task initialization method called - use JSON files instead');
-  }
-  
-  private legacyHardcodedTasks() {
-    // All hardcoded task data removed - replaced with modular JSON files
-    console.log('Legacy hardcoded task method - replaced by JSON loader');
-  }
-}
-
-export const storage = new MemStorage();
-            input: [
-              ["🟡", "⬛"],
-              ["⬛", "🔴"],
-            ],
-            output: [
-              ["🔴", "⬛"],
-              ["⬛", "🟡"],
-            ],
-          },
-          {
-            input: [
-              ["🟢", "🔵"],
-              ["⬛", "⬛"],
-            ],
-            output: [
-              ["⬛", "⬛"],
-              ["🔵", "🟢"],
-            ],
-          },
-        ],
-        testInput: [
-          ["🟣", "⬛"],
-          ["🟠", "⬛"],
-        ],
-        testOutput: [
-          ["⬛", "🟠"],
-          ["⬛", "🟣"],
-        ],
-        emojiSet: "status_main",
-      },
-      {
-        id: "OS-002",
-        title: "Recalibration",
-        description:
-          "Secondary oxygen sensors need recalibration. Here's what worked before, can you recalibrate our setting to restore proper atmospheric readings?",
-        category: "🛡️ O₂ Sensor Check",
-        difficulty: "Basic",
-        gridSize: 2,
-        timeLimit: null,
-        basePoints: 400,
-        requiredRankLevel: 1,
-        examples: [
-          {
-            input: [
-              ["🔴", "🟢"],
-              ["🔵", "🟡"],
-            ],
-            output: [
-              ["🟡", "🔵"],
-              ["🟢", "🔴"],
-            ],
-          },
-        ],
-        testInput: [
-          ["🟣", "🟠"],
-          ["⬛", "🔴"],
-        ],
-        testOutput: [
-          ["🔴", "⬛"],
-          ["🟠", "🟣"],
-        ],
-        emojiSet: "status_main",
-      },
-      {
-        id: "OS-003",
-        title: "Life Support Diagnostics",
-        description:
-          "Critical life support systems require advanced pattern analysis. Complete the 3x3 oxygen flow calibration.",
-        category: "🛡️ O₂ Sensor Check",
-        difficulty: "Intermediate",
-        gridSize: 3,
-        timeLimit: null,
-        basePoints: 650,
-        requiredRankLevel: 2,
-        examples: [
-          {
-            input: [
-              ["🟡", "⬛", "🔴"],
-              ["⬛", "🟢", "⬛"],
-              ["🔵", "⬛", "🟣"],
-            ],
-            output: [
-              ["🟣", "⬛", "🔵"],
-              ["⬛", "🟢", "⬛"],
-              ["🔴", "⬛", "🟡"],
-            ],
-          },
-        ],
-        testInput: [
-          ["🟠", "⬛", "🔴"],
-          ["⬛", "🟢", "⬛"],
-          ["🔵", "⬛", "🟡"],
-        ],
-        testOutput: [
-          ["🟡", "⬛", "🔵"],
-          ["⬛", "🟢", "⬛"],
-          ["🔴", "⬛", "🟠"],
-        ],
-        emojiSet: "status_main",
-      },
-      {
-        id: "OS-004",
-        title: "Emergency O₂ Protocol",
-        description:
-          "Emergency oxygen systems detected anomalies. Execute advanced pattern correction.",
-        category: "🛡️ O₂ Sensor Check",
-        difficulty: "Advanced",
-        gridSize: 4,
-        timeLimit: null,
-        basePoints: 1200,
-        requiredRankLevel: 4,
-        examples: [
-          {
-            input: [
-              ["🟡", "⬛", "🔴", "⬛"],
-              ["⬛", "🟢", "⬛", "🔵"],
-              ["🟣", "⬛", "🟠", "⬛"],
-              ["⬛", "🟤", "⬛", "⚪"],
-            ],
-            output: [
-              ["⚪", "⬛", "🟤", "⬛"],
-              ["⬛", "🟠", "⬛", "🟣"],
-              ["🔵", "⬛", "🟢", "⬛"],
-              ["⬛", "🔴", "⬛", "🟡"],
-            ],
-          },
-        ],
-        testInput: [
-          ["🔴", "⬛", "🟢", "⬛"],
-          ["⬛", "🟣", "⬛", "🟡"],
-          ["🔵", "⬛", "🟠", "⬛"],
-          ["⬛", "⚪", "⬛", "🟤"],
-        ],
-        testOutput: [
-          ["🟤", "⬛", "⚪", "⬛"],
-          ["⬛", "🟠", "⬛", "🔵"],
-          ["🟡", "⬛", "🟣", "⬛"],
-          ["⬛", "🟢", "⬛", "🔴"],
-        ],
-        emojiSet: "status_main",
-      },
-
-      // PRE-LAUNCH OPS TASKS - Using tech_set1 emoji set for authentic space equipment
-      {
-        id: "PL-001",
-        title: "Pre-Launch Sequence Alpha",
-        description:
-          "Critical pre-launch systems require pattern verification. Study the radar and equipment positioning patterns.",
-        category: "🚀 Pre-Launch Ops",
-        difficulty: "Basic",
-        gridSize: 2,
-        timeLimit: null,
-        basePoints: 450,
-        requiredRankLevel: 1,
-        examples: [
-          {
-            input: [
-              ["🛩️", "⬛"],
-              ["⬛", "📡"],
-            ],
-            output: [
-              ["📡", "⬛"],
-              ["⬛", "🛩️"],
-            ],
-          },
-          {
-            input: [
-              ["🔭", "⚡"],
-              ["⬛", "⬛"],
-            ],
-            output: [
-              ["⬛", "⬛"],
-              ["⚡", "🔭"],
-            ],
-          },
-        ],
-        testInput: [
-          ["🔋", "⬛"],
-          ["💻", "⬛"],
-        ],
-        testOutput: [
-          ["⬛", "💻"],
-          ["⬛", "🔋"],
-        ],
-        emojiSet: "tech_set1",
-      },
-      {
-        id: "PL-002",
-        title: "Launch Pad Systems Check",
-        description:
-          "Launch pad systems require sequential verification. Analyze the equipment transformation sequence.",
-        category: "🚀 Pre-Launch Ops",
-        difficulty: "Intermediate",
-        gridSize: 3,
-        timeLimit: null,
-        basePoints: 750,
-        requiredRankLevel: 2,
-        examples: [
-          {
-            input: [
-              ["🛩️", "⬛", "📡"],
-              ["⬛", "🔭", "⬛"],
-              ["⚡", "⬛", "🔋"],
-            ],
-            output: [
-              ["🔋", "⬛", "⚡"],
-              ["⬛", "🔭", "⬛"],
-              ["📡", "⬛", "🛩️"],
-            ],
-          },
-        ],
-        testInput: [
-          ["💻", "⬛", "📱"],
-          ["⬛", "🖥️", "⬛"],
-          ["⌨️", "⬛", "🔭"],
-        ],
-        testOutput: [
-          ["🔭", "⬛", "⌨️"],
-          ["⬛", "🖥️", "⬛"],
-          ["📱", "⬛", "💻"],
-        ],
-        emojiSet: "tech_set1",
-      },
-      {
-        id: "PL-003",
-        title: "Rocket Engine Alignment",
-        description:
-          "Main engine thrust vectors need calibration. Complete the complex equipment alignment pattern.",
-        category: "🚀 Pre-Launch Ops",
-        difficulty: "Advanced",
-        gridSize: 4,
-        timeLimit: null,
-        basePoints: 1400,
-        requiredRankLevel: 4,
-        examples: [
-          {
-            input: [
-              ["🛩️", "⬛", "📡", "⬛"],
-              ["⬛", "🔭", "⬛", "⚡"],
-              ["🔋", "⬛", "💻", "⬛"],
-              ["⬛", "📱", "⬛", "🖥️"],
-            ],
-            output: [
-              ["🖥️", "⬛", "📱", "⬛"],
-              ["⬛", "💻", "⬛", "🔋"],
-              ["⚡", "⬛", "🔭", "⬛"],
-              ["⬛", "📡", "⬛", "🛩️"],
-            ],
-          },
-        ],
-        testInput: [
-          ["⌨️", "⬛", "🔭", "⬛"],
-          ["⬛", "📡", "⬛", "🛩️"],
-          ["⚡", "⬛", "💻", "⬛"],
-          ["⬛", "🔋", "⬛", "📱"],
-        ],
-        testOutput: [
-          ["📱", "⬛", "🔋", "⬛"],
-          ["⬛", "💻", "⬛", "⚡"],
-          ["🛩️", "⬛", "📡", "⬛"],
-          ["⬛", "🔭", "⬛", "⌨️"],
-        ],
-        emojiSet: "tech_set1",
-      },
-
-      // FUEL SYSTEMS TASKS - Using tech_set2 emoji set for mechanical equipment
-      {
-        id: "FS-001",
-        title: "Basic Fuel Flow Check",
-        description:
-          "Primary fuel lines showing irregular flow patterns. Study the mechanical component patterns.",
-        category: "⚡ Fuel Systems",
-        difficulty: "Basic",
-        gridSize: 2,
-        timeLimit: null,
-        basePoints: 500,
-        requiredRankLevel: 1,
-        examples: [
-          {
-            input: [
-              ["⚙️", "⬛"],
-              ["⬛", "🔧"],
-            ],
-            output: [
-              ["🔧", "⬛"],
-              ["⬛", "⚙️"],
-            ],
-          },
-          {
-            input: [
-              ["🔨", "🛠️"],
-              ["⬛", "⬛"],
-            ],
-            output: [
-              ["⬛", "⬛"],
-              ["🛠️", "🔨"],
-            ],
-          },
-        ],
-        testInput: [
-          ["⚛️", "⬛"],
-          ["🎛️", "⬛"],
-        ],
-        testOutput: [
-          ["⬛", "🎛️"],
-          ["⬛", "⚛️"],
-        ],
-        emojiSet: "tech_set2",
-      },
-      {
-        id: "FS-002",
-        title: "Fuel Mixture Analysis",
-        description:
-          "Fuel mixture ratios require adjustment. Follow the mechanical transformation pattern.",
-        category: "⚡ Fuel Systems",
-        difficulty: "Intermediate",
-        gridSize: 3,
-        timeLimit: null,
-        basePoints: 800,
-        requiredRankLevel: 3,
-        examples: [
-          {
-            input: [
-              ["⚙️", "⬛", "🔧"],
-              ["⬛", "🔨", "⬛"],
-              ["🛠️", "⬛", "⚛️"],
-            ],
-            output: [
-              ["⚛️", "⬛", "🛠️"],
-              ["⬛", "🔨", "⬛"],
-              ["🔧", "⬛", "⚙️"],
-            ],
-          },
-        ],
-        testInput: [
-          ["🖱️", "⬛", "📺"],
-          ["⬛", "📻", "⬛"],
-          ["🎛️", "⬛", "⚙️"],
-        ],
-        testOutput: [
-          ["⚙️", "⬛", "🎛️"],
-          ["⬛", "📻", "⬛"],
-          ["📺", "⬛", "🖱️"],
-        ],
-        emojiSet: "tech_set2",
-      },
-      {
-        id: "FS-003",
-        title: "Fuel Matrix Diagnostics",
-        description:
-          "Advanced fuel mixture calculations require precise pattern matching. Complete the complex mechanical sequence.",
-        category: "⚡ Fuel Systems",
-        difficulty: "Advanced",
-        gridSize: 4,
-        timeLimit: 30000,
-        basePoints: 1500,
-        requiredRankLevel: 5,
-        examples: [
-          {
-            input: [
-              ["⚙️", "⬛", "🔧", "⬛"],
-              ["⬛", "🔨", "⬛", "🛠️"],
-              ["⚛️", "⬛", "🖱️", "⬛"],
-              ["⬛", "📺", "⬛", "📻"],
-            ],
-            output: [
-              ["📻", "⬛", "📺", "⬛"],
-              ["⬛", "🖱️", "⬛", "⚛️"],
-              ["🛠️", "⬛", "🔨", "⬛"],
-              ["⬛", "🔧", "⬛", "⚙️"],
-            ],
-          },
-        ],
-        testInput: [
-          ["🎛️", "⬛", "⚙️", "⬛"],
-          ["⬛", "🔧", "⬛", "🔨"],
-          ["🛠️", "⬛", "⚛️", "⬛"],
-          ["⬛", "🖱️", "⬛", "📺"],
-        ],
-        testOutput: [
-          ["📺", "⬛", "🖱️", "⬛"],
-          ["⬛", "⚛️", "⬛", "🛠️"],
-          ["🔨", "⬛", "🔧", "⬛"],
-          ["⬛", "⚙️", "⬛", "🎛️"],
-        ],
-        emojiSet: "tech_set2",
-      },
-
-      // NAVIGATION TASKS - Using nav_alerts emoji set
-      {
-        id: "NAV-001",
-        title: "Navigation Vector Check",
-        description:
-          "Navigation systems require directional calibration. Study the arrow transformation patterns.",
-        category: "🧭 Navigation",
-        difficulty: "Basic",
-        gridSize: 2,
-        timeLimit: null,
-        basePoints: 420,
-        requiredRankLevel: 1,
-        examples: [
-          {
-            input: [
-              ["⬆️", "⬛"],
-              ["⬛", "⬇️"],
-            ],
-            output: [
-              ["⬇️", "⬛"],
-              ["⬛", "⬆️"],
-            ],
-          },
-          {
-            input: [
-              ["⬅️", "➡️"],
-              ["⬛", "⬛"],
-            ],
-            output: [
-              ["⬛", "⬛"],
-              ["➡️", "⬅️"],
-            ],
-          },
-        ],
-        testInput: [
-          ["↗️", "⬛"],
-          ["🧭", "⬛"],
-        ],
-        testOutput: [
-          ["⬛", "🧭"],
-          ["⬛", "↗️"],
-        ],
-        emojiSet: "nav_alerts",
-      },
-      {
-        id: "NAV-002",
-        title: "Compass Alignment Protocol",
-        description:
-          "Advanced navigation requires complex directional transformations. Analyze the compass pattern.",
-        category: "🧭 Navigation",
-        difficulty: "Intermediate",
-        gridSize: 3,
-        timeLimit: null,
-        basePoints: 720,
-        requiredRankLevel: 2,
-        examples: [
-          {
-            input: [
-              ["⬆️", "⬛", "⬇️"],
-              ["⬛", "🧭", "⬛"],
-              ["⬅️", "⬛", "➡️"],
-            ],
-            output: [
-              ["➡️", "⬛", "⬅️"],
-              ["⬛", "🧭", "⬛"],
-              ["⬇️", "⬛", "⬆️"],
-            ],
-          },
-        ],
-        testInput: [
-          ["↗️", "⬛", "↖️"],
-          ["⬛", "🧭", "⬛"],
-          ["↘️", "⬛", "↙️"],
-        ],
-        testOutput: [
-          ["↙️", "⬛", "↘️"],
-          ["⬛", "🧭", "⬛"],
-          ["↖️", "⬛", "↗️"],
-        ],
-        emojiSet: "nav_alerts",
-      },
-
-      // CELESTIAL OBSERVATION TASKS - Using celestial_set1 emoji set
-      {
-        id: "CEL-001",
-        title: "Planetary Alignment Check",
-        description:
-          "Celestial bodies require observation and pattern analysis for navigation calibration.",
-        category: "🌍 Celestial Obs",
-        difficulty: "Intermediate",
-        gridSize: 3,
-        timeLimit: null,
-        basePoints: 850,
-        requiredRankLevel: 3,
-        examples: [
-          {
-            input: [
-              ["🌍", "⬛", "🌎"],
-              ["⬛", "🌏", "⬛"],
-              ["🌕", "⬛", "🌖"],
-            ],
-            output: [
-              ["🌖", "⬛", "🌕"],
-              ["⬛", "🌏", "⬛"],
-              ["🌎", "⬛", "🌍"],
-            ],
-          },
-        ],
-        testInput: [
-          ["🌗", "⬛", "🌘"],
-          ["⬛", "🌑", "⬛"],
-          ["🌒", "⬛", "🌍"],
-        ],
-        testOutput: [
-          ["🌍", "⬛", "🌒"],
-          ["⬛", "🌑", "⬛"],
-          ["🌘", "⬛", "🌗"],
-        ],
-        emojiSet: "celestial_set1",
-      },
-
-      // STELLAR NAVIGATION TASKS - Using celestial_set2 emoji set
-      {
-        id: "STAR-001",
-        title: "Stellar Navigation Array",
-        description:
-          "Deep space navigation requires stellar pattern recognition and complex transformations.",
-        category: "⭐ Stellar Nav",
-        difficulty: "Advanced",
-        gridSize: 4,
-        timeLimit: 360,
-        basePoints: 1800,
-        requiredRankLevel: 6,
-        examples: [
-          {
-            input: [
-              ["☀️", "⬛", "⭐", "⬛"],
-              ["⬛", "🌟", "⬛", "✨"],
-              ["💫", "⬛", "🌠", "⬛"],
-              ["⬛", "🪐", "⬛", "🌓"],
-            ],
-            output: [
-              ["🌓", "⬛", "🪐", "⬛"],
-              ["⬛", "🌠", "⬛", "💫"],
-              ["✨", "⬛", "🌟", "⬛"],
-              ["⬛", "⭐", "⬛", "☀️"],
-            ],
-          },
-        ],
-        testInput: [
-          ["🌔", "⬛", "☀️", "⬛"],
-          ["⬛", "⭐", "⬛", "🌟"],
-          ["✨", "⬛", "💫", "⬛"],
-          ["⬛", "🌠", "⬛", "🪐"],
-        ],
-        testOutput: [
-          ["🪐", "⬛", "🌠", "⬛"],
-          ["⬛", "💫", "⬛", "✨"],
-          ["🌟", "⬛", "⭐", "⬛"],
-          ["⬛", "☀️", "⬛", "🌔"],
-        ],
-        emojiSet: "celestial_set2",
-      },
-    ];
-
-    // Legacy hardcoded tasks removed - now using JSON task files
-    console.log('Legacy task initialization method called - use JSON files instead');
   }
 }
 
