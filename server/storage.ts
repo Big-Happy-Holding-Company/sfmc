@@ -227,7 +227,7 @@ export class MemStorage implements IStorage {
         category: "🛡️ O₂ Sensor Check",
         difficulty: "Basic",
         gridSize: 2,
-        timeLimit: 60,
+        timeLimit: null,
         basePoints: 350,
         requiredRankLevel: 1,
         examples: [
@@ -251,7 +251,7 @@ export class MemStorage implements IStorage {
         category: "🚀 Pre-Launch Ops",
         difficulty: "Intermediate",
         gridSize: 3,
-        timeLimit: 180,
+        timeLimit: null,
         basePoints: 750,
         requiredRankLevel: 2,
         examples: [
