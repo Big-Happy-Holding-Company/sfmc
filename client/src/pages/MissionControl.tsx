@@ -241,12 +241,12 @@ export default function MissionControl() {
                 <div className="bg-slate-900 border border-amber-400 rounded p-4">
                   <h3 className="text-amber-400 font-semibold mb-3 flex items-center">
                     <i className="fas fa-crosshairs mr-2"></i>
-                    YOUR MISSION: SOLVE THE PATTERN
+                    YOUR TASK: SOLVE THE PATTERN
                   </h3>
                   
                   <div className="flex items-center justify-center space-x-8 mb-6">
                     <div>
-                      {renderExampleGrid(currentMission.testInput as string[][], "TEST INPUT")}
+                      {renderExampleGrid(currentTask.testInput as string[][], "TEST INPUT")}
                     </div>
                     
                     <div className="text-cyan-400 text-2xl">→</div>
@@ -254,8 +254,8 @@ export default function MissionControl() {
                     <div>
                       <div className="text-xs text-slate-400 mb-2 text-center">YOUR OUTPUT</div>
                       <InteractiveGrid
-                        gridSize={currentMission.gridSize}
-                        emojiSet={currentMission.emojiSet as EmojiSet}
+                        gridSize={currentTask.gridSize}
+                        emojiSet={currentTask.emojiSet as EmojiSet}
                         onGridChange={setPlayerGrid}
                         disabled={validateSolutionMutation.isPending}
                       />
@@ -270,11 +270,11 @@ export default function MissionControl() {
                       <i className="fas fa-lightbulb mr-2"></i>HINT
                     </Button>
                     <Button
-                      onClick={handleSolveMission}
+                      onClick={handleSolveTask}
                       disabled={validateSolutionMutation.isPending}
                       className="bg-green-400 hover:bg-green-500 text-slate-900"
                     >
-                      <i className="fas fa-check mr-2"></i>EXECUTE MISSION
+                      <i className="fas fa-check mr-2"></i>EXECUTE TASK
                     </Button>
                     <Button
                       variant="outline"

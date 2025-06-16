@@ -2,13 +2,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MISSION_CATEGORIES, DIFFICULTY_COLORS } from "@/data/missions";
 import { getRankProgress } from "@/data/ranks";
-import type { Mission, Player } from "@shared/schema";
+import type { Task, Player } from "@shared/schema";
 import { cn } from "@/lib/utils";
 
 interface MissionSelectorProps {
   player: Player;
-  missions: Mission[];
-  onSelectMission: (mission: Mission) => void;
+  missions: Task[];
+  onSelectMission: (task: Task) => void;
   selectedCategory?: string;
   onSelectCategory: (category: string) => void;
 }
