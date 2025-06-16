@@ -1,0 +1,29 @@
+{
+  "id": "FS-001",
+  "title": "Basic Fuel Flow Check",
+  "description": "Primary fuel lines showing irregular flow patterns. Study the mechanical component patterns.",
+  "category": "⚡ Fuel Systems",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 500,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [["⚙️", "⬛"], ["⬛", "🔧"]],
+      "output": [["🔧", "⬛"], ["⬛", "⚙️"]]
+    },
+    {
+      "input": [["🔨", "🛠️"], ["⬛", "⬛"]],
+      "output": [["⬛", "⬛"], ["🛠️", "🔨"]]
+    }
+  ],
+  "testInput": [["⚛️", "⬛"], ["🎛️", "⬛"]],
+  "testOutput": [["⬛", "🎛️"], ["⬛", "⚛️"]],
+  "hints": [
+    "Notice how the mechanical components change positions.",
+    "The transformation swaps items diagonally across the grid.",
+    "Top-left and bottom-right positions are exchanged."
+  ]
+}

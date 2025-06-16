@@ -17,6 +17,7 @@ import {
   type InsertGameState,
   type UpdateGameState,
 } from "@shared/schema";
+import { taskLoader } from "./services/taskLoader";
 
 export interface IStorage {
   // User operations
@@ -82,8 +83,8 @@ export class MemStorage implements IStorage {
     this.currentPlayerTaskId = 1;
     this.currentGameStateId = 1;
 
-    // Initialize with default tasks
-    this.initializeDefaultTasks();
+    // Initialize tasks from JSON files asynchronously
+    this.initializeTasks().catch(console.error);
   }
 
   // User operations
@@ -266,7 +267,24 @@ export class MemStorage implements IStorage {
     this.gameStates.delete(playerId);
   }
 
+  private async initializeTasks() {
+    try {
+      const loadedTasks = await taskLoader.loadAllTasks();
+      
+      loadedTasks.forEach(task => {
+        this.tasks.set(task.id, task);
+      });
+      
+      console.log(`Loaded ${loadedTasks.length} tasks from JSON files`);
+    } catch (error) {
+      console.error('Error loading tasks:', error);
+      // Fallback to prevent empty task list
+      console.log('Falling back to empty task list - add JSON files to server/data/tasks/');
+    }
+  }
+
   private initializeDefaultTasks() {
+    // Legacy method - now replaced by JSON task loading
     // Initialize with authentic ARC-style tasks using proper emoji sets
     const defaultTasks: InsertTask[] = [
       // O2 SENSOR CHECK TASKS - Using status_main emoji set
