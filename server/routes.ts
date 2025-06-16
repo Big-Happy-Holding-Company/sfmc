@@ -14,6 +14,7 @@ const validateSolutionSchema = z.object({
   taskId: z.string(),
   solution: z.array(z.array(z.string())),
   timeElapsed: z.number().optional(),
+  hintsUsed: z.number().optional().default(0),
 });
 
 const createDefaultPlayerSchema = z.object({
@@ -188,7 +189,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/players/:playerId/validate-solution", async (req, res) => {
     try {
       const playerId = parseInt(req.params.playerId);
-      const { taskId, solution, timeElapsed } = validateSolutionSchema.parse(req.body);
+      const { taskId, solution, timeElapsed, hintsUsed } = validateSolutionSchema.parse(req.body);
       
       const task = await storage.getTask(taskId);
       if (!task) {
@@ -222,9 +223,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       if (isCorrect) {
-        // Calculate points with time bonus
+        // Calculate points with time bonus and hint penalty
         let points = task.basePoints;
         let speedBonus = 0;
+        let hintPenalty = 0;
         
         if (timeElapsed && task.timeLimit) {
           const remainingTime = task.timeLimit - timeElapsed;
@@ -232,6 +234,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             speedBonus = Math.floor((remainingTime / task.timeLimit) * task.basePoints * 0.5);
             points += speedBonus;
           }
+        }
+        
+        // Apply hint penalty (10% reduction per hint used)
+        if (hintsUsed > 0) {
+          hintPenalty = Math.floor(points * (hintsUsed * 0.1));
+          points = Math.max(1, points - hintPenalty); // Ensure at least 1 point
         }
         
         // Update player task

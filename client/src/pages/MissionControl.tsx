@@ -26,6 +26,8 @@ export default function MissionControl() {
   const [showResult, setShowResult] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [isTimerActive, setIsTimerActive] = useState(false);
+  const [hintsUsed, setHintsUsed] = useState(0);
+  const [currentHintIndex, setCurrentHintIndex] = useState(-1);
 
   // Create default player on load
   const createPlayerMutation = useMutation({
@@ -91,6 +93,10 @@ export default function MissionControl() {
     setStartTime(Date.now());
     setIsTimerActive(true); // Always start timer for speed tracking
     
+    // Reset hint state
+    setHintsUsed(0);
+    setCurrentHintIndex(-1);
+    
     // Initialize empty grid
     const emptyGrid = Array(task.gridSize).fill(null).map(() => 
       Array(task.gridSize).fill(SPACE_EMOJIS[task.emojiSet as EmojiSet][0])
@@ -108,6 +114,7 @@ export default function MissionControl() {
       taskId: currentTask.id,
       solution: playerGrid,
       timeElapsed,
+      hintsUsed,
     });
   };
 
@@ -115,6 +122,16 @@ export default function MissionControl() {
     // Auto-submit when time runs out
     if (currentTask && activePlayer) {
       handleSolveTask();
+    }
+  };
+
+  const handleUseHint = () => {
+    if (!currentTask || !currentTask.hints) return;
+    
+    const nextHintIndex = currentHintIndex + 1;
+    if (nextHintIndex < currentTask.hints.length) {
+      setCurrentHintIndex(nextHintIndex);
+      setHintsUsed(hintsUsed + 1);
     }
   };
 
