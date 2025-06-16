@@ -1,0 +1,126 @@
+# 🚀 Mission Control 2045
+*Author: Cascade – 2025-06-14*
+
+Welcome, cadet!  You are now part of the **US Space Force Operations Center** where computers crunch numbers, but humans perceive the bigger picture.  This game is based on the ARC (Artificial Reasoning Challenge) puzzle series.  Your job is to study example **INPUT → OUTPUT** emoji-grids, spot the transformation logic, and apply it to new test grids to solve problems at mission control.
+
+
+## Rank Ladder & Puzzle Specs
+| Rank | Icon | Grid In → Out | Time Limit | Mission Theme |
+|------|------|---------------|-----------|---------------|
+| Specialist 1 (E-1) | 🪖 | 2×2 → 2×2 | — | O₂ sensor check |
+| Specialist 2 (E-2) | 🪖🪖 | 2×2 → 2×2 | ≤ 60 s | Pre-launch checklist #1 |
+| Specialist 3 (E-3) | 🪖🪖🪖 | 3×3 → 3×3 | — | Pre-launch checklist #2 |
+| Specialist 4 (E-4) | 🪖⭐ | 3×3 → 3×3 | ≤ 5 min | Pre-launch checklist #3 |
+| Sergeant (E-5) | ⭐ | 4×4 → 4×4 | Prototype promotion test |
+| Second Lieutenant (O-1) | 🎖️ | 3×3 → 4×4 | Officer candidacy test |
+
+You may attempt higher-rank tests early.  Failure only costs time.
+
+---
+
+## Gameplay Basics
+1. **Study Examples** – Each mission shows two or more example grids.
+2. **Infer Logic** – Determine how the input transforms into the output.
+3. **Control Panel** – Click cells in *YOUR OUTPUT* grid to cycle through allowed emojis.
+4. **Execute Mission** – Hit *Solve* to validate your solution.
+5. **Hints** – If you’re stuck, reveal incremental hints or the full solution.
+
+Score, rank, and mission status display in the HUD.  Timed ranks show a countdown.
+
+---
+
+## Repository Layout
+```text
+│  README.md            ← You are here
+│  space_mission_control.tsx  ← Main React component (will be refactored)
+│
+├─data/
+│   ├─missions.ts       ← Puzzle definitions (emoji grids)
+│   └─ranks.ts          ← Rank metadata & thresholds
+│
+├─components/           ← UI pieces (to be scaffolded)
+│   ├─OnboardingModal.tsx
+│   ├─MissionSelector.tsx
+│   ├─RankBadge.tsx
+│   └─Timer.tsx
+│
+└─docs/
+    ├─game_plan.md      ← Design & technical roadmap
+    └─CHANGELOG.md      ← Chronological feature log
+```
+
+---
+
+## Contributing
+* Keep modules small & commented—remember future cadets!
+* Update `docs/CHANGELOG.md` with every feature (timestamp + author).
+* Use environment variables via `.env` when backend endpoints arrive.
+
+Fly safe, cadet — pattern mastery is mission success!
+
+---
+
+## Emoji Palette Standard
+*Updated: 2025-06-15 – o3 (high reasoning)*
+
+All emojis used in puzzles and UI are defined **once** in `constants/spaceEmojis.ts`.
+Each set is exactly 10 emojis and index 0 is always “⬛” to map cleanly onto ARC colour 0.
+
+```ts
+import { SPACE_EMOJIS } from './constants/spaceEmojis';
+const statusYellow = SPACE_EMOJIS.status_main[1]; // 🟡
+```
+
+Whenever you need an emoji, import from this file—do **not** re-define arrays elsewhere.  This keeps the whole app visually consistent and makes future palette tweaks trivial.
+
+
+
+Here are some references for "General" level puzzles:
+https://arcprize.org/play?task=321b1fc6
+https://arcprize.org/play?task=2dd70a9a
+
+
+Use these as teasers for the player!  
+<!--
+Author: Cascade
+Date: 2025-06-15
+File: docs/Emojis.md
+Description: Centralised ARC-compatible emoji palette.  Each theme contains exactly 10 emojis that map one-to-one to the ARC colour indices 0-9.  Index 0 is always an obviously black square ⬛ acting as the "background" / colour-0 token; indices 1-9 follow the canonical ARC order (blue, red, green, yellow, grey, magenta, orange, cyan, brown).  Down-stream game code can therefore treat the array index as the colour digit.
+-->
+
+```typescript
+// ARC-aligned space emoji palette
+// -------------------------------------------------------------
+// Every list is exactly length-10, enabling a direct mapping of
+// emoji index → ARC colour digit (0-9).  This avoids null cells
+// in our grids: colour-0 (black) is explicitly the first emoji.
+// -------------------------------------------------------------
+export const SPACE_EMOJIS = {
+  // Status - Main Set
+  status_main: ['⬛', '🟡', '🔴', '🟠', '🔵', '🟣', '⚪', '🟢', '🟤', '🚫'],
+
+  // Celestial Bodies - Set 1
+  celestial_set1: ['⬛', '🌍', '🌎', '🌏', '🌕', '🌖', '🌗', '🌘', '🌑', '🌒'],
+
+  // Celestial Bodies - Set 2  
+  celestial_set2: ['⬛', '🌓', '🌔', '☀️', '⭐', '🌟', '✨', '💫', '🌠', '🪐'],
+
+  // Technology & Equipment - Set 1
+  tech_set1: ['⬛', '🛩️', '📡', '🔭', '⚡', '🔋', '💻', '📱', '🖥️', '⌨️'],
+
+  // Technology & Equipment - Set 2
+  tech_set2: ['⬛', '🖱️', '📺', '📻', '🎛️', '⚙️', '🔧', '🔨', '🛠️', '⚛️'],
+
+  // Navigation & Alerts
+  nav_alerts: ['⬛', '⬆️', '⬇️', '⬅️', '➡️', '↗️', '↖️', '↘️', '↙️', '🧭'],
+
+  // Status & Alerts
+  status_alerts: ['⬛', '✅', '❌', '⚠️', '🚨', '🦺', '🔥', '❄️', '📍', '🎯'],
+
+  // Weather & Climate
+  weather_climate: ['⬛', '🌞', '🌝', '🌛', '🌜', '🌧️', '⛈️', '🌩️', '🌨️', '❄️']
+} as const;
+```
+
+> **Note**  
+> If an additional thematic palette is needed just ensure it obeys the same 10-emoji/colour ordering convention.
