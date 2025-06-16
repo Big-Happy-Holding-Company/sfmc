@@ -1,0 +1,29 @@
+{
+  "id": "PL-001",
+  "title": "Pre-Launch Sequence Alpha",
+  "description": "Critical pre-launch systems require pattern verification. Study the radar and equipment positioning patterns.",
+  "category": "🚀 Pre-Launch Ops",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 450,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [["🛩️", "⬛"], ["⬛", "📡"]],
+      "output": [["📡", "⬛"], ["⬛", "🛩️"]]
+    },
+    {
+      "input": [["🔭", "⚡"], ["⬛", "⬛"]],
+      "output": [["⬛", "⬛"], ["⚡", "🔭"]]
+    }
+  ],
+  "testInput": [["🔋", "⬛"], ["💻", "⬛"]],
+  "testOutput": [["⬛", "💻"], ["⬛", "🔋"]],
+  "hints": [
+    "Observe how the equipment symbols change positions.",
+    "The pattern is a diagonal swap of non-black items.",
+    "Equipment in top-left moves to bottom-right and vice versa."
+  ]
+}

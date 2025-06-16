@@ -1,0 +1,29 @@
+{
+  "id": "OS-001",
+  "title": "Oxygen Sensor Calibration",
+  "description": "The oxygen sensors in Bay 2 are showing irregular patterns. Study the transformation examples and apply the same logic to calibrate the faulty sensor grid.",
+  "category": "🛡️ O₂ Sensor Check",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 350,
+  "requiredRankLevel": 1,
+  "emojiSet": "status_main",
+  "examples": [
+    {
+      "input": [["🟡", "⬛"], ["⬛", "🔴"]],
+      "output": [["🔴", "⬛"], ["⬛", "🟡"]]
+    },
+    {
+      "input": [["🟢", "🔵"], ["⬛", "⬛"]],
+      "output": [["⬛", "⬛"], ["🔵", "🟢"]]
+    }
+  ],
+  "testInput": [["🟣", "⬛"], ["🟠", "⬛"]],
+  "testOutput": [["⬛", "🟠"], ["⬛", "🟣"]],
+  "hints": [
+    "Look at how the non-black emojis change position between input and output.",
+    "The transformation swaps the positions of colored emojis diagonally.",
+    "Top-left colored emoji moves to bottom-right, bottom-right moves to top-left."
+  ]
+}

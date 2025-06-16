@@ -34,6 +34,7 @@ export const tasks = pgTable("tasks", {
   testInput: jsonb("test_input").notNull(), // string[][]
   testOutput: jsonb("test_output").notNull(), // string[][]
   emojiSet: text("emoji_set").notNull().default("status_main"),
+  hints: jsonb("hints"), // Array of hint strings
 });
 
 export const playerTasks = pgTable("player_tasks", {
