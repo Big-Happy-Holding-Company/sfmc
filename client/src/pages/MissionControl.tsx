@@ -11,7 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SPACE_EMOJIS } from "@/constants/spaceEmojis";
 import type { Task, Player } from "@shared/schema";
-import type { GameResult, MissionExample, EmojiSet } from "@/types/game";
+import type { GameResult, MissionExample } from "@/types/game";
+import type { EmojiSet } from "@/constants/spaceEmojis";
 
 export default function MissionControl() {
   // State management
@@ -44,14 +45,14 @@ export default function MissionControl() {
 
   // Validate solution mutation
   const validateSolutionMutation = useMutation({
-    mutationFn: async ({ playerId, missionId, solution, timeElapsed }: {
+    mutationFn: async ({ playerId, taskId, solution, timeElapsed }: {
       playerId: number;
-      missionId: string;
+      taskId: string;
       solution: string[][];
       timeElapsed?: number;
     }) => {
       const response = await apiRequest("POST", `/api/players/${playerId}/validate-solution`, {
-        missionId,
+        taskId,
         solution,
         timeElapsed,
       });
@@ -84,26 +85,26 @@ export default function MissionControl() {
 
   const activePlayer = updatedPlayer || currentPlayer;
 
-  const handleSelectMission = (mission: Mission) => {
-    setCurrentMission(mission);
+  const handleSelectTask = (task: Task) => {
+    setCurrentTask(task);
     setStartTime(Date.now());
-    setIsTimerActive(!!mission.timeLimit);
+    setIsTimerActive(!!task.timeLimit);
     
     // Initialize empty grid
-    const emptyGrid = Array(mission.gridSize).fill(null).map(() => 
-      Array(mission.gridSize).fill(SPACE_EMOJIS[mission.emojiSet as EmojiSet][0])
+    const emptyGrid = Array(task.gridSize).fill(null).map(() => 
+      Array(task.gridSize).fill(SPACE_EMOJIS[task.emojiSet as EmojiSet][0])
     );
     setPlayerGrid(emptyGrid);
   };
 
-  const handleSolveMission = () => {
-    if (!currentMission || !activePlayer || !startTime) return;
+  const handleSolveTask = () => {
+    if (!currentTask || !activePlayer || !startTime) return;
     
     const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
     
     validateSolutionMutation.mutate({
       playerId: activePlayer.id,
-      missionId: currentMission.id,
+      taskId: currentTask.id,
       solution: playerGrid,
       timeElapsed,
     });
@@ -111,15 +112,15 @@ export default function MissionControl() {
 
   const handleTimeUp = () => {
     // Auto-submit when time runs out
-    if (currentMission && activePlayer) {
-      handleSolveMission();
+    if (currentTask && activePlayer) {
+      handleSolveTask();
     }
   };
 
   const handleCloseResult = () => {
     setShowResult(false);
     setGameResult(null);
-    setCurrentMission(null);
+    setCurrentTask(null);
     setPlayerGrid([]);
     setStartTime(null);
     setIsTimerActive(false);
@@ -175,11 +176,11 @@ export default function MissionControl() {
       <Header player={activePlayer} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {!currentMission ? (
+        {!currentTask ? (
           <MissionSelector
             player={activePlayer}
-            missions={missions}
-            onSelectMission={handleSelectMission}
+            missions={tasks}
+            onSelectMission={handleSelectTask}
             selectedCategory={selectedCategory}
             onSelectCategory={setSelectedCategory}
           />
@@ -191,20 +192,20 @@ export default function MissionControl() {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h2 className="text-xl font-bold text-cyan-400 mb-1">
-                      MISSION {currentMission.id}: {currentMission.title}
+                      TASK {currentTask.id}: {currentTask.title}
                     </h2>
                     <p className="text-slate-400 text-sm">
-                      Difficulty: <span className="text-green-400">{currentMission.difficulty}</span> • 
-                      Grid: <span className="text-amber-400">{currentMission.gridSize}×{currentMission.gridSize}</span>
-                      {currentMission.timeLimit && (
-                        <span> • Time Limit: <span className="text-red-400">{currentMission.timeLimit}s</span></span>
+                      Difficulty: <span className="text-green-400">{currentTask.difficulty}</span> • 
+                      Grid: <span className="text-amber-400">{currentTask.gridSize}×{currentTask.gridSize}</span>
+                      {currentTask.timeLimit && (
+                        <span> • Time Limit: <span className="text-red-400">{currentTask.timeLimit}s</span></span>
                       )}
                     </p>
                   </div>
                   
-                  {currentMission.timeLimit && (
+                  {currentTask.timeLimit && (
                     <Timer
-                      initialTime={currentMission.timeLimit}
+                      initialTime={currentTask.timeLimit}
                       onTimeUp={handleTimeUp}
                       isActive={isTimerActive}
                     />
@@ -213,14 +214,14 @@ export default function MissionControl() {
                 
                 <div className="bg-slate-900 border border-slate-600 rounded p-4 mb-6">
                   <p className="text-slate-300 text-sm leading-relaxed">
-                    <span className="text-amber-400 font-semibold">Mission Brief:</span> 
-                    {currentMission.description}
+                    <span className="text-amber-400 font-semibold">Task Brief:</span> 
+                    {currentTask.description}
                   </p>
                 </div>
                 
                 {/* Example Transformations */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  {(currentMission.examples as MissionExample[]).map((example, index) => (
+                  {(currentTask.examples as MissionExample[]).map((example, index) => (
                     <div key={index} className="bg-slate-900 border border-slate-600 rounded p-4">
                       <h3 className="text-green-400 font-semibold mb-3 flex items-center">
                         <i className="fas fa-eye mr-2"></i>
