@@ -2,6 +2,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import type { Task, InsertTask } from '../../shared/schema';
+import { EMBEDDED_TASKS } from '../data/taskData.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,8 +27,9 @@ export class TaskLoader {
       
       return tasks.sort((a, b) => a.id.localeCompare(b.id));
     } catch (error) {
-      console.error('Error loading tasks:', error);
-      return [];
+      console.error('Error loading tasks from files, using embedded tasks:', error);
+      // Fallback to embedded tasks for production deployment
+      return EMBEDDED_TASKS.sort((a, b) => a.id.localeCompare(b.id));
     }
   }
 
