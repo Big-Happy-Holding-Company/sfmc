@@ -49,7 +49,8 @@ export class TaskLoader {
         ...taskData,
         timeLimit: taskData.timeLimit || null,
         requiredRankLevel: taskData.requiredRankLevel || 1,
-        emojiSet: taskData.emojiSet || 'status_main'
+        emojiSet: taskData.emojiSet || 'status_main',
+        hints: taskData.hints || []
       };
 
       this.tasksCache.set(taskId, task);

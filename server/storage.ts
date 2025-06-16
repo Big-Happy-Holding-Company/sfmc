@@ -285,22 +285,16 @@ export class MemStorage implements IStorage {
 
   private initializeDefaultTasks() {
     // Legacy method - now replaced by JSON task loading
-    // Initialize with authentic ARC-style tasks using proper emoji sets
-    const defaultTasks: InsertTask[] = [
-      // O2 SENSOR CHECK TASKS - Using status_main emoji set
-      {
-        id: "OS-001",
-        title: "Oxygen Sensor Calibration",
-        description:
-          "Basic systems health checks are part of our daily routine here.  Lend us a hand by examining the previous correct configurations and then correctly configure the new sensor.",
-        category: "🛡️ O₂ Sensor Check",
-        difficulty: "Basic",
-        gridSize: 2,
-        timeLimit: null,
-        basePoints: 350,
-        requiredRankLevel: 1,
-        examples: [
-          {
+    console.log('Legacy task initialization method called - use JSON files instead');
+  }
+  
+  private legacyHardcodedTasks() {
+    // All hardcoded task data removed - replaced with modular JSON files
+    console.log('Legacy hardcoded task method - replaced by JSON loader');
+  }
+}
+
+export const storage = new MemStorage();
             input: [
               ["🟡", "⬛"],
               ["⬛", "🔴"],
@@ -854,24 +848,8 @@ export class MemStorage implements IStorage {
       },
     ];
 
-    defaultTasks.forEach((task) => {
-      const fullTask: Task = {
-        id: task.id,
-        title: task.title,
-        description: task.description,
-        category: task.category,
-        difficulty: task.difficulty,
-        gridSize: task.gridSize,
-        timeLimit: task.timeLimit || null,
-        basePoints: task.basePoints,
-        requiredRankLevel: task.requiredRankLevel || 1,
-        examples: task.examples,
-        testInput: task.testInput,
-        testOutput: task.testOutput,
-        emojiSet: task.emojiSet || "status_main",
-      };
-      this.tasks.set(task.id, fullTask);
-    });
+    // Legacy hardcoded tasks removed - now using JSON task files
+    console.log('Legacy task initialization method called - use JSON files instead');
   }
 }
 
