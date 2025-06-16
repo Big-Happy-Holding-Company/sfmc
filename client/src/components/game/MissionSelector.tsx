@@ -131,10 +131,15 @@ export function MissionSelector({
                 <Button
                   key={mission.id}
                   variant="ghost"
-                  onClick={() => !isLocked && onSelectMission(mission)}
+                  onClick={() => {
+                    console.log('Task clicked:', mission.id, 'isLocked:', isLocked);
+                    if (!isLocked) {
+                      onSelectMission(mission);
+                    }
+                  }}
                   disabled={isLocked}
                   className={cn(
-                    "bg-slate-900 border border-slate-600 rounded p-3 h-auto hover:border-cyan-400 transition-colors duration-200",
+                    "bg-slate-900 border border-slate-600 rounded p-3 h-auto hover:border-cyan-400 transition-colors duration-200 cursor-pointer",
                     isLocked && "opacity-50 cursor-not-allowed"
                   )}
                 >
