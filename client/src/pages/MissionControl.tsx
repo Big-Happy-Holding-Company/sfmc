@@ -326,12 +326,6 @@ export default function MissionControl() {
                   
                   <div className="flex justify-center space-x-4">
                     <Button
-                      variant="outline"
-                      className="bg-amber-400 hover:bg-yellow-500 text-slate-900 border-amber-400"
-                    >
-                      <i className="fas fa-lightbulb mr-2"></i>HINT
-                    </Button>
-                    <Button
                       onClick={handleSolveTask}
                       disabled={validateSolutionMutation.isPending}
                       className="bg-green-400 hover:bg-green-500 text-slate-900"

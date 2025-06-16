@@ -43,6 +43,18 @@ export function ResultModal({ open, onClose, result }: ResultModalProps) {
                   <div className="text-amber-400 font-semibold">Speed Bonus</div>
                   <div className="text-slate-300">+{result.speedBonus || 0}</div>
                 </div>
+                {result.hintPenalty && result.hintPenalty > 0 && (
+                  <div>
+                    <div className="text-yellow-400 font-semibold">Hint Penalty</div>
+                    <div className="text-slate-300">-{result.hintPenalty}</div>
+                  </div>
+                )}
+                {result.hintsUsed && result.hintsUsed > 0 && (
+                  <div>
+                    <div className="text-yellow-400 font-semibold">Hints Used</div>
+                    <div className="text-slate-300">{result.hintsUsed}</div>
+                  </div>
+                )}
                 <div className="col-span-2 border-t border-slate-600 pt-2">
                   <div className="text-green-400 font-semibold text-lg">
                     Total: <span>{result.totalPoints} pts</span>
