@@ -10,14 +10,14 @@ import { ResultModal } from "@/components/game/ResultModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SPACE_EMOJIS } from "@/constants/spaceEmojis";
-import type { Mission, Player } from "@shared/schema";
+import type { Task, Player } from "@shared/schema";
 import type { GameResult, MissionExample, EmojiSet } from "@/types/game";
 
 export default function MissionControl() {
   // State management
   const [showOnboarding, setShowOnboarding] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("🛡️ O₂ Sensor Check");
-  const [currentMission, setCurrentMission] = useState<Mission | null>(null);
+  const [currentTask, setCurrentTask] = useState<Task | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
   const [playerGrid, setPlayerGrid] = useState<string[][]>([]);
   const [gameResult, setGameResult] = useState<GameResult | null>(null);
@@ -36,9 +36,9 @@ export default function MissionControl() {
     },
   });
 
-  // Fetch missions
-  const { data: missions = [] } = useQuery<Mission[]>({
-    queryKey: ["/api/missions"],
+  // Fetch tasks
+  const { data: tasks = [] } = useQuery<Task[]>({
+    queryKey: ["/api/tasks"],
     enabled: !!currentPlayer,
   });
 

@@ -155,8 +155,13 @@ export class MemStorage implements IStorage {
   async createPlayerTask(insertPlayerTask: InsertPlayerTask): Promise<PlayerTask> {
     const id = this.currentPlayerTaskId++;
     const playerTask: PlayerTask = { 
-      ...insertPlayerTask, 
-      id, 
+      id,
+      playerId: insertPlayerTask.playerId!,
+      taskId: insertPlayerTask.taskId!,
+      completed: insertPlayerTask.completed || false,
+      attempts: insertPlayerTask.attempts || 0,
+      bestTime: insertPlayerTask.bestTime || null,
+      pointsEarned: insertPlayerTask.pointsEarned || 0,
       lastAttemptAt: new Date() 
     };
     this.playerTasks.set(`${playerTask.playerId}-${playerTask.taskId}`, playerTask);
@@ -282,7 +287,22 @@ export class MemStorage implements IStorage {
     ];
 
     defaultTasks.forEach(task => {
-      this.tasks.set(task.id, task);
+      const fullTask: Task = {
+        id: task.id,
+        title: task.title,
+        description: task.description,
+        category: task.category,
+        difficulty: task.difficulty,
+        gridSize: task.gridSize,
+        timeLimit: task.timeLimit || null,
+        basePoints: task.basePoints,
+        requiredRankLevel: task.requiredRankLevel || 1,
+        examples: task.examples,
+        testInput: task.testInput,
+        testOutput: task.testOutput,
+        emojiSet: task.emojiSet || "status_main"
+      };
+      this.tasks.set(task.id, fullTask);
     });
   }
 }

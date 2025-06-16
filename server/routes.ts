@@ -11,7 +11,7 @@ import {
 import { z } from "zod";
 
 const validateSolutionSchema = z.object({
-  missionId: z.string(),
+  taskId: z.string(),
   solution: z.array(z.array(z.string())),
   timeElapsed: z.number().optional(),
 });
@@ -33,7 +33,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         rankLevel: 1,
         totalPoints: 0,
         completedMissions: 0,
-        currentMission: null,
+        currentTask: null,
       });
       
       res.json(player);
@@ -74,63 +74,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Mission operations
-  app.get("/api/missions", async (req, res) => {
+  // Task operations
+  app.get("/api/tasks", async (req, res) => {
     try {
       const { category, rankLevel } = req.query;
       
-      let missions;
+      let tasks;
       if (category) {
-        missions = await storage.getMissionsByCategory(category as string);
+        tasks = await storage.getTasksByCategory(category as string);
       } else if (rankLevel) {
-        missions = await storage.getMissionsForRank(parseInt(rankLevel as string));
+        tasks = await storage.getTasksForRank(parseInt(rankLevel as string));
       } else {
-        missions = await storage.getMissions();
+        tasks = await storage.getTasks();
       }
       
-      res.json(missions);
+      res.json(tasks);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch missions" });
+      res.status(500).json({ message: "Failed to fetch tasks" });
     }
   });
 
-  app.get("/api/missions/:id", async (req, res) => {
+  app.get("/api/tasks/:id", async (req, res) => {
     try {
-      const mission = await storage.getMission(req.params.id);
+      const task = await storage.getTask(req.params.id);
       
-      if (!mission) {
-        return res.status(404).json({ message: "Mission not found" });
+      if (!task) {
+        return res.status(404).json({ message: "Task not found" });
       }
       
-      res.json(mission);
+      res.json(task);
     } catch (error) {
-      res.status(500).json({ message: "Failed to fetch mission" });
+      res.status(500).json({ message: "Failed to fetch task" });
     }
   });
 
-  // Player mission progress
-  app.get("/api/players/:playerId/missions", async (req, res) => {
+  // Player task progress
+  app.get("/api/players/:playerId/tasks", async (req, res) => {
     try {
       const playerId = parseInt(req.params.playerId);
-      const playerMissions = await storage.getPlayerMissions(playerId);
-      res.json(playerMissions);
+      const playerTasks = await storage.getPlayerTasks(playerId);
+      res.json(playerTasks);
     } catch (error) {
       res.status(400).json({ message: "Invalid player ID" });
     }
   });
 
-  app.get("/api/players/:playerId/missions/:missionId", async (req, res) => {
+  app.get("/api/players/:playerId/tasks/:taskId", async (req, res) => {
     try {
       const playerId = parseInt(req.params.playerId);
-      const missionId = req.params.missionId;
+      const taskId = req.params.taskId;
       
-      const playerMission = await storage.getPlayerMission(playerId, missionId);
+      const playerTask = await storage.getPlayerTask(playerId, taskId);
       
-      if (!playerMission) {
-        return res.status(404).json({ message: "Player mission not found" });
+      if (!playerTask) {
+        return res.status(404).json({ message: "Player task not found" });
       }
       
-      res.json(playerMission);
+      res.json(playerTask);
     } catch (error) {
       res.status(400).json({ message: "Invalid request" });
     }
@@ -188,11 +188,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/players/:playerId/validate-solution", async (req, res) => {
     try {
       const playerId = parseInt(req.params.playerId);
-      const { missionId, solution, timeElapsed } = validateSolutionSchema.parse(req.body);
+      const { taskId, solution, timeElapsed } = validateSolutionSchema.parse(req.body);
       
-      const mission = await storage.getMission(missionId);
-      if (!mission) {
-        return res.status(404).json({ message: "Mission not found" });
+      const task = await storage.getTask(taskId);
+      if (!task) {
+        return res.status(404).json({ message: "Task not found" });
       }
       
       const player = await storage.getPlayer(playerId);
@@ -201,15 +201,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Validate solution
-      const expectedOutput = mission.testOutput as string[][];
+      const expectedOutput = task.testOutput as string[][];
       const isCorrect = JSON.stringify(solution) === JSON.stringify(expectedOutput);
       
-      let playerMission = await storage.getPlayerMission(playerId, missionId);
+      let playerTask = await storage.getPlayerTask(playerId, taskId);
       
-      if (!playerMission) {
-        playerMission = await storage.createPlayerMission({
+      if (!playerTask) {
+        playerTask = await storage.createPlayerTask({
           playerId,
-          missionId,
+          taskId,
           completed: false,
           attempts: 0,
           pointsEarned: 0,
@@ -217,25 +217,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Update attempts
-      await storage.updatePlayerMission(playerId, missionId, {
-        attempts: playerMission.attempts + 1,
+      await storage.updatePlayerTask(playerId, taskId, {
+        attempts: playerTask.attempts + 1,
       });
       
       if (isCorrect) {
         // Calculate points with time bonus
-        let points = mission.basePoints;
+        let points = task.basePoints;
         let speedBonus = 0;
         
-        if (timeElapsed && mission.timeLimit) {
-          const remainingTime = mission.timeLimit - timeElapsed;
+        if (timeElapsed && task.timeLimit) {
+          const remainingTime = task.timeLimit - timeElapsed;
           if (remainingTime > 0) {
-            speedBonus = Math.floor((remainingTime / mission.timeLimit) * mission.basePoints * 0.5);
+            speedBonus = Math.floor((remainingTime / task.timeLimit) * task.basePoints * 0.5);
             points += speedBonus;
           }
         }
         
-        // Update player mission
-        await storage.updatePlayerMission(playerId, missionId, {
+        // Update player task
+        await storage.updatePlayerTask(playerId, taskId, {
           completed: true,
           pointsEarned: points,
           bestTime: timeElapsed || null,
@@ -243,7 +243,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Update player stats
         const newTotalPoints = player.totalPoints + points;
-        const newCompletedMissions = player.completedMissions + (playerMission.completed ? 0 : 1);
+        const newCompletedMissions = player.completedMissions + (playerTask.completed ? 0 : 1);
         
         // Calculate new rank
         const { newRank, newRankLevel } = calculateRank(newTotalPoints);
@@ -258,7 +258,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.json({
           success: true,
           correct: true,
-          basePoints: mission.basePoints,
+          basePoints: task.basePoints,
           speedBonus,
           totalPoints: points,
           newRank,
@@ -268,7 +268,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.json({
           success: true,
           correct: false,
-          attempts: playerMission.attempts + 1,
+          attempts: playerTask.attempts + 1,
         });
       }
     } catch (error) {
