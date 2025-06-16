@@ -11,30 +11,30 @@ export const MISSION_CATEGORIES = [
   {
     id: "o2-sensor",
     name: "🛡️ O₂ Sensor Check",
-    description: "2×2 Grids • Basic",
+    description: "Atmospheric monitoring systems",
+    difficulty: "Basic",
+    gridSize: "2×2",
+  },
+  {
+    id: "fuel-systems",
+    name: "⚡ Fuel Systems",
+    description: "Primary fuel line diagnostics", 
+    difficulty: "Basic",
+    gridSize: "2×2",
+  },
+  {
+    id: "navigation",
+    name: "🧭 Navigation",
+    description: "Vector calibration systems",
     difficulty: "Basic",
     gridSize: "2×2",
   },
   {
     id: "pre-launch",
     name: "🚀 Pre-Launch Ops", 
-    description: "3×3 Grids • Intermediate",
-    difficulty: "Intermediate",
-    gridSize: "3×3",
-  },
-  {
-    id: "fuel-systems",
-    name: "⚡ Fuel Systems",
-    description: "4×4 Grids • Advanced", 
-    difficulty: "Advanced",
-    gridSize: "4×4",
-  },
-  {
-    id: "officer-track",
-    name: "🎖️ Officer Track",
-    description: "Variable Grids • Expert",
-    difficulty: "Expert", 
-    gridSize: "Variable",
+    description: "Launch sequence verification",
+    difficulty: "Basic",
+    gridSize: "2×2",
   },
 ];
 
