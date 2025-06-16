@@ -1,9 +1,9 @@
 import { 
-  users, players, missions, playerMissions, gameState,
+  users, players, tasks, playerTasks, gameState,
   type User, type InsertUser,
   type Player, type InsertPlayer, type UpdatePlayer,
-  type Mission, type InsertMission,
-  type PlayerMission, type InsertPlayerMission,
+  type Task, type InsertTask,
+  type PlayerTask, type InsertPlayerTask,
   type GameState, type InsertGameState, type UpdateGameState
 } from "@shared/schema";
 
@@ -19,18 +19,18 @@ export interface IStorage {
   createPlayer(player: InsertPlayer): Promise<Player>;
   updatePlayer(id: number, updates: UpdatePlayer): Promise<Player | undefined>;
   
-  // Mission operations
-  getMission(id: string): Promise<Mission | undefined>;
-  getMissions(): Promise<Mission[]>;
-  getMissionsByCategory(category: string): Promise<Mission[]>;
-  getMissionsForRank(rankLevel: number): Promise<Mission[]>;
-  createMission(mission: InsertMission): Promise<Mission>;
+  // Task operations
+  getTask(id: string): Promise<Task | undefined>;
+  getTasks(): Promise<Task[]>;
+  getTasksByCategory(category: string): Promise<Task[]>;
+  getTasksForRank(rankLevel: number): Promise<Task[]>;
+  createTask(task: InsertTask): Promise<Task>;
   
-  // Player mission progress
-  getPlayerMission(playerId: number, missionId: string): Promise<PlayerMission | undefined>;
-  getPlayerMissions(playerId: number): Promise<PlayerMission[]>;
-  createPlayerMission(playerMission: InsertPlayerMission): Promise<PlayerMission>;
-  updatePlayerMission(playerId: number, missionId: string, updates: Partial<PlayerMission>): Promise<PlayerMission | undefined>;
+  // Player task progress
+  getPlayerTask(playerId: number, taskId: string): Promise<PlayerTask | undefined>;
+  getPlayerTasks(playerId: number): Promise<PlayerTask[]>;
+  createPlayerTask(playerTask: InsertPlayerTask): Promise<PlayerTask>;
+  updatePlayerTask(playerId: number, taskId: string, updates: Partial<PlayerTask>): Promise<PlayerTask | undefined>;
   
   // Game state operations
   getGameState(playerId: number): Promise<GameState | undefined>;
@@ -42,27 +42,27 @@ export interface IStorage {
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private players: Map<number, Player>;
-  private missions: Map<string, Mission>;
-  private playerMissions: Map<string, PlayerMission>; // key: `${playerId}-${missionId}`
+  private tasks: Map<string, Task>;
+  private playerTasks: Map<string, PlayerTask>; // key: `${playerId}-${taskId}`
   private gameStates: Map<number, GameState>; // key: playerId
   private currentUserId: number;
   private currentPlayerId: number;
-  private currentPlayerMissionId: number;
+  private currentPlayerTaskId: number;
   private currentGameStateId: number;
 
   constructor() {
     this.users = new Map();
     this.players = new Map();
-    this.missions = new Map();
-    this.playerMissions = new Map();
+    this.tasks = new Map();
+    this.playerTasks = new Map();
     this.gameStates = new Map();
     this.currentUserId = 1;
     this.currentPlayerId = 1;
-    this.currentPlayerMissionId = 1;
+    this.currentPlayerTaskId = 1;
     this.currentGameStateId = 1;
     
-    // Initialize with default missions
-    this.initializeDefaultMissions();
+    // Initialize with default tasks
+    this.initializeDefaultTasks();
   }
 
   // User operations
@@ -94,7 +94,12 @@ export class MemStorage implements IStorage {
     const id = this.currentPlayerId++;
     const now = new Date();
     const player: Player = { 
-      ...insertPlayer, 
+      userId: insertPlayer.userId || null,
+      rank: insertPlayer.rank || "Specialist 1", 
+      rankLevel: insertPlayer.rankLevel || 1,
+      totalPoints: insertPlayer.totalPoints || 0,
+      completedMissions: insertPlayer.completedMissions || 0,
+      currentTask: insertPlayer.currentTask || null,
       id, 
       createdAt: now, 
       updatedAt: now 
@@ -116,60 +121,60 @@ export class MemStorage implements IStorage {
     return updatedPlayer;
   }
 
-  // Mission operations
-  async getMission(id: string): Promise<Mission | undefined> {
-    return this.missions.get(id);
+  // Task operations
+  async getTask(id: string): Promise<Task | undefined> {
+    return this.tasks.get(id);
   }
 
-  async getMissions(): Promise<Mission[]> {
-    return Array.from(this.missions.values());
+  async getTasks(): Promise<Task[]> {
+    return Array.from(this.tasks.values());
   }
 
-  async getMissionsByCategory(category: string): Promise<Mission[]> {
-    return Array.from(this.missions.values()).filter(mission => mission.category === category);
+  async getTasksByCategory(category: string): Promise<Task[]> {
+    return Array.from(this.tasks.values()).filter(task => task.category === category);
   }
 
-  async getMissionsForRank(rankLevel: number): Promise<Mission[]> {
-    return Array.from(this.missions.values()).filter(mission => mission.requiredRankLevel <= rankLevel);
+  async getTasksForRank(rankLevel: number): Promise<Task[]> {
+    return Array.from(this.tasks.values()).filter(task => task.requiredRankLevel <= rankLevel);
   }
 
-  async createMission(mission: InsertMission): Promise<Mission> {
-    this.missions.set(mission.id, mission);
-    return mission;
+  async createTask(task: InsertTask): Promise<Task> {
+    this.tasks.set(task.id, task);
+    return task;
   }
 
-  // Player mission progress
-  async getPlayerMission(playerId: number, missionId: string): Promise<PlayerMission | undefined> {
-    return this.playerMissions.get(`${playerId}-${missionId}`);
+  // Player task progress
+  async getPlayerTask(playerId: number, taskId: string): Promise<PlayerTask | undefined> {
+    return this.playerTasks.get(`${playerId}-${taskId}`);
   }
 
-  async getPlayerMissions(playerId: number): Promise<PlayerMission[]> {
-    return Array.from(this.playerMissions.values()).filter(pm => pm.playerId === playerId);
+  async getPlayerTasks(playerId: number): Promise<PlayerTask[]> {
+    return Array.from(this.playerTasks.values()).filter(pt => pt.playerId === playerId);
   }
 
-  async createPlayerMission(insertPlayerMission: InsertPlayerMission): Promise<PlayerMission> {
-    const id = this.currentPlayerMissionId++;
-    const playerMission: PlayerMission = { 
-      ...insertPlayerMission, 
+  async createPlayerTask(insertPlayerTask: InsertPlayerTask): Promise<PlayerTask> {
+    const id = this.currentPlayerTaskId++;
+    const playerTask: PlayerTask = { 
+      ...insertPlayerTask, 
       id, 
       lastAttemptAt: new Date() 
     };
-    this.playerMissions.set(`${playerMission.playerId}-${playerMission.missionId}`, playerMission);
-    return playerMission;
+    this.playerTasks.set(`${playerTask.playerId}-${playerTask.taskId}`, playerTask);
+    return playerTask;
   }
 
-  async updatePlayerMission(playerId: number, missionId: string, updates: Partial<PlayerMission>): Promise<PlayerMission | undefined> {
-    const key = `${playerId}-${missionId}`;
-    const playerMission = this.playerMissions.get(key);
-    if (!playerMission) return undefined;
+  async updatePlayerTask(playerId: number, taskId: string, updates: Partial<PlayerTask>): Promise<PlayerTask | undefined> {
+    const key = `${playerId}-${taskId}`;
+    const playerTask = this.playerTasks.get(key);
+    if (!playerTask) return undefined;
     
-    const updatedPlayerMission: PlayerMission = { 
-      ...playerMission, 
+    const updatedPlayerTask: PlayerTask = { 
+      ...playerTask, 
       ...updates, 
       lastAttemptAt: new Date() 
     };
-    this.playerMissions.set(key, updatedPlayerMission);
-    return updatedPlayerMission;
+    this.playerTasks.set(key, updatedPlayerTask);
+    return updatedPlayerTask;
   }
 
   // Game state operations
@@ -207,14 +212,14 @@ export class MemStorage implements IStorage {
     this.gameStates.delete(playerId);
   }
 
-  private initializeDefaultMissions() {
-    // Initialize with sample missions for each category
-    const defaultMissions: InsertMission[] = [
+  private initializeDefaultTasks() {
+    // Initialize with sample tasks for each category
+    const defaultTasks: InsertTask[] = [
       {
         id: "OS-001",
         title: "Oxygen Sensor Calibration",
         description: "The oxygen sensors in Bay 2 are showing irregular patterns. Study the transformation examples and apply the same logic to calibrate the faulty sensor grid.",
-        category: "O₂ Sensor Check",
+        category: "🛡️ O₂ Sensor Check",
         difficulty: "Basic",
         gridSize: 2,
         timeLimit: 60,
@@ -238,7 +243,7 @@ export class MemStorage implements IStorage {
         id: "PL-001",
         title: "Pre-Launch Sequence Alpha",
         description: "Critical pre-launch systems require pattern verification. Analyze the command sequences and complete the missing pattern.",
-        category: "Pre-Launch Ops",
+        category: "🚀 Pre-Launch Ops",
         difficulty: "Intermediate",
         gridSize: 3,
         timeLimit: 180,
@@ -258,7 +263,7 @@ export class MemStorage implements IStorage {
         id: "FS-001",
         title: "Fuel Matrix Diagnostics",
         description: "Advanced fuel mixture calculations require precise pattern matching. Complete the complex transformation sequence.",
-        category: "Fuel Systems",
+        category: "⚡ Fuel Systems",
         difficulty: "Advanced",
         gridSize: 4,
         timeLimit: 300,
@@ -276,8 +281,8 @@ export class MemStorage implements IStorage {
       }
     ];
 
-    defaultMissions.forEach(mission => {
-      this.missions.set(mission.id, mission);
+    defaultTasks.forEach(task => {
+      this.tasks.set(task.id, task);
     });
   }
 }

@@ -15,12 +15,12 @@ export const players = pgTable("players", {
   rankLevel: integer("rank_level").notNull().default(1),
   totalPoints: integer("total_points").notNull().default(0),
   completedMissions: integer("completed_missions").notNull().default(0),
-  currentMission: text("current_mission"),
+  currentTask: text("current_task"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const missions = pgTable("missions", {
+export const tasks = pgTable("tasks", {
   id: text("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
@@ -36,10 +36,10 @@ export const missions = pgTable("missions", {
   emojiSet: text("emoji_set").notNull().default("status_main"),
 });
 
-export const playerMissions = pgTable("player_missions", {
+export const playerTasks = pgTable("player_tasks", {
   id: serial("id").primaryKey(),
   playerId: integer("player_id").references(() => players.id),
-  missionId: text("mission_id").references(() => missions.id),
+  taskId: text("task_id").references(() => tasks.id),
   completed: boolean("completed").notNull().default(false),
   attempts: integer("attempts").notNull().default(0),
   bestTime: integer("best_time"), // in seconds
@@ -50,7 +50,7 @@ export const playerMissions = pgTable("player_missions", {
 export const gameState = pgTable("game_state", {
   id: serial("id").primaryKey(),
   playerId: integer("player_id").references(() => players.id),
-  currentMissionId: text("current_mission_id").references(() => missions.id),
+  currentTaskId: text("current_task_id").references(() => tasks.id),
   currentGrid: jsonb("current_grid"), // string[][]
   startTime: timestamp("start_time"),
   timeRemaining: integer("time_remaining"),
@@ -62,8 +62,8 @@ export const gameState = pgTable("game_state", {
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true });
 export const insertPlayerSchema = createInsertSchema(players).omit({ id: true, createdAt: true, updatedAt: true });
-export const insertMissionSchema = createInsertSchema(missions);
-export const insertPlayerMissionSchema = createInsertSchema(playerMissions).omit({ id: true });
+export const insertTaskSchema = createInsertSchema(tasks);
+export const insertPlayerTaskSchema = createInsertSchema(playerTasks).omit({ id: true });
 export const insertGameStateSchema = createInsertSchema(gameState).omit({ id: true, createdAt: true, updatedAt: true });
 
 // Update schemas
@@ -78,11 +78,11 @@ export type Player = typeof players.$inferSelect;
 export type InsertPlayer = z.infer<typeof insertPlayerSchema>;
 export type UpdatePlayer = z.infer<typeof updatePlayerSchema>;
 
-export type Mission = typeof missions.$inferSelect;
-export type InsertMission = z.infer<typeof insertMissionSchema>;
+export type Task = typeof tasks.$inferSelect;
+export type InsertTask = z.infer<typeof insertTaskSchema>;
 
-export type PlayerMission = typeof playerMissions.$inferSelect;
-export type InsertPlayerMission = z.infer<typeof insertPlayerMissionSchema>;
+export type PlayerTask = typeof playerTasks.$inferSelect;
+export type InsertPlayerTask = z.infer<typeof insertPlayerTaskSchema>;
 
 export type GameState = typeof gameState.$inferSelect;
 export type InsertGameState = z.infer<typeof insertGameStateSchema>;

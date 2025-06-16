@@ -6,7 +6,7 @@ import {
   updatePlayerSchema,
   insertGameStateSchema,
   updateGameStateSchema,
-  insertPlayerMissionSchema
+  insertPlayerTaskSchema
 } from "@shared/schema";
 import { z } from "zod";
 
