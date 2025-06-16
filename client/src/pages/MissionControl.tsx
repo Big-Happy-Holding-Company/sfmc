@@ -30,7 +30,7 @@ export default function MissionControl() {
   // Create default player on load
   const createPlayerMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest("POST", "/api/players", { username: "cadet" });
+      const response = await apiRequest("POST", "/api/players", { username: "Wyatt" });
       return response.json();
     },
     onSuccess: (player: Player) => {
@@ -151,7 +151,7 @@ export default function MissionControl() {
   if (!activePlayer) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="text-slate-400">Loading Mission Control...</div>
+        <div className="text-slate-400">Loading Operations Center...</div>
       </div>
     );
   }
@@ -204,12 +204,15 @@ export default function MissionControl() {
                     </p>
                   </div>
                   
-                  {currentTask.timeLimit && (
+                  {/* Show countdown timer only for advanced tasks with time limits, otherwise show speed timer */}
+                  {currentTask.timeLimit ? (
                     <Timer
                       initialTime={currentTask.timeLimit}
                       onTimeUp={handleTimeUp}
                       isActive={isTimerActive}
                     />
+                  ) : (
+                    <SpeedTimer isActive={isTimerActive} />
                   )}
                 </div>
                 

@@ -159,9 +159,9 @@ export function MissionSelector({
                     {isLocked ? (
                       <div className="text-xs text-slate-500">🔒 Requires Rank Level {mission.requiredRankLevel}</div>
                     ) : mission.timeLimit ? (
-                      <div className="text-xs text-amber-400">⚡ Speed Bonus Available</div>
+                      <div className="text-xs text-red-400">⏱️ Time Limited</div>
                     ) : (
-                      <div className="text-xs text-slate-400">No Time Limit</div>
+                      <div className="text-xs text-amber-400">⚡ Speed Bonus Available</div>
                     )}
                   </div>
                 </Button>
