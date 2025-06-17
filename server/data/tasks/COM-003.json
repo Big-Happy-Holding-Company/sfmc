@@ -1,0 +1,29 @@
+{
+  "id": "COM-003",
+  "title": "Signal Pattern Identity",
+  "description": "Communication arrays require identity transformation verification. Input pattern must remain unchanged.",
+  "category": "📡 Communications",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 280,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [["📡", "💻"], ["🛰️", "📻"]],
+      "output": [["📡", "💻"], ["🛰️", "📻"]]
+    },
+    {
+      "input": [["🔭", "⬛"], ["⬛", "📶"]],
+      "output": [["🔭", "⬛"], ["⬛", "📶"]]
+    }
+  ],
+  "testInput": [["🛩️", "⚡"], ["💡", "🔋"]],
+  "testOutput": [["🛩️", "⚡"], ["💡", "🔋"]],
+  "hints": [
+    "The transformation is the identity function.",
+    "Input and output grids are exactly the same.",
+    "No changes are made to any positions."
+  ]
+}

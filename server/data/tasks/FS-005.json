@@ -1,0 +1,29 @@
+{
+  "id": "FS-005",
+  "title": "Fuel Matrix Vertical Mirror",
+  "description": "Fuel distribution matrix requires vertical mirror calibration. Analyze the top-bottom reflection patterns.",
+  "category": "⚡ Fuel Systems",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 330,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [["⚙️", "🔧"], ["🛠️", "🔨"]],
+      "output": [["🛠️", "🔨"], ["⚙️", "🔧"]]
+    },
+    {
+      "input": [["⚛️", "⬛"], ["⬛", "🎛️"]],
+      "output": [["⬛", "🎛️"], ["⚛️", "⬛"]]
+    }
+  ],
+  "testInput": [["🔋", "💡"], ["⚡", "🎛️"]],
+  "testOutput": [["⚡", "🎛️"], ["🔋", "💡"]],
+  "hints": [
+    "Elements are reflected across the horizontal center line.",
+    "Top row becomes bottom row and vice versa.",
+    "The transformation is a vertical mirror flip."
+  ]
+}
