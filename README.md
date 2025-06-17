@@ -79,8 +79,8 @@ Emoji sets follow ARC-AGI (Abstract and Reasoning Corpus for Artificial General 
 
 #### Available Emoji Sets
 - `status_main`: Basic status indicators
-- `tech_set1`: Digital systems (computers, displays)
-- `tech_set2`: Mechanical systems (tools, controls)
+- `tech_set1`: Power and Fuel systems
+- `tech_set2`: Communication systems
 - `celestial_set1`: Planetary bodies
 - `celestial_set2`: Stellar objects
 - `nav_alerts`: Navigation vectors
@@ -109,7 +109,7 @@ Players advance through Space Force enlisted ranks by earning points:
 
 ### Timer System
 - **Speed Bonus**: Most tasks count up, rewarding faster completion
-- **Time Limited**: Very advanced tasks have countdown timers for added pressure
+- **Time Limited**: Very advanced tasks have countdown timers for added pressure (NOT YET IMPLEMENTED)
 
 ## Development Guidelines
 
@@ -138,11 +138,11 @@ Players advance through Space Force enlisted ranks by earning points:
 - The app should be able to import standard ARC-AGI files like those from the official repositories
 - Note: Existing files in the tasks folder may use emojis directly, but all new files should follow the standard integer format
 
-### Modifying Emoji Sets
-1. Edit `client/src/constants/spaceEmojis.ts`
+### SOURCE Emoji Sets
+1.  `client/src/constants/spaceEmojis.ts` is the source of truth for emoji mapping!!
 2. Maintain exactly 10 emojis per set
 3. Keep index 0 as `⬛` (black background)
-4. Update `EMOJI_SET_INFO` with descriptions
+4. `EMOJI_SET_INFO` is the source of truth for emoji set metadata!!
 
 ### UI Components
 - Game components in `client/src/components/game/`

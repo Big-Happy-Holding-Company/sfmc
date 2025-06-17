@@ -48,14 +48,14 @@ export const EMOJI_SET_INFO = {
     theme: 'Deep Space'
   },
   tech_set1: {
-    name: 'Fuel Systems',
-    description: 'Fuel and power systems',
-    theme: 'Command & Control'
+    name: 'Power & Fuel Systems',
+    description: 'Power & Fuel systems',
+    theme: 'Power & Fuel'
   },
   tech_set2: {
     name: 'Communication Systems',
     description: 'Communication arrays and signal relays',
-    theme: 'Engineering'
+    theme: 'Communication'
   },
   nav_alerts: {
     name: 'Navigation Vectors',
