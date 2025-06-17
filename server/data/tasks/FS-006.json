@@ -7,7 +7,7 @@
   "gridSize": 3,
   "timeLimit": null,
   "basePoints": 1200,
-  "requiredRankLevel": 3,
+  "requiredRankLevel": 1,
   "emojiSet": "tech_set1",
   "examples": [
     {

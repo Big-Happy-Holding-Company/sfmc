@@ -1,7 +1,7 @@
 {
   "id": "COM-001",
   "title": "Signal Relay Connection",
-  "description": "Communication arrays require connection path analysis. Find the shortest path between signal endpoints.",
+  "description": "Communication arrays require connection path analysis. Based on these previous examples, what do you think the output should be?",
   "category": "📡 Communications",
   "difficulty": "Basic",
   "gridSize": 3,
@@ -10,116 +10,4 @@
   "requiredRankLevel": 1,
   "emojiSet": "tech_set2",
   "examples": [
-    {
-      "input": [
-        [
-          2,
-          0,
-          0
-        ],
-        [
-          0,
-          0,
-          0
-        ],
-        [
-          0,
-          0,
-          3
-        ]
-      ],
-      "output": [
-        [
-          2,
-          2,
-          0
-        ],
-        [
-          0,
-          2,
-          0
-        ],
-        [
-          0,
-          2,
-          3
-        ]
-      ]
-    },
-    {
-      "input": [
-        [
-          4,
-          0,
-          0
-        ],
-        [
-          0,
-          0,
-          0
-        ],
-        [
-          0,
-          0,
-          5
-        ]
-      ],
-      "output": [
-        [
-          4,
-          2,
-          0
-        ],
-        [
-          0,
-          2,
-          0
-        ],
-        [
-          0,
-          2,
-          6
-        ]
-      ]
-    }
-  ],
-  "testInput": [
-    [
-      2,
-      0,
-      0
-    ],
-    [
-      0,
-      0,
-      0
-    ],
-    [
-      0,
-      0,
-      6
-    ]
-  ],
-  "testOutput": [
-    [
-      2,
-      2,
-      0
-    ],
-    [
-      0,
-      2,
-      0
-    ],
-    [
-      0,
-      2,
-      6
-    ]
-  ],
-  "hints": [
-    "Connect the two communication devices with a direct path.",
-    "Use signal bars (🖥️) to create the connection line.",
-    "The path follows the shortest route between endpoints."
-  ]
-}
+   

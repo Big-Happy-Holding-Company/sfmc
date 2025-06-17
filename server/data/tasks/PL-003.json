@@ -5,9 +5,9 @@
   "category": "🚀 Pre-Launch Ops",
   "difficulty": "Advanced",
   "gridSize": 4,
-  "timeLimit": 220,
-  "basePoints": 950,
-  "requiredRankLevel": 3,
+  "timeLimit": null,
+  "basePoints": 1950,
+  "requiredRankLevel": 1,
   "emojiSet": "status_alerts",
   "examples": [
     {

@@ -5,34 +5,12 @@
   "category": "⚡ Power Systems",
   "difficulty": "Advanced",
   "gridSize": 3,
-  "timeLimit": 180,
+  "timeLimit": null,
   "basePoints": 1300,
-  "requiredRankLevel": 3,
+  "requiredRankLevel": 1,
   "emojiSet": "tech_set2",
   "examples": [
-    {
-      "input": [
-        ["🔋", "⚡", "🖱️"],
-        ["🎛️", "⚙️", "📺"],
-        ["🔨", "🛠️", "⚛️"]
-      ],
-      "output": [
-        ["⚛️", "🛠️", "🔨"],
-        ["📺", "⚙️", "🎛️"],
-        ["🖱️", "⚡", "🔋"]
-      ]
-    }
-  ],
-  "testInput": [
-    ["📺", "🎛️", "⚛️"],
-    ["🖱️", "🛠️", "⚙️"],
-    ["⚡", "🎛️", "🔋"]
-  ],
-  "testOutput": [
-    ["🔋", "🎛️", "⚡"],
-    ["⚙️", "🖱️", "🛠️"],
-    ["⚛️", "🎛️", "📺"]
-  ],
+   
   "hints": [
     "The grid undergoes both horizontal and vertical reflection.",
     "This is equivalent to a 180-degree rotation around the center.",
