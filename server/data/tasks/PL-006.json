@@ -1,0 +1,29 @@
+{
+  "id": "PL-006",
+  "title": "Launch Matrix Checkerboard",
+  "description": "Pre-launch systems require checkerboard pattern generation. Create alternating pattern from input elements.",
+  "category": "🚀 Pre-Launch Ops",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 345,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [["🔋", "💻"], ["📡", "🔭"]],
+      "output": [["🔋", "💻"], ["💻", "🔋"]]
+    },
+    {
+      "input": [["🛩️", "⚡"], ["🛰️", "🔌"]],
+      "output": [["🛩️", "⚡"], ["⚡", "🛩️"]]
+    }
+  ],
+  "testInput": [["📻", "🔭"], ["💡", "⚙️"]],
+  "testOutput": [["📻", "🔭"], ["🔭", "📻"]],
+  "hints": [
+    "Create a checkerboard pattern using the top row elements.",
+    "Bottom row mirrors the top row with positions swapped.",
+    "Each 2x2 block alternates between two element types."
+  ]
+}

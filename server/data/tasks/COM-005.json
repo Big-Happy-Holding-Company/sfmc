@@ -1,0 +1,29 @@
+{
+  "id": "COM-005",
+  "title": "Signal Pattern Duplication",
+  "description": "Communication arrays require pattern duplication protocols. Specific elements replicate to adjacent positions.",
+  "category": "📡 Communications",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 290,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [["📡", "⬛"], ["⬛", "💻"]],
+      "output": [["📡", "📡"], ["💻", "💻"]]
+    },
+    {
+      "input": [["🛰️", "⬛"], ["⬛", "📻"]],
+      "output": [["🛰️", "🛰️"], ["📻", "📻"]]
+    }
+  ],
+  "testInput": [["🔭", "⬛"], ["⬛", "📶"]],
+  "testOutput": [["🔭", "🔭"], ["📶", "📶"]],
+  "hints": [
+    "Non-empty elements duplicate to their adjacent empty space.",
+    "Each element fills its corresponding row completely.",
+    "Empty spaces become filled with their diagonal element."
+  ]
+}

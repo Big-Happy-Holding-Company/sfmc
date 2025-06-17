@@ -1,0 +1,29 @@
+{
+  "id": "FS-008",
+  "title": "Fuel Pattern Mask Filter",
+  "description": "Critical fuel systems require pattern mask operations. Only specific pattern elements remain active in the distribution network.",
+  "category": "⚡ Fuel Systems",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 310,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [["⚙️", "🔧"], ["🛠️", "⚙️"]],
+      "output": [["⚙️", "⬛"], ["⬛", "⚙️"]]
+    },
+    {
+      "input": [["⚛️", "🎛️"], ["🔨", "⚛️"]],
+      "output": [["⚛️", "⬛"], ["⬛", "⚛️"]]
+    }
+  ],
+  "testInput": [["🔋", "💡"], ["⚡", "🔋"]],
+  "testOutput": [["🔋", "⬛"], ["⬛", "🔋"]],
+  "hints": [
+    "Only elements that appear multiple times are preserved.",
+    "Elements that appear only once become empty spaces.",
+    "Look for the recurring pattern element in the grid."
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "FS-009",
+  "title": "Advanced Fuel Spiral Pattern",
+  "description": "Complex fuel distribution requires spiral transformation. Elements move in spiral pattern from outside to center.",
+  "category": "⚡ Fuel Systems",
+  "difficulty": "Advanced",
+  "gridSize": 3,
+  "timeLimit": 190,
+  "basePoints": 1350,
+  "requiredRankLevel": 3,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        ["⚙️", "🔧", "🛠️"],
+        ["⚛️", "🎛️", "💡"],
+        ["🔋", "⚡", "🔨"]
+      ],
+      "output": [
+        ["🔨", "⚙️", "🔧"],
+        ["⚡", "🎛️", "🛠️"],
+        ["🔋", "⚛️", "💡"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["💻", "🔭", "📡"],
+    ["🛩️", "🔌", "⚙️"],
+    ["⚡", "🎛️", "🔋"]
+  ],
+  "testOutput": [
+    ["🔋", "💻", "🔭"],
+    ["🎛️", "🔌", "📡"],
+    ["⚡", "🛩️", "⚙️"]
+  ],
+  "hints": [
+    "Elements move in a clockwise spiral pattern from perimeter to center.",
+    "The outer ring shifts one position clockwise while center stays fixed.",
+    "Follow the spiral path: top row, right column, bottom row, left column."
+  ]
+}
