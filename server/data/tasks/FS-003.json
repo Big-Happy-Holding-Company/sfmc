@@ -1,0 +1,45 @@
+{
+  "id": "FS-003",
+  "title": "Fuel Pressure Equalization",
+  "description": "Critical fuel systems require pressure balancing across connected chambers. Balance the distribution network.",
+  "category": "⚡ Fuel Systems",
+  "difficulty": "Advanced",
+  "gridSize": 4,
+  "timeLimit": 180,
+  "basePoints": 800,
+  "requiredRankLevel": 3,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        ["⚙️", "⚙️", "⬛", "⬛"],
+        ["⚙️", "⚙️", "⬛", "⬛"],
+        ["⬛", "⬛", "🔧", "🔧"],
+        ["⬛", "⬛", "🔧", "🔧"]
+      ],
+      "output": [
+        ["⚙️", "⚙️", "🔧", "🔧"],
+        ["⚙️", "⚙️", "🔧", "🔧"],
+        ["⚙️", "⚙️", "🔧", "🔧"],
+        ["⚙️", "⚙️", "🔧", "🔧"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["🛠️", "🛠️", "⬛", "⬛"],
+    ["🛠️", "🛠️", "⬛", "⬛"],
+    ["⬛", "⬛", "⚛️", "⚛️"],
+    ["⬛", "⬛", "⚛️", "⚛️"]
+  ],
+  "testOutput": [
+    ["🛠️", "🛠️", "⚛️", "⚛️"],
+    ["🛠️", "🛠️", "⚛️", "⚛️"],
+    ["🛠️", "🛠️", "⚛️", "⚛️"],
+    ["🛠️", "🛠️", "⚛️", "⚛️"]
+  ],
+  "hints": [
+    "Each quadrant expands to fill the empty adjacent quadrant.",
+    "The pattern fills the entire grid maintaining the original boundaries.",
+    "Objects spread to equalize pressure across connected regions."
+  ]
+}

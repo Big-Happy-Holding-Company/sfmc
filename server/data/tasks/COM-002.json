@@ -1,0 +1,53 @@
+{
+  "id": "COM-002",
+  "title": "Signal Interference Cancellation",
+  "description": "Communication arrays suffer from signal interference. Remove interference patterns while preserving primary signals.",
+  "category": "📡 Communications",
+  "difficulty": "Intermediate",
+  "gridSize": 3,
+  "timeLimit": 110,
+  "basePoints": 580,
+  "requiredRankLevel": 2,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [
+        ["📡", "📶", "📡"],
+        ["📶", "❌", "📶"],
+        ["📡", "📶", "📡"]
+      ],
+      "output": [
+        ["📡", "⬛", "📡"],
+        ["⬛", "⬛", "⬛"],
+        ["📡", "⬛", "📡"]
+      ]
+    },
+    {
+      "input": [
+        ["🛰️", "❌", "💻"],
+        ["❌", "📶", "❌"],
+        ["📻", "❌", "🔭"]
+      ],
+      "output": [
+        ["🛰️", "⬛", "💻"],
+        ["⬛", "📶", "⬛"],
+        ["📻", "⬛", "🔭"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["📡", "❌", "🛰️"],
+    ["❌", "📶", "❌"],
+    ["💻", "❌", "📻"]
+  ],
+  "testOutput": [
+    ["📡", "⬛", "🛰️"],
+    ["⬛", "📶", "⬛"],
+    ["💻", "⬛", "📻"]
+  ],
+  "hints": [
+    "Remove all interference markers (❌) from the grid.",
+    "Replace interference with empty space (⬛).",
+    "Keep all communication devices and valid signals intact."
+  ]
+}
