@@ -5,7 +5,7 @@
   "category": "📡 Communications",
   "difficulty": "Basic",
   "gridSize": 3,
-  "timeLimit": 90,
+  "timeLimit": null,
   "basePoints": 400,
   "requiredRankLevel": 1,
   "emojiSet": "tech_set1",
