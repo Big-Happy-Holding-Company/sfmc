@@ -11,16 +11,70 @@
   "emojiSet": "tech_set1",
   "examples": [
     {
-      "input": [["📡", "⬛"], ["⬛", "📱"]],
-      "output": [["📡", "📡"], ["📱", "📱"]]
+      "input": [
+        [
+          2,
+          0
+        ],
+        [
+          0,
+          3
+        ]
+      ],
+      "output": [
+        [
+          2,
+          2
+        ],
+        [
+          3,
+          3
+        ]
+      ]
     },
     {
-      "input": [["🛩️", "⬛"], ["⬛", "🔭"]],
-      "output": [["🛩️", "🛩️"], ["🔭", "🔭"]]
+      "input": [
+        [
+          4,
+          0
+        ],
+        [
+          0,
+          6
+        ]
+      ],
+      "output": [
+        [
+          4,
+          4
+        ],
+        [
+          6,
+          6
+        ]
+      ]
     }
   ],
-  "testInput": [["🔭", "⬛"], ["⬛", "🖥️"]],
-  "testOutput": [["🔭", "🔭"], ["🖥️", "🖥️"]],
+  "testInput": [
+    [
+      6,
+      0
+    ],
+    [
+      0,
+      2
+    ]
+  ],
+  "testOutput": [
+    [
+      6,
+      6
+    ],
+    [
+      2,
+      2
+    ]
+  ],
   "hints": [
     "Non-empty elements duplicate to their adjacent empty space.",
     "Each element fills its corresponding row completely.",
