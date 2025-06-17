@@ -1,6 +1,13 @@
 # Changelog
 
 ## 2025-06-17 - Puzzle Task Creation
+
+### COM-002 to COM-005 Added
+- Created new communication puzzles `COM-002` through `COM-005` with integer grids, simple rotations/reflections, and updated hints using ⬛.
+
+_Author: Cascade_
+
+## 2025-06-17 - Puzzle Task Creation
 - Added or rewrote the following task JSON files with integer-based puzzles and hints:
   - `PWR-001`, `PWR-002`, `PWR-003`
   - `PL-001`, `PL-003`

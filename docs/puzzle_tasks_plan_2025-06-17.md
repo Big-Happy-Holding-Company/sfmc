@@ -24,17 +24,12 @@ The following plan outlines the steps required to generate or rewrite basic emoj
 - `client/src/constants/spaceEmojis.ts` – **source of truth for emoji mapping**
 
 ## Tasks Checklist
-- [ ] Review schema in **FS-001.json**
-- [ ] Review transformation guidelines in **arc_transformations.md**
-- [ ] Review emoji mapping in **spaceEmojis.ts**
-- [ ] Review example **NAV-001.json**
-- [ ] Design puzzle for **PWR-001.json**
-- [ ] Design puzzle for **PWR-002.json**
-- [ ] Design puzzle for **PWR-003.json**
-- [ ] Rewrite puzzle in **COM-001.json**
-- [ ] Design puzzle for **PL-001.json**
-- [ ] Design puzzle for **PL-003.json**
-- [ ] Append entry to **docs/changelog.md** with timestamp and summary of all changes
+- [x] Review schema in **FS-001.json**
+- [x] Review transformation guidelines in **arc_transformations.md**
+- [x] Review emoji mapping in **spaceEmojis.ts**
+- [x] Review example **NAV-001.json**
+
+
 
 ## Transformation Strategy
 We will employ easy-to-grasp ARC transformations to keep puzzles accessible:
