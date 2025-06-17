@@ -1,6 +1,6 @@
 {
   "id": "PWR-005",
-  "title": "Power Grid Status Glyph",
+  "title": "Power Circuit Diagonal Swap",
   "description": "Render the numeric glyph 3 on the power-status matrix. All ⬛ grids must be transformed into the glyph using the same token.",
   "category": "⚡ Power Systems",
   "difficulty": "Advanced",

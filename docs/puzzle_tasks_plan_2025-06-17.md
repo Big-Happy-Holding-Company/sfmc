@@ -63,7 +63,7 @@ attached_assets/           ← transformation reference docs
   "timeLimit": null,
   "basePoints": 500,
   "requiredRankLevel": 1,
-  "emojiSet": "tech_set1",
+  "emojiSet": "<EMOJI-SET-NAME>",
   "examples": [ /* two example objects */ ],
   "testInput": [ /* grid */ ],
   "testOutput": [ /* grid */ ],

@@ -77,7 +77,7 @@
   ],
   "hints": [
     "Only elements that appear multiple times are preserved.",
-    "Elements that appear only once become empty spaces.",
+    "Elements that appear only once become ⬛ spaces.",
     "Look for the recurring pattern element in the grid."
   ]
 }

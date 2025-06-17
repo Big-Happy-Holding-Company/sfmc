@@ -100,16 +100,17 @@ Players advance through Space Force enlisted ranks by earning points:
 - Chief Master Sergeant (E-10)
 
 ### Task Categories
-- **🛡️ O₂ Sensor Check**: Oxygen system diagnostics
-- **🚀 Pre-Launch Ops**: Launch preparation tasks
-- **⚡ Fuel Systems**: Fuel flow and mixture analysis
-- **🧭 Navigation**: Directional calibration
-- **🌍 Celestial Obs**: Planetary observation
-- **⭐ Stellar Nav**: Deep space navigation
+- **🛡️ O₂ Sensor Check**: Oxygen system diagnostics (OS-XXX)
+- **🚀 Pre-Launch Ops**: Launch preparation tasks (PL-XXX)
+- **⚡ Fuel Systems**: Fuel flow and mixture analysis (FS-XXX)
+- **🧭 Navigation**: Directional calibration (NAV-XXX)
+- **COM-XXX Communications**: Communication systems (COM-XXX) 
+- **PWR-XXX Power Systems**: Power flow and distribution (PWR-XXX)
+- **SEC-XXX Security**: Security systems (SEC-XXX)
 
 ### Timer System
-- **Speed Bonus**: Most tasks count up, rewarding faster completion
-- **Time Limited**: Very advanced tasks have countdown timers for added pressure (NOT YET IMPLEMENTED)
+- **Speed Bonus**: Tasks count up, rewarding faster completion
+- **Time Limited**: Limits are all set to null for development, but can be added for expanded difficulty and point rewards.
 
 ## Development Guidelines
 
@@ -137,6 +138,30 @@ Players advance through Space Force enlisted ranks by earning points:
 ### SOURCE Task Sets 
 1. Tasks should have their transformation types in the description
 2. This allows for 40 different types of task in each category.
+
+### Ready-to-Do Template (copy & replace fields)
+```jsonc
+{
+  "id": "<CATEGORY-XXX>",
+  "title": "<Creative title incorporating the logic of the transformation>",
+  "description": "<Creative player-facing story about the task as it relates to the operations of ground control at the US Space Force>",
+  "category": "<COM-XXX Communications / FS-XXX Fuel Systems / NAV-XXX Navigation / OS-XXX Oxygen Sensors / PL-XXX Pre-Launch / PWR-XXX Power Systems / SEC-XXX Security>",
+  "difficulty": "Basic",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 1500,
+  "requiredRankLevel": 1,
+  "emojiSet": "<EMOJI-SET-NAME>",
+  "examples": [ /* two example objects */ ],
+  "testInput": [ /* grid */ ],
+  "testOutput": [ /* grid */ ],
+  "hints": [
+    "<Hint 1>",
+    "<Hint 2>",
+    "⬛ <background clarification>"
+  ]
+}
+```
 
 # ARC-AGI Transformation Types
 

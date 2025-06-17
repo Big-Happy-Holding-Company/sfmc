@@ -118,7 +118,7 @@
     ]
   ],
   "hints": [
-    "Each quadrant expands to fill the empty adjacent quadrant.",
+    "Each quadrant expands to fill the ⬛ adjacent quadrant.",
     "The pattern fills the entire grid maintaining the original boundaries.",
     "Objects spread to equalize pressure across connected regions."
   ]

@@ -76,8 +76,8 @@
     ]
   ],
   "hints": [
-    "Collect all non-empty elements to the top row.",
-    "Empty spaces fill the bottom row completely.",
+    "Collect all non-⬛ elements to the top row.",
+    "⬛ spaces fill the bottom row completely.",
     "Maintain left-to-right order of collected elements."
   ]
 }

@@ -48,6 +48,6 @@
   "hints": [
     "Rotate the grid 180° (flip horizontally then vertically).",
     "Each cell moves to its diagonally opposite position.",
-    "⬛ remains background after rotation."
+    "⬛ remains ⬛ after rotation."
   ]
 }
