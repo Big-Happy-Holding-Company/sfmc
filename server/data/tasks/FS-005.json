@@ -19,8 +19,8 @@
       "output": [["⬛", "🎛️"], ["⚛️", "⬛"]]
     }
   ],
-  "testInput": [["🔋", "📱"], ["⚡", "🎛️"]],
-  "testOutput": [["⚡", "🎛️"], ["🔋", "📱"]],
+  "testInput": [["🔋", "🖱️"], ["⚡", "🎛️"]],
+  "testOutput": [["⚡", "🎛️"], ["🔋", "🖱️"]],
   "hints": [
     "Elements are reflected across the horizontal center line.",
     "Top row becomes bottom row and vice versa.",

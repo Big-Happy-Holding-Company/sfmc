@@ -19,8 +19,8 @@
       "output": [["⬛", "⚛️"], ["🎛️", "⬛"]]
     }
   ],
-  "testInput": [["🔋", "📱"], ["⚡", "🎛️"]],
-  "testOutput": [["📱", "🔋"], ["🎛️", "⚡"]],
+  "testInput": [["🔋", "🖱️"], ["⚡", "🎛️"]],
+  "testOutput": [["🖱️", "🔋"], ["🎛️", "⚡"]],
   "hints": [
     "Elements are reflected across the vertical center line.",
     "Left column becomes right column and vice versa.",
