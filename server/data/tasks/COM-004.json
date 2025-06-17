@@ -1,0 +1,41 @@
+{
+  "id": "COM-004",
+  "title": "Advanced Signal Cross Pattern",
+  "description": "Complex communication arrays require cross-pattern extraction. Only center row and center column elements remain active.",
+  "category": "📡 Communications",
+  "difficulty": "Advanced",
+  "gridSize": 3,
+  "timeLimit": 110,
+  "basePoints": 950,
+  "requiredRankLevel": 3,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [
+        ["📡", "💻", "🛰️"],
+        ["🔭", "📶", "📻"],
+        ["🛩️", "⚡", "🔌"]
+      ],
+      "output": [
+        ["⬛", "💻", "⬛"],
+        ["🔭", "📶", "📻"],
+        ["⬛", "⚡", "⬛"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["🔋", "🎛️", "💡"],
+    ["⚙️", "📶", "🔨"],
+    ["📻", "🛰️", "🔭"]
+  ],
+  "testOutput": [
+    ["⬛", "🎛️", "⬛"],
+    ["⚙️", "📶", "🔨"],
+    ["⬛", "🛰️", "⬛"]
+  ],
+  "hints": [
+    "Only the center row and center column are preserved.",
+    "Corner elements become empty spaces.",
+    "The pattern forms a cross shape in the output."
+  ]
+}

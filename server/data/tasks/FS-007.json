@@ -1,0 +1,41 @@
+{
+  "id": "FS-007",
+  "title": "Advanced Fuel Center Propagation",
+  "description": "Complex fuel distribution systems require center-based propagation patterns. Center element spreads to all surrounding positions.",
+  "category": "⚡ Fuel Systems",
+  "difficulty": "Advanced",
+  "gridSize": 3,
+  "timeLimit": 120,
+  "basePoints": 980,
+  "requiredRankLevel": 3,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        ["⚙️", "🔧", "🛠️"],
+        ["⚛️", "🎛️", "💡"],
+        ["🔋", "⚡", "🔨"]
+      ],
+      "output": [
+        ["🎛️", "🎛️", "🎛️"],
+        ["🎛️", "🎛️", "🎛️"],
+        ["🎛️", "🎛️", "🎛️"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["💻", "🔭", "📡"],
+    ["🛩️", "🔌", "⚙️"],
+    ["⚡", "🎛️", "🔋"]
+  ],
+  "testOutput": [
+    ["🔌", "🔌", "🔌"],
+    ["🔌", "🔌", "🔌"],
+    ["🔌", "🔌", "🔌"]
+  ],
+  "hints": [
+    "The center element fills the entire grid.",
+    "All other elements are replaced by the center element.",
+    "This creates a uniform pattern across the entire matrix."
+  ]
+}

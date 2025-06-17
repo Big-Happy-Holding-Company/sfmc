@@ -1,0 +1,41 @@
+{
+  "id": "PWR-002",
+  "title": "Advanced Power Grid Diagonal Extraction",
+  "description": "Complex power distribution networks require diagonal element isolation. Only main diagonal elements remain in the power matrix.",
+  "category": "⚡ Power Systems",
+  "difficulty": "Advanced",
+  "gridSize": 3,
+  "timeLimit": 150,
+  "basePoints": 1150,
+  "requiredRankLevel": 3,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        ["🔋", "⚡", "🔌"],
+        ["🎛️", "⚙️", "💡"],
+        ["🔨", "🛠️", "⚛️"]
+      ],
+      "output": [
+        ["🔋", "⬛", "⬛"],
+        ["⬛", "⚙️", "⬛"],
+        ["⬛", "⬛", "⚛️"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["💻", "🔭", "📡"],
+    ["🛩️", "🔌", "⚙️"],
+    ["⚡", "🎛️", "🔋"]
+  ],
+  "testOutput": [
+    ["💻", "⬛", "⬛"],
+    ["⬛", "🔌", "⬛"],
+    ["⬛", "⬛", "🔋"]
+  ],
+  "hints": [
+    "Only elements on the main diagonal are preserved.",
+    "Main diagonal runs from top-left to bottom-right.",
+    "All other positions become empty spaces."
+  ]
+}
