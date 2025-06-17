@@ -1,0 +1,65 @@
+{
+  "id": "PWR-004",
+  "title": "Power Node Fault Extraction",
+  "description": "Extract a 3×3 diagnostic window centred on the first detected fault (⬛) in the power-distribution lattice.",
+  "category": "⚡ Power Systems",
+  "difficulty": "Advanced",
+  "gridSize": 7,
+  "timeLimit": null,
+  "basePoints": 1100,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [
+        [2,2,2,2,2,2,2],
+        [2,2,2,2,2,2,2],
+        [2,2,2,2,2,2,2],
+        [2,2,2,0,2,2,2],
+        [2,2,2,2,2,2,2],
+        [2,2,2,2,2,2,2],
+        [2,2,2,2,2,2,2]
+      ],
+      "output": [
+        [2,2,2],
+        [2,0,2],
+        [2,2,2]
+      ]
+    },
+    {
+      "input": [
+        [3,3,3,3,3,3,3],
+        [3,3,3,3,3,0,3],
+        [3,3,3,3,3,3,3],
+        [3,3,3,3,3,3,3],
+        [3,3,3,3,3,3,3],
+        [3,3,3,3,3,3,3],
+        [3,3,3,3,3,3,3]
+      ],
+      "output": [
+        [3,3,0],
+        [3,3,3],
+        [3,3,3]
+      ]
+    }
+  ],
+  "testInput": [
+    [6,6,6,6,6,6,6],
+    [6,6,6,6,6,6,6],
+    [6,6,6,6,6,6,6],
+    [6,6,6,6,6,6,6],
+    [6,0,6,6,6,6,6],
+    [6,6,6,6,6,6,6],
+    [6,6,6,6,6,6,6]
+  ],
+  "testOutput": [
+    [6,0,6],
+    [6,6,6],
+    [6,6,6]
+  ],
+  "hints": [
+    "Scan rows left-to-right, top-to-bottom to locate the first ⬛ fault cell.",
+    "Copy the 3×3 window centred on that cell into a new grid (use ⬛ if the window overflows).",
+    "⬛ indicates a fault; all other integers represent functioning power nodes."
+  ]
+}

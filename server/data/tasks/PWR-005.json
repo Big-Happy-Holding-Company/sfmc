@@ -1,0 +1,29 @@
+{
+  "id": "PWR-005",
+  "title": "Power Grid Status Glyph",
+  "description": "Render the numeric glyph 3 on the power-status matrix. All ⬛ grids must be transformed into the glyph using the same token.",
+  "category": "⚡ Power Systems",
+  "difficulty": "Advanced",
+  "gridSize": 13,
+  "timeLimit": null,
+  "basePoints": 1200,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]],
+      "output": [[3,3,3,3,3,3,3,3],[0,0,0,0,0,0,0,3],[3,3,3,3,3,3,0,3],[3,0,0,0,0,3,0,3],[3,0,3,3,0,3,0,3],[3,0,3,3,3,3,0,3],[3,0,0,0,0,0,0,3],[3,3,3,3,3,3,3,3]]
+    },
+    {
+      "input": [[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0],[0,0,0,0,0,0]],
+      "output": [[3,3,3,3,3,3],[0,0,0,0,0,3],[3,3,3,3,0,3],[3,0,3,3,0,3],[3,0,0,0,0,3],[3,3,3,3,3,3]]
+    }
+  ],
+  "testInput": [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]],
+  "testOutput": [[3,3,3,3],[0,0,0,3],[3,3,0,3],[3,3,3,3]],
+  "hints": [
+    "Draw the digit 3 using the same non-⬛ token across all sizes.",
+    "Top, middle and bottom rows become solid; rightmost column is solid; left half curves are formed with gaps.",
+    "Input grids are entirely ⬛; output must overlay the glyph exactly within bounds."
+  ]
+}

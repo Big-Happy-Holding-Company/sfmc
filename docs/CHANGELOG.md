@@ -1,5 +1,15 @@
 # Changelog
 
+## 2025-06-17 - Power Puzzle PWR-005 Added
+- Created power task `PWR-005` rendering digit 3 glyph across variable grid sizes using integer 3 tokens.
+
+_Author: Cascade_
+
+## 2025-06-17 - Power Puzzle PWR-004 Added
+- Created advanced power task `PWR-004` (3×3 window extraction around first ⬛ fault in a 7×7 grid).
+
+_Author: Cascade_
+
 ## 2025-06-17 - Puzzle Task Creation
 
 ### COM-002 to COM-005 Added
