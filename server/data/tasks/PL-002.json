@@ -1,0 +1,53 @@
+{
+  "id": "PL-002",
+  "title": "Launch Sequence Color Coding",
+  "description": "Pre-launch systems require color propagation analysis. Objects spread their colors to adjacent empty spaces.",
+  "category": "🚀 Pre-Launch Ops",
+  "difficulty": "Intermediate",
+  "gridSize": 3,
+  "timeLimit": 100,
+  "basePoints": 700,
+  "requiredRankLevel": 2,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [
+        ["🔋", "⬛", "⬛"],
+        ["⬛", "⬛", "⬛"],
+        ["⬛", "⬛", "💻"]
+      ],
+      "output": [
+        ["🔋", "🔋", "⬛"],
+        ["🔋", "⬛", "💻"],
+        ["⬛", "💻", "💻"]
+      ]
+    },
+    {
+      "input": [
+        ["⬛", "🛩️", "⬛"],
+        ["⬛", "⬛", "⬛"],
+        ["📡", "⬛", "⬛"]
+      ],
+      "output": [
+        ["🛩️", "🛩️", "🛩️"],
+        ["📡", "⬛", "⬛"],
+        ["📡", "📡", "⬛"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["⚡", "⬛", "⬛"],
+    ["⬛", "⬛", "⬛"],
+    ["⬛", "⬛", "🔭"]
+  ],
+  "testOutput": [
+    ["⚡", "⚡", "⬛"],
+    ["⚡", "⬛", "🔭"],
+    ["⬛", "🔭", "🔭"]
+  ],
+  "hints": [
+    "Each object expands to fill one adjacent empty space.",
+    "Objects spread horizontally and vertically, not diagonally.",
+    "Multiple objects can expand simultaneously without overlapping."
+  ]
+}

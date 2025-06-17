@@ -1,0 +1,45 @@
+{
+  "id": "PWR-001",
+  "title": "Power Grid Cascade Analysis",
+  "description": "Energy distribution systems require cascade failure prevention. Analyze how power flows through connected components.",
+  "category": "⚡ Power Systems",
+  "difficulty": "Advanced",
+  "gridSize": 4,
+  "timeLimit": 240,
+  "basePoints": 900,
+  "requiredRankLevel": 3,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        ["🔋", "⬛", "⬛", "⬛"],
+        ["⬛", "⚡", "⬛", "⬛"],
+        ["⬛", "⬛", "⚡", "⬛"],
+        ["⬛", "⬛", "⬛", "💡"]
+      ],
+      "output": [
+        ["🔋", "🔌", "⬛", "⬛"],
+        ["🔌", "⚡", "🔌", "⬛"],
+        ["⬛", "🔌", "⚡", "🔌"],
+        ["⬛", "⬛", "🔌", "💡"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["🔋", "⬛", "⬛", "⬛"],
+    ["⬛", "⬛", "⚡", "⬛"],
+    ["⬛", "⚡", "⬛", "⬛"],
+    ["⬛", "⬛", "⬛", "💡"]
+  ],
+  "testOutput": [
+    ["🔋", "🔌", "⬛", "⬛"],
+    ["🔌", "🔌", "⚡", "🔌"],
+    ["⬛", "⚡", "🔌", "🔌"],
+    ["⬛", "⬛", "🔌", "💡"]
+  ],
+  "hints": [
+    "Power flows from the battery to the light through the shortest path.",
+    "Power nodes (⚡) act as connection points in the grid.",
+    "Empty spaces between connected components become power lines (🔌)."
+  ]
+}
