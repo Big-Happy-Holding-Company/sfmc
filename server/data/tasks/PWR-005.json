@@ -10,17 +10,7 @@
   "requiredRankLevel": 1,
   "emojiSet": "tech_set2",
   "examples": [
-    {
-      "input": [["🔋", "⬛"], ["⬛", "⚡"]],
-      "output": [["🔋", "🔋"], ["⚡", "⚡"]]
-    },
-    {
-      "input": [["🖱️", "⬛"], ["⬛", "📺"]],
-      "output": [["🖱️", "🖱️"], ["📺", "📺"]]
-    }
-  ],
-  "testInput": [["⚙️", "⬛"], ["⬛", "🎛️"]],
-  "testOutput": [["⚙️", "⚙️"], ["🎛️", "🎛️"]],
+    
   "hints": [
     "Each power source expands horizontally to fill its row.",
     "Diagonal elements propagate across their respective rows.",
