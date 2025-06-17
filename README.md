@@ -1,6 +1,14 @@
 # Mission Control 2045
 
-A Space Force-themed ARC puzzle game where cadets complete operational tasks to advance through enlisted ranks.
+A Space Force-themed ARC-AGI puzzle game where cadets complete operational tasks to advance through enlisted ranks.
+
+## ARC-AGI Framework
+
+The Abstract and Reasoning Corpus for Artificial General Intelligence (ARC-AGI) is a benchmark designed to measure intelligence. This project leverages puzzles and logic from:
+
+- Official ARC Prize: https://arcprize.org/arc-agi
+- Puzzle datasets: https://github.com/arcprize/ARC-AGI-2/tree/main/data
+- Reference implementation: https://github.com/fchollet/ARC-AGI
 
 ## Architecture Overview
 
@@ -52,12 +60,12 @@ Tasks are stored as individual JSON files in `server/data/tasks/` for easy maint
   "emojiSet": "status_main",
   "examples": [
     {
-      "input": [["🟡", "⬛"], ["⬛", "🔴"]],
-      "output": [["🔴", "⬛"], ["⬛", "🟡"]]
+      "input": [[0, 1], [1, 0]],
+      "output": [[1, 0], [0, 1]]
     }
   ],
-  "testInput": [["🟣", "⬛"], ["🟠", "⬛"]],
-  "testOutput": [["⬛", "🟠"], ["⬛", "🟣"]],
+  "testInput": [[0, 1], [1, 0]],
+  "testOutput": [[1, 0], [0, 1]],
   "hints": [
     "Progressive hint 1",
     "Progressive hint 2", 
@@ -67,7 +75,7 @@ Tasks are stored as individual JSON files in `server/data/tasks/` for easy maint
 ```
 
 ### Emoji Set System
-Emoji sets follow ARC (Artificial Reasoning Challenge) conventions with exactly 10 emojis per set, mapping to color indices 0-9.
+Emoji sets follow ARC-AGI (Abstract and Reasoning Corpus for Artificial General Intelligence) conventions with exactly 10 emojis per set, mapping to numerical indices 0-9.
 
 #### Available Emoji Sets
 - `status_main`: Basic status indicators
@@ -101,16 +109,34 @@ Players advance through Space Force enlisted ranks by earning points:
 
 ### Timer System
 - **Speed Bonus**: Most tasks count up, rewarding faster completion
-- **Time Limited**: Advanced tasks have countdown timers for added pressure
+- **Time Limited**: Very advanced tasks have countdown timers for added pressure
 
 ## Development Guidelines
 
 ### Adding New Tasks
 1. Create a new JSON file in `server/data/tasks/`
 2. Follow the task file structure above
-3. Use appropriate emoji sets from `client/src/constants/spaceEmojis.ts`
-4. Test the task transformation logic
-5. Add progressive hints for player assistance
+3. **IMPORTANT**: Use numbers 0-9 in the logic/data files, not emojis
+4. Emojis are only mapped in the UI layer using `client/src/constants/spaceEmojis.ts`
+5. Test the task transformation logic
+6. Add progressive hints for player assistance
+
+### Standard for Puzzle Representation
+- **Logic/Data Files**: Always use integers 0-9 in data files (input, output arrays)
+- **UI Rendering**: Numbers are mapped to emojis only during rendering
+- **Example Format**:
+  ```json
+  {
+    "input": [
+      [0, 1, 1],
+      [0, 1, 1],
+      [1, 0, 0]
+    ],
+    "output": [[3]]
+  }
+  ```
+- The app should be able to import standard ARC-AGI files like those from the official repositories
+- Note: Existing files in the tasks folder may use emojis directly, but all new files should follow the standard integer format
 
 ### Modifying Emoji Sets
 1. Edit `client/src/constants/spaceEmojis.ts`
@@ -149,14 +175,10 @@ The application is configured for Replit deployment with automatic process manag
 
 ### Scalability Considerations
 - Database migration from in-memory to persistent storage
-- Task validation service for community-contributed puzzles
-- Performance monitoring for large task libraries
-- Caching layer for frequently accessed tasks
 
 ### Feature Roadmap
-- Multiplayer competitions
-- Custom puzzle creation tools
-- Advanced hint systems with visual aids
+
+- UI/UX improvements
 - Achievement and badge systems
 - Officer track with complex transformations
 
