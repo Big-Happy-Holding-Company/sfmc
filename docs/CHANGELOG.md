@@ -2,6 +2,24 @@
 
 ## 2025-06-17
 
+### Emoji Set Correction for Task Files
+- Updated all COM-XXX tasks to use `emojiSet: tech_set2`.
+- Updated all FS-XXX tasks to use `emojiSet: tech_set1`.
+- This ensures correct emoji palette mapping for communication and field systems tasks.
+
+_Author: GPT 4.1 (Cascade AI)_
+
+### Windows Compatibility: cross-env for Scripts
+- Installed cross-env as a dev dependency.
+- Updated `dev` and `start` scripts in package.json to use cross-env, allowing environment variables to work on Windows.
+- Removed invalid JSON comments from package.json after lint feedback.
+- Tested: `npm run dev` now works locally on Windows.
+
+_Author: GPT 4.1 (Cascade AI)_
+
+
+## 2025-06-17
+
 ### Task JSON Standardization - Improved Approach
 
 - Updated specific task files to ensure `timeLimit` is set to `null`.
