@@ -71,7 +71,10 @@ export function MissionSelector({
                       {category.name.includes('O₂') ? '🛡️' : 
                        category.name.includes('Pre-Launch') ? '🚀' :
                        category.name.includes('Fuel') ? '⚡' : 
-                       category.name.includes('Navigation') ? '🧭' : '🎖️'}
+                       category.name.includes('Navigation') ? '🧭' :
+                       category.name.includes('Communications') ? '📡' :
+                       category.name.includes('Power') ? '⚡' :
+                       category.name.includes('Security') ? '🔐' : '🎖️'}
                     </div>
                     <div className="text-left">
                       <div className="font-semibold text-slate-300">{category.name}</div>
