@@ -1,0 +1,45 @@
+{
+  "id": "PWR-004",
+  "title": "Advanced Power Grid Expansion",
+  "description": "Complex power distribution requires expansion algorithms. Single power sources expand to fill connected regions.",
+  "category": "⚡ Power Systems",
+  "difficulty": "Advanced",
+  "gridSize": 4,
+  "timeLimit": 220,
+  "basePoints": 1450,
+  "requiredRankLevel": 3,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        ["🔋", "⬛", "⬛", "⬛"],
+        ["⬛", "⬛", "⬛", "⬛"],
+        ["⬛", "⬛", "⬛", "⬛"],
+        ["⬛", "⬛", "⬛", "💡"]
+      ],
+      "output": [
+        ["🔋", "🔋", "🔋", "💡"],
+        ["🔋", "🔋", "🔋", "💡"],
+        ["🔋", "🔋", "🔋", "💡"],
+        ["🔋", "🔋", "🔋", "💡"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["⚡", "⬛", "⬛", "⬛"],
+    ["⬛", "⬛", "⬛", "⬛"],
+    ["⬛", "⬛", "⬛", "⬛"],
+    ["⬛", "⬛", "⬛", "🔌"]
+  ],
+  "testOutput": [
+    ["⚡", "⚡", "⚡", "🔌"],
+    ["⚡", "⚡", "⚡", "🔌"],
+    ["⚡", "⚡", "⚡", "🔌"],
+    ["⚡", "⚡", "⚡", "🔌"]
+  ],
+  "hints": [
+    "Power sources expand to fill the grid in column-based regions.",
+    "Left power source fills the left 3 columns completely.",
+    "Right power source fills the rightmost column completely."
+  ]
+}

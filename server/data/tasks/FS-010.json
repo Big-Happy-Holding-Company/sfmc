@@ -1,0 +1,29 @@
+{
+  "id": "FS-010",
+  "title": "Fuel System Element Sorting",
+  "description": "Fuel distribution requires element sorting protocols. Non-empty elements gather at specific grid positions.",
+  "category": "⚡ Fuel Systems",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 365,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [["⚙️", "⬛"], ["⬛", "🔧"]],
+      "output": [["⚙️", "🔧"], ["⬛", "⬛"]]
+    },
+    {
+      "input": [["⬛", "🛠️"], ["⚛️", "⬛"]],
+      "output": [["⚛️", "🛠️"], ["⬛", "⬛"]]
+    }
+  ],
+  "testInput": [["🔋", "⬛"], ["⬛", "💡"]],
+  "testOutput": [["🔋", "💡"], ["⬛", "⬛"]],
+  "hints": [
+    "Collect all non-empty elements to the top row.",
+    "Empty spaces fill the bottom row completely.",
+    "Maintain left-to-right order of collected elements."
+  ]
+}

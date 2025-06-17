@@ -1,0 +1,29 @@
+{
+  "id": "PL-008",
+  "title": "Launch Element Redistribution",
+  "description": "Pre-launch systems require element redistribution protocols. Elements redistribute to form balanced quadrant patterns.",
+  "category": "🚀 Pre-Launch Ops",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 350,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [["🔋", "💻"], ["⬛", "⬛"]],
+      "output": [["🔋", "⬛"], ["💻", "⬛"]]
+    },
+    {
+      "input": [["📡", "🔭"], ["⬛", "⬛"]],
+      "output": [["📡", "⬛"], ["🔭", "⬛"]]
+    }
+  ],
+  "testInput": [["🛩️", "⚡"], ["⬛", "⬛"]],
+  "testOutput": [["🛩️", "⬛"], ["⚡", "⬛"]],
+  "hints": [
+    "Elements from the top row redistribute vertically to the left column.",
+    "Right column becomes completely empty after redistribution.",
+    "Vertical ordering follows the original horizontal sequence."
+  ]
+}
