@@ -7,7 +7,7 @@
   "gridSize": 4,
   "timeLimit": null,
   "basePoints": 900,
-  "requiredRankLevel": 3,
+  "requiredRankLevel": 1,
   "emojiSet": "tech_set1",
   "examples": [
     {
@@ -54,6 +54,6 @@
   "hints": [
     "Visualize the grid turning upside-down and reversed.",
     "A 180° rotation moves each component to its diagonally opposite position.",
-    "Background cells (0) remain unchanged after rotation."
+    "Background cells ⬛ remain unchanged after rotation."
   ]
 }

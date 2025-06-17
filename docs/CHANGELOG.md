@@ -1,5 +1,17 @@
 # Changelog
 
+## 2025-06-17 - Puzzle Task Creation
+- Added or rewrote the following task JSON files with integer-based puzzles and hints:
+  - `PWR-001`, `PWR-002`, `PWR-003`
+  - `PL-001`, `PL-003`
+  - `COM-001`
+- All puzzles follow the FS-001 schema, use 0–9 integers (no raw emojis), and apply simple rotations/reflections.
+- Each task now has `requiredRankLevel: 1` and `timeLimit: null` as per guidelines.
+
+_Author: Cascade_
+
+# Changelog
+
 ## 2025-06-17
 
 ### Emoji Set Correction for Task Files

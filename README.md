@@ -124,17 +124,7 @@ Players advance through Space Force enlisted ranks by earning points:
 ### Standard for Puzzle Representation
 - **Logic/Data Files**: Always use integers 0-9 in data files (input, output arrays)
 - **UI Rendering**: Numbers are mapped to emojis only during rendering
-- **Example Format**:
-  ```json
-  {
-    "input": [
-      [0, 1, 1],
-      [0, 1, 1],
-      [1, 0, 0]
-    ],
-    "output": [[3]]
-  }
-  ```
+
 - The app should be able to import standard ARC-AGI files like those from the official repositories
 - Note: Existing files in the tasks folder may use emojis directly, but all new files should follow the standard integer format
 
@@ -143,6 +133,73 @@ Players advance through Space Force enlisted ranks by earning points:
 2. Maintain exactly 10 emojis per set
 3. Keep index 0 as `⬛` (black background)
 4. `EMOJI_SET_INFO` is the source of truth for emoji set metadata!!
+
+### SOURCE Task Sets 
+1. Tasks should have their transformation types in the description
+2. This allows for 40 different types of task in each category.
+
+# ARC-AGI Transformation Types
+
+## Geometric Transformations
+- Rotation (90°, 180°, 270°)
+- Reflection (horizontal, vertical, diagonal)
+- Translation (moving objects)
+- Scaling (resize objects)
+
+## Pattern Operations
+- Pattern completion
+- Pattern extension
+- Pattern repetition
+- Sequence prediction
+
+## Logical Operations
+- AND operations
+- OR operations
+- XOR operations
+- NOT operations
+- Conditional logic
+
+## Grid Operations
+- Grid splitting (horizontal, vertical, quadrant)
+- Grid merging
+- Grid overlay
+- Grid subtraction
+
+## Object Manipulation
+- Object counting
+- Object sorting
+- Object grouping
+- Object filtering
+
+## Spatial Relationships
+- Inside/outside relationships
+- Adjacent/touching relationships
+- Containment relationships
+- Proximity relationships
+
+## Color Operations
+- Color mapping
+- Color replacement
+- Color pattern matching
+- Color logic operations
+
+## Shape Operations
+- Shape detection
+- Shape transformation
+- Shape combination
+- Shape decomposition
+
+## Rule Inference
+- Single rule application
+- Multiple rule application
+- Rule interaction
+- Rule generalization
+
+## Abstract Reasoning
+- Symbol interpretation
+- Semantic relationships
+- Conceptual mapping
+- Abstract pattern recognition
 
 ### UI Components
 - Game components in `client/src/components/game/`
@@ -160,16 +217,7 @@ Players advance through Space Force enlisted ranks by earning points:
 - `GET /api/tasks` - Get all available tasks
 - `GET /api/tasks/:id` - Get specific task
 
-## Running the Application
 
-### Development
-```bash
-npm run dev
-```
-Starts both frontend (Vite) and backend (Express) on port 5000
-
-### Production
-The application is configured for Replit deployment with automatic process management.
 
 ## Future Enhancements
 
@@ -179,20 +227,4 @@ The application is configured for Replit deployment with automatic process manag
 ### Feature Roadmap
 
 - UI/UX improvements
-- Achievement and badge systems
 - Officer track with complex transformations
-
-## Contributing
-
-### Code Standards
-- TypeScript strict mode enabled
-- ESLint + Prettier for code formatting
-- Modular architecture with clear separation of concerns
-- Comprehensive error handling and logging
-
-### Testing
-- Unit tests for task validation logic
-- Integration tests for API endpoints
-- E2E tests for critical user flows
-
-For questions or support, refer to the inline documentation and type definitions throughout the codebase.

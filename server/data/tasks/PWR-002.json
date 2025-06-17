@@ -7,7 +7,7 @@
   "gridSize": 3,
   "timeLimit": null,
   "basePoints": 1150,
-  "requiredRankLevel": 3,
+  "requiredRankLevel": 1,
   "emojiSet": "tech_set1",
   "examples": [
     {
@@ -47,7 +47,7 @@
   ],
   "hints": [
     "Focus only on the main diagonal running top-left to bottom-right.",
-    "All non-diagonal positions become 0 (background).",
+    "All non-diagonal positions become ⬛.",
     "Diagonal elements keep their original values and positions."
   ]
 
