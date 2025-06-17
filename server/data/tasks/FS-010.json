@@ -19,8 +19,8 @@
       "output": [["⚛️", "🛠️"], ["⬛", "⬛"]]
     }
   ],
-  "testInput": [["🔋", "⬛"], ["⬛", "💡"]],
-  "testOutput": [["🔋", "💡"], ["⬛", "⬛"]],
+  "testInput": [["🔋", "⬛"], ["⬛", "📱"]],
+  "testOutput": [["🔋", "📱"], ["⬛", "⬛"]],
   "hints": [
     "Collect all non-empty elements to the top row.",
     "Empty spaces fill the bottom row completely.",

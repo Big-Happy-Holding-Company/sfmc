@@ -19,8 +19,8 @@
       "output": [["⬛", "⬛"], ["⚡", "🔭"]]
     }
   ],
-  "testInput": [["🔋", "⬛"], ["💻", "⬛"]],
-  "testOutput": [["⬛", "💻"], ["⬛", "🔋"]],
+  "testInput": [["🔋", "⬛"], ["📱", "⬛"]],
+  "testOutput": [["⬛", "📱"], ["⬛", "🔋"]],
   "hints": [
     "Look at how equipment positions change between input and output.",
     "The transformation swaps elements diagonally across the grid.",

@@ -19,7 +19,7 @@
       "output": [["⚛️", "⬛"], ["⬛", "⚛️"]]
     }
   ],
-  "testInput": [["🔋", "💡"], ["⚡", "🔋"]],
+  "testInput": [["🔋", "📱"], ["⚡", "🔋"]],
   "testOutput": [["🔋", "⬛"], ["⬛", "🔋"]],
   "hints": [
     "Only elements that appear multiple times are preserved.",
