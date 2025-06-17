@@ -8,7 +8,7 @@ The Abstract and Reasoning Corpus for Artificial General Intelligence (ARC-AGI) 
 
 - Official ARC Prize: https://arcprize.org/arc-agi
 - Puzzle datasets: https://github.com/arcprize/ARC-AGI-2/tree/main/data
-- Reference implementation: https://github.com/fchollet/ARC-AGI
+- Reference: https://github.com/fchollet/ARC-AGI
 
 ## Architecture Overview
 
@@ -16,7 +16,7 @@ The Abstract and Reasoning Corpus for Artificial General Intelligence (ARC-AGI) 
 - **Frontend**: React + TypeScript with Vite
 - **Backend**: Express.js with TypeScript
 - **Storage**: In-memory with modular JSON task loading
-- **UI**: Tailwind CSS + shadcn/ui components
+- **UI**: Tailwind CSS + shadcn/ui components  (This is just for the prototype)
 
 ### Directory Structure
 ```
@@ -43,7 +43,7 @@ The Abstract and Reasoning Corpus for Artificial General Intelligence (ARC-AGI) 
 ## Task System Architecture
 
 ### Modular Task Loading
-Tasks are stored as individual JSON files in `server/data/tasks/` for easy maintenance and scalability.
+Tasks are stored as individual JSON files in `server/data/tasks/` for easy maintenance and scalability.  The time limit on all tasks should be null unless otherwise specified.
 
 #### Task File Structure
 ```json
