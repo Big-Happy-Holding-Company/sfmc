@@ -22,34 +22,47 @@
 Create category-specific templates that embed domain knowledge:
 
 ```typescript
+/**
+ * CategoryTemplate is used by the TaskFactory to pre-populate
+ * Task fields that are purely category-driven. ALL keys below
+ * correspond 1-to-1 with properties in the canonical `Task`
+ * type found in `shared/schema.ts`.
+ */
 interface CategoryTemplate {
+  /** Two- or three-letter mission code (e.g. "PL", "COM") */
   categoryCode: string;
+  /** Display name surfaced in the frontend */
   categoryName: string;
+  /** Emoji palette key (must exist in spaceEmojis.ts) */
   emojiSet: string;
+  /** Default point reward for tasks of this category */
   basePoints: number;
-  storyContext: string;
-  commonHints: string[];
+  /** Minimum rank level required to attempt the task */
+  requiredRankLevel: number;
 }
 
+/**
+ * Registry of category presets.  Only fields that are written
+ * verbatim into the final Task JSON are listed here – the
+ * generator may use additional internal metadata elsewhere.
+ */
 const CATEGORY_TEMPLATES: Record<string, CategoryTemplate> = {
-  "COM": {
+  COM: {
     categoryCode: "COM",
     categoryName: "📡 Communications",
     emojiSet: "tech_set2",
     basePoints: 400,
-    storyContext: "communication systems and signal processing",
-    commonHints: ["⬛ represents no signal/background"]
+    requiredRankLevel: 1
   },
-  "OS": {
-    categoryCode: "OS", 
+  OS: {
+    categoryCode: "OS",
     categoryName: "🛡️ O₂ Sensor Check",
     emojiSet: "status_main",
     basePoints: 350,
-    storyContext: "oxygen sensor diagnostics and life support",
-    commonHints: ["⬛ indicates inactive sensor zones"]
+    requiredRankLevel: 1
   }
   // ... other categories
-}
+};
 ```
 
 #### Transformation Pattern Templates
