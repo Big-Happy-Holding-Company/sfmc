@@ -246,42 +246,48 @@ class BatchTaskGenerator {
 
 ## Implementation Roadmap
 
-### Phase 1: Core Templates (Week 1)
-- [ ] Create category and transformation templates
-- [ ] Build basic task factory
-- [ ] Implement 5 core geometric transformations
+### Phase 1: Core Foundation & Testing
+- [ ] Create category templates (all categories)
+- [ ] Build validation framework with automatic test case generation
+- [ ] Implement task quality verification system
 
-### Phase 2: Generation Engine (Week 2)  
-- [ ] Build grid generation system
-- [ ] Create validation framework
-- [ ] Generate first complete category (COM)
+### Phase 2: Initial Transformations
+- [ ] Implement 5 core transformation types:
+  - [ ] Horizontal reflection (geometric)
+  - [ ] 90° rotation (geometric)
+  - [ ] Pattern completion (pattern)
+  - [ ] XOR operation (logical)
+  - [ ] Object counting (object manipulation)
+- [ ] Build grid generation for these transformations only
 
-### Phase 3: Content Enhancement (Week 3)
-- [ ] Add story generation templates
-- [ ] Implement progressive difficulty
-- [ ] Create batch generation tools
+### Phase 3: Integration & Compatibility
+- [ ] Implement hybrid approach for task management:
+  - [ ] Flag manual vs generated tasks
+  - [ ] Ensure generated tasks work alongside existing manual tasks
+  - [ ] Create migration path for converting manual tasks (optional)
 
-### Phase 4: Full Production (Week 4)
-- [ ] Generate all 280 tasks automatically
-- [ ] Implement quality assurance pipeline
-- [ ] Create developer tooling
+### Phase 4: User Testing & Refinement
+- [ ] Generate test batch of 10 tasks (2 per transformation type)
+- [ ] Conduct playtesting sessions with real users
+- [ ] Measure difficulty levels and adjust generation parameters
+- [ ] Document findings and refine generation algorithms
 
 ## Benefits of This Approach
 
 ### Development Efficiency
-- **10x Faster**: Generate 280 tasks in hours vs weeks
-- **Consistency**: Uniform formatting and validation
-- **Quality**: Automated testing of transformation logic
+- **Initial Focus**: Generate 35 tasks (5 transformations × 7 categories) to establish the system
+- **Consistency**: Uniform formatting and validation across manually and automatically generated tasks
+- **Quality**: Automated testing of transformation logic with robust validation
 
 ### Maintainability
-- **Single Source**: Update templates to affect all tasks
-- **Versioning**: Track template changes vs individual tasks
-- **Extensibility**: Add new categories/transformations easily
+- **Hybrid Approach**: Support both manual and generated tasks in the same system
+- **Versioning**: Track template changes to maintain consistency
+- **Incremental Expansion**: Add more transformation types as needed after validating the initial set
 
 ### Quality Assurance
-- **Validation**: Automatic verification of logic and structure
-- **Testing**: Built-in test case generation
-- **Balancing**: Consistent difficulty progression
+- **Early Validation**: Test-driven development with automatic verification
+- **Real User Feedback**: Playtesting to validate difficulty levels and engagement
+- **Balanced Learning Curve**: Focus on core patterns that provide a solid foundation
 
 ## File Structure Changes
 
@@ -303,24 +309,28 @@ server/
 
 ## Migration Strategy
 
-### Backward Compatibility
-- Keep existing manual tasks
-- Flag generated vs manual tasks
-- Gradual migration of categories
+### Hybrid Task Management
+- Maintain existing manual tasks without disruption
+- Flag tasks as `generated: true` in task metadata
+- Implement both systems side-by-side with clear documentation
+- Prioritize user experience consistency across both task types
 
 ### Developer Workflow
 ```bash
-# Generate single task
+# Generate a specific task for a category
 npm run generate:task COM horizontal_reflection
 
-# Generate full category  
-npm run generate:category COM
+# Generate 5 core transformations for a specific category
+npm run generate:core-set COM
 
-# Generate all tasks
-npm run generate:all
+# Generate all 5 core transformations across all categories (35 tasks)
+npm run generate:all-core
 
-# Validate existing tasks
+# Validate tasks against schema and transformation rules
 npm run validate:tasks
+
+# Run automated playtest simulation
+npm run test:difficulty-curve
 ```
 
-This templatization system will transform task creation from a manual, error-prone process into an automated, consistent, and scalable system that can rapidly generate the full complement of 280 tasks while maintaining quality and thematic coherence.
+This templatization system will transform task creation through a balanced approach - starting with 35 high-quality tasks (5 transformation types across 7 categories) that can be thoroughly tested and refined before expanding. The hybrid compatibility ensures we get the best of both worlds: structured automation while preserving existing manual content.
