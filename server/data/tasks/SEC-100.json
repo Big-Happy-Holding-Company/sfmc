@@ -1,0 +1,180 @@
+{
+  "id": "SEC-100",
+  "title": "threat analysis Boolean Logic",
+  "description": "Apply XOR (exclusive OR) operations to the threat analysis by comparing adjacent cells in each row.",
+  "category": "🔒 Security",
+  "difficulty": "Advanced",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 425,
+  "requiredRankLevel": 1,
+  "emojiSet": "status_alerts",
+  "examples": [
+    {
+      "input": [
+        [
+          4,
+          3,
+          3,
+          0
+        ],
+        [
+          2,
+          2,
+          4,
+          4
+        ],
+        [
+          4,
+          3,
+          1,
+          0
+        ],
+        [
+          1,
+          2,
+          3,
+          3
+        ]
+      ],
+      "output": [
+        [
+          7,
+          0,
+          3,
+          0
+        ],
+        [
+          0,
+          6,
+          0,
+          4
+        ],
+        [
+          7,
+          4,
+          1,
+          0
+        ],
+        [
+          3,
+          5,
+          0,
+          3
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          0,
+          4,
+          3,
+          4
+        ],
+        [
+          2,
+          4,
+          4,
+          0
+        ],
+        [
+          2,
+          4,
+          4,
+          0
+        ],
+        [
+          1,
+          0,
+          0,
+          1
+        ]
+      ],
+      "output": [
+        [
+          4,
+          7,
+          7,
+          4
+        ],
+        [
+          6,
+          0,
+          4,
+          0
+        ],
+        [
+          6,
+          0,
+          4,
+          0
+        ],
+        [
+          1,
+          0,
+          1,
+          1
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      1,
+      3,
+      0,
+      1
+    ],
+    [
+      3,
+      4,
+      4,
+      2
+    ],
+    [
+      0,
+      3,
+      0,
+      0
+    ],
+    [
+      3,
+      1,
+      4,
+      0
+    ]
+  ],
+  "testOutput": [
+    [
+      4,
+      3,
+      1,
+      1
+    ],
+    [
+      7,
+      0,
+      6,
+      2
+    ],
+    [
+      3,
+      3,
+      0,
+      0
+    ],
+    [
+      4,
+      5,
+      4,
+      0
+    ]
+  ],
+  "hints": [
+    "XOR returns 'true' when inputs differ and 'false' when they're the same.",
+    "For numbers, think of XOR as: if values are different, the result is their sum; if the same, the result is 0.",
+    "Process each row independently, comparing pairs of adjacent cells."
+  ],
+  "generated": true
+}
