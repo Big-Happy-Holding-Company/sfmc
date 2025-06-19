@@ -19,7 +19,7 @@
    • `testInput` / `testOutput` – evaluation pair.
 4. All grids must use the integers **0-9** only.  
    • `0` maps to the ⬛ background.  
-   • Never embed raw emoji glyphs in JSON.
+   • Never embed raw emoji glyphs in JSON, always use the integer tokens.
 
 ## 2. Transformation Playbook
 Stick to simple, visually clear ARC transformations described in `attached_assets/arc_transformations.md`:

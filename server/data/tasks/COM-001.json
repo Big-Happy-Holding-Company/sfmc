@@ -47,6 +47,7 @@
   ],
   "hints": [
     "Flip the grid left-to-right.",
-    "First column becomes last column, second stays in middle (for 3×3)."
+    "First column becomes last column, second stays in middle (for 3×3).",
+    "⬛ cells flip along with all other values."
   ]
 }
