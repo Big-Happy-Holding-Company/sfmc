@@ -248,15 +248,34 @@ export class TaskValidator {
    * @returns Transformation type or undefined if not found
    */
   private inferTransformationType(taskId: string): string | undefined {
-    // This is a placeholder implementation
-    // In a real implementation, we would have a mapping from task ID prefixes to transformation types
+    // Extract transformation type from the task ID parameter, if provided
+    const parts = taskId.split('-');
+    const categoryPrefix = parts[0];
+    const taskNumber = parseInt(parts[1]);
     
-    // For now, we'll just return a default transformation for each category
-    if (taskId.startsWith("COM-")) return "horizontal_reflection";
-    if (taskId.startsWith("NAV-")) return "rotation_90deg";
-    if (taskId.startsWith("SEC-")) return "xor_operation";
-    if (taskId.startsWith("PL-")) return "pattern_completion";
-    if (taskId.startsWith("OS-")) return "object_counting";
+    // For sequentially numbered tasks (100+), use the transformation type passed directly
+    // This approach is needed because the new sequential numbering system doesn't encode the transformation
+    if (taskNumber >= 100) {
+      // Since the task ID no longer encodes the transformation, we need to check if the task has a specific transformation
+      // For now, we'll use the default transformation mapping based on category
+      if (categoryPrefix === "COM") return "horizontal_reflection";
+      if (categoryPrefix === "NAV") return "rotation_90deg";
+      if (categoryPrefix === "SEC") return "xor_operation";
+      if (categoryPrefix === "PL") return "pattern_completion";
+      if (categoryPrefix === "OS") return "xor_operation"; // Change from object_counting to xor_operation for OS tasks
+      if (categoryPrefix === "FS") return "rotation_90deg";
+      if (categoryPrefix === "PWR") return "pattern_completion";
+    }
+    
+    // Legacy implementation for reference tasks (001-099)
+    // Return a default transformation for each category (for backwards compatibility)
+    if (categoryPrefix === "COM") return "horizontal_reflection";
+    if (categoryPrefix === "NAV") return "rotation_90deg";
+    if (categoryPrefix === "SEC") return "xor_operation";
+    if (categoryPrefix === "PL") return "pattern_completion";
+    if (categoryPrefix === "OS") return "object_counting"; // Keep the original mapping for reference tasks
+    if (categoryPrefix === "FS") return "rotation_90deg";
+    if (categoryPrefix === "PWR") return "pattern_completion";
     
     return undefined;
   }
