@@ -1,0 +1,19 @@
+# nixpacks.toml
+# Nixpacks build configuration for Railway
+# Author: Cascade AI
+
+[phases.setup]
+# Ensure Node.js 18 and any other system dependencies
+nixPkgs = ["nodejs_18"]
+
+[phases.install]
+# Use npm ci for clean install
+cmds = ["npm ci"]
+
+[phases.build]
+# Build both the client and server bundles
+cmds = ["npm run build"]
+
+[start]
+# Start the bundled Node.js server
+cmd = "node dist/index.js"
