@@ -104,15 +104,42 @@ Players advance through Space Force enlisted ranks by earning points:
 - **🚀 Pre-Launch Ops**: Launch preparation tasks (PL-XXX)
 - **⚡ Fuel Systems**: Fuel flow and mixture analysis (FS-XXX)
 - **🧭 Navigation**: Directional calibration (NAV-XXX)
-- **COM-XXX Communications**: Communication systems (COM-XXX) 
-- **PWR-XXX Power Systems**: Power flow and distribution (PWR-XXX)
-- **SEC-XXX Security**: Security systems (SEC-XXX)
+- **📡 Communications**: Communication systems (COM-XXX) 
+- **⚡ Power Systems**: Power flow and distribution (PWR-XXX)
+- **🔒 Security**: Security systems (SEC-XXX)
 
 ### Timer System
 - **Speed Bonus**: Tasks count up, rewarding faster completion
 - **Time Limited**: Limits are all set to null for development, but can be added for expanded difficulty and point rewards.
 
 ## Development Guidelines
+
+### Task Generation Tools
+
+The project includes CLI tools for generating puzzle tasks programmatically:
+
+```powershell
+# Generate a single task
+npx tsx server\cli\generate-task.ts single -c <CATEGORY> -t <TRANSFORMATION> -s <SIZE> -o <OUTPUT_PATH>
+
+# Generate all tasks for a category
+npx tsx server\cli\generate-task.ts category -c <CATEGORY> -o <OUTPUT_DIR>
+
+# Generate all tasks for all categories
+npx tsx server\cli\generate-task.ts all -o <OUTPUT_DIR>
+
+# List available categories and transformations
+npx tsx server\cli\generate-task.ts list
+```
+
+Parameters:
+- `-c, --category`: Category code (e.g., COM, NAV, FS)
+- `-t, --transformation`: Transformation type (e.g., horizontal_reflection, rotation_90deg)
+- `-s, --size`: Grid size (2-4)
+- `-d, --difficulty`: Difficulty level (Basic, Intermediate, Advanced)
+- `-o, --output`: Output file or directory
+
+See the comprehensive guide in `docs/task_generation_guide.md` for more details.
 
 ### Adding New Tasks
 1. Create a new JSON file in `server/data/tasks/`
@@ -139,7 +166,7 @@ Players advance through Space Force enlisted ranks by earning points:
 1. Tasks should have their transformation types in the description
 2. This allows for 40 different types of task in each category.
 
-### Ready-to-Do Template (copy & replace fields)
+### Ready-to-Use Template (copy & replace fields)
 ```jsonc
 {
   "id": "<CATEGORY-XXX>",
@@ -250,6 +277,6 @@ Players advance through Space Force enlisted ranks by earning points:
 - Database migration from in-memory to persistent storage
 
 ### Feature Roadmap
-
+- Unity port
 - UI/UX improvements
 - Officer track with complex transformations

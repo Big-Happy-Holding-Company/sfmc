@@ -1,5 +1,12 @@
 # Changelog
 
+## 2025-06-19 - Templatization System Added
+- Added templatization system
+- Added task generation CLI
+- Added task validation CLI
+- Added task factory CLI
+
+
 ## 2025-06-17 - Power Puzzle PWR-005 Added
 - Created power task `PWR-005` rendering digit 3 glyph across variable grid sizes using integer 3 tokens.
 
