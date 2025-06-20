@@ -66,6 +66,13 @@ export class MemStorage implements IStorage {
   private players: Map<number, Player>;
   private tasks: Map<string, Task>;
   private playerTasks: Map<string, PlayerTask>; // key: `${playerId}-${taskId}`
+  /**
+   * Promise that resolves once task initialization has completed. This is critical
+   * for serverless environments where the storage instance is constructed lazily
+   * for each request. Route handlers will await this promise to guarantee that
+   * task data is available before continuing.
+   */
+  private tasksInitPromise: Promise<void> = Promise.resolve();
   private gameStates: Map<number, GameState>; // key: playerId
   private currentUserId: number;
   private currentPlayerId: number;
@@ -83,8 +90,10 @@ export class MemStorage implements IStorage {
     this.currentPlayerTaskId = 1;
     this.currentGameStateId = 1;
 
-    // Initialize tasks from JSON files asynchronously
-    this.initializeTasks().catch(console.error);
+    // Initialize tasks from JSON files asynchronously and store the promise so
+    // that other methods can await it.
+    this.tasksInitPromise = this.initializeTasks();
+    this.tasksInitPromise.catch(console.error);
   }
 
   // User operations
@@ -146,21 +155,29 @@ export class MemStorage implements IStorage {
   }
 
   // Task operations
+  private async ensureTasksLoaded(): Promise<void> {
+    await this.tasksInitPromise;
+  }
+
   async getTask(id: string): Promise<Task | undefined> {
+    await this.ensureTasksLoaded();
     return this.tasks.get(id);
   }
 
   async getTasks(): Promise<Task[]> {
+    await this.ensureTasksLoaded();
     return Array.from(this.tasks.values());
   }
 
   async getTasksByCategory(category: string): Promise<Task[]> {
+    await this.ensureTasksLoaded();
     return Array.from(this.tasks.values()).filter(
       (task) => task.category === category,
     );
   }
 
   async getTasksForRank(rankLevel: number): Promise<Task[]> {
+    await this.ensureTasksLoaded();
     return Array.from(this.tasks.values()).filter(
       (task) => task.requiredRankLevel <= rankLevel,
     );
