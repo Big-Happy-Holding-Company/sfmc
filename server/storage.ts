@@ -129,8 +129,14 @@ export class MemStorage implements IStorage {
     const id = this.currentPlayerId++;
     const now = new Date();
     const player: Player = {
-      ...insertPlayer,
+      // Required fields with sensible defaults if not supplied
       id,
+      userId: insertPlayer.userId ?? null,
+      rank: insertPlayer.rank ?? "Specialist 1",
+      rankLevel: insertPlayer.rankLevel ?? 1,
+      totalPoints: insertPlayer.totalPoints ?? 0,
+      completedMissions: insertPlayer.completedMissions ?? 0,
+      currentTask: insertPlayer.currentTask ?? null,
       createdAt: now,
       updatedAt: now,
     };
@@ -214,8 +220,14 @@ export class MemStorage implements IStorage {
   ): Promise<PlayerTask> {
     const id = this.currentPlayerTaskId++;
     const playerTask: PlayerTask = {
-      ...insertPlayerTask,
       id,
+      playerId: insertPlayerTask.playerId ?? null,
+      taskId: insertPlayerTask.taskId ?? null,
+      completed: insertPlayerTask.completed ?? false,
+      attempts: insertPlayerTask.attempts ?? 0,
+      bestTime: insertPlayerTask.bestTime ?? null,
+      pointsEarned: insertPlayerTask.pointsEarned ?? 0,
+      lastAttemptAt: insertPlayerTask.lastAttemptAt ?? new Date(),
     };
     this.playerTasks.set(
       `${insertPlayerTask.playerId}-${insertPlayerTask.taskId}`,
@@ -250,8 +262,13 @@ export class MemStorage implements IStorage {
     const id = this.currentGameStateId++;
     const now = new Date();
     const gameState: GameState = {
-      ...insertGameState,
       id,
+      playerId: insertGameState.playerId ?? null,
+      currentTaskId: insertGameState.currentTaskId ?? null,
+      currentGrid: insertGameState.currentGrid ?? null,
+      startTime: insertGameState.startTime ?? null,
+      timeRemaining: insertGameState.timeRemaining ?? null,
+      hintsUsed: insertGameState.hintsUsed ?? 0,
       createdAt: now,
       updatedAt: now,
     };
