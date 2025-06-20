@@ -1,5 +1,10 @@
 # Changelog
 
+## 2025-06-20 - Vercel Deployment Setup
+- Added Vercel configuration with `vercel.json`
+- Fixed TypeScript error in `server/vite.ts` related to `allowedHosts` type
+- Documented build and deployment process
+
 ## 2025-06-19 - Templatization System Added
 - Added templatization system
 - Added task generation CLI
