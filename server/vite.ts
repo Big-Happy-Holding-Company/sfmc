@@ -4,7 +4,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
-import viteConfig from "../vite.config";
 import { nanoid } from "nanoid";
 
 // __dirname in ES modules environment
@@ -24,6 +23,10 @@ export function log(message: string, source = "express") {
 }
 
 export async function setupVite(app: Express, server: Server) {
+  // Dynamically import Vite config only when running in development. This avoids
+  // executing vite.config.ts (which uses `import.meta.dirname`) in production bundles.
+  const { default: viteConfig } = await import("../vite.config");
+
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
