@@ -1,5 +1,15 @@
 # Changelog
 
+## 2025-06-21 - Narrative Story Wrapper Added
+- Implemented modular "story wrapper" system (`server/tools/story-factory.ts`).
+- Added writer-editable templates in `server/templates/storyTemplates.ts` with multi-placeholder support.
+- Introduced data lists `server/data/antagonists.json` and `server/data/components.json`.
+- Updated README directory structure and added `docs/story_wrapper_system_plan.md` for contributor guidance.
+- Enhanced placeholder engine for multiple antagonists and arbitrary keys.
+- NOTE: Existing `object_counting` transformation flagged for removal; will be replaced by `rotation_270deg` in a future patch.
+
+_Author: Cascade with o3 (high reasoning)_
+
 ## 2025-06-20 - Vercel Deployment Setup
 - Added Vercel configuration with `vercel.json`
 - Fixed TypeScript error in `server/vite.ts` related to `allowedHosts` type
