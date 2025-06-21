@@ -1,0 +1,85 @@
+{
+  "id": "NAV-101",
+  "title": "stellar mapping Boolean Logic",
+  "description": "Apply XOR (exclusive OR) operations to the stellar mapping by comparing adjacent cells in each row.",
+  "category": "🧭 Navigation",
+  "difficulty": "Advanced",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 350,
+  "requiredRankLevel": 1,
+  "emojiSet": "nav_alerts",
+  "examples": [
+    {
+      "input": [
+        [
+          2,
+          3
+        ],
+        [
+          0,
+          0
+        ]
+      ],
+      "output": [
+        [
+          5,
+          3
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          3,
+          0
+        ],
+        [
+          4,
+          1
+        ]
+      ],
+      "output": [
+        [
+          3,
+          0
+        ],
+        [
+          5,
+          1
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      2,
+      4
+    ],
+    [
+      2,
+      3
+    ]
+  ],
+  "testOutput": [
+    [
+      6,
+      4
+    ],
+    [
+      5,
+      3
+    ]
+  ],
+  "hints": [
+    "XOR returns 'true' when inputs differ and 'false' when they're the same.",
+    "For numbers, think of XOR as: if values are different, the result is their sum; if the same, the result is 0.",
+    "Process each row independently, comparing pairs of adjacent cells."
+  ],
+  "transformationType": "xor_operation",
+  "generated": true
+}

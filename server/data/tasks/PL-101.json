@@ -1,0 +1,85 @@
+{
+  "id": "PL-101",
+  "title": "system readiness Boolean Logic",
+  "description": "Apply XOR (exclusive OR) operations to the system readiness by comparing adjacent cells in each row.",
+  "category": "🚀 Pre-Launch Ops",
+  "difficulty": "Advanced",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 300,
+  "requiredRankLevel": 1,
+  "emojiSet": "celestial_set1",
+  "examples": [
+    {
+      "input": [
+        [
+          4,
+          4
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "output": [
+        [
+          0,
+          4
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          1,
+          2
+        ],
+        [
+          0,
+          3
+        ]
+      ],
+      "output": [
+        [
+          3,
+          2
+        ],
+        [
+          3,
+          3
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      1,
+      4
+    ],
+    [
+      3,
+      3
+    ]
+  ],
+  "testOutput": [
+    [
+      5,
+      4
+    ],
+    [
+      0,
+      3
+    ]
+  ],
+  "hints": [
+    "XOR returns 'true' when inputs differ and 'false' when they're the same.",
+    "For numbers, think of XOR as: if values are different, the result is their sum; if the same, the result is 0.",
+    "Process each row independently, comparing pairs of adjacent cells."
+  ],
+  "transformationType": "xor_operation",
+  "generated": true
+}
