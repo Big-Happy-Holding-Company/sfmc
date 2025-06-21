@@ -1,0 +1,181 @@
+{
+  "id": "PL-100",
+  "title": "system readiness Pattern Analysis",
+  "description": "Complete the pattern in the system readiness by identifying the logical sequence and filling in the missing values.",
+  "category": "🚀 Pre-Launch Ops",
+  "difficulty": "Intermediate",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 11300,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [
+          0,
+          0,
+          2,
+          3
+        ],
+        [
+          1,
+          0,
+          3,
+          4
+        ],
+        [
+          0,
+          3,
+          0,
+          5
+        ],
+        [
+          0,
+          4,
+          0,
+          6
+        ]
+      ],
+      "output": [
+        [
+          0,
+          1,
+          2,
+          3
+        ],
+        [
+          1,
+          2,
+          3,
+          4
+        ],
+        [
+          2,
+          3,
+          4,
+          5
+        ],
+        [
+          3,
+          4,
+          5,
+          6
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          2,
+          3,
+          4
+        ],
+        [
+          0,
+          3,
+          4,
+          0
+        ],
+        [
+          3,
+          0,
+          5,
+          0
+        ]
+      ],
+      "output": [
+        [
+          0,
+          1,
+          2,
+          3
+        ],
+        [
+          1,
+          2,
+          3,
+          4
+        ],
+        [
+          2,
+          3,
+          4,
+          5
+        ],
+        [
+          3,
+          4,
+          5,
+          6
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      0,
+      0,
+      0,
+      3
+    ],
+    [
+      1,
+      2,
+      3,
+      4
+    ],
+    [
+      2,
+      0,
+      0,
+      5
+    ],
+    [
+      3,
+      0,
+      5,
+      0
+    ]
+  ],
+  "testOutput": [
+    [
+      0,
+      1,
+      2,
+      3
+    ],
+    [
+      1,
+      2,
+      3,
+      4
+    ],
+    [
+      2,
+      3,
+      4,
+      5
+    ],
+    [
+      3,
+      4,
+      5,
+      6
+    ]
+  ],
+  "hints": [
+    "Look for repeating sequences or progressions in the grid.",
+    "Analyze both rows and columns for patterns that might reveal missing values.",
+    "Simple mathematical operations (addition, subtraction) often reveal the pattern."
+  ],
+  "transformationType": "pattern_completion",
+  "generated": true
+}

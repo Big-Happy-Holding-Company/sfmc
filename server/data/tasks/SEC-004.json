@@ -5,8 +5,8 @@
   "category": "🔐 Security Systems",
   "difficulty": "Advanced",
   "gridSize": 4,
-  "timeLimit": 170,
-  "basePoints": 1220,
+  "timeLimit": null,
+  "basePoints": 11220,
   "requiredRankLevel": 3,
   "emojiSet": "status_main",
   "examples": [

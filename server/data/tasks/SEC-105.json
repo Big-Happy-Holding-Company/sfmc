@@ -1,0 +1,181 @@
+{
+  "id": "SEC-105",
+  "title": "perimeter sensors Rotation Analysis",
+  "description": "Analyze the perimeter sensors by rotating the input grid 270 degrees clockwise (or 90 degrees counter-clockwise).",
+  "category": "🔒 Security",
+  "difficulty": "Intermediate",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 425,
+  "requiredRankLevel": 1,
+  "emojiSet": "status_alerts",
+  "examples": [
+    {
+      "input": [
+        [
+          3,
+          0,
+          9,
+          0
+        ],
+        [
+          8,
+          8,
+          7,
+          4
+        ],
+        [
+          9,
+          3,
+          7,
+          8
+        ],
+        [
+          1,
+          0,
+          2,
+          7
+        ]
+      ],
+      "output": [
+        [
+          0,
+          4,
+          8,
+          7
+        ],
+        [
+          9,
+          7,
+          7,
+          2
+        ],
+        [
+          0,
+          8,
+          3,
+          0
+        ],
+        [
+          3,
+          8,
+          9,
+          1
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          7,
+          8,
+          4,
+          4
+        ],
+        [
+          8,
+          8,
+          6,
+          8
+        ],
+        [
+          8,
+          6,
+          3,
+          9
+        ],
+        [
+          7,
+          5,
+          1,
+          0
+        ]
+      ],
+      "output": [
+        [
+          4,
+          8,
+          9,
+          0
+        ],
+        [
+          4,
+          6,
+          3,
+          1
+        ],
+        [
+          8,
+          8,
+          6,
+          5
+        ],
+        [
+          7,
+          8,
+          8,
+          7
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      0,
+      5,
+      3,
+      5
+    ],
+    [
+      2,
+      7,
+      8,
+      6
+    ],
+    [
+      6,
+      0,
+      8,
+      4
+    ],
+    [
+      9,
+      2,
+      4,
+      2
+    ]
+  ],
+  "testOutput": [
+    [
+      5,
+      6,
+      4,
+      2
+    ],
+    [
+      3,
+      8,
+      8,
+      4
+    ],
+    [
+      5,
+      7,
+      0,
+      2
+    ],
+    [
+      0,
+      2,
+      6,
+      9
+    ]
+  ],
+  "hints": [
+    "Rotate the entire grid 270 degrees clockwise (¾ turn to the right).",
+    "The leftmost column becomes the top row, reading from left to right.",
+    "Each row in the original becomes a column in the result, with order shifted accordingly."
+  ],
+  "transformationType": "rotation_270deg",
+  "generated": true
+}
