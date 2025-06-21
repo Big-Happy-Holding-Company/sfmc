@@ -1,0 +1,84 @@
+{
+  "id": "SEC-100",
+  "title": "threat analysis Boolean Logic",
+  "description": "Apply XOR (exclusive OR) operations to the threat analysis by comparing adjacent cells in each row.",
+  "category": "🔒 Security",
+  "difficulty": "Advanced",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 425,
+  "requiredRankLevel": 1,
+  "emojiSet": "status_alerts",
+  "examples": [
+    {
+      "input": [
+        [
+          3,
+          3
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "output": [
+        [
+          0,
+          3
+        ],
+        [
+          2,
+          2
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "output": [
+        [
+          1,
+          1
+        ],
+        [
+          4,
+          3
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      3,
+      2
+    ],
+    [
+      1,
+      3
+    ]
+  ],
+  "testOutput": [
+    [
+      5,
+      2
+    ],
+    [
+      4,
+      3
+    ]
+  ],
+  "hints": [
+    "XOR returns 'true' when inputs differ and 'false' when they're the same.",
+    "For numbers, think of XOR as: if values are different, the result is their sum; if the same, the result is 0.",
+    "Process each row independently, comparing pairs of adjacent cells."
+  ],
+  "generated": true
+}
