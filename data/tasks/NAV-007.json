@@ -1,0 +1,41 @@
+{
+  "id": "NAV-007",
+  "title": "Advanced Navigation 270° Rotation",
+  "description": "Complex navigation arrays require 270-degree clockwise rotation for deep space alignment. Triple rotation transformation applied.",
+  "category": "🧭 Navigation",
+  "difficulty": "Advanced",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 1250,
+  "requiredRankLevel": 1,
+  "emojiSet": "nav_alerts",
+  "examples": [
+    {
+      "input": [
+        ["⬆️", "➡️", "⬇️"],
+        ["⬅️", "🧭", "↗️"],
+        ["↙️", "↖️", "↘️"]
+      ],
+      "output": [
+        ["⬇️", "↗️", "↘️"],
+        ["➡️", "🧭", "↖️"],
+        ["⬆️", "⬅️", "↙️"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["↗️", "⬆️", "↖️"],
+    ["➡️", "🧭", "⬅️"],
+    ["↘️", "⬇️", "↙️"]
+  ],
+  "testOutput": [
+    ["↖️", "⬅️", "↙️"],
+    ["⬆️", "🧭", "⬇️"],
+    ["↗️", "➡️", "↘️"]
+  ],
+  "hints": [
+    "The grid rotates 270 degrees clockwise (or 90 degrees counter-clockwise).",
+    "Each element moves three positions clockwise around the center.",
+    "The center element remains stationary during rotation."
+  ]
+}

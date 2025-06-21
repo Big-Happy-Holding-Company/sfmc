@@ -1,0 +1,29 @@
+{
+  "id": "SEC-002",
+  "title": "Security Color Inversion",
+  "description": "Access control systems require color inversion protocols. Transform each color to its designated security opposite.",
+  "category": "🔐 Security Systems",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 290,
+  "requiredRankLevel": 1,
+  "emojiSet": "status_main",
+  "examples": [
+    {
+      "input": [["🔴", "🟢"], ["🔵", "🟡"]],
+      "output": [["🟢", "🔴"], ["🟡", "🔵"]]
+    },
+    {
+      "input": [["🟣", "🟠"], ["⬛", "🔴"]],
+      "output": [["🟠", "🟣"], ["⬛", "🟢"]]
+    }
+  ],
+  "testInput": [["🔵", "🟡"], ["🟢", "🟣"]],
+  "testOutput": [["🟡", "🔵"], ["🔴", "🟠"]],
+  "hints": [
+    "Red becomes green, green becomes red.",
+    "Blue becomes yellow, yellow becomes blue.",
+    "Purple becomes orange, orange becomes purple."
+  ]
+}

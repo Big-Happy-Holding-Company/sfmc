@@ -1,0 +1,85 @@
+{
+  "id": "SEC-102",
+  "title": "defense matrix Boolean Logic",
+  "description": "Apply XOR (exclusive OR) operations to the defense matrix by comparing adjacent cells in each row.",
+  "category": "🔒 Security",
+  "difficulty": "Impossible?",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 41125,
+  "requiredRankLevel": 1,
+  "emojiSet": "status_alerts",
+  "examples": [
+    {
+      "input": [
+        [
+          3,
+          4
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "output": [
+        [
+          7,
+          4
+        ],
+        [
+          1,
+          0
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          0,
+          0
+        ],
+        [
+          1,
+          3
+        ]
+      ],
+      "output": [
+        [
+          0,
+          0
+        ],
+        [
+          4,
+          3
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      1,
+      1
+    ],
+    [
+      2,
+      0
+    ]
+  ],
+  "testOutput": [
+    [
+      0,
+      1
+    ],
+    [
+      2,
+      0
+    ]
+  ],
+  "hints": [
+    "XOR returns 'true' when inputs differ and 'false' when they're the same.",
+    "For numbers, think of XOR as: if values are different, the result is their sum; if the same, the result is 0.",
+    "Process each row independently, comparing pairs of adjacent cells."
+  ],
+  "transformationType": "xor_operation",
+  "generated": true
+}

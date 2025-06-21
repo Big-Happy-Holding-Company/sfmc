@@ -1,0 +1,181 @@
+{
+  "id": "OS-102",
+  "title": "environmental data Rotation Analysis",
+  "description": "Analyze the environmental data by rotating the input grid 270 degrees clockwise (or 90 degrees counter-clockwise).",
+  "category": "🛡️ O₂ Sensor Check",
+  "difficulty": "Intermediate",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 350,
+  "requiredRankLevel": 1,
+  "emojiSet": "status_main",
+  "examples": [
+    {
+      "input": [
+        [
+          8,
+          9,
+          3,
+          2
+        ],
+        [
+          3,
+          2,
+          4,
+          8
+        ],
+        [
+          9,
+          8,
+          8,
+          6
+        ],
+        [
+          2,
+          1,
+          1,
+          2
+        ]
+      ],
+      "output": [
+        [
+          2,
+          8,
+          6,
+          2
+        ],
+        [
+          3,
+          4,
+          8,
+          1
+        ],
+        [
+          9,
+          2,
+          8,
+          1
+        ],
+        [
+          8,
+          3,
+          9,
+          2
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          4,
+          7,
+          0,
+          2
+        ],
+        [
+          4,
+          4,
+          0,
+          0
+        ],
+        [
+          5,
+          6,
+          1,
+          5
+        ],
+        [
+          0,
+          7,
+          7,
+          1
+        ]
+      ],
+      "output": [
+        [
+          2,
+          0,
+          5,
+          1
+        ],
+        [
+          0,
+          0,
+          1,
+          7
+        ],
+        [
+          7,
+          4,
+          6,
+          7
+        ],
+        [
+          4,
+          4,
+          5,
+          0
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      6,
+      2,
+      7,
+      9
+    ],
+    [
+      1,
+      6,
+      2,
+      9
+    ],
+    [
+      3,
+      0,
+      3,
+      7
+    ],
+    [
+      2,
+      1,
+      2,
+      5
+    ]
+  ],
+  "testOutput": [
+    [
+      9,
+      9,
+      7,
+      5
+    ],
+    [
+      7,
+      2,
+      3,
+      2
+    ],
+    [
+      2,
+      6,
+      0,
+      1
+    ],
+    [
+      6,
+      1,
+      3,
+      2
+    ]
+  ],
+  "hints": [
+    "Rotate the entire grid 270 degrees clockwise (¾ turn to the right).",
+    "The leftmost column becomes the top row, reading from left to right.",
+    "Each row in the original becomes a column in the result, with order shifted accordingly."
+  ],
+  "transformationType": "rotation_270deg",
+  "generated": true
+}

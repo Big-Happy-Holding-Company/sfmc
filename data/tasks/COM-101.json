@@ -1,33 +1,33 @@
 {
-  "id": "SEC-102",
-  "title": "defense matrix Boolean Logic",
-  "description": "Apply XOR (exclusive OR) operations to the defense matrix by comparing adjacent cells in each row.",
-  "category": "🔒 Security",
+  "id": "COM-101",
+  "title": "transmission data Boolean Logic",
+  "description": "Apply XOR (exclusive OR) operations to the transmission data by comparing adjacent cells in each row.",
+  "category": "📡 Communications",
   "difficulty": "Advanced",
   "gridSize": 2,
   "timeLimit": null,
-  "basePoints": 425,
+  "basePoints": 400,
   "requiredRankLevel": 1,
-  "emojiSet": "status_alerts",
+  "emojiSet": "tech_set2",
   "examples": [
     {
       "input": [
         [
-          3,
-          4
+          2,
+          3
         ],
         [
-          1,
+          3,
           0
         ]
       ],
       "output": [
         [
-          7,
-          4
+          5,
+          3
         ],
         [
-          1,
+          3,
           0
         ]
       ]
@@ -35,44 +35,44 @@
     {
       "input": [
         [
-          0,
+          4,
           0
         ],
         [
-          1,
-          3
+          3,
+          1
         ]
       ],
       "output": [
         [
-          0,
+          4,
           0
         ],
         [
           4,
-          3
+          1
         ]
       ]
     }
   ],
   "testInput": [
     [
-      1,
+      4,
       1
     ],
     [
-      2,
-      0
+      0,
+      3
     ]
   ],
   "testOutput": [
     [
-      0,
+      5,
       1
     ],
     [
-      2,
-      0
+      3,
+      3
     ]
   ],
   "hints": [

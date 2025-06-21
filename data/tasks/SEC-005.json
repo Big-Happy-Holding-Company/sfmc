@@ -1,0 +1,29 @@
+{
+  "id": "SEC-005",
+  "title": "Security Element Clustering",
+  "description": "Access control systems require element clustering operations. Similar elements group together in adjacent positions.",
+  "category": "🔐 Security Systems",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 315,
+  "requiredRankLevel": 1,
+  "emojiSet": "status_main",
+  "examples": [
+    {
+      "input": [["🔴", "🟢"], ["🟢", "🔴"]],
+      "output": [["🔴", "🔴"], ["🟢", "🟢"]]
+    },
+    {
+      "input": [["🔵", "🟡"], ["🟡", "🔵"]],
+      "output": [["🔵", "🔵"], ["🟡", "🟡"]]
+    }
+  ],
+  "testInput": [["🟣", "🟠"], ["🟠", "🟣"]],
+  "testOutput": [["🟣", "🟣"], ["🟠", "🟠"]],
+  "hints": [
+    "Group identical elements together in the same row.",
+    "Top row collects one type, bottom row collects the other.",
+    "Maintain clustering by element type rather than position."
+  ]
+}

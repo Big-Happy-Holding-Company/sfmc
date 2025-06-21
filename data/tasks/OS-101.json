@@ -1,17 +1,49 @@
 {
-  "id": "PWR-101",
-  "title": "resource allocation Boolean Logic",
-  "description": "Apply XOR (exclusive OR) operations to the resource allocation by comparing adjacent cells in each row.",
-  "category": "⚡ Power Systems",
+  "id": "OS-101",
+  "title": "environmental data Boolean Logic",
+  "description": "Apply XOR (exclusive OR) operations to the environmental data by comparing adjacent cells in each row.",
+  "category": "🛡️ O₂ Sensor Check",
   "difficulty": "Advanced",
   "gridSize": 2,
   "timeLimit": null,
-  "basePoints": 375,
+  "basePoints": 350,
   "requiredRankLevel": 1,
-  "emojiSet": "tech_set1",
+  "emojiSet": "status_main",
   "examples": [
     {
       "input": [
+        [
+          1,
+          3
+        ],
+        [
+          2,
+          0
+        ]
+      ],
+      "output": [
+        [
+          4,
+          3
+        ],
+        [
+          2,
+          0
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          2
+        ]
+      ],
+      "output": [
         [
           0,
           0
@@ -20,59 +52,27 @@
           2,
           2
         ]
-      ],
-      "output": [
-        [
-          0,
-          0
-        ],
-        [
-          0,
-          2
-        ]
-      ]
-    },
-    {
-      "input": [
-        [
-          3,
-          4
-        ],
-        [
-          1,
-          2
-        ]
-      ],
-      "output": [
-        [
-          7,
-          4
-        ],
-        [
-          3,
-          2
-        ]
       ]
     }
   ],
   "testInput": [
     [
-      3,
-      0
-    ],
-    [
       4,
       1
+    ],
+    [
+      3,
+      0
     ]
   ],
   "testOutput": [
     [
-      3,
-      0
-    ],
-    [
       5,
       1
+    ],
+    [
+      3,
+      0
     ]
   ],
   "hints": [

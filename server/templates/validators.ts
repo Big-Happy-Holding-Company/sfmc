@@ -260,9 +260,9 @@ export class TaskValidator {
       // For now, we'll use the default transformation mapping based on category
       if (categoryPrefix === "COM") return "horizontal_reflection";
       if (categoryPrefix === "NAV") return "rotation_90deg";
-      if (categoryPrefix === "SEC") return "xor_operation";
+      if (categoryPrefix === "SEC") return "vertical_reflection";
       if (categoryPrefix === "PL") return "pattern_completion";
-      if (categoryPrefix === "OS") return "xor_operation"; // Change from object_counting to xor_operation for OS tasks
+      if (categoryPrefix === "OS") return "rotation_270deg"; // Change from object_counting to rotation_270deg for OS tasks
       if (categoryPrefix === "FS") return "rotation_90deg";
       if (categoryPrefix === "PWR") return "pattern_completion";
     }
@@ -271,7 +271,7 @@ export class TaskValidator {
     // Return a default transformation for each category (for backwards compatibility)
     if (categoryPrefix === "COM") return "horizontal_reflection";
     if (categoryPrefix === "NAV") return "rotation_90deg";
-    if (categoryPrefix === "SEC") return "xor_operation";
+    if (categoryPrefix === "SEC") return "vertical_reflection";
     if (categoryPrefix === "PL") return "pattern_completion";
     if (categoryPrefix === "OS") return "rotation_270deg"; // Change from object_counting to rotation_270deg
     if (categoryPrefix === "FS") return "rotation_90deg";

@@ -1,0 +1,84 @@
+{
+  "id": "COM-100",
+  "title": "signal strength Mirror Analysis",
+  "description": "Analyze the signal strength by reflecting the input grid horizontally (left-to-right mirror).",
+  "category": "📡 Communications",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 400,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [
+          7,
+          1
+        ],
+        [
+          7,
+          1
+        ]
+      ],
+      "output": [
+        [
+          1,
+          7
+        ],
+        [
+          1,
+          7
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          4,
+          1
+        ],
+        [
+          2,
+          6
+        ]
+      ],
+      "output": [
+        [
+          1,
+          4
+        ],
+        [
+          6,
+          2
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      3,
+      7
+    ],
+    [
+      5,
+      1
+    ]
+  ],
+  "testOutput": [
+    [
+      7,
+      3
+    ],
+    [
+      1,
+      5
+    ]
+  ],
+  "hints": [
+    "Think of the grid as being reflected in a mirror placed to the right side.",
+    "The first column becomes the last column, the second becomes the second-to-last, and so on.",
+    "The black square (⬛) reflects just like any other cell value."
+  ],
+  "generated": true
+}

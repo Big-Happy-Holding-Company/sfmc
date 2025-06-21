@@ -1,0 +1,53 @@
+{
+  "id": "OS-003",
+  "title": "Pattern Fill Algorithm",
+  "description": "Oxygen sensor arrays need pattern completion. Fill empty spaces following the established color sequence patterns.",
+  "category": "🛡️ O₂ Sensor Check",
+  "difficulty": "Intermediate",
+  "gridSize": 3,
+  "timeLimit": 120,
+  "basePoints": 550,
+  "requiredRankLevel": 2,
+  "emojiSet": "status_main",
+  "examples": [
+    {
+      "input": [
+        ["🔴", "⬛", "🔴"],
+        ["⬛", "🟢", "⬛"],
+        ["🔴", "⬛", "🔴"]
+      ],
+      "output": [
+        ["🔴", "🟢", "🔴"],
+        ["🟢", "🟢", "🟢"],
+        ["🔴", "🟢", "🔴"]
+      ]
+    },
+    {
+      "input": [
+        ["🔵", "🟡", "⬛"],
+        ["🟡", "⬛", "🟡"],
+        ["⬛", "🟡", "🔵"]
+      ],
+      "output": [
+        ["🔵", "🟡", "🔵"],
+        ["🟡", "🔵", "🟡"],
+        ["🔵", "🟡", "🔵"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["🟣", "⬛", "🟣"],
+    ["⬛", "🟠", "⬛"],
+    ["🟣", "⬛", "🟣"]
+  ],
+  "testOutput": [
+    ["🟣", "🟠", "🟣"],
+    ["🟠", "🟠", "🟠"],
+    ["🟣", "🟠", "🟣"]
+  ],
+  "hints": [
+    "Look for the dominant color pattern in the corners.",
+    "⬛ spaces are filled with the center color.",
+    "The transformation creates a checkerboard-like pattern."
+  ]
+}

@@ -3,10 +3,10 @@
   "title": "energy distribution Pattern Analysis",
   "description": "Complete the pattern in the energy distribution by identifying the logical sequence and filling in the missing values.",
   "category": "⚡ Power Systems",
-  "difficulty": "Intermediate",
+  "difficulty": "Impossible?",
   "gridSize": 4,
   "timeLimit": null,
-  "basePoints": 375,
+  "basePoints": 37500,
   "requiredRankLevel": 1,
   "emojiSet": "tech_set1",
   "examples": [

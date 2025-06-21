@@ -1,14 +1,14 @@
 {
-  "id": "SEC-101",
-  "title": "threat analysis Boolean Logic",
-  "description": "Apply XOR (exclusive OR) operations to the threat analysis by comparing adjacent cells in each row.",
-  "category": "🔒 Security",
+  "id": "FS-101",
+  "title": "fuel efficiency Boolean Logic",
+  "description": "Apply XOR (exclusive OR) operations to the fuel efficiency by comparing adjacent cells in each row.",
+  "category": "⚡ Fuel Systems",
   "difficulty": "Advanced",
   "gridSize": 2,
   "timeLimit": null,
-  "basePoints": 425,
+  "basePoints": 325,
   "requiredRankLevel": 1,
-  "emojiSet": "status_alerts",
+  "emojiSet": "tech_set1",
   "examples": [
     {
       "input": [
@@ -17,8 +17,8 @@
           3
         ],
         [
-          0,
-          2
+          4,
+          3
         ]
       ],
       "output": [
@@ -27,16 +27,16 @@
           3
         ],
         [
-          2,
-          2
+          7,
+          3
         ]
       ]
     },
     {
       "input": [
         [
-          0,
-          1
+          4,
+          4
         ],
         [
           1,
@@ -45,8 +45,8 @@
       ],
       "output": [
         [
-          1,
-          1
+          0,
+          4
         ],
         [
           4,
@@ -58,20 +58,20 @@
   "testInput": [
     [
       3,
-      2
+      3
     ],
     [
-      1,
+      2,
       3
     ]
   ],
   "testOutput": [
     [
-      5,
-      2
+      0,
+      3
     ],
     [
-      4,
+      5,
       3
     ]
   ],
@@ -80,5 +80,6 @@
     "For numbers, think of XOR as: if values are different, the result is their sum; if the same, the result is 0.",
     "Process each row independently, comparing pairs of adjacent cells."
   ],
+  "transformationType": "xor_operation",
   "generated": true
 }

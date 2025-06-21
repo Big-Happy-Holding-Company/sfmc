@@ -1,0 +1,53 @@
+{
+  "id": "NAV-002",
+  "title": "Coordinate Rotation Protocol",
+  "description": "Navigation arrays require 90-degree clockwise rotation for orbital alignment. Study the directional transformation patterns.",
+  "category": "🧭 Navigation",
+  "difficulty": "Intermediate",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 600,
+  "requiredRankLevel": 1,
+  "emojiSet": "nav_alerts",
+  "examples": [
+    {
+      "input": [
+        ["⬆️", "➡️", "⬇️"],
+        ["⬅️", "🧭", "↗️"],
+        ["↙️", "↖️", "↘️"]
+      ],
+      "output": [
+        ["↙️", "⬅️", "⬆️"],
+        ["↖️", "🧭", "➡️"],
+        ["↘️", "↗️", "⬇️"]
+      ]
+    },
+    {
+      "input": [
+        ["⬆️", "⬛", "⬇️"],
+        ["⬛", "🧭", "⬛"],
+        ["⬅️", "⬛", "➡️"]
+      ],
+      "output": [
+        ["⬅️", "⬛", "⬆️"],
+        ["⬛", "🧭", "⬛"],
+        ["➡️", "⬛", "⬇️"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["↗️", "⬆️", "↖️"],
+    ["➡️", "🧭", "⬅️"],
+    ["↘️", "⬇️", "↙️"]
+  ],
+  "testOutput": [
+    ["↘️", "➡️", "↗️"],
+    ["⬇️", "🧭", "⬆️"],
+    ["↙️", "⬅️", "↖️"]
+  ],
+  "hints": [
+    "The grid rotates 90 degrees clockwise around the center.",
+    "Each directional arrow also rotates to match its new position.",
+    "The center element remains stationary during rotation."
+  ]
+}

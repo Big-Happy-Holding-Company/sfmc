@@ -22,7 +22,7 @@ export type TransformationKey =
   | "horizontal_reflection"
   | "rotation_90deg"
   | "pattern_completion"
-  | "xor_operation"
+  | "vertical_reflection"
   | "rotation_270deg";
 
 /**
@@ -60,13 +60,13 @@ export const StoryTemplates: Record<TransformationKey, StoryTemplate[]> = {
     },
   ],
 
-  /** XOR-style compare rule, simplified */
-  xor_operation: [
+  /** Vertical reflection: flip entire grid top ↔ bottom */
+  vertical_reflection: [
     {
-      id: "clear_static",
-      title: "Zero-Out the Static!",
+      id: "mirror_vertical",
+      title: "Flip the Radar Upside Down!",
       description:
-        "🛰️ Channel chaos! {{antagonist}} tried impressing friends by hacking 💻 two satellite feeds at once and created a waveform mess 📊. Classified messages 🔒 are getting scrambled with pizza 🍕 delivery orders! When symbols matched in the samples ➡️ they became ⬛, when different ➡️ the brighter symbol stayed ✨. Apply this XOR-like rule to today's grid to untangle the signals 📶!",
+        "📡 Radar calamity! {{antagonist}} spilled coffee ☕ on the console and flipped the radar display upside-down. The ground looks like sky and incoming ships are showing up backwards 🛸! Study the before → after symbol grids to see the flip. Mirror today's entire grid top-to-bottom 🔼🔽 to prevent spacecraft collisions 💥!",
     },
   ],
 

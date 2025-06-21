@@ -1,0 +1,85 @@
+{
+  "id": "PWR-101",
+  "title": "resource allocation Boolean Logic",
+  "description": "Apply XOR (exclusive OR) operations to the resource allocation by comparing adjacent cells in each row.",
+  "category": "⚡ Power Systems",
+  "difficulty": "Impossible?",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 375,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [
+        [
+          0,
+          0
+        ],
+        [
+          2,
+          2
+        ]
+      ],
+      "output": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          2
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          3,
+          4
+        ],
+        [
+          1,
+          2
+        ]
+      ],
+      "output": [
+        [
+          7,
+          4
+        ],
+        [
+          3,
+          2
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      3,
+      0
+    ],
+    [
+      4,
+      1
+    ]
+  ],
+  "testOutput": [
+    [
+      3,
+      0
+    ],
+    [
+      5,
+      1
+    ]
+  ],
+  "hints": [
+    "XOR returns 'true' when inputs differ and 'false' when they're the same.",
+    "For numbers, think of XOR as: if values are different, the result is their sum; if the same, the result is 0.",
+    "Process each row independently, comparing pairs of adjacent cells."
+  ],
+  "transformationType": "xor_operation",
+  "generated": true
+}

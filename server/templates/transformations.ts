@@ -112,7 +112,7 @@ export const TRANSFORMATION_TEMPLATES: TransformationTemplate[] = [
     descriptionPattern: "Analyze the {domain} by rotating the input grid 90 degrees clockwise.",
     gridGenerator: "Rotation90DegGenerator",
     hintPatterns: [
-      "Rotate the entire grid 90 degrees clockwise (¼ turn to the right).",
+      "Rotate the entire grid 90 degrees clockwise 🔃 (¼ turn to the right).",
       "The top row becomes the rightmost column, reading from top to bottom.",
       "Each column in the original becomes a row in the result, with order reversed."
     ],
@@ -135,20 +135,20 @@ export const TRANSFORMATION_TEMPLATES: TransformationTemplate[] = [
     difficulty: "Intermediate"
   },
   
-  // 4. XOR operation (logical)
+  // 4. Vertical reflection (geometric)
   {
-    type: "xor_operation",
-    name: "XOR Operation",
-    category: "logical",
-    titlePattern: "{context} Boolean Logic",
-    descriptionPattern: "Apply XOR (exclusive OR) operations to the {domain} by comparing adjacent cells in each row.",
-    gridGenerator: "XorOperationGenerator",
+    type: "vertical_reflection",
+    name: "Vertical Reflection",
+    category: "geometric",
+    titlePattern: "{context} Vertical Analysis",
+    descriptionPattern: "Analyze the {domain} by flipping the input grid vertically (top-to-bottom).",
+    gridGenerator: "VerticalReflectionGenerator",
     hintPatterns: [
-      "XOR returns 'true' when inputs differ and 'false' when they're the same.",
-      "For numbers, think of XOR as: if values are different, the result is their sum; if the same, the result is 0.",
-      "Process each row independently, comparing pairs of adjacent cells."
+      "Flip the entire grid vertically (top ↔ bottom) 🔼🔽.",
+      "The top row becomes the bottom row, the second row from the top becomes the second row from the bottom, and so on.",
+      "Each row maintains its order from left to right, but rows swap positions vertically."
     ],
-    difficulty: "Advanced"
+    difficulty: "Intermediate"
   },
   
   // 5. 270° rotation (geometric)

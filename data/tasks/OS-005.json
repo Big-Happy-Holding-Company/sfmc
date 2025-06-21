@@ -1,0 +1,41 @@
+{
+  "id": "OS-005",
+  "title": "Advanced Sensor Border Extraction",
+  "description": "Complex oxygen sensor networks require border element extraction. Only perimeter elements remain active in the output.",
+  "category": "🛡️ O₂ Sensor Check",
+  "difficulty": "Advanced",
+  "gridSize": 3,
+  "timeLimit": 130,
+  "basePoints": 1050,
+  "requiredRankLevel": 3,
+  "emojiSet": "status_main",
+  "examples": [
+    {
+      "input": [
+        ["🔴", "🟢", "🔵"],
+        ["🟡", "🟣", "🟠"],
+        ["🔵", "🔴", "🟢"]
+      ],
+      "output": [
+        ["🔴", "🟢", "🔵"],
+        ["🟡", "⬛", "🟠"],
+        ["🔵", "🔴", "🟢"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["🟣", "🟠", "🔴"],
+    ["🔵", "🟡", "🟢"],
+    ["🔴", "🟣", "🔵"]
+  ],
+  "testOutput": [
+    ["🟣", "🟠", "🔴"],
+    ["🔵", "⬛", "🟢"],
+    ["🔴", "🟣", "🔵"]
+  ],
+  "hints": [
+    "Only the border/perimeter elements are preserved.",
+    "The center element is replaced with ⬛.",
+    "Edge elements (top, bottom, left, right rows/columns) remain unchanged."
+  ]
+}
