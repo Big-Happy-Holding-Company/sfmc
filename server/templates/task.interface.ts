@@ -37,6 +37,7 @@ export interface TaskDefinition {
   testInput: number[][];         // Test case input grid
   testOutput: number[][];        // Expected output grid
   hints: string[];               // 3 hints as per guidelines
+  transformationType?: string;  // Transformation type used for validation
   // Optional metadata flag for generated vs manual
   generated?: boolean;           // true for template-generated tasks
 }

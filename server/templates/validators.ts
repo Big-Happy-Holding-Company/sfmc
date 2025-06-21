@@ -207,8 +207,8 @@ export class TaskValidator {
    * @param errors Array to add error messages to
    */
   private validateTransformationLogic(task: TaskDefinition, errors: string[]): void {
-    // Extract transformation type from the task ID (e.g., HOR from HOR-123)
-    const transformationType = this.inferTransformationType(task.id);
+    // Prefer explicit transformationType if present; otherwise infer from ID
+    const transformationType = task.transformationType || this.inferTransformationType(task.id);
     if (!transformationType) {
       errors.push(`Could not infer transformation type from task ID: ${task.id}`);
       return;

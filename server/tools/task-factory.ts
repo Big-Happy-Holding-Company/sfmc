@@ -122,6 +122,7 @@ export class TaskFactory {
       testInput,
       testOutput,
       hints: hints.slice(0, 3), // Ensure exactly 3 hints
+      transformationType: transformationType,
       generated: true // Mark as template-generated
     };
   }
