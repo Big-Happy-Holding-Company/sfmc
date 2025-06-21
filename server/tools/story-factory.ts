@@ -29,9 +29,7 @@ export interface StoryOptions {
 // Primary and secondary lists for placeholder substitutions
 const antagonistsFallback = [
   "Elon Musk",
-  "Jeff Bezos",
-  "Richard Branson",
-  "Mysterious Tech Mogul",
+  
 ];
 const componentsFallback = [
   "gyro-stabilizer",
