@@ -21,23 +21,35 @@ The Abstract and Reasoning Corpus for Artificial General Intelligence (ARC-AGI) 
 ### Directory Structure
 ```
 ├── client/                 # Frontend React application
-│   ├── src/
-│   │   ├── components/     # Reusable UI components
-│   │   │   ├── game/       # Game-specific components
-│   │   │   └── ui/         # Base UI components (shadcn)
-│   │   ├── constants/      # Emoji sets and game constants
-│   │   ├── pages/          # Route components
-│   │   └── types/          # TypeScript type definitions
+│   └── src/
+│       ├── components/     # Reusable UI components
+│       │   ├── game/       # Game-specific components
+│       │   └── ui/         # Base UI components (shadcn)
+│       ├── constants/      # Emoji sets and game constants
+│       ├── pages/          # Route components
+│       └── types/          # TypeScript type definitions
 ├── server/                 # Backend Express application
+│   ├── cli/                # CLI utilities (task generation, etc.)
 │   ├── data/
 │   │   └── tasks/          # Individual JSON task files
+│   ├── templates/          # Task and story templates
+│   │   ├── generators/
+│   │   ├── categories.ts
+│   │   ├── transformations.ts
+│   │   └── validators.ts
+│   ├── tools/              # Code-generation helpers
+│   │   ├── task-factory.ts
+│   │   └── story-factory.ts   # Narrative wrapper (NEW)
 │   ├── services/           # Business logic services
-│   ├── index.ts           # Server entry point
-│   ├── routes.ts          # API route handlers
-│   └── storage.ts         # Data storage interface
+│   ├── tests/              # Automated backend tests
+│   ├── index.ts            # Server entry point
+│   ├── routes.ts           # API route handlers
+│   └── storage.ts          # Data storage interface
+├── docs/                   # Technical and design documentation
+│   └── story_wrapper_system_plan.md   # Narrative wrapper plan (NEW)
 ├── shared/                 # Shared types and schemas
-│   └── schema.ts          # Database schema and types
-└── README.md              # This file
+│   └── schema.ts           # Database schema and types
+└── README.md               # This file
 ```
 
 ## Task System Architecture
