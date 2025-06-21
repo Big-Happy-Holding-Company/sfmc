@@ -21,17 +21,6 @@ Provide a modular narrative layer (“story wrapper”) that adds humorous Space
 
 > NOTE: Only `story-factory.ts` contains logic; all narrative content lives in data files so non-dev writers can update without code changes.
 
-## Template Format Example
-```jsonc
-{
-  "xor_operation": [
-    {
-      "title": "{{antagonist}}’s Satellites Are Colliding!",
-      "description": "Jeff Bezos’ and Elon Musk’s comm-sats keep toggling each other’s signals. Apply XOR to stabilize their channels before mission control goes silent!"
-    }
-  ]
-}
-```
 Writers can add or remove entries freely.
 
 ## API Surface

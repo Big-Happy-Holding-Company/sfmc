@@ -1,5 +1,5 @@
 {
-  "id": "COM-102",
+  "id": "COM-104",
   "title": "transmission data Mirror Analysis",
   "description": "Analyze the transmission data by reflecting the input grid horizontally (left-to-right mirror).",
   "category": "📡 Communications",
