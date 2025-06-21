@@ -1,85 +1,181 @@
 {
   "id": "SEC-102",
-  "title": "defense matrix Boolean Logic",
-  "description": "Apply XOR (exclusive OR) operations to the defense matrix by comparing adjacent cells in each row.",
+  "title": "perimeter sensors Rotation Analysis",
+  "description": "Analyze the perimeter sensors by rotating the input grid 270 degrees clockwise (or 90 degrees counter-clockwise).",
   "category": "🔒 Security",
-  "difficulty": "Impossible?",
-  "gridSize": 2,
+  "difficulty": "Intermediate",
+  "gridSize": 4,
   "timeLimit": null,
-  "basePoints": 41125,
+  "basePoints": 425,
   "requiredRankLevel": 1,
   "emojiSet": "status_alerts",
   "examples": [
     {
       "input": [
         [
-          3,
-          4
+          6,
+          1,
+          0,
+          9
         ],
         [
-          1,
+          8,
+          8,
+          0,
+          2
+        ],
+        [
+          0,
+          6,
+          4,
+          5
+        ],
+        [
+          6,
+          0,
+          5,
           0
         ]
       ],
       "output": [
         [
-          7,
-          4
+          9,
+          2,
+          5,
+          0
+        ],
+        [
+          0,
+          0,
+          4,
+          5
         ],
         [
           1,
+          8,
+          6,
           0
+        ],
+        [
+          6,
+          8,
+          0,
+          6
         ]
       ]
     },
     {
       "input": [
         [
+          9,
+          6,
           0,
-          0
+          2
         ],
         [
+          9,
+          9,
+          2,
+          8
+        ],
+        [
+          0,
+          8,
           1,
-          3
+          5
+        ],
+        [
+          7,
+          0,
+          0,
+          2
         ]
       ],
       "output": [
         [
+          2,
+          8,
+          5,
+          2
+        ],
+        [
           0,
+          2,
+          1,
           0
         ],
         [
-          4,
-          3
+          6,
+          9,
+          8,
+          0
+        ],
+        [
+          9,
+          9,
+          0,
+          7
         ]
       ]
     }
   ],
   "testInput": [
     [
-      1,
+      7,
+      4,
+      5,
+      0
+    ],
+    [
+      4,
+      5,
+      2,
       1
     ],
     [
-      2,
-      0
+      3,
+      0,
+      6,
+      3
+    ],
+    [
+      8,
+      5,
+      3,
+      5
     ]
   ],
   "testOutput": [
     [
       0,
-      1
+      1,
+      3,
+      5
     ],
     [
+      5,
       2,
-      0
+      6,
+      3
+    ],
+    [
+      4,
+      5,
+      0,
+      5
+    ],
+    [
+      7,
+      4,
+      3,
+      8
     ]
   ],
   "hints": [
-    "XOR returns 'true' when inputs differ and 'false' when they're the same.",
-    "For numbers, think of XOR as: if values are different, the result is their sum; if the same, the result is 0.",
-    "Process each row independently, comparing pairs of adjacent cells."
+    "Rotate the entire grid 270 degrees clockwise (¾ turn to the right).",
+    "The leftmost column becomes the top row, reading from left to right.",
+    "Each row in the original becomes a column in the result, with order shifted accordingly."
   ],
-  "transformationType": "xor_operation",
+  "transformationType": "rotation_270deg",
   "generated": true
 }

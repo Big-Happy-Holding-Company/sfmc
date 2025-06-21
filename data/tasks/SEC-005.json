@@ -6,7 +6,7 @@
   "difficulty": "Basic",
   "gridSize": 2,
   "timeLimit": null,
-  "basePoints": 315,
+  "basePoints": 1315,
   "requiredRankLevel": 1,
   "emojiSet": "status_main",
   "examples": [

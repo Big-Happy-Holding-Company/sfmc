@@ -3,10 +3,10 @@
   "title": "Power Node Fault Extraction",
   "description": "Extract a 3×3 diagnostic window centred on the first detected fault (⬛) in the power-distribution lattice.",
   "category": "⚡ Power Systems",
-  "difficulty": "Advanced",
-  "gridSize": 7,
+  "difficulty": "Officer (Expert)",
+  "gridSize": 3,
   "timeLimit": null,
-  "basePoints": 1100,
+  "basePoints": 111100,
   "requiredRankLevel": 1,
   "emojiSet": "tech_set1",
   "examples": [
