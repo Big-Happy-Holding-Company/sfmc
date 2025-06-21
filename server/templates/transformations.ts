@@ -151,21 +151,20 @@ export const TRANSFORMATION_TEMPLATES: TransformationTemplate[] = [
     difficulty: "Advanced"
   },
   
-  // 5. Object counting (object manipulation)
+  // 5. 270° rotation (geometric)
   {
-    type: "object_counting",
-    name: "Object Counting",
-    category: "object manipulation",
-    titlePattern: "{context} Inventory Analysis",
-    descriptionPattern: "Count the number of each type of object in the {domain} and represent the counts in the output grid.",
-    gridGenerator: "ObjectCountingGenerator",
+    type: "rotation_270deg",
+    name: "270° Rotation",
+    category: "geometric",
+    titlePattern: "{context} Rotation Analysis",
+    descriptionPattern: "Analyze the {domain} by rotating the input grid 270 degrees clockwise (or 90 degrees counter-clockwise).",
+    gridGenerator: "Rotation270DegGenerator",
     hintPatterns: [
-      "Count how many times each number (0-9) appears in the input grid.",
-      "The output grid shows the count of each value, with position 0 showing count of 0s, position 1 showing count of 1s, etc.",
-      "The black square (⬛) represents 0 and should be counted like any other value."
+      "Rotate the entire grid 270 degrees clockwise (¾ turn to the right).",
+      "The leftmost column becomes the top row, reading from left to right.",
+      "Each row in the original becomes a column in the result, with order shifted accordingly."
     ],
-    difficulty: "Basic",
-    contextVariations: ["inventory", "resource count", "object tally", "element census"]
+    difficulty: "Intermediate"
   }
 ];
 

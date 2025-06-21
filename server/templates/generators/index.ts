@@ -20,7 +20,7 @@ import { HorizontalReflectionGenerator } from './horizontal-reflection-generator
 import { Rotation90DegGenerator } from './rotation90-deg-generator';
 import { PatternCompletionGenerator } from './pattern-completion-generator';
 import { XorOperationGenerator } from './xor-operation-generator';
-import { ObjectCountingGenerator } from './object-counting-generator';
+import { Rotation270DegGenerator } from './rotation270-deg-generator';
 
 // Export generator implementations
 export {
@@ -28,7 +28,7 @@ export {
   Rotation90DegGenerator,
   PatternCompletionGenerator,
   XorOperationGenerator,
-  ObjectCountingGenerator
+  Rotation270DegGenerator
 };
 
 // Register all generators with the registry
@@ -38,5 +38,5 @@ registerGridGenerator('HorizontalReflectionGenerator', HorizontalReflectionGener
 registerGridGenerator('Rotation90DegGenerator', Rotation90DegGenerator);
 registerGridGenerator('PatternCompletionGenerator', PatternCompletionGenerator);
 registerGridGenerator('XorOperationGenerator', XorOperationGenerator);
-registerGridGenerator('ObjectCountingGenerator', ObjectCountingGenerator);
+registerGridGenerator('Rotation270DegGenerator', Rotation270DegGenerator);
 

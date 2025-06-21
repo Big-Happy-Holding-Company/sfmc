@@ -1,13 +1,13 @@
 /**
  * Narrative template definitions for the Story Wrapper System.
  *
- * Writers Tips:
- * 1. Use double-brace placeholders like {{antagonist}}, {{antagonist1}}, {{antagonist2}}, {{component}}.
- * 2. You can introduce your own placeholder names; just ensure `story-factory.ts` is updated to substitute them.
- * 3. Keep titles short (<60 chars) and descriptions <180 chars so they fit UI cards.
- * 4. Focus on what the player must conceptually do (e.g., “count distinct blobs”) rather than low-level technical terms.
+ * Each template explains— in plain, kid-friendly words— how the player at
+ * US Space Force Mission Control should manipulate an ARC-AGI colored grid.
+ * Grids are pixel art where numbers 0-9 map to colors (0 = black).
+ * The file provides one clear template per transformation type, using a single
+ * {{antagonist}} placeholder. Titles stay under 60 chars; descriptions under 180.
  *
- * Author: Cascade with o3 (high reasoning)
+ * Author: Cascade (model)
  */
 
 export interface StoryTemplate {
@@ -17,63 +17,66 @@ export interface StoryTemplate {
   description: string;
 }
 
-// Transformation keys recognised by the existing task factory
+// Transformation keys recognised by the task factory
 export type TransformationKey =
   | "horizontal_reflection"
   | "rotation_90deg"
   | "pattern_completion"
   | "xor_operation"
-  | "object_counting";
+  | "rotation_270deg";
 
 /**
- * Map of ARC-AGI transformation type → available narrative templates.
- * Placeholders follow simple double-brace syntax, e.g. {{antagonist}}.
+ * Map of ARC-AGI transformation type → narrative templates.
+ * Placeholders follow double-brace syntax, e.g. {{antagonist}}.
  */
 export const StoryTemplates: Record<TransformationKey, StoryTemplate[]> = {
+  /** Horizontal reflection: flip entire grid left ↔ right */
   horizontal_reflection: [
     {
-      id: "mirror_mischief",
-      title: "{{antagonist}}'s Solar Arrays Are Flipping Out!",
+      id: "mirror_panels",
+      title: "Flip the Solar Grid!",
       description:
-        "The starboard panels are mirroring port panels after a software glitch. Perform a horizontal reflection to straighten the arrays before power drops!",
+        "🚀 Crisis! {{antagonist}} was taking selfies 📱 near the control panel and knocked the solar array blueprint backwards ⇄! Now the panels face deep space instead of the Sun ☀️, and life support is failing! Study the before → after symbol grids to see the flip. Mirror today's entire grid left-to-right ↔️ to restore oxygen 💨 before time runs out ⏰!",
     },
   ],
+
+  /** 90-degree clockwise rotation */
   rotation_90deg: [
     {
-      id: "spin_cycle",
-      title: "{{component}} Needs a Quarter-Turn Twist!",
+      id: "quarter_spin",
+      title: "Realign the Launch Pad 90°!",
       description:
-        "Your {{component}} got rotated while dodging space junk. Rotate the grid 90° to restore proper orientation before mission data becomes unreadable.",
+        "🔥 Countdown halted! {{antagonist}} was playing mobile games 🎮 and carelessly spun the launch-pad orientation map one quarter-turn ↻ (90° clockwise). Now the boosters point at Mission Control 🏢 instead of orbit 🛰️! Study the sample symbol grids to see the rotation. Turn today's entire grid 90° clockwise 🔃 to save everyone from fiery disaster 💥!",
     },
   ],
+
+  /** Fill missing squares to complete pattern */
   pattern_completion: [
     {
-      id: "predictive_patterns",
-      title: "Fill the Gaps in {{antagonist}}'s Starlink Maze!",
+      id: "complete_colors",
+      title: "Finish the Color Pattern!",
       description:
-        "{{antagonist}} left an unfinished broadcast pattern. Complete the sequence so comms stay synced across the fleet.",
+        "📡 Pattern failure! {{antagonist}} was too busy watching space soap operas 📺 to complete the transmission grid. Half the critical relay symbols are missing ❓ and astronauts can't call home 📞! Examine the example grids to see how blank spaces should be filled. Complete today's symbol grid with the correct patterns ✨ to restore communication for the stranded crew 👩‍🚀👨‍🚀!",
     },
   ],
+
+  /** XOR-style compare rule, simplified */
   xor_operation: [
     {
-      id: "signal_smash",
-      title: "Satellites Are Colliding!",
+      id: "clear_static",
+      title: "Zero-Out the Static!",
       description:
-        "{{antagonist1}} and {{antagonist2}} are in a feud and their comm-sats keep toggling each other’s signals. Apply XOR to stabilise their channels before mission control goes silent!",
+        "🛰️ Channel chaos! {{antagonist}} tried impressing friends by hacking 💻 two satellite feeds at once and created a waveform mess 📊. Classified messages 🔒 are getting scrambled with pizza 🍕 delivery orders! When symbols matched in the samples ➡️ they became ⬛, when different ➡️ the brighter symbol stayed ✨. Apply this XOR-like rule to today's grid to untangle the signals 📶!",
     },
   ],
-  object_counting: [
+
+  /** 270-degree clockwise rotation (three clicks) */
+  rotation_270deg: [
     {
-      id: "blob_tally",
-      title: "How Many Blobs in the Grid?",
+      id: "three_spin",
+      title: "Spin the Grid 270°!",
       description:
-        "Sensors show amorphous energy blobs drifting across the panel. Build the diagnostics grid where each cell reports how many blobs of its colour appear in the original display—mission control needs the full colour-coded count matrix!",
-    },
-    {
-      id: "cluster_control",
-      title: "{{component}} Cluster Audit",
-      description:
-        "Your {{component}} is overwhelmed by unidentified pixel clusters. Construct a compact summary grid that lists the count of each cluster colour so mission control can rebalance power!",
+        "🌌 Trajectory disaster! {{antagonist}} was showing off to visitors 👥 and spun the flight deck display three full clicks ↻↻↻ (270° clockwise). Now the rocket's aimed at the Moon 🌙 instead of Mars 🔴 and we've got minutes ⏱️ to fix it! Study the before → after symbol grids to see the exact rotation. Turn today's entire grid 270° clockwise 🔃 to save the $4 billion mission 🚀💰!",
     },
   ],
 };

@@ -273,7 +273,7 @@ export class TaskValidator {
     if (categoryPrefix === "NAV") return "rotation_90deg";
     if (categoryPrefix === "SEC") return "xor_operation";
     if (categoryPrefix === "PL") return "pattern_completion";
-    if (categoryPrefix === "OS") return "object_counting"; // Keep the original mapping for reference tasks
+    if (categoryPrefix === "OS") return "rotation_270deg"; // Change from object_counting to rotation_270deg
     if (categoryPrefix === "FS") return "rotation_90deg";
     if (categoryPrefix === "PWR") return "pattern_completion";
     
