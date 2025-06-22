@@ -1,0 +1,187 @@
+{
+  "id": "COM-201",
+  "title": "broadcast patterns Mirror Analysis",
+  "description": "The Tesla Corporation's quantum nav computer kept trying to calculate mirror reflections by asking 'Which pixel goes where?' for every single cell. It processed 847 calculations just to flip a 2x2 grid, while Rick the Intern figured it out by glancing at it. AI struggles with spatial reasoning and mirror symmetry because it processes data sequentially rather than understanding 2D spatial relationships. Unlike humans who instantly recognize left-right flips, AI must learn complex coordinate transformations. The AI kept trying to calculate mirror reflections pixel by pixel. AI struggles with spatial reasoning and mirror symmetry. Analyze the broadcast patterns by reflecting the input grid horizontally (left-to-right mirror).",
+  "category": "📡 Communications",
+  "difficulty": "Basic",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 1400,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [
+          7,
+          0,
+          3,
+          7
+        ],
+        [
+          4,
+          4,
+          5,
+          2
+        ],
+        [
+          0,
+          8,
+          2,
+          5
+        ],
+        [
+          8,
+          1,
+          3,
+          1
+        ]
+      ],
+      "output": [
+        [
+          7,
+          3,
+          0,
+          7
+        ],
+        [
+          2,
+          5,
+          4,
+          4
+        ],
+        [
+          5,
+          2,
+          8,
+          0
+        ],
+        [
+          1,
+          3,
+          1,
+          8
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          5,
+          1,
+          6,
+          5
+        ],
+        [
+          4,
+          7,
+          9,
+          4
+        ],
+        [
+          6,
+          9,
+          5,
+          5
+        ],
+        [
+          0,
+          0,
+          9,
+          1
+        ]
+      ],
+      "output": [
+        [
+          5,
+          6,
+          1,
+          5
+        ],
+        [
+          4,
+          9,
+          7,
+          4
+        ],
+        [
+          5,
+          5,
+          9,
+          6
+        ],
+        [
+          1,
+          9,
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      6,
+      0,
+      1,
+      9
+    ],
+    [
+      8,
+      6,
+      5,
+      1
+    ],
+    [
+      9,
+      6,
+      9,
+      5
+    ],
+    [
+      0,
+      4,
+      2,
+      8
+    ]
+  ],
+  "testOutput": [
+    [
+      9,
+      1,
+      0,
+      6
+    ],
+    [
+      1,
+      5,
+      6,
+      8
+    ],
+    [
+      5,
+      9,
+      6,
+      9
+    ],
+    [
+      8,
+      2,
+      4,
+      0
+    ]
+  ],
+  "hints": [
+    "Computers don't understand mirrors like you do. When you look in a bathroom mirror, you know your left hand looks like it's on the right side. But computers have to think really hard about where each tiny square should move to make a mirror image.",
+    "It's like when you write your name on paper and then try to read it by holding it up to a window backwards. You can figure it out easily, but a computer would have to think about where each letter should go one by one.",
+    "Imagine you're playing with building blocks and someone asks you to build the exact same tower but with everything flipped around. You'd just look at it and know what to do, but a computer would count every single block and calculate where it should move.",
+    "Computers don't understand mirrors like you do.",
+    "It's like reading your name in a mirror - you figure it out easily, computers struggle.",
+    "Imagine flipping a tower of blocks - you just see it, computers calculate each block.",
+    "Think of the grid as being reflected in a mirror placed to the right side.",
+    "The first column becomes the last column, the second becomes the second-to-last, and so on.",
+    "The black square (⬛) reflects just like any other cell value."
+  ],
+  "transformationType": "horizontal_reflection",
+  "generated": true
+}

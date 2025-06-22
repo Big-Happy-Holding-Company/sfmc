@@ -1,0 +1,33 @@
+{
+  "id": "NAV-004",
+  "title": "Navigation Array 90° Clockwise 🔁",
+  "description": "Medical bay scanners couldn't figure out how to rotate X-ray images 90 degrees for proper viewing. The AI kept trying to physically rotate the injured astronaut on the examination table instead of just turning the digital image on the screen. 90-degree rotations combine spatial reasoning with coordinate transformation. AI must understand how positions change in 2D space while maintaining object relationships - a complex geometric abstraction that requires true spatial intelligence. Navigation systems require 90 degree clockwise 🔁 rotation calibration. Study the positional transformation patterns.",
+  "category": "🧭 Navigation",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 1340,
+  "requiredRankLevel": 1,
+  "emojiSet": "nav_alerts",
+  "examples": [
+    {
+      "input": [["⬆️", "➡️"], ["⬅️", "⬇️"]],
+      "output": [["⬅️", "⬆️"], ["⬇️", "➡️"]]
+    },
+    {
+      "input": [["🧭", "↗️"], ["⬛", "↘️"]],
+      "output": [["⬛", "🧭"], ["↘️", "↗️"]]
+    }
+  ],
+  "testInput": [["↖️", "↙️"], ["↗️", "↘️"]],
+  "testOutput": [["↗️", "↖️"], ["↘️", "↙️"]],
+  "hints": [
+    "When you turn a picture sideways, you just know what it looks like. But computers have to figure out where every single dot should move when you spin something. It's like doing a puzzle where every piece changes places.",
+    "Think about when you turn your head to look at something sideways. You don't have to think about it - you just do it. But a computer is like someone who has to carefully move every toy in your room to new spots just to see what it looks like from a different angle.",
+    "It's like playing with a kaleidoscope. When you turn it, all the pretty colors move to new places, but you can still see it's the same pattern. A computer would have to track where each tiny piece of color went and calculate its new home.",
+    "Turn the entire grid 90 degrees clockwise 🔁 (¼ turn to the right).",
+    "Each value should shift to a new position as if the grid was rotated.",
+    "Top-left becomes top-right, bottom-left becomes top-left.",
+    "Each position shifts one step clockwise 🔁 around the grid. So if the top-left is at 12 o'clock, it will move to 3 o'clock."
+  ]
+}

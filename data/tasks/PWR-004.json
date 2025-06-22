@@ -1,0 +1,65 @@
+{
+  "id": "PWR-004",
+  "title": "Power Node Fault Extraction",
+  "description": "Example of Power Node Fault Extraction",
+  "category": "⚡ Power Systems",
+  "difficulty": "Officer (Expert)",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 111100,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [
+        [2,2,2,2,2,2,2],
+        [2,0,2,2,2,2,2],
+        [2,2,2,2,2,2,2],
+        [2,2,2,0,2,2,2],
+        [2,2,2,2,2,2,2],
+        [2,2,2,2,2,0,2],
+        [2,2,2,2,2,2,2]
+      ],
+      "output": [
+        [2,2,2],
+        [2,0,2],
+        [2,2,2]
+      ]
+    },
+    {
+      "input": [
+        [3,3,3,3,3,3,3],
+        [3,3,3,3,3,0,3],
+        [3,3,3,3,3,3,3],
+        [3,3,3,3,3,3,3],
+        [3,3,3,3,3,3,3],
+        [3,3,3,3,3,3,3],
+        [3,3,3,3,3,3,3]
+      ],
+      "output": [
+        [3,3,3],
+        [3,0,3],
+        [3,3,3]
+      ]
+    }
+  ],
+  "testInput": [
+    [1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1],
+    [1,1,1,0,1,1,1],
+    [1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1]
+  ],
+  "testOutput": [
+    [1,1,1],
+    [1,0,1],
+    [1,1,1]
+  ],
+  "hints": [
+    "Scan rows left-to-right, top-to-bottom to locate the ⬛ fault cell. Make your grid to isolate the fault cell.",
+    "Isolate the fault cell in the middle of the grid.",
+    "⬛ indicates a fault; all other integers represent functioning power nodes."
+  ]
+}
