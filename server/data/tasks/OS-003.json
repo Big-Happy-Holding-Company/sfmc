@@ -13,116 +13,116 @@
     {
       "input": [
         [
-          "🔴",
-          "⬛",
-          "🔴"
+          1,
+          0,
+          1
         ],
         [
-          "⬛",
-          "🟢",
-          "⬛"
+          0,
+          2,
+          0
         ],
         [
-          "🔴",
-          "⬛",
-          "🔴"
+          1,
+          0,
+          1
         ]
       ],
       "output": [
         [
-          "🔴",
-          "🟢",
-          "🔴"
+          1,
+          2,
+          1
         ],
         [
-          "🟢",
-          "🟢",
-          "🟢"
+          2,
+          2,
+          2
         ],
         [
-          "🔴",
-          "🟢",
-          "🔴"
+          1,
+          2,
+          1
         ]
       ]
     },
     {
       "input": [
         [
-          "🔵",
-          "🟡",
-          "⬛"
+          3,
+          4,
+          0
         ],
         [
-          "🟡",
-          "⬛",
-          "🟡"
+          4,
+          0,
+          4
         ],
         [
-          "⬛",
-          "🟡",
-          "🔵"
+          0,
+          4,
+          3
         ]
       ],
       "output": [
         [
-          "🔵",
-          "🟡",
-          "🔵"
+          3,
+          4,
+          3
         ],
         [
-          "🟡",
-          "🔵",
-          "🟡"
+          4,
+          3,
+          4
         ],
         [
-          "🔵",
-          "🟡",
-          "🔵"
+          3,
+          4,
+          3
         ]
       ]
     }
   ],
   "testInput": [
     [
-      "🟣",
-      "⬛",
-      "🟣"
+      5,
+      0,
+      5
     ],
     [
-      "⬛",
-      "🟠",
-      "⬛"
+      0,
+      6,
+      0
     ],
     [
-      "🟣",
-      "⬛",
-      "🟣"
+      5,
+      0,
+      5
     ]
   ],
   "testOutput": [
     [
-      "🟣",
-      "🟠",
-      "🟣"
+      5,
+      6,
+      5
     ],
     [
-      "🟠",
-      "🟠",
-      "🟠"
+      6,
+      6,
+      6
     ],
     [
-      "🟣",
-      "🟠",
-      "🟣"
+      5,
+      6,
+      5
     ]
   ],
   "hints": [
-    "When you see a pattern like 'red, blue, red, blue, red, ___', you know the next one is blue. But computers look at each example and think of hundreds of different rules it could be, instead of seeing the simple pattern.",
+    "When you see a pattern like '1, 2, 1, 2, 1, ___', you know the next one is 2. But computers look at each example and think of hundreds of different rules it could be, instead of seeing the simple pattern.",
     "It's like when you're learning to clap to music. You hear 'clap, clap, pause, clap, clap, pause' and you know what comes next. But a computer might think it needs to count the number of sounds, measure the exact time between claps, or figure out what song it is.",
     "Think about putting on your shoes. You know the pattern: sock, shoe, sock, shoe. But a computer might think it needs to consider the color of your socks, the day of the week, how many steps you'll take, and a million other things instead of just following the simple pattern.",
-    "Look for the dominant color pattern in the corners.",
-    "⬛ spaces are filled with the center color.",
+    "Look for the dominant pattern in the corners.",
+    "⬛ spaces are filled with the center symbol.",
     "The transformation creates a checkerboard-like pattern."
   ]
 }
