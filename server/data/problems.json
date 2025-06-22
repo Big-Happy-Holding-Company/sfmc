@@ -3,8 +3,8 @@
     {
       "id": "os_horiz_reflect",
       "category": "O₂ Sensor Check",
-      "title": "Mirror Oxygen Diagnostics",
-      "description": "The {{component}} display for O₂ levels is flipped horizontally after {{antagonist}} bumped the console. Mirror the diagnostic grid left-to-right to interpret the sensor data correctly."
+      "title": "Mirror-O₂ Misdirection Madness",
+      "description": "Alert! {{antagonist}} recalibrated their personal model of {{component}} to double as a selfie mirror and flipped the oxygen readout. Flip the grid left↔right so we can breathe easy again."
     },
     {
       "id": "pl_horiz_reflect",

@@ -1,6 +1,7 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
+
 interface OnboardingModalProps {
   open: boolean;
   onClose: () => void;
@@ -12,8 +13,8 @@ export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
       <DialogContent className="max-w-2xl bg-slate-800 border-cyan-400 text-slate-50">
         <div className="text-center space-y-6">
           <div>
-            <div className="text-cyan-400 text-6xl mb-4">🚀</div>
-            <h1 className="text-3xl font-bold text-cyan-400 mb-2">Mission Control 2045</h1>
+            <img src="/wyatt-space-force.jpg" alt="Cadet Wyatt" className="mx-auto w-32 h-32 rounded-full border-4 border-cyan-400 object-cover mb-4" />
+            <h1 className="text-3xl font-bold text-cyan-400 mb-2">Mission Control 2050</h1>
             <p className="text-amber-400 font-mono text-sm">US SPACE FORCE OPERATIONS CENTER</p>
           </div>
           
