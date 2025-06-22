@@ -1,0 +1,184 @@
+{
+  "id": "NAV-102",
+  "title": "stellar mapping Rotation Analysis",
+  "description": "Joffrey Beezooos's solar array controller spent 23 minutes calculating how to turn a fuel systems diagram sideways. It kept asking 'If I move this corner here, where do the other three corners go?' while the human operator just tilted their head. 90-degree rotations combine spatial reasoning with coordinate transformation. AI must understand how positions change in 2D space while maintaining object relationships - a complex geometric abstraction that requires true spatial intelligence. Analyze the stellar mapping by rotating the input grid 90 degrees clockwise 🔁.",
+  "category": "🧭 Navigation",
+  "difficulty": "Intermediate",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 11350,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [
+          2,
+          7,
+          4,
+          1
+        ],
+        [
+          9,
+          4,
+          0,
+          0
+        ],
+        [
+          8,
+          7,
+          9,
+          9
+        ],
+        [
+          1,
+          9,
+          2,
+          3
+        ]
+      ],
+      "output": [
+        [
+          1,
+          8,
+          9,
+          2
+        ],
+        [
+          9,
+          7,
+          4,
+          7
+        ],
+        [
+          2,
+          9,
+          0,
+          4
+        ],
+        [
+          3,
+          9,
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          9,
+          5,
+          1,
+          6
+        ],
+        [
+          8,
+          5,
+          3,
+          8
+        ],
+        [
+          5,
+          9,
+          5,
+          1
+        ],
+        [
+          5,
+          0,
+          5,
+          3
+        ]
+      ],
+      "output": [
+        [
+          5,
+          5,
+          8,
+          9
+        ],
+        [
+          0,
+          9,
+          5,
+          5
+        ],
+        [
+          5,
+          5,
+          3,
+          1
+        ],
+        [
+          3,
+          1,
+          8,
+          6
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      7,
+      3,
+      0,
+      2
+    ],
+    [
+      7,
+      2,
+      7,
+      3
+    ],
+    [
+      1,
+      5,
+      5,
+      7
+    ],
+    [
+      6,
+      4,
+      5,
+      8
+    ]
+  ],
+  "testOutput": [
+    [
+      6,
+      1,
+      7,
+      7
+    ],
+    [
+      4,
+      5,
+      2,
+      3
+    ],
+    [
+      5,
+      5,
+      7,
+      0
+    ],
+    [
+      8,
+      7,
+      3,
+      2
+    ]
+  ],
+  "hints": [
+    "When you turn a picture sideways, you just know what it looks like. But computers have to figure out where every single dot should move when you spin something. It's like doing a puzzle where every piece changes places.",
+    "Think about when you turn your head to look at something sideways. You don't have to think about it - you just do it. But a computer is like someone who has to carefully move every toy in your room to new spots just to see what it looks like from a different angle.",
+    "It's like playing with a kaleidoscope. When you turn it, all the pretty colors move to new places, but you can still see it's the same pattern. A computer would have to track where each tiny piece of color went and calculate its new home.",
+    "Rotate the entire grid 90 degrees clockwise 🔃 (¼ turn to the right).",
+    "The top row becomes the rightmost column, reading from top to bottom.",
+    "Each column in the original becomes a row in the result, with order reversed."
+  ],
+  "transformationType": "rotation_90deg",
+  "generated": true
+}

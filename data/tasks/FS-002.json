@@ -1,0 +1,125 @@
+{
+  "id": "FS-002",
+  "title": "Fuel Line Symmetry Check",
+  "description": "Fuel distribution requires mirror symmetry verification. Analyze the reflection patterns in the system diagnostics.",
+  "category": "⚡ Fuel Systems",
+  "difficulty": "Intermediate",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 6510,
+  "requiredRankLevel": 2,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [
+        [
+          8,
+          0,
+          1
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          1,
+          0,
+          9
+        ]
+      ],
+      "output": [
+        [
+          1,
+          0,
+          8
+        ],
+        [
+          0,
+          2,
+          0
+        ],
+        [
+          9,
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          5,
+          7,
+          0
+        ],
+        [
+          6,
+          0,
+          7
+        ],
+        [
+          0,
+          1,
+          1
+        ]
+      ],
+      "output": [
+        [
+          0,
+          7,
+          5
+        ],
+        [
+          7,
+          0,
+          6
+        ],
+        [
+          1,
+          1,
+          0
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      8,
+      9,
+      0
+    ],
+    [
+      3,
+      2,
+      7
+    ],
+    [
+      0,
+      1,
+      1
+    ]
+  ],
+  "testOutput": [
+    [
+      0,
+      9,
+      8
+    ],
+    [
+      7,
+      2,
+      3
+    ],
+    [
+      1,
+      1,
+      0
+    ]
+  ],
+  "hints": [
+    "Look for a reflection pattern across the vertical center line.",
+    "Elements on the left side appear on the right side in mirrored positions.",
+    "The center column remains unchanged during the transformation."
+  ]
+}

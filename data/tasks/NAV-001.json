@@ -1,0 +1,29 @@
+{
+  "id": "NAV-001",
+  "title": "Navigation Vector Check",
+  "description": "Navigation systems require directional calibration. Study the arrow transformation patterns.",
+  "category": "🧭 Navigation",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 1420,
+  "requiredRankLevel": 1,
+  "emojiSet": "nav_alerts",
+  "examples": [
+    {
+      "input": [["⬆️", "⬛"], ["⬛", "⬇️"]],
+      "output": [["⬇️", "⬛"], ["⬛", "⬆️"]]
+    },
+    {
+      "input": [["⬅️", "➡️"], ["⬛", "⬛"]],
+      "output": [["⬛", "⬛"], ["➡️", "⬅️"]]
+    }
+  ],
+  "testInput": [["↗️", "⬛"], ["🧭", "⬛"]],
+  "testOutput": [["⬛", "🧭"], ["⬛", "↗️"]],
+  "hints": [
+    "Observe how directional arrows change positions.",
+    "The pattern swaps elements diagonally across the grid.",
+    "Navigation vectors move to opposite diagonal positions."
+  ]
+}

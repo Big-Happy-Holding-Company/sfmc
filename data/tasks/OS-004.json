@@ -1,0 +1,29 @@
+{
+  "id": "OS-004",
+  "title": "Sensor Anti-Diagonal Swap",
+  "description": "Oxygen sensor arrays require anti-diagonal calibration. Elements swap across the opposite diagonal line.",
+  "category": "🛡️ O₂ Sensor Check",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 1360,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [[1, 2], [3, 4]],
+      "output": [[3, 2], [1, 4]]
+    },
+    {
+      "input": [[5, 0], [0, 6]],
+      "output": [[0, 0], [5, 6]]
+    }
+  ],
+  "testInput": [[1, 3], [2, 4]],
+  "testOutput": [[2, 3], [1, 4]],
+  "hints": [
+    "Top-left swaps with bottom-left position.",
+    "Top-right and bottom-right positions remain unchanged.",
+    "Only the anti-diagonal elements change positions."
+  ]
+}

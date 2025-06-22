@@ -1,0 +1,56 @@
+{
+  "id": "NAV-002",
+  "title": "Coordinate Rotation Protocol",
+  "description": "Joffrey Beezooos's solar array controller spent 23 minutes calculating how to turn a fuel systems diagram sideways. It kept asking 'If I move this corner here, where do the other three corners go?' while the human operator just tilted their head. 90-degree rotations combine spatial reasoning with coordinate transformation. AI must understand how positions change in 2D space while maintaining object relationships - a complex geometric abstraction that requires true spatial intelligence. Navigation arrays require 90 degree clockwise rotation for orbital alignment. Study the directional transformation patterns.",
+  "category": "🧭 Navigation",
+  "difficulty": "Intermediate",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 6000,
+  "requiredRankLevel": 1,
+  "emojiSet": "nav_alerts",
+  "examples": [
+    {
+      "input": [
+        ["⬆️", "➡️", "⬇️"],
+        ["⬅️", "🧭", "↗️"],
+        ["↙️", "↖️", "↘️"]
+      ],
+      "output": [
+        ["↙️", "⬅️", "⬆️"],
+        ["↖️", "🧭", "➡️"],
+        ["↘️", "↗️", "⬇️"]
+      ]
+    },
+    {
+      "input": [
+        ["⬆️", "⬛", "⬇️"],
+        ["⬛", "🧭", "⬛"],
+        ["⬅️", "⬛", "➡️"]
+      ],
+      "output": [
+        ["⬅️", "⬛", "⬆️"],
+        ["⬛", "🧭", "⬛"],
+        ["➡️", "⬛", "⬇️"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["↗️", "⬆️", "↖️"],
+    ["➡️", "🧭", "⬅️"],
+    ["↘️", "⬇️", "↙️"]
+  ],
+  "testOutput": [
+    ["↘️", "➡️", "↗️"],
+    ["⬇️", "🧭", "⬆️"],
+    ["↙️", "⬅️", "↖️"]
+  ],
+  "hints": [
+    "When you turn a picture sideways, you just know what it looks like. But computers have to figure out where every single dot should move when you spin something. It's like doing a puzzle where every piece changes places.",
+    "Think about when you turn your head to look at something sideways. You don't have to think about it - you just do it. But a computer is like someone who has to carefully move every toy in your room to new spots just to see what it looks like from a different angle.",
+    "It's like playing with a kaleidoscope. When you turn it, all the pretty colors move to new places, but you can still see it's the same pattern. A computer would have to track where each tiny piece of color went and calculate its new home.",
+    "Turn the entire grid 90 degrees clockwise (¼ turn to the right).",
+    "The top row becomes the rightmost column, read top to bottom.",
+    "Apply this rotation to the entire grid, including the black cells."
+  ]
+}

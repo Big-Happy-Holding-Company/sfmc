@@ -1,0 +1,41 @@
+{
+  "id": "NAV-006",
+  "title": "Advanced Navigation 180° Rotation",
+  "description": "Complex navigation arrays require 180-degree rotation for orbital synchronization. Each element rotates to its opposite position.",
+  "category": "🧭 Navigation",
+  "difficulty": "Advanced",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 15100,
+  "requiredRankLevel": 1,
+  "emojiSet": "nav_alerts",
+  "examples": [
+    {
+      "input": [
+        ["⬆️", "➡️", "⬇️"],
+        ["⬅️", "🧭", "↗️"],
+        ["↙️", "↖️", "↘️"]
+      ],
+      "output": [
+        ["↘️", "↖️", "↙️"],
+        ["↗️", "🧭", "⬅️"],
+        ["⬇️", "➡️", "⬆️"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["↗️", "⬆️", "↖️"],
+    ["➡️", "🧭", "⬅️"],
+    ["↘️", "⬇️", "↙️"]
+  ],
+  "testOutput": [
+    ["↙️", "⬇️", "↘️"],
+    ["⬅️", "🧭", "➡️"],
+    ["↖️", "⬆️", "↗️"]
+  ],
+  "hints": [
+    "Each element rotates 180 degrees to its diagonally opposite position.",
+    "Top-left moves to bottom-right, top-right to bottom-left.",
+    "The center element remains stationary during rotation."
+  ]
+}

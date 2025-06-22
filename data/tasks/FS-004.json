@@ -1,0 +1,83 @@
+{
+  "id": "FS-004",
+  "title": "Fuel Valve Horizontal Mirror",
+  "description": "Fuel valve configuration requires horizontal mirror calibration. Analyze the left-right reflection patterns.",
+  "category": "⚡ Fuel Systems",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 3220,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [
+        [
+          8,
+          1
+        ],
+        [
+          1,
+          9
+        ]
+      ],
+      "output": [
+        [
+          1,
+          8
+        ],
+        [
+          9,
+          1
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          2,
+          0
+        ],
+        [
+          0,
+          7
+        ]
+      ],
+      "output": [
+        [
+          0,
+          2
+        ],
+        [
+          7,
+          0
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      5,
+      3
+    ],
+    [
+      6,
+      7
+    ]
+  ],
+  "testOutput": [
+    [
+      3,
+      5
+    ],
+    [
+      7,
+      6
+    ]
+  ],
+  "hints": [
+    "Elements are reflected across the vertical center line.",
+    "Left column becomes right column and vice versa.",
+    "The transformation is a horizontal mirror flip."
+  ]
+}

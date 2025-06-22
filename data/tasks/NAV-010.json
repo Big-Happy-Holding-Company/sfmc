@@ -1,0 +1,29 @@
+{
+  "id": "NAV-010",
+  "title": "Navigation Element Stacking",
+  "description": "Navigation arrays require vertical stacking operations. Elements compress vertically while preserving horizontal order.",
+  "category": "🧭 Navigation",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 3335,
+  "requiredRankLevel": 1,
+  "emojiSet": "nav_alerts",
+  "examples": [
+    {
+      "input": [["⬆️", "⬛"], ["⬛", "⬇️"]],
+      "output": [["⬛", "⬛"], ["⬆️", "⬇️"]]
+    },
+    {
+      "input": [["🧭", "⬛"], ["⬛", "↗️"]],
+      "output": [["⬛", "⬛"], ["🧭", "↗️"]]
+    }
+  ],
+  "testInput": [["↖️", "⬛"], ["⬛", "↘️"]],
+  "testOutput": [["⬛", "⬛"], ["↖️", "↘️"]],
+  "hints": [
+    "All non-⬛ elements drop to the bottom row.",
+    "Maintain column positions during the drop operation.",
+    "Top row becomes completely ⬛ after stacking."
+  ]
+}
