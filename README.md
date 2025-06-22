@@ -283,6 +283,31 @@ See the comprehensive guide in `docs/task_generation_guide.md` for more details.
 
 
 
+## Narrative Story Wrapper System
+
+### Purpose
+Adds a light-hearted Space-Force-2050 story layer to every ARC-AGI puzzle without touching core puzzle data.
+
+### How It Works
+1. `server/data/problems.json` – Holds every narrative template.  Keys are transformation types; each array contains one template per task **category** (O₂ Sensor Check, Pre-Launch Ops, Fuel Systems, Navigation, Communications, Power Systems, Security).
+2. `server/data/antagonists.json` – List of mischievous characters (e.g. "Rick the Intern") that caused the mishap.
+3. `server/data/components.json` – List of ship components the antagonist fiddled with.
+4. `server/templates/storyTemplates.ts` – Loader that reads `problems.json` at runtime and exposes templates to the factory.
+5. `server/tools/story-factory.ts` – Pure function that:
+   - Randomly selects an antagonist + component.
+   - Picks the correct template for the task’s `transformationType` + `category`.
+   - Substitutes `{{antagonist}}` and `{{component}}` placeholders.
+   - Returns an enriched task object ready for the API/UI.
+
+### Updating Stories (Writers-Friendly)
+- Open `server/data/problems.json`.
+- Find the transformation type you want (e.g. `rotation_90deg`).
+- Add or edit an object in the array with fields: `id`, `category`, `title`, `description`.
+- Keep it short (<60-char title, <180-char description) and include placeholders where relevant.
+- No code changes are needed – the loader will pick it up automatically.
+
+---
+
 ## Future Enhancements
 
 ### Scalability Considerations
