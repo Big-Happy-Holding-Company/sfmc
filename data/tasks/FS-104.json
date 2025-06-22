@@ -1,12 +1,12 @@
 {
   "id": "FS-102",
   "title": "flow regulation Rotation Analysis",
-  "description": "Analyze the flow regulation by rotating the input grid 90 degrees clockwise.",
+  "description": "Analyze the flow regulation by rotating the input grid 90 degrees clockwise 🔁.",
   "category": "⚡ Fuel Systems",
   "difficulty": "Intermediate",
   "gridSize": 4,
   "timeLimit": null,
-  "basePoints": 325,
+  "basePoints": 1325,
   "requiredRankLevel": 1,
   "emojiSet": "tech_set1",
   "examples": [

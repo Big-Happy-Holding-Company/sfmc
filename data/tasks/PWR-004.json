@@ -1,7 +1,7 @@
 {
   "id": "PWR-004",
   "title": "Power Node Fault Extraction",
-  "description": "Extract a 3×3 diagnostic window centred on the first detected fault (⬛) in the power-distribution lattice.",
+  "description": "Example of Power Node Fault Extraction",
   "category": "⚡ Power Systems",
   "difficulty": "Officer (Expert)",
   "gridSize": 3,
@@ -13,11 +13,11 @@
     {
       "input": [
         [2,2,2,2,2,2,2],
-        [2,2,2,2,2,2,2],
+        [2,0,2,2,2,2,2],
         [2,2,2,2,2,2,2],
         [2,2,2,0,2,2,2],
         [2,2,2,2,2,2,2],
-        [2,2,2,2,2,2,2],
+        [2,2,2,2,2,0,2],
         [2,2,2,2,2,2,2]
       ],
       "output": [
@@ -37,29 +37,29 @@
         [3,3,3,3,3,3,3]
       ],
       "output": [
-        [3,3,0],
         [3,3,3],
+        [3,0,3],
         [3,3,3]
       ]
     }
   ],
   "testInput": [
-    [6,6,6,6,6,6,6],
-    [6,6,6,6,6,6,6],
-    [6,6,6,6,6,6,6],
-    [6,6,6,6,6,6,6],
-    [6,0,6,6,6,6,6],
-    [6,6,6,6,6,6,6],
-    [6,6,6,6,6,6,6]
+    [1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1],
+    [1,1,1,0,1,1,1],
+    [1,1,1,1,1,1,1],
+    [1,1,1,1,1,1,1]
   ],
   "testOutput": [
-    [6,0,6],
-    [6,6,6],
-    [6,6,6]
+    [1,1,1],
+    [1,0,1],
+    [1,1,1]
   ],
   "hints": [
-    "Scan rows left-to-right, top-to-bottom to locate the first ⬛ fault cell.",
-    "Copy the 3×3 window centred on that cell into a new grid (use ⬛ if the window overflows).",
+    "Scan rows left-to-right, top-to-bottom to locate the ⬛ fault cell. Make your grid to isolate the fault cell.",
+    "Isolate the fault cell in the middle of the grid.",
     "⬛ indicates a fault; all other integers represent functioning power nodes."
   ]
 }

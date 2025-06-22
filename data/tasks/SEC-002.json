@@ -1,12 +1,12 @@
 {
   "id": "SEC-002",
   "title": "Security Color Inversion",
-  "description": "Access control systems require color inversion protocols. Transform each color to its designated security opposite.",
+  "description": "Our basic access control systems require color inversion protocols, because they are hard for AI to solve. Transform each color to its designated security opposite.",
   "category": "🔐 Security Systems",
   "difficulty": "Basic",
   "gridSize": 2,
   "timeLimit": null,
-  "basePoints": 290,
+  "basePoints": 2900,
   "requiredRankLevel": 1,
   "emojiSet": "status_main",
   "examples": [

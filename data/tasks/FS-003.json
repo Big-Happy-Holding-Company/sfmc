@@ -6,7 +6,7 @@
   "difficulty": "Advanced",
   "gridSize": 4,
   "timeLimit": null,
-  "basePoints": 800,
+  "basePoints": 8200,
   "requiredRankLevel": 3,
   "emojiSet": "tech_set1",
   "examples": [

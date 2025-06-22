@@ -6,7 +6,7 @@
   "difficulty": "Basic",
   "gridSize": 2,
   "timeLimit": null,
-  "basePoints": 355,
+  "basePoints": 3355,
   "requiredRankLevel": 1,
   "emojiSet": "nav_alerts",
   "examples": [
@@ -22,7 +22,7 @@
   "testInput": [["↖️", "↗️"], ["↙️", "↘️"]],
   "testOutput": [["↘️", "↖️"], ["↗️", "↙️"]],
   "hints": [
-    "Each element moves to the next position in clockwise order.",
+    "Each element moves to the next position in clockwise 🔁 order.",
     "Top-left goes to top-right, top-right to bottom-right, etc.",
     "The pattern forms a circular shift around the grid."
   ]

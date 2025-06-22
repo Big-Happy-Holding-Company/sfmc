@@ -3,11 +3,11 @@
   "title": "Advanced Sensor Outer Ring Extraction",
   "description": "Complex oxygen sensor networks require outer ring element preservation. Only the outermost ring of elements remains active.",
   "category": "🛡️ O₂ Sensor Check",
-  "difficulty": "Advanced",
+  "difficulty": "Officer (Expert)",
   "gridSize": 3,
-  "timeLimit": 135,
-  "basePoints": 1080,
-  "requiredRankLevel": 3,
+  "timeLimit": null,
+  "basePoints": 21080,
+  "requiredRankLevel": 1,
   "emojiSet": "status_main",
   "examples": [
     {

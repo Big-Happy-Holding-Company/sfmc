@@ -1,12 +1,12 @@
 {
   "id": "NAV-102",
   "title": "stellar mapping Rotation Analysis",
-  "description": "Analyze the stellar mapping by rotating the input grid 90 degrees clockwise.",
+  "description": "Analyze the stellar mapping by rotating the input grid 90 degrees clockwise 🔁.",
   "category": "🧭 Navigation",
   "difficulty": "Intermediate",
   "gridSize": 4,
   "timeLimit": null,
-  "basePoints": 350,
+  "basePoints": 11350,
   "requiredRankLevel": 1,
   "emojiSet": "nav_alerts",
   "examples": [

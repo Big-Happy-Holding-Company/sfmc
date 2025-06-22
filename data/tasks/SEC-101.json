@@ -1,12 +1,12 @@
 {
   "id": "SEC-101",
   "title": "defense matrix Rotation Analysis",
-  "description": "Analyze the defense matrix by rotating the input grid 270 degrees clockwise (or 90 degrees counter-clockwise).",
+  "description": "Analyze the defense matrix by rotating the input grid 270 degrees clockwise 🔁🔁🔁.",
   "category": "🔒 Security",
   "difficulty": "Intermediate",
   "gridSize": 4,
   "timeLimit": null,
-  "basePoints": 425,
+  "basePoints": 4125,
   "requiredRankLevel": 1,
   "emojiSet": "status_alerts",
   "examples": [
@@ -172,7 +172,7 @@
     ]
   ],
   "hints": [
-    "Rotate the entire grid 270 degrees clockwise (¾ turn to the right).",
+    "Rotate the entire grid 270 degrees clockwise 🔁🔁🔁 (¾ turn to the right). You can also think of this as 90 degrees counter-clockwise 🔄 (¼ turn to the left)."  ,
     "The leftmost column becomes the top row, reading from left to right.",
     "Each row in the original becomes a column in the result, with order shifted accordingly."
   ],

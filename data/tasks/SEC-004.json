@@ -3,11 +3,11 @@
   "title": "Advanced Security Matrix Layering",
   "description": "Complex access control systems require multi-layer security patterns. Elements layer in concentric rectangular patterns.",
   "category": "🔐 Security Systems",
-  "difficulty": "Advanced",
+  "difficulty": "Officer (Expert)",
   "gridSize": 4,
   "timeLimit": null,
-  "basePoints": 11220,
-  "requiredRankLevel": 3,
+  "basePoints": 21220,
+  "requiredRankLevel": 1,
   "emojiSet": "status_main",
   "examples": [
     {

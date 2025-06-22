@@ -3,11 +3,11 @@
   "title": "Advanced Security Anti-Diagonal Extraction",
   "description": "Complex access control systems require anti-diagonal element isolation. Only anti-diagonal elements remain in the security matrix.",
   "category": "🔐 Security Systems",
-  "difficulty": "Advanced",
+  "difficulty": "Officer (Expert)",
   "gridSize": 3,
-  "timeLimit": 140,
-  "basePoints": 1100,
-  "requiredRankLevel": 3,
+  "timeLimit": null,
+  "basePoints": 110000,
+  "requiredRankLevel": 1,
   "emojiSet": "status_main",
   "examples": [
     {

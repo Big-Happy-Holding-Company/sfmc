@@ -1,12 +1,12 @@
 {
   "id": "PL-003",
   "title": "Launch Trajectory Rotation",
-  "description": "Rotate trajectory control grid 90° clockwise to align with updated launch vector.",
+  "description": "Rotate trajectory control grid 90° clockwise 🔁 to align with updated launch vector.",
   "category": "🚀 Pre-Launch Ops",
   "difficulty": "Advanced",
   "gridSize": 4,
   "timeLimit": null,
-  "basePoints": 1950,
+  "basePoints": 19500,
   "requiredRankLevel": 1,
   "emojiSet": "status_alerts",
   "examples": [
@@ -52,7 +52,7 @@
     [0, 6, 0, 0]
   ],
   "hints": [
-    "Rotate the entire grid 90° clockwise.",
+    "Rotate the entire grid 90° clockwise 🔁.",
     "Rows become columns from left to right.",
     "⬛ rotates like any other value."
   ]

@@ -22,7 +22,7 @@
   "testInput": [[9,8,7],[6,5,4],[3,2,1]],
   "testOutput": [[3,6,9],[2,5,8],[1,4,7]],
   "hints": [
-    "Rotate the entire grid 90 degrees clockwise.",
+    "Rotate the entire grid 90 degrees clockwise 🔁.",
     "The element at (row, col) moves to (col, gridSize - 1 - row).",
     "Imagine turning a square piece of paper one quarter turn to the right."
   ]

@@ -1,7 +1,7 @@
 {
   "id": "FS-100",
   "title": "propellant mixture Rotation Analysis",
-  "description": "Analyze the propellant mixture by rotating the input grid 90 degrees clockwise.",
+  "description": "Analyze the propellant mixture by rotating the input grid 90 degrees clockwise 🔁.",
   "category": "⚡ Fuel Systems",
   "difficulty": "Intermediate",
   "gridSize": 3,

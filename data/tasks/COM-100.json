@@ -1,12 +1,12 @@
 {
   "id": "COM-100",
   "title": "Flip the Solar Grid!",
-  "description": "🚀 Crisis! Elun Stink was taking selfies 📱 near the control panel and knocked the solar array blueprint backwards ⇄! Now the panels face deep space instead of the Sun ☀️, and life support is failing! Study the before → after symbol grids to see the flip. Mirror today's entire grid left-to-right ↔️ to restore oxygen 💨 before time runs out ⏰!",
+  "description": "🚀 Crisis! Someone was taking selfies 📱 near the control panel and knocked the solar array blueprint backwards ⇄! Now the panels face deep space instead of the Sun ☀️, and life support is failing! Study the before → after symbol grids to see the flip. Mirror today's entire grid left-to-right ↔️ to restore oxygen 💨 before time runs out ⏰!",
   "category": "📡 Communications",
   "difficulty": "Basic",
   "gridSize": 2,
   "timeLimit": null,
-  "basePoints": 400,
+  "basePoints": 4050,
   "requiredRankLevel": 1,
   "emojiSet": "tech_set2",
   "examples": [

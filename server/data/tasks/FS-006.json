@@ -3,10 +3,10 @@
   "title": "Advanced Fuel Matrix Transpose",
   "description": "Given a 3x3 matrix representing a fuel distribution grid, transpose the matrix so that rows become columns. The element at position (i, j) moves to position (j, i).",
   "category": "⚡ Fuel Systems",
-  "difficulty": "Advanced",
+  "difficulty": "Expert",
   "gridSize": 3,
   "timeLimit": null,
-  "basePoints": 1200,
+  "basePoints": 521900,
   "requiredRankLevel": 1,
   "emojiSet": "tech_set1",
   "examples": [
