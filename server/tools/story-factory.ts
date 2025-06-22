@@ -20,6 +20,12 @@ import path from "path";
 import { TaskDefinition } from "../templates/task.interface";
 import { TransformationKey } from "../templates/storyTemplates";
 
+/**
+ * Final implementation of the AI failure narrative wrapper system.
+ * This module enriches tasks with AI failure narratives based on transformation types.
+ * @author Cascade
+ */
+
 /** Options to influence AI failure content selection */
 export interface StoryOptions {
   comicSituationIndex?: number; // Force a particular comic situation (1-3)
@@ -49,22 +55,27 @@ const aiFallbackData = {
  */
 function loadAIFailureContent() {
   try {
-    // Try multiple path approaches to find the file
+    // In ESM, __dirname isn't defined, so we need to use different approaches
+    // Use process.cwd() as the base for file paths in ES modules
     const possiblePaths = [
-      path.resolve(__dirname, "..", "data", "ai_failure.json"),
+      // Project root based paths
       path.resolve(process.cwd(), "server", "data", "ai_failure.json"),
-      path.resolve(".", "server", "data", "ai_failure.json"),
-      // Add more absolute paths for debugging
+      path.resolve(process.cwd(), "data", "ai_failure.json"),
+      // Relative paths
+      path.resolve("server", "data", "ai_failure.json"),
+      path.resolve("data", "ai_failure.json"),
+      // Absolute path for debugging
       "d:\\1Projects\\sfmc-vercel-deploy\\server\\data\\ai_failure.json"
     ];
     
-    // Log all possible paths for debugging
-    console.log("Trying paths:", possiblePaths);
+    // Uncomment for debugging if needed
+    // console.log(`Trying ESM-compatible paths:`, possiblePaths);
     
     // Try each path until we find one that exists
     let dataPath = "";
     for (const p of possiblePaths) {
-      console.log(`Checking path: ${p}, exists: ${fs.existsSync(p)}`);
+      // Uncomment for debugging if needed
+      // console.log(`Checking path: ${p}, exists: ${fs.existsSync(p)}`);
       if (fs.existsSync(p)) {
         dataPath = p;
         break;
@@ -75,13 +86,12 @@ function loadAIFailureContent() {
       const raw = fs.readFileSync(dataPath, "utf-8");
       const parsed = JSON.parse(raw);
       console.log(`Successfully loaded AI failure content from ${dataPath}`);
-      console.log(`Available transformation types in AI failure data:`, Object.keys(parsed));
       return parsed;
     } else {
       console.warn("Warning: ai_failure.json not found in any of the expected locations, using fallback data");
     }
   } catch (error) {
-    console.error("Error loading ai_failure.json:", error);
+    console.error(`Error loading ai_failure.json:`, error);
     /* Will fall back to default values */
   }
   return aiFallbackData;
@@ -108,16 +118,11 @@ export function applyStory(
   // Load AI failure content
   const aiFailureContent = loadAIFailureContent();
   
-  // Debug output for transformation type matching
-  console.log(`Transformation type from task: '${transformationType}'`);
-  console.log(`AI failure content keys: ${JSON.stringify(Object.keys(aiFailureContent))}`);
-  
   // Check if we have content for this transformation type
   if (!aiFailureContent[transformationType]) {
     console.warn(`No AI failure content found for transformation type: ${transformationType}`);
     return task;
   }
-  console.log(`Found matching content for transformation type: ${transformationType}`);
 
   // Get the appropriate content for this transformation
   const content = aiFailureContent[transformationType];
