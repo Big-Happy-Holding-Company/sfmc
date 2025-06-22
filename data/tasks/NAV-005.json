@@ -1,0 +1,29 @@
+{
+  "id": "NAV-005",
+  "title": "Navigation Array 90° Counter-Clockwise",
+  "description": "Navigation systems require 90-degree counter-clockwise 🔄 rotation calibration. Study the reverse positional transformation patterns.",
+  "category": "🧭 Navigation",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 3455,
+  "requiredRankLevel": 1,
+  "emojiSet": "nav_alerts",
+  "examples": [
+    {
+      "input": [["⬆️", "➡️"], ["⬅️", "⬇️"]],
+      "output": [["➡️", "⬇️"], ["⬆️", "⬅️"]]
+    },
+    {
+      "input": [["🧭", "↗️"], ["⬛", "↘️"]],
+      "output": [["↗️", "↘️"], ["🧭", "⬛"]]
+    }
+  ],
+  "testInput": [["↖️", "↙️"], ["↗️", "↘️"]],
+  "testOutput": [["↙️", "↘️"], ["↖️", "↗️"]],
+  "hints": [
+    "The grid rotates 90 degrees counter-clockwise 🔄 around the center.",
+    "Top-left moves to bottom-left, bottom-left to bottom-right.",
+    "Each position shifts one step counter-clockwise 🔄 around the grid."
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "id": "PL-009",
+  "title": "Pre-Launch 270° Rotation",
+  "description": "The waste management system tried to rotate disposal schedules by 270 degrees but applied three separate 90-degree transforms to the actual rotating waste compactor. The machine spun through three slow quarter-turns, taking 45 minutes to complete what should have been a 5-second data adjustment. 270-degree rotations are particularly challenging because they require understanding that three quarter-turns equal one three-quarter turn, not just applying 90-degree logic three times. This tests deeper spatial reasoning and transformation composition. Rotate the indicator grid 270° clockwise 🔁🔁🔁 (or 90° counter-clockwise 🔄) to match the final launch control orientation.",
+  "category": "🚀 Pre-Launch Ops",
+  "difficulty": "Basic",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 11600,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [[1,0,0,2],[0,3,4,0],[0,5,6,0],[7,0,0,8]],
+      "output": [[2,0,0,8],[0,4,6,0],[0,3,5,0],[1,0,0,7]]
+    },
+    {
+      "input": [[0,0,9,0],[0,8,0,7],[6,0,5,0],[0,4,0,0]],
+      "output": [[0,7,0,0],[0,0,5,8],[4,0,0,9],[0,6,0,0]]
+    }
+  ],
+  "testInput": [[0,1,0,2],[3,0,4,0],[0,5,0,6],[7,0,8,0]],
+  "testOutput": [[2,0,0,0],[0,4,6,1],[0,3,5,0],[7,0,0,8]],
+  "hints": [
+    "This is like spinning a toy three times to the right instead of once to the left to end up in the same place. You know they're the same, but computers have to think step-by-step through each turn.",
+    "Imagine you're playing 'Simon Says' and Simon says 'turn around 3/4 of the way.' You'd just turn almost all the way around and stop. But a computer might think it has to turn a little bit, then turn again, then turn again, taking much longer to get to the same place.",
+    "It's like when you're unscrewing a jar lid. You know you need to turn it mostly around to the left, but a computer might think it needs to turn it a little to the right three times instead of just turning left once. Both ways work, but one is much sillier.",
+    "Rotate the entire grid 270° clockwise 🔁🔁🔁 you can also think of this as one 90° counter-clockwise 🔄 rotation.",
+    "Columns become rows from bottom to top.",
+    "⬛ rotates like any other cell."
+  ]
+}

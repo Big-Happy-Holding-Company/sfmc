@@ -1,0 +1,45 @@
+{
+  "id": "SEC-004",
+  "title": "Advanced Security Matrix Layering",
+  "description": "Complex access control systems require multi-layer security patterns. Elements layer in concentric rectangular patterns.",
+  "category": "🔐 Security Systems",
+  "difficulty": "Officer (Expert)",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 21220,
+  "requiredRankLevel": 1,
+  "emojiSet": "status_main",
+  "examples": [
+    {
+      "input": [
+        ["🔴", "🟢", "🔵", "🟡"],
+        ["⬛", "⬛", "⬛", "⬛"],
+        ["⬛", "⬛", "⬛", "⬛"],
+        ["⬛", "⬛", "⬛", "⬛"]
+      ],
+      "output": [
+        ["🔴", "🟢", "🔵", "🟡"],
+        ["🔴", "🟢", "🔵", "🟡"],
+        ["🔴", "🟢", "🔵", "🟡"],
+        ["🔴", "🟢", "🔵", "🟡"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["🟣", "🟠", "🔴", "🔵"],
+    ["⬛", "⬛", "⬛", "⬛"],
+    ["⬛", "⬛", "⬛", "⬛"],
+    ["⬛", "⬛", "⬛", "⬛"]
+  ],
+  "testOutput": [
+    ["🟣", "🟠", "🔴", "🔵"],
+    ["🟣", "🟠", "🔴", "🔵"],
+    ["🟣", "🟠", "🔴", "🔵"],
+    ["🟣", "🟠", "🔴", "🔵"]
+  ],
+  "hints": [
+    "The top row pattern repeats vertically throughout the grid.",
+    "Each column maintains its color from the top row.",
+    "Security layers propagate downward in vertical bands."
+  ]
+}

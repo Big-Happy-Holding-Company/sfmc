@@ -1,0 +1,41 @@
+{
+  "id": "FS-007",
+  "title": "Advanced Fuel Center Propagation",
+  "description": "Given a 3x3 matrix representing a fuel grid, replace every element with the center element's value. The center element (position [1][1]) propagates to fill the entire matrix.",
+  "category": "⚡ Fuel Systems",
+  "difficulty": "Advanced",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 9820,
+  "requiredRankLevel": 3,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [
+        [8, 1, 1],
+        [2, 7, 3],
+        [5, 6, 9]
+      ],
+      "output": [
+        [7, 7, 7],
+        [7, 7, 7],
+        [7, 7, 7]
+      ]
+    }
+  ],
+  "testInput": [
+    [3, 7, 2],
+    [3, 4, 8],
+    [6, 7, 5]
+  ],
+  "testOutput": [
+    [4, 4, 4],
+    [4, 4, 4],
+    [4, 4, 4]
+  ],
+  "hints": [
+    "The center element fills the entire grid.",
+    "All other elements are replaced by the center value.",
+    "This creates a uniform pattern across the matrix."
+  ]
+}

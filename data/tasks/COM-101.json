@@ -1,0 +1,85 @@
+{
+  "id": "COM-101",
+  "title": "Finish the Color Pattern!",
+  "description": "📡 Pattern failure! Elun Stink was too busy fighting with bots on Twitter to complete the transmission grid. Half the critical relay symbols are missing ❓ and astronauts can't call home 📞! Examine the example grids to see how blank spaces should be filled. Complete today's symbol grid with the correct patterns ✨ to restore communication for the stranded crew 👩‍🚀👨‍🚀!",
+  "category": "📡 Communications",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 4700,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [
+          7,
+          1
+        ],
+        [
+          7,
+          1
+        ]
+      ],
+      "output": [
+        [
+          1,
+          7
+        ],
+        [
+          1,
+          7
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          4,
+          1
+        ],
+        [
+          2,
+          6
+        ]
+      ],
+      "output": [
+        [
+          1,
+          4
+        ],
+        [
+          6,
+          2
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      3,
+      7
+    ],
+    [
+      5,
+      1
+    ]
+  ],
+  "testOutput": [
+    [
+      7,
+      3
+    ],
+    [
+      1,
+      5
+    ]
+  ],
+  "hints": [
+    "Think of the grid as being reflected in a mirror placed to the right side.",
+    "The first column becomes the last column, the second becomes the second-to-last, and so on.",
+    "The black square (⬛) reflects just like any other cell value."
+  ],
+  "transformationType": "pattern_completion",
+  "generated": true
+}

@@ -1,0 +1,61 @@
+{
+  "id": "PWR-104",
+  "title": "Energy Flow Pattern Analysis",
+  "description": "Complete the energy flow pattern by identifying the visual sequence. Each row and column follows a rotating energy cycle.",
+  "category": "⚡ Power Systems",
+  "difficulty": "Officer (Expert)",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 21375,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [
+        [0, 0, 2, 3],
+        [1, 0, 3, 0],
+        [2, 3, 4, 0],
+        [3, 0, 0, 6]
+      ],
+      "output": [
+        [0, 1, 2, 3],
+        [1, 2, 3, 4],
+        [2, 3, 4, 5],
+        [3, 4, 5, 6]
+      ]
+    },
+    {
+      "input": [
+        [0, 1, 2, 0],
+        [0, 2, 0, 0],
+        [2, 3, 4, 5],
+        [0, 4, 5, 0]
+      ],
+      "output": [
+        [0, 1, 2, 3],
+        [1, 2, 3, 4],
+        [2, 3, 4, 5],
+        [3, 4, 5, 6]
+      ]
+    }
+  ],
+  "testInput": [
+    [0, 0, 2, 0],
+    [1, 0, 3, 4],
+    [2, 3, 4, 5],
+    [0, 0, 0, 6]
+  ],
+  "testOutput": [
+    [0, 1, 2, 3],
+    [1, 2, 3, 4],
+    [2, 3, 4, 5],
+    [3, 4, 5, 6]
+  ],
+  "hints": [
+    "Each row follows the same energy flow sequence, but starts at a different point in the cycle.",
+    "Look at complete rows/columns to identify the repeating pattern: each position increases by 1.",
+    "The pattern creates diagonal shifts - row 0 starts with 0, row 1 starts with 1, etc."
+  ],
+  "transformationType": "visual_sequence_pattern",
+  "generated": true
+}

@@ -1,0 +1,29 @@
+{
+  "id": "OS-001",
+  "title": "Oxygen Sensor Calibration",
+  "description": "Basic systems health checks are part of our daily routine here. Lend us a hand by examining the previous correct configurations and then correctly configure the new sensor.",
+  "category": "🛡️ O₂ Sensor Check",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 3250,
+  "requiredRankLevel": 1,
+  "emojiSet": "status_main",
+  "examples": [
+    {
+      "input": [["🟡", "⬛"], ["⬛", "🔴"]],
+      "output": [["🔴", "⬛"], ["⬛", "🟡"]]
+    },
+    {
+      "input": [["🟢", "🔵"], ["⬛", "⬛"]],
+      "output": [["⬛", "⬛"], ["🔵", "🟢"]]
+    }
+  ],
+  "testInput": [["🟣", "⬛"], ["🟠", "⬛"]],
+  "testOutput": [["⬛", "🟠"], ["⬛", "🟣"]],
+  "hints": [
+    "Look at how the colored indicators change positions.",
+    "The transformation swaps elements diagonally across the grid.",
+    "Top-left goes to bottom-right, bottom-left goes to top-right."
+  ]
+}
