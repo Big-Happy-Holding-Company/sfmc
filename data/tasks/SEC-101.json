@@ -1,0 +1,181 @@
+{
+  "id": "SEC-101",
+  "title": "defense matrix Rotation Analysis",
+  "description": "Analyze the defense matrix by rotating the input grid 270 degrees clockwise 🔁🔁🔁.",
+  "category": "🔒 Security Systems",
+  "difficulty": "Intermediate",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 4125,
+  "requiredRankLevel": 1,
+  "emojiSet": "status_alerts",
+  "examples": [
+    {
+      "input": [
+        [
+          1,
+          9,
+          8,
+          8
+        ],
+        [
+          8,
+          0,
+          0,
+          7
+        ],
+        [
+          0,
+          4,
+          9,
+          5
+        ],
+        [
+          9,
+          9,
+          8,
+          6
+        ]
+      ],
+      "output": [
+        [
+          8,
+          7,
+          5,
+          6
+        ],
+        [
+          8,
+          0,
+          9,
+          8
+        ],
+        [
+          9,
+          0,
+          4,
+          9
+        ],
+        [
+          1,
+          8,
+          0,
+          9
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          4,
+          4,
+          9,
+          7
+        ],
+        [
+          2,
+          4,
+          5,
+          0
+        ],
+        [
+          1,
+          9,
+          8,
+          2
+        ],
+        [
+          3,
+          0,
+          0,
+          2
+        ]
+      ],
+      "output": [
+        [
+          7,
+          0,
+          2,
+          2
+        ],
+        [
+          9,
+          5,
+          8,
+          0
+        ],
+        [
+          4,
+          4,
+          9,
+          0
+        ],
+        [
+          4,
+          2,
+          1,
+          3
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      5,
+      2,
+      7,
+      4
+    ],
+    [
+      3,
+      5,
+      8,
+      0
+    ],
+    [
+      9,
+      5,
+      5,
+      0
+    ],
+    [
+      5,
+      3,
+      8,
+      2
+    ]
+  ],
+  "testOutput": [
+    [
+      4,
+      0,
+      0,
+      2
+    ],
+    [
+      7,
+      8,
+      5,
+      8
+    ],
+    [
+      2,
+      5,
+      5,
+      3
+    ],
+    [
+      5,
+      3,
+      9,
+      5
+    ]
+  ],
+  "hints": [
+    "Rotate the entire grid 270 degrees clockwise 🔁🔁🔁 (¾ turn to the right). You can also think of this as 90 degrees counter-clockwise 🔄 (¼ turn to the left)."  ,
+    "The leftmost column becomes the top row, reading from left to right.",
+    "Each row in the original becomes a column in the result, with order shifted accordingly."
+  ],
+  "transformationType": "rotation_270deg",
+  "generated": true
+}

@@ -1,4 +1,4 @@
-import { RANK_ICONS } from "@/data/missions";
+import { RANK_ICONS } from "@/data/ranks";
 import type { Player } from "@shared/schema";
 
 interface RankBadgeProps {
