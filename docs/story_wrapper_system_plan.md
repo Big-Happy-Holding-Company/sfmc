@@ -16,8 +16,9 @@ Provide a modular narrative layer (“story wrapper”) that adds humorous Space
 | --- | --- |
 | `server/tools/story-factory.ts` | Core function `applyStory(task, opts)` + lightweight helper utilities. |
 | `server/templates/storyTemplates.ts` | Pure data: map of transformation → array of `{ title, description }` templates containing Handlebars-style placeholders `{{placeholder}}`. |
-| `server/data/antagonists.json` | Optional list of antagonists for writers. |
-| `server/data/components.json` | Optional list of ship/mission components for placeholders. |
+| `server/data/antagonists.json` | List of antagonists for inserting as story elements via the `{{antagonist}}` placeholder. |
+| `server/data/components.json` | List of ship/mission components for inserting as story elements via the `{{component}}` placeholder. |
+| `server/data/problems.json` | List of transformations for inserting as story elements via the `{{problem}}` placeholder. |
 
 > NOTE: Only `story-factory.ts` contains logic; all narrative content lives in data files so non-dev writers can update without code changes.
 
@@ -44,8 +45,9 @@ After validation, add a flag (`--with-story`) to the CLI generator to call `appl
 ## Outstanding Tasks
 - Scaffold new files with comments per project guidelines.
 - Implement `applyStory` logic (simple and pure).
-- Populate starter template JSON with one humorous example per transformation.
-- Write demo script for QA team.
+- Populate starter template JSON with five humorous examples per transformation. DONE!
+
+
 
 ---
-*End of plan.*
+Plan modified by user.
