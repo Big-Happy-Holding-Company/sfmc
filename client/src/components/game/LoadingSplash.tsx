@@ -1,13 +1,16 @@
 /**
  * LoadingSplash Component
  * --------------------------------------------------------
- * Author: Cascade AI
+ * Author: Cascade AI with Claude 3.7 Sonnet Thinking
+ * Date: 2025-06-22
+ * Version: 1.0.0
+ * Fixed by: Claude 4 Sonnet
  * Description: 
  *   A fun splash screen that displays when the app first loads.
  *   Features Master Chief Wyatt with animated space emojis and a percentage counter.
  *   Purely decorative - not tied to actual loading processes.
  */
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { SPACE_EMOJIS } from "@/constants/spaceEmojis";
 
 interface LoadingSplashProps {
@@ -20,41 +23,40 @@ export function LoadingSplash({ onComplete, duration = 5000 }: LoadingSplashProp
   const [emojiRow, setEmojiRow] = useState<string[]>([]);
   const [isExiting, setIsExiting] = useState(false);
   
-  // Combine celestial emojis for a more interesting display
-  const combinedEmojis = [
+  // Memoize the combined emojis to prevent recreation on each render
+  const combinedEmojis = useMemo(() => [
     ...SPACE_EMOJIS.celestial_set1.slice(1), 
     ...SPACE_EMOJIS.celestial_set2.slice(1)
-  ];
+  ], []);
 
   useEffect(() => {
     // Initialize emoji row
     setEmojiRow(combinedEmojis);
     
-    // Set start time
-    const startTime = Date.now();
+    // Use the duration prop to calculate intervals
+    const totalSteps = 50;
+    const intervalTime = duration / totalSteps;
+    let step = 0;
     
-    // Simple interval-based animation for more reliable progress updates
-    // Update every 50ms for smoother animation
+    console.log('Starting progress animation with duration:', duration, 'ms, interval:', intervalTime, 'ms');
+    
+    // Progress counter using actual duration
     const progressInterval = setInterval(() => {
-      const elapsed = Date.now() - startTime;
-      const progressPercent = Math.min(Math.floor((elapsed / duration) * 100), 100);
+      step++;
+      const newProgress = Math.min(Math.floor((step / totalSteps) * 100), 100);
+      console.log('Progress:', newProgress + '%');
+      setProgress(newProgress);
       
-      // Update progress state
-      setProgress(progressPercent);
-      
-      // Check if complete
-      if (progressPercent >= 100) {
+      // When we reach 100%, clear interval and finish
+      if (step >= totalSteps) {
         clearInterval(progressInterval);
-        
-        // Start exit animation
         setIsExiting(true);
-        
-        // Call onComplete after exit animation finishes
+        console.log('Animation complete, exiting...');
         setTimeout(() => onComplete(), 700);
       }
-    }, 50);
+    }, intervalTime);
     
-    // Emoji rotation on a separate interval for animation
+    // Simple emoji rotation
     const emojiInterval = setInterval(() => {
       setEmojiRow(prev => {
         if (prev.length === 0) return prev;
@@ -67,7 +69,7 @@ export function LoadingSplash({ onComplete, duration = 5000 }: LoadingSplashProp
       clearInterval(progressInterval);
       clearInterval(emojiInterval);
     };
-  }, [onComplete, duration, combinedEmojis]);
+  }, [onComplete, duration]); // Removed combinedEmojis from dependency array
 
   return (
     <div 
