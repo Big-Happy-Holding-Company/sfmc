@@ -8,7 +8,7 @@
   "timeLimit": null,
   "basePoints": 2380,
   "requiredRankLevel": 1,
-  "emojiSet": "status_main",
+  "emojiSet": "celestial_set1",
   "examples": [
     {
       "input": [["🔴", "🟢"], ["🔴", "🟡"]],

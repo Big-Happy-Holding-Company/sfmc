@@ -1,5 +1,5 @@
 {
-  "id": "OS-102",
+  "id": "OS-104",
   "title": "environmental data Rotation Analysis",
   "description": "Airlock control systems got confused trying to rotate safety protocols 270 degrees. Instead of one smooth turn, it performed three separate 90-degree rotations of the actual airlock chamber, cycling through pressurization three times and trapping two astronauts in the middle. 270-degree rotations are particularly challenging because they require understanding that three quarter-turns equal one three-quarter turn, not just applying 90-degree logic three times. This tests deeper spatial reasoning and transformation composition. Analyze the environmental data by rotating the input grid 270 degrees clockwise 🔁🔁🔁.",
   "category": "🛡️ O₂ Sensor Check",
@@ -8,7 +8,7 @@
   "timeLimit": null,
   "basePoints": 11350,
   "requiredRankLevel": 1,
-  "emojiSet": "status_main",
+  "emojiSet": "status_alerts",
   "examples": [
     {
       "input": [

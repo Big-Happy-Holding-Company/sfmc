@@ -92,9 +92,9 @@ export class TaskValidator {
       errors.push(`Invalid difficulty: ${task.difficulty}`);
     }
     
-    // Check grid size (2-4)
-    if (task.gridSize !== undefined && (task.gridSize < 2 || task.gridSize > 4)) {
-      errors.push(`Invalid grid size: ${task.gridSize} (should be 2-4)`); 
+    // Check grid size (minimum 2)
+    if (task.gridSize !== undefined && task.gridSize < 2) {
+      errors.push(`Invalid grid size: ${task.gridSize} (minimum 2)`); 
     }
     
     // Check emoji set exists
@@ -107,9 +107,9 @@ export class TaskValidator {
       errors.push(`Not enough examples: ${task.examples.length} (minimum 2)`); 
     }
     
-    // Check hints (exactly 3)
-    if (task.hints && task.hints.length !== 3) {
-      errors.push(`Invalid number of hints: ${task.hints.length} (should be 3)`); 
+    // Check hints (minimum 3)
+    if (task.hints && task.hints.length < 3) {
+      errors.push(`Not enough hints: ${task.hints.length} (minimum 3)`); 
     }
     
     return errors;

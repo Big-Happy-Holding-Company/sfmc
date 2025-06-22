@@ -7,9 +7,21 @@
  * @author Cascade
  */
 
-import { CategoryTemplate, CATEGORY_TEMPLATES, getNextTaskId } from "../templates/categories";
-import { TransformationTemplate, getTransformationByType, getDomainContext } from "../templates/transformations";
-import { TaskDefinition, ExamplePair, TaskOptions } from "../templates/task.interface";
+import { 
+  TaskDefinition, 
+  ExamplePair 
+} from "../templates/task.interface";
+import { 
+  CategoryTemplate, 
+  CATEGORY_TEMPLATES
+} from "../templates/categories";
+import { 
+  TransformationTemplate,
+  getTransformationByType,
+  getDomainContext 
+} from "../templates/transformations";
+import { getNextTaskId } from "../templates/categories";
+import { applyStory } from "./story-factory";
 import { getGridGenerator } from "../templates/generators";
 
 /**
@@ -44,7 +56,7 @@ export class TaskFactory {
   generateTask(
     categoryCode: string, 
     transformationType: string, 
-    options: TaskOptions = {}
+    options: any = {}
   ): TaskDefinition | null {
     // Validate inputs
     const category = this.categoryTemplates[categoryCode];
@@ -106,8 +118,8 @@ export class TaskFactory {
     // Generate a sequential ID for the task starting from 100
     const id = getNextTaskId(categoryCode);
 
-    // Build the complete task definition
-    return {
+    // Build the base task definition
+    const baseTask = {
       id,
       title,
       description,
@@ -125,6 +137,9 @@ export class TaskFactory {
       transformationType: transformationType,
       generated: true // Mark as template-generated
     };
+
+    // Apply AI failure content wrapper
+    return applyStory(baseTask);
   }
 
   /**

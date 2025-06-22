@@ -5,140 +5,141 @@
  * Space-Force-2050 narrative. It is intentionally **pure** (no side-effects),
  * with all story content loaded from external JSON files:
  * 
- * - problems.json: Contains all story templates organized by transformation type
- * - antagonists.json: List of antagonists who cause the problems
- * - components.json: List of ship/system components that get broken
+ * - ai_failure.json: PRIMARY source of narrative content organized by transformation type
+ *   Contains comic situations, AI difficulty explanations, and kid-friendly hints
  * 
  * This modular design allows writers to update content without touching code.
  * 
- * Author: Cascade with o3 (high reasoning)
- * Date: 2025-06-21
+ * Author: Cascade Claude 3.7 Sonnet Thinking 
+ * Date: 2025-06-22
+ * Updated: 2025-06-22 - Changed to use ai_failure.json as primary content source
  */
 
 import fs from "fs";
 import path from "path";
 import { TaskDefinition } from "../templates/task.interface";
-import {
-  StoryTemplates,
-  TransformationKey,
-  StoryTemplate,
-} from "../templates/storyTemplates";
+import { TransformationKey } from "../templates/storyTemplates";
 
-/** Options writers can use to influence the output */
+/** Options to influence AI failure content selection */
 export interface StoryOptions {
-  antagonist?: string; // Force a particular antagonist name
-  component?: string; // Force a particular ship/system component
-  templateId?: string; // Force a particular narrative template id
+  comicSituationIndex?: number; // Force a particular comic situation (1-3)
+  randomizeHints?: boolean; // Whether to randomize the order of kids_explanation hints (default: false)
 }
 
-/** Fallback data in case the JSON lists are missing */
-// Primary and secondary lists for placeholder substitutions
-const antagonistsFallback = [
-  "Elun Stink",
-  "Joffrey Beezooos",
-  "Mork Zickarborg", 
-  "The Tesla Corporation",
-  "The SpaceX Corporation"
-];
-
-const componentsFallback = [
-  "gyro-stabilizer",
-  "life-support unit",
-  "quantum nav computer",
-  "solar array controller",
-  "navigation interface",
-  "orbital scanner",
-  "comms relay",
-  "reactor core"
-];
+/** 
+ * Default AI Failure content in case the JSON file is missing 
+ * Contains simplified version of one transformation type
+ */
+const aiFallbackData = {
+  "horizontal_reflection": {
+    "ai_difficulty": "AI struggles with spatial reasoning and mirror symmetry.",
+    "comic_situation1": "The AI kept trying to calculate mirror reflections pixel by pixel.",
+    "comic_situation2": "Mission Control's guidance system confused left and right when mirroring.",
+    "comic_situation3": "The life support display showed oxygen readings backwards for 2 hours.",
+    "kids_explanation": "Computers don't understand mirrors like you do.",
+    "kids_explanation1": "It's like reading your name in a mirror - you figure it out easily, computers struggle.",
+    "kids_explanation2": "Imagine flipping a tower of blocks - you just see it, computers calculate each block."
+  }
+};
 
 /** 
- * Utility: Load a simple JSON array from server/data/ 
+ * Utility: Load AI failure content from server/data/ai_failure.json 
  * 
- * @param filename The JSON file to load from server/data/
- * @param fallback Fallback array to use if file can't be loaded
- * @returns The loaded array or fallback if loading failed
+ * @returns The loaded AI failure content or fallback if loading failed
  */
-function loadJsonArray(filename: string, fallback: string[]): string[] {
+function loadAIFailureContent() {
   try {
-    const dataPath = path.resolve(__dirname, "..", "data", filename);
-    if (fs.existsSync(dataPath)) {
+    // Try multiple path approaches to find the file
+    const possiblePaths = [
+      path.resolve(__dirname, "..", "data", "ai_failure.json"),
+      path.resolve(process.cwd(), "server", "data", "ai_failure.json"),
+      path.resolve(".", "server", "data", "ai_failure.json")
+    ];
+    
+    // Try each path until we find one that exists
+    let dataPath = "";
+    for (const p of possiblePaths) {
+      if (fs.existsSync(p)) {
+        dataPath = p;
+        break;
+      }
+    }
+    
+    if (dataPath) {
       const raw = fs.readFileSync(dataPath, "utf-8");
       const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed as string[];
-      } else {
-        console.warn(`Warning: ${filename} does not contain a valid array or is empty`); 
-      }
+      console.log(`Successfully loaded AI failure content from ${dataPath}`);
+      return parsed;
     } else {
-      console.warn(`Warning: ${filename} not found, using fallback data`);
+      console.warn("Warning: ai_failure.json not found in any of the expected locations, using fallback data");
     }
   } catch (error) {
-    console.error(`Error loading ${filename}:`, error);
+    console.error("Error loading ai_failure.json:", error);
     /* Will fall back to default values */
   }
-  return fallback;
+  return aiFallbackData;
 }
 
 /**
- * Main entry point.
+ * Main entry point. Applies AI failure content to the task based on its transformation type.
  *
- * @param task  The task to enrich.
- * @param opts  Optional overrides to guide template filling.
+ * @param task  The task to enrich with AI failure content.
+ * @param opts  Optional overrides to guide content selection.
  */
 export function applyStory(
   task: TaskDefinition,
   opts: StoryOptions = {}
 ): TaskDefinition {
-  const key = task.transformationType as TransformationKey | undefined;
+  const transformationType = task.transformationType as TransformationKey | undefined;
 
-  if (!key || !(key in StoryTemplates)) {
-    // Transformation not recognised – return task unchanged.
+  if (!transformationType) {
+    // Transformation not recognized – return task unchanged.
+    console.warn("Warning: No transformation type specified in task");
     return task;
   }
 
-  // Choose template
-  const templates = StoryTemplates[key];
-  let chosen: StoryTemplate | undefined = undefined;
-
-  if (opts.templateId) {
-    chosen = templates.find((t) => t.id === opts.templateId);
-  }
-  if (!chosen) {
-    chosen = templates[Math.floor(Math.random() * templates.length)];
+  // Load AI failure content
+  const aiFailureContent = loadAIFailureContent();
+  
+  // Check if we have content for this transformation type
+  if (!aiFailureContent[transformationType]) {
+    console.warn(`No AI failure content found for transformation type: ${transformationType}`);
+    return task;
   }
 
-  // Gather substitution data
-  const antagonists = loadJsonArray("antagonists.json", antagonistsFallback);
-  const components = loadJsonArray("components.json", componentsFallback);
-
-  const antagonist = opts.antagonist ??
-    antagonists[Math.floor(Math.random() * antagonists.length)];
-    const component = opts.component ??
-    components[Math.floor(Math.random() * components.length)];
-
-  // In case templates need two distinct antagonists
-  let antagonist1 = antagonist;
-  let antagonist2 = antagonist;
-  if (/{{\s*antagonist2\s*}}/i.test(chosen.title + chosen.description)) {
-    // Ensure antagonist2 differs from antagonist1 if possible
-    const others = antagonists.filter((a) => a !== antagonist1);
-    antagonist2 = others.length > 0 ? others[Math.floor(Math.random() * others.length)] : antagonist1;
+  // Get the appropriate content for this transformation
+  const content = aiFailureContent[transformationType];
+  
+  // Select which comic situation to use (randomly or via options)
+  let comicSituationIndex = opts.comicSituationIndex;
+  if (!comicSituationIndex || comicSituationIndex < 1 || comicSituationIndex > 3) {
+    comicSituationIndex = Math.floor(Math.random() * 3) + 1;
   }
-
-  const placeholderMap: Record<string, string> = {
-    antagonist: antagonist1,
-    antagonist1: antagonist1,
-    antagonist2: antagonist2,
-    component,
-  };
-
-  const substitute = (text: string) =>
-    text.replace(/{{\s*(\w+)\s*}}/g, (_, key: string) => placeholderMap[key] || "");
-
+  
+  const comicSituation = content[`comic_situation${comicSituationIndex}`];
+  const aiDifficulty = content.ai_difficulty;
+  
+  // Create enhanced description by prepending comic situation and AI difficulty
+  const enhancedDescription = `${comicSituation} ${aiDifficulty} ${task.description}`;
+  
+  // Get the kid-friendly explanations
+  const kidsExplanations = [
+    content.kids_explanation,
+    content.kids_explanation1,
+    content.kids_explanation2
+  ];
+  
+  // Combine the existing hints with the kid-friendly explanations
+  const enhancedHints = [...kidsExplanations];
+  
+  // Add the original hints after the kid-friendly explanations
+  if (task.hints && Array.isArray(task.hints)) {
+    enhancedHints.push(...task.hints);
+  }
+  
   return {
     ...task,
-    title: substitute(chosen.title),
-    description: substitute(chosen.description),
+    description: enhancedDescription,
+    hints: enhancedHints,
   };
 }

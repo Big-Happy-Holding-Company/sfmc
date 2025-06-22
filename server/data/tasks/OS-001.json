@@ -8,7 +8,7 @@
   "timeLimit": null,
   "basePoints": 3250,
   "requiredRankLevel": 1,
-  "emojiSet": "tech_set1",
+  "emojiSet": "status_alerts",
   "examples": [
     {
       "input": [["1", "0"], ["0", "2"]],
