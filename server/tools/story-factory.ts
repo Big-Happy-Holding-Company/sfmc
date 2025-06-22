@@ -3,10 +3,16 @@
  * --------------------------------------------------
  * This module augments a mechanically generated task with a humorous
  * Space-Force-2050 narrative. It is intentionally **pure** (no side-effects),
- * keeping all story content in external JSON/template files so that writers
- * can iterate without touching TypeScript logic.
- *
+ * with all story content loaded from external JSON files:
+ * 
+ * - problems.json: Contains all story templates organized by transformation type
+ * - antagonists.json: List of antagonists who cause the problems
+ * - components.json: List of ship/system components that get broken
+ * 
+ * This modular design allows writers to update content without touching code.
+ * 
  * Author: Cascade with o3 (high reasoning)
+ * Date: 2025-06-21
  */
 
 import fs from "fs";
@@ -28,27 +34,48 @@ export interface StoryOptions {
 /** Fallback data in case the JSON lists are missing */
 // Primary and secondary lists for placeholder substitutions
 const antagonistsFallback = [
-  "Elon Musk",
-  
+  "Elun Stink",
+  "Joffrey Beezooos",
+  "Mork Zickarborg", 
+  "The Tesla Corporation",
+  "The SpaceX Corporation"
 ];
+
 const componentsFallback = [
   "gyro-stabilizer",
   "life-support unit",
   "quantum nav computer",
   "solar array controller",
+  "navigation interface",
+  "orbital scanner",
+  "comms relay",
+  "reactor core"
 ];
 
-/** Utility: Load a simple JSON array from server/data/ */
+/** 
+ * Utility: Load a simple JSON array from server/data/ 
+ * 
+ * @param filename The JSON file to load from server/data/
+ * @param fallback Fallback array to use if file can't be loaded
+ * @returns The loaded array or fallback if loading failed
+ */
 function loadJsonArray(filename: string, fallback: string[]): string[] {
   try {
     const dataPath = path.resolve(__dirname, "..", "data", filename);
-    const raw = fs.readFileSync(dataPath, "utf-8");
-    const parsed = JSON.parse(raw);
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      return parsed as string[];
+    if (fs.existsSync(dataPath)) {
+      const raw = fs.readFileSync(dataPath, "utf-8");
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed as string[];
+      } else {
+        console.warn(`Warning: ${filename} does not contain a valid array or is empty`); 
+      }
+    } else {
+      console.warn(`Warning: ${filename} not found, using fallback data`);
     }
-  } catch {
-    /* silent – will fall back */
+  } catch (error) {
+    console.error(`Error loading ${filename}:`, error);
+    /* Will fall back to default values */
   }
   return fallback;
 }
