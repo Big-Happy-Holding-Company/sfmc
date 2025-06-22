@@ -1,3 +1,15 @@
+/**
+ * MissionControl Page (Game Interface)
+ * --------------------------------------------------------
+ * Author: Cascade AI
+ * Description:
+ *   Handles the core game UI including mission selection, grid interaction,
+ *   timer controls, and hint system. This modification enhances the hint UI:
+ *     - Removes explicit point penalty text from the hint button and guidance.
+ *     - Displays Sergeant Wyatt avatar alongside hint header and each hint
+ *       message to create a narrative delivery experience.
+ *   All functionality remains unchanged aside from visual/UX updates.
+ */
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -263,6 +275,7 @@ export default function MissionControl() {
                   <div className="bg-slate-800 border border-yellow-500 rounded p-4 mb-4">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-yellow-400 font-semibold flex items-center">
+                        <img src="/wyatt-space-force.jpg" alt="Sgt Wyatt" className="w-10 h-10 rounded-full border-2 border-cyan-400 mr-2" />
                         <i className="fas fa-lightbulb mr-2"></i>
                         MISSION HINTS ({hintsUsed}/{currentTask.hints.length})
                       </h3>
@@ -273,7 +286,7 @@ export default function MissionControl() {
                           className="bg-yellow-500 hover:bg-yellow-600 text-slate-900"
                         >
                           <i className="fas fa-lightbulb mr-1"></i>
-                          GET HINT (-10% POINTS)
+                          GET HINT
                         </Button>
                       )}
                     </div>
@@ -283,15 +296,19 @@ export default function MissionControl() {
                         {currentTask.hints.slice(0, currentHintIndex + 1).map((hint, index) => (
                           <div key={index} className="bg-slate-700 p-3 rounded border-l-4 border-yellow-400">
                             <div className="text-xs text-yellow-400 mb-1">HINT {index + 1}</div>
-                            <div className="text-slate-200 text-sm">{hint}</div>
+                            <div className="flex items-start space-x-2">
+                              <img src="/wyatt-space-force.jpg" alt="Sgt Wyatt" className="w-8 h-8 rounded-full border-2 border-cyan-400" />
+                              <span className="text-slate-200 text-sm">{hint}</span>
+                            </div>
                           </div>
                         ))}
                       </div>
                     )}
                     
                     {currentHintIndex === -1 && (
-                      <div className="text-slate-400 text-sm italic">
-                        Click "GET HINT" to reveal mission guidance. Each hint reduces your final score by 10%.
+                      <div className="flex items-center text-slate-400 text-sm italic">
+                        <img src="/wyatt-space-force.jpg" alt="Sgt Wyatt" className="w-8 h-8 rounded-full border-2 border-cyan-400 mr-2" />
+                        Click 'GET HINT' and Sergeant Wyatt will guide you through the mission.
                       </div>
                     )}
                   </div>

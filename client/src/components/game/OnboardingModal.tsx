@@ -13,14 +13,14 @@ export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
       <DialogContent className="max-w-2xl bg-slate-800 border-cyan-400 text-slate-50">
         <div className="text-center space-y-6">
           <div>
-            <img src="/wyatt-space-force.jpg" alt="Cadet Wyatt" className="mx-auto w-64 h-64 rounded-full border-4 border-cyan-400 object-cover mb-4" />
+            <img src="/wyatt-space-force.jpg" alt="Sgt Wyatt" className="mx-auto w-64 h-64 rounded-full border-4 border-cyan-400 object-cover mb-4" />
             <h1 className="text-3xl font-bold text-cyan-400 mb-2">Mission Control 2050</h1>
             <p className="text-amber-400 font-mono text-sm">US SPACE FORCE OPERATIONS CENTER</p>
           </div>
           
           <div className="space-y-4">
             <div className="bg-slate-900 border border-slate-600 rounded p-4">
-              <h3 className="text-green-400 font-semibold mb-2">Welcome, Cadet Wyatt!</h3>
+              <h3 className="text-green-400 font-semibold mb-2">Welcome, Cadet! I'm your Mission Control Specialist trainer, Sergeant Wyatt. I'll be here if you need hints!</h3>
               <p className="text-slate-300 text-sm leading-relaxed">
                 You are now part of the <span className="text-cyan-400 font-semibold">US Space Force Operations Center</span> where computers do math, but we need humans to perceive the bigger picture. Let's start you with some basic tasks to make you a useful member of the team. This training will take you all the way to the highest enlisted rank: <span className="text-amber-400 font-semibold">Chief Master Sergeant of the Space Force!</span>
               </p>

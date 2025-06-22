@@ -3,195 +3,195 @@
     {
       "id": "os_horiz_reflect",
       "category": "O₂ Sensor Check",
-      "title": "Mirror-O₂ Misdirection Madness",
-      "description": "Alert! {{antagonist}} recalibrated their personal model of {{component}} to double as a selfie mirror and flipped the oxygen readout. Flip the grid left↔right so we can breathe easy again."
+      "title": "O₂ Mirror Meltdown!",
+      "description": "{{antagonist}} configured the {{component}} dashboard for their left-handed mirror layout, broadcasting oxygen data reversed left ↔ right. Reflect the grid horizontally so our diagnostics match theirs."
     },
     {
       "id": "pl_horiz_reflect",
       "category": "Pre-Launch Ops",
-      "title": "Reverse Launch Sequence Map",
-      "description": "Pre-launch checklists appear reversed! {{antagonist}} accidentally mirrored the launch panel display. Flip the sequence map horizontally to ensure all systems are ready for liftoff."
+      "title": "Countdown, Backwards!",
+      "description": "{{antagonist}}’s luxury edition {{component}} presents checklists right-to-left to fit their signature UI theme. Mirror the sequence horizontally (left ↔ right) so our launch controller reads the steps in the intended order."
     },
     {
       "id": "fs_horiz_reflect",
       "category": "Fuel Systems",
-      "title": "Flip Fuel Flow Diagram",
-      "description": "A technician mirrored the fuel flow diagram on the {{component}}. Mirror the schematic left-to-right to verify correct fuel distribution before ignition."
+      "title": "Fuel Flow Flip-Flop",
+      "description": "To showcase their corporate logo, {{antagonist}} set the {{component}} to display fuel schematics mirrored left ↔ right. Reflect the grid so our pumps follow the correct flow."
     },
     {
       "id": "nav_horiz_reflect",
       "category": "Navigation",
-      "title": "Correct Navigation Chart",
-      "description": "Navigation charts are accidentally mirrored! Flip the star map horizontally to plot the correct course."
+      "title": "Starboard is Port?",
+      "description": "{{antagonist}} prefers star maps that rise in the west; their {{component}} outputs charts mirrored left ↔ right. Reflect the navigation grid horizontally so our autopilot follows the real sky."
     },
     {
       "id": "com_horiz_reflect",
       "category": "Communications",
-      "title": "Reverse Signal Routing",
-      "description": "Signal routing diagrams are mirrored after a system update. Flip the comms grid horizontally to restore proper signal flow."
+      "title": "Comms Kaboom-erang",
+      "description": "In ‘echo’ visual mode, {{antagonist}}’s {{component}} mirrors every routing diagram. Reflect the comms grid left ↔ right so signal paths align with our antennas."
     },
     {
       "id": "pwr_horiz_reflect",
       "category": "Power Systems",
-      "title": "Flip Power Distribution Map",
-      "description": "The power grid visualization is mirrored. Flip the grid horizontally to ensure all modules receive the correct voltage."
+      "title": "Power Paradox Panorama",
+      "description": "{{antagonist}} insists on a fun-house landscape for the {{component}} power display. Mirror the voltage map horizontally (left ↔ right) so each module draws from the correct bus."
     },
     {
       "id": "sec_horiz_reflect",
       "category": "Security",
-      "title": "Mirror Security Access Codes",
-      "description": "Security code patterns are mirrored due to a system glitch. Flip the pattern horizontally to authenticate access."
+      "title": "Mirror, Mirror, Who’s the Intruder?",
+      "description": "For aesthetic symmetry, {{antagonist}} shows access patterns mirrored left ↔ right on their {{component}}. Reflect the grid so our authentication matches theirs."
     }
   ],
   "rotation_90deg": [
     {
       "id": "os_rot90",
       "category": "O₂ Sensor Check",
-      "title": "Rotate O₂ Sensor Grid",
-      "description": "O₂ sensor data is rotated 90° after {{antagonist}} recalibrated the {{component}}. Rotate the grid clockwise to analyze the readings."
+      "title": "Quarter-Turn Oxygen Tango",
+      "description": "{{antagonist}}’s wrist-top UI rotates sensor grids 90° clockwise for easier scrolling. Rotate the oxygen grid 90° clockwise to align with their format."
     },
     {
       "id": "pl_rot90",
       "category": "Pre-Launch Ops",
-      "title": "Turn Launch Checklist",
-      "description": "The launch checklist display is rotated 90°. Rotate it clockwise to verify all steps before launch."
+      "title": "Tilt-A-Whirl Countdown",
+      "description": "{{antagonist}} views the launch sequence in portrait mode, rotated 90° clockwise. Apply the same rotation so our automation interprets the steps correctly."
     },
     {
       "id": "fs_rot90",
       "category": "Fuel Systems",
-      "title": "Rotate Fuel Flow Map",
-      "description": "Fuel flow maps are rotated 90° due to a display error. Rotate the schematic to confirm correct fuel routing."
+      "title": "Sideways Fuel Salsa",
+      "description": "{{antagonist}}’s vertical monitor stack requires fuel diagrams rotated 90° clockwise. Rotate the flow map so valve labels align with our hardware."
     },
     {
       "id": "nav_rot90",
       "category": "Navigation",
-      "title": "Turn Navigation Chart",
-      "description": "The navigation chart is rotated 90°. Rotate it clockwise to plot the correct trajectory."
+      "title": "Galactic Neck-Cramp Chart",
+      "description": "Sideways star charts are {{antagonist}}’s signature look; their {{component}} outputs navigation data rotated 90° clockwise. Rotate our chart accordingly to synchronize trajectories."
     },
     {
       "id": "com_rot90",
       "category": "Communications",
-      "title": "Rotate Signal Grid",
-      "description": "Signal grid is rotated 90° after a firmware update. Rotate the grid to restore communication pathways."
+      "title": "Signal Spin-Cycle",
+      "description": "Vintage radar imitation on {{antagonist}}’s {{component}} rotates signal matrices 90° clockwise. Rotate the comms grid so channel mapping matches."
     },
     {
       "id": "pwr_rot90",
       "category": "Power Systems",
-      "title": "Turn Power Distribution",
-      "description": "Power distribution grid is rotated 90°. Rotate it to verify module connectivity."
+      "title": "90-Volt Swivel",
+      "description": "{{antagonist}} reoriented the {{component}} power diagram 90° clockwise to fit their wall display. Rotate ours to verify every circuit reaches its intended module."
     },
     {
       "id": "sec_rot90",
       "category": "Security",
-      "title": "Rotate Security Pattern",
-      "description": "Security access patterns are rotated 90°. Rotate the pattern to match the required access code."
+      "title": "Access Hokey-Pokey",
+      "description": "For a ‘dramatic reveal’, {{antagonist}}’s security console shows access patterns rotated 90° clockwise. Rotate the grid so our passcodes authenticate."
     }
   ],
   "pattern_completion": [
     {
       "id": "os_pattern",
       "category": "O₂ Sensor Check",
-      "title": "Complete O₂ Sensor Data",
-      "description": "Some O₂ sensor readings are missing after {{antagonist}} interrupted the scan. Fill in the missing data points on the grid to complete the diagnostics."
+      "title": "O₂ Connect-the-Dots",
+      "description": "{{antagonist}} enabled aggressive compression on the {{component}}, omitting every other O₂ reading to save screen space. Reconstruct the missing data points to complete diagnostics."
     },
     {
       "id": "pl_pattern",
       "category": "Pre-Launch Ops",
-      "title": "Finish Launch Sequence",
-      "description": "The launch sequence checklist is incomplete. Fill in the missing steps to ensure a safe launch."
+      "title": "Launch Mad-Libs",
+      "description": "To keep things ‘minimalist’, {{antagonist}} replaced even-numbered steps on the {{component}} with icons. Fill in the missing checklist items to restore the full launch sequence."
     },
     {
       "id": "fs_pattern",
       "category": "Fuel Systems",
-      "title": "Complete Fuel Flow Chart",
-      "description": "Fuel flow chart is missing key data points. Complete the pattern to verify fuel delivery."
+      "title": "Fuel Sudoku Scandal",
+      "description": "{{antagonist}}’s fuel monitor omits every third value for a sleeker dashboard. Complete the fuel flow chart so our engines receive continuous data."
     },
     {
       "id": "nav_pattern",
       "category": "Navigation",
-      "title": "Fill Navigation Data",
-      "description": "Some navigation data is missing. Complete the grid to plot the full course."
+      "title": "Lost Constellation Crossword",
+      "description": "{{antagonist}}’s nav computer publishes coordinates in an alternating-cell pattern to showcase constellation art. Fill in the gaps to plot a sane course."
     },
     {
       "id": "com_pattern",
       "category": "Communications",
-      "title": "Restore Signal Pattern",
-      "description": "Signal pattern is incomplete after a system reset. Fill in the missing data to restore communication."
+      "title": "Static-Gap Symphony",
+      "description": "{{antagonist}}’s comms interface transmits only odd packets to emulate Morse cadence. Restore the missing pattern so messages arrive intact."
     },
     {
       "id": "pwr_pattern",
       "category": "Power Systems",
-      "title": "Complete Power Grid",
-      "description": "Power grid data is incomplete. Fill in the missing values to ensure all systems are powered."
+      "title": "Watt-Missing Whodunit",
+      "description": "{{antagonist}} dimmed alternate power readings on the {{component}} to create a striped aesthetic. Fill in the blanks to verify power delivery across the grid."
     },
     {
       "id": "sec_pattern",
       "category": "Security",
-      "title": "Finish Security Sequence",
-      "description": "Security sequence is incomplete. Fill in the missing pattern to enable access."
+      "title": "Password Dot-Dot-Dot",
+      "description": "For stylistic minimalism, {{antagonist}} hides every second dot in the {{component}} security grid. Complete the pattern so our door logic recognizes valid access."
     }
   ],
   "vertical_reflection": [
     {
       "id": "os_vert_reflect",
       "category": "O₂ Sensor Check",
-      "title": "Flip O₂ Diagnostics Vertically",
-      "description": "O₂ diagnostic grid is upside down after {{antagonist}} adjusted the {{component}}. Flip the grid vertically to interpret the data."
+      "title": "Upside-Down O₂ Uproar",
+      "description": "For their helmet HUD, {{antagonist}} configures the {{component}} to present oxygen diagnostics inverted top ↔ bottom. Flip the grid vertically so our life-support software interprets the values correctly."
     },
     {
       "id": "pl_vert_reflect",
       "category": "Pre-Launch Ops",
-      "title": "Reverse Launch Display Vertically",
-      "description": "The launch display is flipped vertically. Mirror it top-to-bottom to confirm all systems are go."
+      "title": "Invert-and-Blast Countdown",
+      "description": "Ever the show-off, {{antagonist}} mounts the {{component}} display upside-down for dramatic hangar reveals. Mirror the launch checklist vertically (top ↔ bottom) so auto-sequence scripts run in the proper order."
     },
     {
       "id": "fs_vert_reflect",
       "category": "Fuel Systems",
-      "title": "Flip Fuel Chart Vertically",
-      "description": "Fuel chart is upside down. Flip it vertically to check fuel distribution."
+      "title": "Fuel Waterfall… Up?",
+      "description": "To mimic a ‘reverse waterfall’ effect in their lobby, {{antagonist}} sets the {{component}} fuel diagram inverted top ↔ bottom. Flip the chart vertically so pump controls correspond to actual flow."
     },
     {
       "id": "nav_vert_reflect",
       "category": "Navigation",
-      "title": "Invert Navigation Chart",
-      "description": "Navigation chart is flipped vertically. Mirror it top-to-bottom to plot the correct trajectory."
+      "title": "Southern Constellations on Top",
+      "description": "{{antagonist}} prefers south-up star maps; their {{component}} outputs navigation charts inverted top ↔ bottom. Mirror our nav grid vertically to align headings."
     },
     {
       "id": "com_vert_reflect",
       "category": "Communications",
-      "title": "Flip Comms Grid Vertically",
-      "description": "Comms grid is upside down after a hardware reset. Flip it vertically to restore normal operation."
+      "title": "Comms Upside-Downtime",
+      "description": "The comm console in {{antagonist}}’s flagship is mounted upside-down to ‘save neck strain’. Flip the signal grid vertically (top ↔ bottom) so channel mapping matches."
     },
     {
       "id": "pwr_vert_reflect",
       "category": "Power Systems",
-      "title": "Flip Power Display Vertically",
-      "description": "Power display is flipped vertically. Mirror it to verify all modules are powered."
+      "title": "Inverse Power Hour",
+      "description": "{{antagonist}} showcases power stats on a ceiling projector, requiring inverted visuals. Mirror the voltage chart vertically (top ↔ bottom) so each module reports to the right bus."
     },
     {
       "id": "sec_vert_reflect",
       "category": "Security",
-      "title": "Invert Security Pattern",
-      "description": "Security pattern is vertically inverted. Mirror it to match the required access code."
+      "title": "Security Headstand Challenge",
+      "description": "For theatrical flair, {{antagonist}}’s security console displays access patterns inverted top ↔ bottom. Flip the grid vertically so our passkeys authenticate across both systems."
     }
   ],
   "rotation_270deg": [
     {
       "id": "os_rot270",
       "category": "O₂ Sensor Check",
-      "title": "Rotate O₂ Grid 270°",
-      "description": "O₂ sensor grid is rotated 270° after {{antagonist}} reconfigured the {{component}}. Rotate the grid to interpret the readings."
+      "title": "Three-Quarter Spin O₂ Spin",
+      "description": "{{antagonist}} recalibrated the {{component}} to match the upside-down layout on their limited-edition wrist console. Our O₂ sensor grid now reaches us 270° out of phase. Rotate the grid 270° clockwise so mission control can read oxygen levels correctly."
     },
     {
       "id": "pl_rot270",
       "category": "Pre-Launch Ops",
-      "title": "Turn Launch Display 270°",
-      "description": "The launch display is rotated 270°. Rotate it to verify all pre-launch steps."
+      "title": "Retrograde Launch Kaleidoscope",
+      "description": "Eager for dramatic flair, {{antagonist}} set the {{component}} to display the launch sequence rotated 270° clockwise. Rotate the checklist the same amount so our automation can follow the steps in the right order."
     },
     {
       "id": "extreme_turn",
       "title": "Triple-Rotate the Scanner!",
-      "description": "🌪️ Scanner chaos! {{antagonist}} triple-rotated the {{component}} while trying to take a space-selfie! All our asteroid detection grids are showing 270° out of alignment! Study the example grids to see the rotation pattern, then apply a 270° clockwise turn to today's grid before we crash into a space rock!"
+      "description": "Asteroid-alert misalignment! To showcase their logo watermark, {{antagonist}} programmed the {{component}} to render every scan 270° clockwise. Apply the same 270° clockwise rotation to today’s grid so our targeting array stops tracking empty vacuum."
     }
   ]
 }
