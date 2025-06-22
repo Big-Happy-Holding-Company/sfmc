@@ -1,0 +1,128 @@
+{
+  "id": "COM-002",
+  "title": "Relay Rotation Protocol",
+  "description": "The communications array got stuck trying to rotate antenna positioning data 90 degrees. Instead of simply turning the coordinate map, it began physically rotating the entire 50-ton antenna assembly, creating a slow-motion disaster as cables twisted into knots. 90-degree rotations combine spatial reasoning with coordinate transformation. AI must understand how positions change in 2D space while maintaining object relationships - a complex geometric abstraction that requires true spatial intelligence. Rotate relay indicator grid 90° clockwise 🔁 to align with new satellite orientation.",
+  "category": "📡 Communications",
+  "difficulty": "Basic",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 4220,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          3,
+          4,
+          0
+        ],
+        [
+          0,
+          5,
+          6
+        ]
+      ],
+      "output": [
+        [
+          0,
+          3,
+          1
+        ],
+        [
+          5,
+          4,
+          0
+        ],
+        [
+          6,
+          0,
+          2
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          0,
+          7,
+          0
+        ],
+        [
+          8,
+          0,
+          9
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "output": [
+        [
+          0,
+          8,
+          0
+        ],
+        [
+          0,
+          0,
+          7
+        ],
+        [
+          0,
+          9,
+          0
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      2,
+      0,
+      0
+    ],
+    [
+      0,
+      3,
+      4
+    ],
+    [
+      5,
+      0,
+      0
+    ]
+  ],
+  "testOutput": [
+    [
+      5,
+      0,
+      2
+    ],
+    [
+      0,
+      3,
+      0
+    ],
+    [
+      0,
+      4,
+      0
+    ]
+  ],
+  "hints": [
+    "When you turn a picture sideways, you just know what it looks like. But computers have to figure out where every single dot should move when you spin something. It's like doing a puzzle where every piece changes places.",
+    "Think about when you turn your head to look at something sideways. You don't have to think about it - you just do it. But a computer is like someone who has to carefully move every toy in your room to new spots just to see what it looks like from a different angle.",
+    "It's like playing with a kaleidoscope. When you turn it, all the pretty colors move to new places, but you can still see it's the same pattern. A computer would have to track where each tiny piece of color went and calculate its new home.",
+    "Rotate the entire grid 90° clockwise.",
+    "Rows become columns from left to right.",
+    "⬛ cells rotate just like any other value."
+  ]
+}

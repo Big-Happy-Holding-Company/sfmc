@@ -1,0 +1,181 @@
+{
+  "id": "NAV-200",
+  "title": "trajectory calculation Vertical Analysis",
+  "description": "Analyze the trajectory calculation by flipping the input grid vertically (top-to-bottom).",
+  "category": "🧭 Navigation",
+  "difficulty": "Intermediate",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 12350,
+  "requiredRankLevel": 1,
+  "emojiSet": "nav_alerts",
+  "examples": [
+    {
+      "input": [
+        [
+          2,
+          1,
+          6,
+          9
+        ],
+        [
+          4,
+          3,
+          9,
+          0
+        ],
+        [
+          8,
+          0,
+          1,
+          0
+        ],
+        [
+          6,
+          1,
+          0,
+          5
+        ]
+      ],
+      "output": [
+        [
+          6,
+          1,
+          0,
+          5
+        ],
+        [
+          8,
+          0,
+          1,
+          0
+        ],
+        [
+          4,
+          3,
+          9,
+          0
+        ],
+        [
+          2,
+          1,
+          6,
+          9
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          7,
+          7,
+          8,
+          9
+        ],
+        [
+          7,
+          4,
+          5,
+          7
+        ],
+        [
+          1,
+          9,
+          4,
+          7
+        ],
+        [
+          7,
+          2,
+          8,
+          7
+        ]
+      ],
+      "output": [
+        [
+          7,
+          2,
+          8,
+          7
+        ],
+        [
+          1,
+          9,
+          4,
+          7
+        ],
+        [
+          7,
+          4,
+          5,
+          7
+        ],
+        [
+          7,
+          7,
+          8,
+          9
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      0,
+      5,
+      0,
+      0
+    ],
+    [
+      7,
+      3,
+      7,
+      7
+    ],
+    [
+      2,
+      3,
+      8,
+      2
+    ],
+    [
+      9,
+      1,
+      8,
+      9
+    ]
+  ],
+  "testOutput": [
+    [
+      9,
+      1,
+      8,
+      9
+    ],
+    [
+      2,
+      3,
+      8,
+      2
+    ],
+    [
+      7,
+      3,
+      7,
+      7
+    ],
+    [
+      0,
+      5,
+      0,
+      0
+    ]
+  ],
+  "hints": [
+    "Flip the entire grid vertically (top ↔ bottom) 🔼🔽.",
+    "The top row becomes the bottom row, the second row from the top becomes the second row from the bottom, and so on.",
+    "Each row maintains its order from left to right, but rows swap positions vertically."
+  ],
+  "transformationType": "vertical_reflection",
+  "generated": true
+}

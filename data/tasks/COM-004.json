@@ -1,0 +1,53 @@
+{
+  "id": "COM-004",
+  "title": "Relay Diagonal Reflection",
+  "description": "Recalculate relay grid by reflecting across the main diagonal (top-left to bottom-right).",
+  "category": "📡 Communications",
+  "difficulty": "Basic",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 4620,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [1, 2, 0],
+        [0, 3, 4],
+        [5, 0, 6]
+      ],
+      "output": [
+        [1, 0, 5],
+        [2, 3, 0],
+        [0, 4, 6]
+      ]
+    },
+    {
+      "input": [
+        [7, 0, 0],
+        [8, 9, 0],
+        [0, 0, 1]
+      ],
+      "output": [
+        [7, 8, 0],
+        [0, 9, 0],
+        [0, 0, 1]
+      ]
+    }
+  ],
+  "testInput": [
+    [2, 0, 3],
+    [0, 4, 0],
+    [5, 0, 0]
+  ],
+  "testOutput": [
+    [2, 0, 5],
+    [0, 4, 0],
+    [3, 0, 0]
+  ],
+  "hints": [
+    "Swap elements symmetrically across the main diagonal.",
+    "Row index becomes column index.",
+    "⬛ cells reflect just like any other value."
+  ]
+}

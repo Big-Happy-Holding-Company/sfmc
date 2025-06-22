@@ -1,0 +1,29 @@
+{
+  "id": "OS-007",
+  "title": "Sensor Color Exchange",
+  "description": "Oxygen sensors require color exchange protocols. Adjacent elements swap their color values in sequence.",
+  "category": "🛡️ O₂ Sensor Check",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 1325,
+  "requiredRankLevel": 1,
+  "emojiSet": "status_alerts",
+  "examples": [
+    {
+      "input": [["🔴", "🟢"], ["🔵", "🟡"]],
+      "output": [["🟢", "🔴"], ["🟡", "🔵"]]
+    },
+    {
+      "input": [["🟣", "🟠"], ["⬛", "🔴"]],
+      "output": [["🟠", "🟣"], ["🔴", "⬛"]]
+    }
+  ],
+  "testInput": [["🔵", "🟡"], ["🟢", "🟣"]],
+  "testOutput": [["🟡", "🔵"], ["🟣", "🟢"]],
+  "hints": [
+    "Adjacent horizontal pairs swap their positions.",
+    "Left element becomes right, right element becomes left.",
+    "Each row processes its swap independently."
+  ]
+}
