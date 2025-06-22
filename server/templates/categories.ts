@@ -33,7 +33,7 @@ export const CATEGORY_TEMPLATES: Record<string, CategoryTemplate> = {
   OS: {
     categoryCode: "OS",
     categoryName: "🛡️ O₂ Sensor Check",
-    emojiSet: "status_main",
+    emojiSet: "tech_set2",
     basePoints: 1550,
     requiredRankLevel: 1
   },

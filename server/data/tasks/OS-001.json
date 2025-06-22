@@ -8,21 +8,21 @@
   "timeLimit": null,
   "basePoints": 3250,
   "requiredRankLevel": 1,
-  "emojiSet": "status_main",
+  "emojiSet": "tech_set1",
   "examples": [
     {
-      "input": [["🟡", "⬛"], ["⬛", "🔴"]],
-      "output": [["🔴", "⬛"], ["⬛", "🟡"]]
+      "input": [["1", "0"], ["0", "2"]],
+      "output": [["2", "0"], ["0", "1"]]
     },
     {
-      "input": [["🟢", "🔵"], ["⬛", "⬛"]],
-      "output": [["⬛", "⬛"], ["🔵", "🟢"]]
+      "input": [["8", "0"], ["0", "9"]],
+      "output": [["9", "0"], ["0", "8"]]
     }
   ],
-  "testInput": [["🟣", "⬛"], ["🟠", "⬛"]],
-  "testOutput": [["⬛", "🟠"], ["⬛", "🟣"]],
+  "testInput": [["1", "0"], ["0", "2"]],
+  "testOutput": [["2", "0"], ["0", "1"]],
   "hints": [
-    "Look at how the colored indicators change positions.",
+    "Look at how the indicators change positions.",
     "The transformation swaps elements diagonally across the grid.",
     "Top-left goes to bottom-right, bottom-left goes to top-right."
   ]
