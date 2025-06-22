@@ -32,11 +32,13 @@ export function ResultModal({ open, onClose, result, onRetry }: ResultModalProps
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-md bg-slate-800 border border-slate-600 text-slate-50">
         <div className="text-center space-y-4">
-          <img 
-            src="/wyatt-space-force.jpg" 
-            alt="Sgt Wyatt" 
-            className={`mx-auto w-24 h-24 rounded-full border-4 ${isSuccess ? 'border-green-400' : 'border-amber-400'} object-cover`} 
-          />
+          <div className="flex justify-center mb-2">
+            <img 
+              src={isSuccess ? "/master-chief-wyatt.png" : "/wyatt-space-force.jpg"} 
+              alt={isSuccess ? "Master Chief Wyatt" : "Sgt Wyatt"} 
+              className={`w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 ${isSuccess ? 'border-green-400' : 'border-amber-400'} object-cover`} 
+            />
+          </div>
           <div className={`text-4xl mb-4 ${isSuccess ? 'text-green-400' : 'text-red-400'}`}>
             {isSuccess ? '✅' : '❌'}
           </div>

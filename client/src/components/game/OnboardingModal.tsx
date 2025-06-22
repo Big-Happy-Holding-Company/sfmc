@@ -1,6 +1,6 @@
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-
 
 interface OnboardingModalProps {
   open: boolean;
@@ -8,16 +8,40 @@ interface OnboardingModalProps {
 }
 
 export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
+  const [showTeaser, setShowTeaser] = useState(true);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setShowTeaser(true);
+      setIsAnimating(true);
+      const timer = setTimeout(() => {
+        setIsAnimating(false);
+        setTimeout(() => setShowTeaser(false), 500); // Match this with the CSS transition duration
+      }, 3000); // Show teaser for 3 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [open]);
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-800 border-cyan-400 text-slate-50">
+      {showTeaser && (
+        <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black transition-opacity duration-500 ${isAnimating ? 'opacity-100' : 'opacity-0'}`}>
+          <img 
+            src="/master-chief-wyatt.png" 
+            alt="Master Chief Wyatt" 
+            className="w-full h-full object-contain p-8"
+          />
+        </div>
+      )}
+      <DialogContent className={`max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-800 border-cyan-400 text-slate-50 ${showTeaser ? 'opacity-0' : 'opacity-100 transition-opacity duration-500'}`}>
         <div className="text-center space-y-4 p-2 sm:p-4">
           <div>
             <div className="flex justify-center mb-4">
               <img 
                 src="/wyatt-space-force.jpg" 
                 alt="Sgt Wyatt" 
-                className="w-48 h-48 sm:w-64 sm:h-64 rounded-full border-4 border-cyan-400 object-cover" 
+                className="w-48 h-48 sm:w-64 sm:h-64 rounded-full border-4 border-cyan-400 object-cover transition-transform duration-300 hover:scale-105" 
               />
             </div>
             <h1 className="text-3xl font-bold text-cyan-400 mb-2">Mission Control 2050</h1>

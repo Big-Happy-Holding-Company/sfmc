@@ -13,7 +13,7 @@ export function Header({ player }: HeaderProps) {
           <div className="flex items-center space-x-4">
             <div className="text-cyan-400 text-2xl">🚀</div>
             <div>
-              <h1 className="text-xl font-bold text-cyan-400">Mission Control 2045</h1>
+              <h1 className="text-xl font-bold text-cyan-400">Mission Control 2050</h1>
               <p className="text-xs text-amber-400 font-mono">OPERATIONS CENTER</p>
             </div>
           </div>
@@ -23,7 +23,7 @@ export function Header({ player }: HeaderProps) {
             
             <div className="bg-slate-900 border border-amber-400 rounded px-3 py-1">
               <div className="text-xs">
-                <div className="text-amber-400 font-semibold">MISSIONS</div>
+                <div className="text-amber-400 font-semibold">Tasks</div>
                 <div className="text-slate-400 font-mono">{player.completedMissions}/45</div>
               </div>
             </div>
