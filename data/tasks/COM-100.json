@@ -1,7 +1,7 @@
 {
   "id": "COM-100",
-  "title": "signal strength Mirror Analysis",
-  "description": "Analyze the signal strength by reflecting the input grid horizontally (left-to-right mirror).",
+  "title": "Flip the Solar Grid!",
+  "description": "🚀 Crisis! Elon Musk was taking selfies 📱 near the control panel and knocked the solar array blueprint backwards ⇄! Now the panels face deep space instead of the Sun ☀️, and life support is failing! Study the before → after symbol grids to see the flip. Mirror today's entire grid left-to-right ↔️ to restore oxygen 💨 before time runs out ⏰!",
   "category": "📡 Communications",
   "difficulty": "Basic",
   "gridSize": 2,
@@ -80,5 +80,6 @@
     "The first column becomes the last column, the second becomes the second-to-last, and so on.",
     "The black square (⬛) reflects just like any other cell value."
   ],
+  "transformationType": "horizontal_reflection",
   "generated": true
 }

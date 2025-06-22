@@ -1,9 +1,9 @@
 {
   "id": "COM-101",
-  "title": "transmission data Boolean Logic",
-  "description": "Apply XOR (exclusive OR) operations to the transmission data by comparing adjacent cells in each row.",
+  "title": "Finish the Color Pattern!",
+  "description": "📡 Pattern failure! Elon Musk was too busy watching space soap operas 📺 to complete the transmission grid. Half the critical relay symbols are missing ❓ and astronauts can't call home 📞! Examine the example grids to see how blank spaces should be filled. Complete today's symbol grid with the correct patterns ✨ to restore communication for the stranded crew 👩‍🚀👨‍🚀!",
   "category": "📡 Communications",
-  "difficulty": "Advanced",
+  "difficulty": "Basic",
   "gridSize": 2,
   "timeLimit": null,
   "basePoints": 400,
@@ -13,22 +13,22 @@
     {
       "input": [
         [
-          2,
-          3
+          7,
+          1
         ],
         [
-          3,
-          0
+          7,
+          1
         ]
       ],
       "output": [
         [
-          5,
-          3
+          1,
+          7
         ],
         [
-          3,
-          0
+          1,
+          7
         ]
       ]
     },
@@ -36,50 +36,50 @@
       "input": [
         [
           4,
-          0
+          1
         ],
         [
-          3,
-          1
+          2,
+          6
         ]
       ],
       "output": [
         [
-          4,
-          0
+          1,
+          4
         ],
         [
-          4,
-          1
+          6,
+          2
         ]
       ]
     }
   ],
   "testInput": [
     [
-      4,
-      1
+      3,
+      7
     ],
     [
-      0,
-      3
+      5,
+      1
     ]
   ],
   "testOutput": [
     [
-      5,
-      1
+      7,
+      3
     ],
     [
-      3,
-      3
+      1,
+      5
     ]
   ],
   "hints": [
-    "XOR returns 'true' when inputs differ and 'false' when they're the same.",
-    "For numbers, think of XOR as: if values are different, the result is their sum; if the same, the result is 0.",
-    "Process each row independently, comparing pairs of adjacent cells."
+    "Think of the grid as being reflected in a mirror placed to the right side.",
+    "The first column becomes the last column, the second becomes the second-to-last, and so on.",
+    "The black square (⬛) reflects just like any other cell value."
   ],
-  "transformationType": "xor_operation",
+  "transformationType": "pattern_completion",
   "generated": true
 }
