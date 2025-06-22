@@ -142,13 +142,7 @@ Emoji sets follow ARC-AGI (Abstract and Reasoning Corpus for Artificial General 
 
 ### Rank Progression
 Players advance through Space Force enlisted ranks by earning points:
-- Specialist 1-4 (E-1 to E-4)
-- Sergeant (E-5)
-- Staff Sergeant (E-6)
-- Technical Sergeant (E-7)
-- Master Sergeant (E-8)
-- Senior Master Sergeant (E-9)
-- Chief Master Sergeant (E-10)
+See `client/src/data/ranks.ts` for rank progression.
 
 ### Task Categories
 - **🛡️ O₂ Sensor Check**: Oxygen system diagnostics (OS-XXX)
@@ -158,10 +152,12 @@ Players advance through Space Force enlisted ranks by earning points:
 - **📡 Communications**: Communication systems (COM-XXX) 
 - **⚡ Power Systems**: Power flow and distribution (PWR-XXX)
 - **🔒 Security**: Security systems (SEC-XXX)
+See `server/templates/categories.ts` for category metadata.
+
 
 ### Timer System
 - **Speed Bonus**: Tasks count up, rewarding faster completion
-- **Time Limited**: Limits are all set to null for development, but can be added for expanded difficulty and point rewards.
+- **Time Limited**: Limits are all set to null for development, but can be added for expanded difficulty and point rewards. I personally hate timed missions so I'll probably never do it.
 
 ## Development Guidelines
 

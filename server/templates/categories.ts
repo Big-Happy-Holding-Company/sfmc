@@ -34,49 +34,49 @@ export const CATEGORY_TEMPLATES: Record<string, CategoryTemplate> = {
     categoryCode: "OS",
     categoryName: "🛡️ O₂ Sensor Check",
     emojiSet: "status_main",
-    basePoints: 350,
+    basePoints: 1550,
     requiredRankLevel: 1
   },
   PL: {
     categoryCode: "PL",
     categoryName: "🚀 Pre-Launch Ops",
     emojiSet: "celestial_set1",
-    basePoints: 300,
+    basePoints: 2300,
     requiredRankLevel: 1
   },
   FS: {
     categoryCode: "FS",
     categoryName: "⚡ Fuel Systems",
     emojiSet: "tech_set1",
-    basePoints: 325,
+    basePoints: 2325,
     requiredRankLevel: 1
   },
   NAV: {
     categoryCode: "NAV",
     categoryName: "🧭 Navigation",
     emojiSet: "nav_alerts",
-    basePoints: 350,
+    basePoints: 2350,
     requiredRankLevel: 1
   },
   COM: {
     categoryCode: "COM",
     categoryName: "📡 Communications",
     emojiSet: "tech_set2",
-    basePoints: 400,
+    basePoints: 1400,
     requiredRankLevel: 1
   },
   PWR: {
     categoryCode: "PWR",
     categoryName: "⚡ Power Systems",
     emojiSet: "tech_set1",
-    basePoints: 375,
+    basePoints: 1675,
     requiredRankLevel: 1
   },
   SEC: {
     categoryCode: "SEC",
     categoryName: "🔒 Security",
     emojiSet: "status_alerts",
-    basePoints: 425,
+    basePoints: 5325,
     requiredRankLevel: 1
   }
 };

@@ -1,5 +1,7 @@
 # Changelog
 
+
+
 ## 2025-06-22 - Transformation System Updates
 
 ### Core Changes
@@ -7,12 +9,15 @@
 - Added new `vertical_reflection` transformation to replace `xor_operation`
 - Updated task generation system to support new transformations
 - Enhanced story templates with Space-Force-themed narratives
+- Added new `rotation_270deg` transformation to replace `object_counting`
+
 
 ### Technical Updates
 - Created new `vertical-reflection-generator.ts` based on horizontal reflection pattern
 - Updated transformation registry and validators
 - Generated new SEC-100 through SEC-105 tasks with 4x4 grids
 - Ensured all transformations have consistent story templates
+- Fixed task display issues
 
 ### Documentation
 - Updated transformation documentation in `transformations.ts`

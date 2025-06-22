@@ -3,10 +3,10 @@
   "title": "Pre-Launch 180° Rotation",
   "description": "Rotate the indicator grid 180° to verify orientation tolerances.",
   "category": "🚀 Pre-Launch Ops",
-  "difficulty": "Basic",
+  "difficulty": "Expert",
   "gridSize": 4,
   "timeLimit": null,
-  "basePoints": 5240,
+  "basePoints": 25240,
   "requiredRankLevel": 1,
   "emojiSet": "tech_set1",
   "examples": [
