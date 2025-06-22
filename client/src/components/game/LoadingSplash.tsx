@@ -18,7 +18,7 @@ interface LoadingSplashProps {
   duration?: number; // Duration in ms (default 5000)
 }
 
-export function LoadingSplash({ onComplete, duration = 5000 }: LoadingSplashProps) {
+export function LoadingSplash({ onComplete, duration = 3000 }: LoadingSplashProps) {
   const [progress, setProgress] = useState(0);
   const [emojiRow, setEmojiRow] = useState<string[]>([]);
   const [isExiting, setIsExiting] = useState(false);
