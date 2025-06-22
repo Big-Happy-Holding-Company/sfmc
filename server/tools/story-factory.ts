@@ -53,12 +53,18 @@ function loadAIFailureContent() {
     const possiblePaths = [
       path.resolve(__dirname, "..", "data", "ai_failure.json"),
       path.resolve(process.cwd(), "server", "data", "ai_failure.json"),
-      path.resolve(".", "server", "data", "ai_failure.json")
+      path.resolve(".", "server", "data", "ai_failure.json"),
+      // Add more absolute paths for debugging
+      "d:\\1Projects\\sfmc-vercel-deploy\\server\\data\\ai_failure.json"
     ];
+    
+    // Log all possible paths for debugging
+    console.log("Trying paths:", possiblePaths);
     
     // Try each path until we find one that exists
     let dataPath = "";
     for (const p of possiblePaths) {
+      console.log(`Checking path: ${p}, exists: ${fs.existsSync(p)}`);
       if (fs.existsSync(p)) {
         dataPath = p;
         break;
@@ -69,6 +75,7 @@ function loadAIFailureContent() {
       const raw = fs.readFileSync(dataPath, "utf-8");
       const parsed = JSON.parse(raw);
       console.log(`Successfully loaded AI failure content from ${dataPath}`);
+      console.log(`Available transformation types in AI failure data:`, Object.keys(parsed));
       return parsed;
     } else {
       console.warn("Warning: ai_failure.json not found in any of the expected locations, using fallback data");
@@ -101,11 +108,16 @@ export function applyStory(
   // Load AI failure content
   const aiFailureContent = loadAIFailureContent();
   
+  // Debug output for transformation type matching
+  console.log(`Transformation type from task: '${transformationType}'`);
+  console.log(`AI failure content keys: ${JSON.stringify(Object.keys(aiFailureContent))}`);
+  
   // Check if we have content for this transformation type
   if (!aiFailureContent[transformationType]) {
     console.warn(`No AI failure content found for transformation type: ${transformationType}`);
     return task;
   }
+  console.log(`Found matching content for transformation type: ${transformationType}`);
 
   // Get the appropriate content for this transformation
   const content = aiFailureContent[transformationType];
