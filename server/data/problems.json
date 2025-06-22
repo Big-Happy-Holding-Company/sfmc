@@ -1,86 +1,192 @@
 {
   "horizontal_reflection": [
     {
-      "id": "mirror_panels",
-      "title": "Flip the Solar Grid!",
-      "description": "🚀 Crisis! {{antagonist}} was taking selfies 📱 near the control panel and knocked the solar array blueprint backwards ⇄! Now the panels face deep space instead of the Sun ☀️, and life support is failing! Study the before → after symbol grids to see the flip. Mirror today's entire grid left-to-right ↔️ to restore oxygen 💨 before time runs out ⏰!"
+      "id": "os_horiz_reflect",
+      "category": "O₂ Sensor Check",
+      "title": "Mirror Oxygen Diagnostics",
+      "description": "The {{component}} display for O₂ levels is flipped horizontally after {{antagonist}} bumped the console. Mirror the diagnostic grid left-to-right to interpret the sensor data correctly."
     },
     {
-      "id": "mirror_holo",
-      "title": "Reverse the Hologram!",
-      "description": "⚠️ Emergency! {{antagonist}} accidentally installed a mirror inside the {{component}} and now all holographic displays are backward! Captain needs the stellar maps flipped horizontally before we hit an asteroid field! Study the example grids to see the reflection pattern, then apply it to today's grid to save the ship!"
+      "id": "pl_horiz_reflect",
+      "category": "Pre-Launch Ops",
+      "title": "Reverse Launch Sequence Map",
+      "description": "Pre-launch checklists appear reversed! {{antagonist}} accidentally mirrored the launch panel display. Flip the sequence map horizontally to ensure all systems are ready for liftoff."
     },
     {
-      "id": "invert_blueprint",
-      "title": "Fix the Inverted Blueprints!",
-      "description": "😱 Alert! {{antagonist}} installed the new {{component}} backwards! If we don't mirror the instructions horizontally, the system will explode on startup! Examine the example grids to understand the reflection pattern. Apply this horizontal flip to today's grid before the countdown ends!"
+      "id": "fs_horiz_reflect",
+      "category": "Fuel Systems",
+      "title": "Flip Fuel Flow Diagram",
+      "description": "A technician mirrored the fuel flow diagram on the {{component}}. Mirror the schematic left-to-right to verify correct fuel distribution before ignition."
+    },
+    {
+      "id": "nav_horiz_reflect",
+      "category": "Navigation",
+      "title": "Correct Navigation Chart",
+      "description": "Navigation charts are accidentally mirrored! Flip the star map horizontally to plot the correct course."
+    },
+    {
+      "id": "com_horiz_reflect",
+      "category": "Communications",
+      "title": "Reverse Signal Routing",
+      "description": "Signal routing diagrams are mirrored after a system update. Flip the comms grid horizontally to restore proper signal flow."
+    },
+    {
+      "id": "pwr_horiz_reflect",
+      "category": "Power Systems",
+      "title": "Flip Power Distribution Map",
+      "description": "The power grid visualization is mirrored. Flip the grid horizontally to ensure all modules receive the correct voltage."
+    },
+    {
+      "id": "sec_horiz_reflect",
+      "category": "Security",
+      "title": "Mirror Security Access Codes",
+      "description": "Security code patterns are mirrored due to a system glitch. Flip the pattern horizontally to authenticate access."
     }
   ],
-  
   "rotation_90deg": [
     {
-      "id": "quarter_spin",
-      "title": "Realign the Launch Pad 90°!",
-      "description": "🔥 Countdown halted! {{antagonist}} was playing mobile games 🎮 and carelessly spun the launch-pad orientation map one quarter-turn ↻ (90° clockwise). Now the boosters point at Mission Control 🏢 instead of orbit 🛰️! Study the sample symbol grids to see the rotation. Turn today's entire grid 90° clockwise 🔃 to save everyone from fiery disaster 💥!"
+      "id": "os_rot90",
+      "category": "O₂ Sensor Check",
+      "title": "Rotate O₂ Sensor Grid",
+      "description": "O₂ sensor data is rotated 90° after {{antagonist}} recalibrated the {{component}}. Rotate the grid clockwise to analyze the readings."
     },
     {
-      "id": "fix_scanner",
-      "title": "Rotate Scanner Output 90°!",
-      "description": "🛸 Scan error! {{antagonist}} calibrated the {{component}} incorrectly, and all scanner outputs are rotated 90° clockwise! The Captain needs proper readings before we enter the asteroid belt! Study the example grids, then rotate today's grid 90° clockwise to correct the scanner display!"
+      "id": "pl_rot90",
+      "category": "Pre-Launch Ops",
+      "title": "Turn Launch Checklist",
+      "description": "The launch checklist display is rotated 90°. Rotate it clockwise to verify all steps before launch."
     },
     {
-      "id": "tactical_display",
-      "title": "Turn the Tactical Display!",
-      "description": "🎯 Battle stations! {{antagonist}} accidentally rotated our tactical display 90° and enemy ships appear in the wrong position! Unless we rotate the grid back, our defense cannons will fire in the wrong direction! Study the example grids and rotate today's grid 90° clockwise to save the fleet!"
+      "id": "fs_rot90",
+      "category": "Fuel Systems",
+      "title": "Rotate Fuel Flow Map",
+      "description": "Fuel flow maps are rotated 90° due to a display error. Rotate the schematic to confirm correct fuel routing."
+    },
+    {
+      "id": "nav_rot90",
+      "category": "Navigation",
+      "title": "Turn Navigation Chart",
+      "description": "The navigation chart is rotated 90°. Rotate it clockwise to plot the correct trajectory."
+    },
+    {
+      "id": "com_rot90",
+      "category": "Communications",
+      "title": "Rotate Signal Grid",
+      "description": "Signal grid is rotated 90° after a firmware update. Rotate the grid to restore communication pathways."
+    },
+    {
+      "id": "pwr_rot90",
+      "category": "Power Systems",
+      "title": "Turn Power Distribution",
+      "description": "Power distribution grid is rotated 90°. Rotate it to verify module connectivity."
+    },
+    {
+      "id": "sec_rot90",
+      "category": "Security",
+      "title": "Rotate Security Pattern",
+      "description": "Security access patterns are rotated 90°. Rotate the pattern to match the required access code."
     }
   ],
-  
   "pattern_completion": [
     {
-      "id": "complete_colors",
-      "title": "Finish the Color Pattern!",
-      "description": "📡 Pattern failure! {{antagonist}} was too busy watching space soap operas 📺 to complete the transmission grid. Half the critical relay symbols are missing ❓ and astronauts can't call home 📞! Examine the example grids to see how blank spaces should be filled. Complete today's symbol grid with the correct patterns ✨ to restore communication for the stranded crew 👩‍🚀👨‍🚀!"
+      "id": "os_pattern",
+      "category": "O₂ Sensor Check",
+      "title": "Complete O₂ Sensor Data",
+      "description": "Some O₂ sensor readings are missing after {{antagonist}} interrupted the scan. Fill in the missing data points on the grid to complete the diagnostics."
     },
     {
-      "id": "missing_pixels",
-      "title": "Restore the Missing Pixels!",
-      "description": "🖥️ Display glitch! {{antagonist}} spilled an energy drink on the {{component}} and now parts of our navigation screen are missing! Study the example patterns to see how incomplete grids should look when finished. Complete today's grid to restore our navigation system before we drift into uncharted space!"
+      "id": "pl_pattern",
+      "category": "Pre-Launch Ops",
+      "title": "Finish Launch Sequence",
+      "description": "The launch sequence checklist is incomplete. Fill in the missing steps to ensure a safe launch."
     },
     {
-      "id": "fill_gaps",
-      "title": "Fill in the Data Gaps!",
-      "description": "💾 Data corruption! {{antagonist}} tried downloading cat videos on the ship's {{component}} and caused partial memory loss! Critical operational codes have missing values that follow specific patterns. Study the examples to decode the pattern rules, then complete today's grid to restore system functions!"
+      "id": "fs_pattern",
+      "category": "Fuel Systems",
+      "title": "Complete Fuel Flow Chart",
+      "description": "Fuel flow chart is missing key data points. Complete the pattern to verify fuel delivery."
+    },
+    {
+      "id": "nav_pattern",
+      "category": "Navigation",
+      "title": "Fill Navigation Data",
+      "description": "Some navigation data is missing. Complete the grid to plot the full course."
+    },
+    {
+      "id": "com_pattern",
+      "category": "Communications",
+      "title": "Restore Signal Pattern",
+      "description": "Signal pattern is incomplete after a system reset. Fill in the missing data to restore communication."
+    },
+    {
+      "id": "pwr_pattern",
+      "category": "Power Systems",
+      "title": "Complete Power Grid",
+      "description": "Power grid data is incomplete. Fill in the missing values to ensure all systems are powered."
+    },
+    {
+      "id": "sec_pattern",
+      "category": "Security",
+      "title": "Finish Security Sequence",
+      "description": "Security sequence is incomplete. Fill in the missing pattern to enable access."
     }
   ],
-  
   "vertical_reflection": [
     {
-      "id": "mirror_vertical",
-      "title": "Flip the Radar Upside Down!",
-      "description": "📡 Radar calamity! {{antagonist}} spilled coffee ☕ on the console and flipped the radar display upside-down. The ground looks like sky and incoming ships are showing up backwards 🛸! Study the before → after symbol grids to see the flip. Mirror today's entire grid top-to-bottom 🔼🔽 to prevent spacecraft collisions 💥!"
+      "id": "os_vert_reflect",
+      "category": "O₂ Sensor Check",
+      "title": "Flip O₂ Diagnostics Vertically",
+      "description": "O₂ diagnostic grid is upside down after {{antagonist}} adjusted the {{component}}. Flip the grid vertically to interpret the data."
     },
     {
-      "id": "gravity_switch",
-      "title": "Reverse the Gravity Maps!",
-      "description": "⚠️ Gravity alert! {{antagonist}} reversed the {{component}} and now all our gravity maps are displaying upside-down! We need to flip everything vertically before landing or we'll crash! Study the example grids to understand the vertical reflection pattern, then apply it to today's grid to ensure a safe landing!"
+      "id": "pl_vert_reflect",
+      "category": "Pre-Launch Ops",
+      "title": "Reverse Launch Display Vertically",
+      "description": "The launch display is flipped vertically. Mirror it top-to-bottom to confirm all systems are go."
     },
     {
-      "id": "mirror_sensors",
-      "title": "Invert the Sensor Array!",
-      "description": "🌡️ Sensor malfunction! {{antagonist}} mounted the {{component}} upside down and now all readings are vertically flipped! We need accurate atmospheric data before we can safely exit the ship. Study the example grids and apply the vertical reflection to today's grid to correct our readings!"
+      "id": "fs_vert_reflect",
+      "category": "Fuel Systems",
+      "title": "Flip Fuel Chart Vertically",
+      "description": "Fuel chart is upside down. Flip it vertically to check fuel distribution."
+    },
+    {
+      "id": "nav_vert_reflect",
+      "category": "Navigation",
+      "title": "Invert Navigation Chart",
+      "description": "Navigation chart is flipped vertically. Mirror it top-to-bottom to plot the correct trajectory."
+    },
+    {
+      "id": "com_vert_reflect",
+      "category": "Communications",
+      "title": "Flip Comms Grid Vertically",
+      "description": "Comms grid is upside down after a hardware reset. Flip it vertically to restore normal operation."
+    },
+    {
+      "id": "pwr_vert_reflect",
+      "category": "Power Systems",
+      "title": "Flip Power Display Vertically",
+      "description": "Power display is flipped vertically. Mirror it to verify all modules are powered."
+    },
+    {
+      "id": "sec_vert_reflect",
+      "category": "Security",
+      "title": "Invert Security Pattern",
+      "description": "Security pattern is vertically inverted. Mirror it to match the required access code."
     }
   ],
-  
   "rotation_270deg": [
     {
-      "id": "three_spin",
-      "title": "Spin the Grid 270°!",
-      "description": "🌌 Trajectory disaster! {{antagonist}} was showing off to visitors 👥 and spun the flight deck display three full clicks ↻↻↻ (270° clockwise). Now the rocket's aimed at the Moon 🌙 instead of Mars 🔴 and we've got minutes ⏱️ to fix it! Study the before → after symbol grids to see the exact rotation. Turn today's entire grid 270° clockwise 🔃 to save the $4 billion mission 🚀💰!"
+      "id": "os_rot270",
+      "category": "O₂ Sensor Check",
+      "title": "Rotate O₂ Grid 270°",
+      "description": "O₂ sensor grid is rotated 270° after {{antagonist}} reconfigured the {{component}}. Rotate the grid to interpret the readings."
     },
     {
-      "id": "navigation_flip",
-      "title": "Re-align Star Navigation!",
-      "description": "🌠 Navigation emergency! {{antagonist}} rotated the {{component}} 270° and our ship is heading toward a black hole ⚫! Unless we counter-rotate our navigation grid, we'll be stretched into space spaghetti! Study the sample rotations and apply a 270° clockwise turn to today's grid to restore our proper course!"
+      "id": "pl_rot270",
+      "category": "Pre-Launch Ops",
+      "title": "Turn Launch Display 270°",
+      "description": "The launch display is rotated 270°. Rotate it to verify all pre-launch steps."
     },
     {
       "id": "extreme_turn",
