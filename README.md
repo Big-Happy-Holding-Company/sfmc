@@ -341,6 +341,49 @@ Adds a light-hearted Space-Force-2050 story layer to every ARC-AGI puzzle withou
 - Keep it short (<60-char title, <180-char description) and include placeholders where relevant.
 - No code changes are needed – the loader will pick it up automatically.
 
+## AI Failure Content System
+
+### Purpose
+Provides humorous and educational content about why AI struggles with different transformation types, adding both entertainment value and educational insights to tasks.
+
+### AI Failure Data Structure
+The `server/data/ai_failure.json` file contains content for each transformation type:
+
+```json
+{
+  "transformation_type": {
+    "ai_difficulty": "Technical explanation of why AI struggles with this transformation",
+    "comic_situation1": "Humorous scenario showing AI failing at the transformation",
+    "comic_situation2": "Another humorous scenario",
+    "comic_situation3": "A third humorous scenario",
+    "kids_explanation": "Simple explanation for younger players about why the transformation is hard for AI",
+    "kids_explanation1": "Second simple explanation",
+    "kids_explanation2": "Third simple explanation"
+  }
+}
+```
+
+### Transformation Types Covered
+- `horizontal_reflection`: Mirror flips left-to-right
+- `vertical_reflection`: Mirror flips top-to-bottom
+- `rotation_90deg`: 90° clockwise rotation
+- `rotation_270deg`: 270° clockwise (or 90° counter-clockwise) rotation
+- `pattern_completion`: Logical sequence pattern completion
+
+### Using the AI Failure Content
+- Use the `scripts/enhance-tasks.js` script to automatically enhance task descriptions and hints with this content
+- The enhancement script:
+  1. Detects the transformation type used in each task
+  2. Prepends a random comic situation and AI difficulty explanation to the task's description
+  3. Adds the three kids_explanation entries to the beginning of the hints array
+- For tasks that don't follow standard transformation naming patterns, manual enhancement is recommended
+
+### Updating AI Failure Content
+- Edit `server/data/ai_failure.json` to modify existing content
+- Maintain the structure of each transformation type entry
+- When adding new transformation types, ensure all seven fields are included
+- After updating, re-run the enhancement script to apply changes to task files
+
 ---
 
 ## Future Enhancements
