@@ -2,7 +2,7 @@
   "id": "SEC-104",
   "title": "perimeter sensors Vertical Analysis",
   "description": "Analyze the perimeter sensors by flipping the input grid vertically 🔼🔽 top-to-bottom.",
-  "category": "🔒 Security",
+  "category": "🔒 Security Systems",
   "difficulty": "Intermediate",
   "gridSize": 4,
   "timeLimit": null,

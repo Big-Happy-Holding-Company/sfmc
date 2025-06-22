@@ -2,7 +2,7 @@
   "id": "SEC-100",
   "title": "defense matrix Rotation Analysis",
   "description": "Analyze the defense matrix by rotating the input grid 270 degrees clockwise 🔁🔁🔁.",
-  "category": "🔒 Security",
+  "category": "🔒 Security Systems",
   "difficulty": "Intermediate",
   "gridSize": 4,
   "timeLimit": null,

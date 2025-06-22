@@ -23,7 +23,7 @@ export function Header({ player }: HeaderProps) {
             
             <div className="bg-slate-900 border border-amber-400 rounded px-3 py-1">
               <div className="text-xs">
-                <div className="text-amber-400 font-semibold">Tasks</div>
+                <div className="text-amber-400 font-semibold">Completed Tasks</div>
                 <div className="text-slate-400 font-mono">{player.completedMissions}/45</div>
               </div>
             </div>

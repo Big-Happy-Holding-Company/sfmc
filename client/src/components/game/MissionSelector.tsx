@@ -120,8 +120,11 @@ export function MissionSelector({
                                 <div className={`text-${difficultyColor} text-lg`}>
                                   {mission.category.includes('O₂') ? '🛡️' : 
                                    mission.category.includes('Pre-Launch') ? '🚀' :
-                                   mission.category.includes('Fuel') ? '⚡ ' :
-                                   mission.category.includes('Navigation') ? '🧭' : '🎖️'}
+                                   mission.category.includes('Fuel') ? '⚡' :
+                                   mission.category.includes('Navigation') ? '🧭' :
+                                   mission.category.includes('Communication') ? '📡' :
+                                   mission.category.includes('Power') ? '⚡' :
+                                   mission.category.includes('Security') ? '🔒' : '🎖️'}
                                 </div>
                                 <div className={cn(
                                   "text-xs px-2 py-1 rounded",
