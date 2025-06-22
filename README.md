@@ -54,8 +54,47 @@ The Abstract and Reasoning Corpus for Artificial General Intelligence (ARC-AGI) 
 
 ## Task System Architecture
 
+### Transformation System
+
+#### Available Transformations
+1. **Geometric Transformations**
+   - `horizontal_reflection`: Flip grid left-to-right
+   - `vertical_reflection`: Flip grid top-to-bottom (NEW)
+   - `rotation_90deg`: Rotate grid 90° clockwise
+   - `rotation_270deg`: Rotate grid 270° clockwise (replaces object_counting)
+
+2. **Logical Transformations**
+   - `pattern_completion`: Complete the pattern in the grid
+
+#### Transformation Properties
+Each transformation includes:
+- Unique type identifier
+- Name and description
+- Category (geometric/logical)
+- Difficulty level
+- Hint patterns
+- Associated grid generator
+
+### Task Generation
+
+#### CLI Commands
+```bash
+# Generate a single task
+npx tsx server/cli/generate-task.ts single -c CATEGORY -t TRANSFORMATION -s SIZE -o OUTPUT_FILE
+
+# Example: Generate SEC task with vertical reflection
+npx tsx server/cli/generate-task.ts single -c SEC -t vertical_reflection -s 4 -o server/data/tasks/SEC-100.json
+```
+
+#### Task Generation Process
+1. Selects transformation type based on category
+2. Generates appropriate grid examples
+3. Applies story wrapper with Space-Force theme
+4. Validates the task
+5. Saves to specified location
+
 ### Modular Task Loading
-Tasks are stored as individual JSON files in `server/data/tasks/` for easy maintenance and scalability.  The time limit on all tasks should be null unless otherwise specified.
+Tasks are stored as individual JSON files in `server/data/tasks/` for easy maintenance and scalability. The time limit on all tasks should be null unless otherwise specified.
 
 #### Task File Structure
 ```json
