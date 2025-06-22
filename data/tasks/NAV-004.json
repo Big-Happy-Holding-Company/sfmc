@@ -1,7 +1,7 @@
 {
   "id": "NAV-004",
-  "title": "Navigation Array 90° Clockwise",
-  "description": "Navigation systems require 90-degree clockwise rotation calibration. Study the positional transformation patterns.",
+  "title": "Navigation Array 90° Clockwise 🔁",
+  "description": "Navigation systems require 90-degree clockwise 🔁 rotation calibration. Study the positional transformation patterns.",
   "category": "🧭 Navigation",
   "difficulty": "Basic",
   "gridSize": 2,
@@ -22,8 +22,8 @@
   "testInput": [["↖️", "↙️"], ["↗️", "↘️"]],
   "testOutput": [["↗️", "↖️"], ["↘️", "↙️"]],
   "hints": [
-    "The grid rotates 90 degrees clockwise around the center.",
+    "The grid rotates 90 degrees clockwise 🔁 around the center. Think of it as the direction of the hands of a clock moving forward.",
     "Top-left moves to top-right, top-right to bottom-right.",
-    "Each position shifts one step clockwise around the grid."
+    "Each position shifts one step clockwise 🔁 around the grid. So if the top-left is at 12 o'clock, it will move to 3 o'clock."
   ]
 }

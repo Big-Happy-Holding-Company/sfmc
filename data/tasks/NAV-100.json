@@ -1,7 +1,7 @@
 {
   "id": "NAV-100",
   "title": "course plotting Rotation Analysis",
-  "description": "Analyze the course plotting by rotating the input grid 90 degrees clockwise.",
+  "description": "Analyze the course plotting by rotating the input grid 90 degrees clockwise 🔁.",
   "category": "🧭 Navigation",
   "difficulty": "Intermediate",
   "gridSize": 4,
@@ -172,7 +172,7 @@
     ]
   ],
   "hints": [
-    "Rotate the entire grid 90 degrees clockwise (¼ turn to the right).",
+    "Rotate the entire grid 90 degrees clockwise 🔁 (¼ turn to the right).",
     "The top row becomes the rightmost column, reading from top to bottom.",
     "Each column in the original becomes a row in the result, with order reversed."
   ],
