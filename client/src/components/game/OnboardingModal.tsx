@@ -13,7 +13,7 @@ export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
       <DialogContent className="max-w-2xl bg-slate-800 border-cyan-400 text-slate-50">
         <div className="text-center space-y-6">
           <div>
-            <img src="/wyatt-space-force.jpg" alt="Cadet Wyatt" className="mx-auto w-32 h-32 rounded-full border-4 border-cyan-400 object-cover mb-4" />
+            <img src="/wyatt-space-force.jpg" alt="Cadet Wyatt" className="mx-auto w-64 h-64 rounded-full border-4 border-cyan-400 object-cover mb-4" />
             <h1 className="text-3xl font-bold text-cyan-400 mb-2">Mission Control 2050</h1>
             <p className="text-amber-400 font-mono text-sm">US SPACE FORCE OPERATIONS CENTER</p>
           </div>
@@ -33,7 +33,7 @@ export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
               </div>
               <div className="bg-slate-900 border border-slate-600 rounded p-3">
                 <h4 className="text-amber-400 font-semibold text-sm mb-1">Starting Rank</h4>
-                <p className="text-slate-400 text-xs">🪖 Specialist 1 (E-1)</p>
+                <p className="text-slate-400 text-xs">🎖 Specialist 1 (E-1)</p>
               </div>
             </div>
           </div>
