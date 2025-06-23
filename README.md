@@ -1,14 +1,18 @@
 # Mission Control 2045
 
-A Space Force-themed ARC-AGI puzzle game where cadets complete operational tasks to advance through enlisted ranks.
+My nephew Wyatt was the inspiration for this app.  AI is rapidly changing the world we live in. He is 6 years old and wants to be a mission control specialist.  The US Space Force was formed in 2019 and is the branch of the U.S. Armed Forces that is responsible for space operations, including space situational awareness, space traffic management, and space-based missile defense. I wonder what that will look like in 2050.  I want to give him a fun way to learn about the types of tasks he might actually encounter in the future based upon the reasoning and logic that are difficult for AI to perform.  I envision a future where AI can perform most tasks, but there are still some tasks that require human intuition and reasoning.  This Space Force-themed puzzle game has recruits complete operational tasks to advance through enlisted ranks and all the tasks are based upon the Abstract Reasoning Corpus (ARC) puzzles. The puzzles are transformed to fit the Space Force theme and the game is designed to be platform agnostic. One challenge as a developer has been accomodating the challenges that individuals with unique disabilities (such as colorblindness) face, while still maintaining a fun and engaging experience for all players and staying true to the structure of the ARC-AGI test framework. 
 
-## ARC-AGI Framework
+In 2050 this game will hopefully serve as an interesting temporal artifact of a very specific moment in the development of AI and AI reasoning towards what we today call AGI.  (And in 25 years will probably call something totally different!)  
 
-The Abstract and Reasoning Corpus for Artificial General Intelligence (ARC-AGI) is a benchmark designed to measure intelligence. This project leverages puzzles and logic from:
+## ARC-AGI Framework - Like holy sh*t these people are way smarter than me...
+
+The Abstract and Reasoning Corpus for Artificial General Intelligence (ARC-AGI) is a benchmark designed to measure intelligence. (If you want to feel really dumb, go see what they consider to be "easy" puzzles for humans to solve! 😂) This project leverages puzzles and logic from:
 
 - Official ARC Prize: https://arcprize.org/arc-agi
 - Puzzle datasets: https://github.com/arcprize/ARC-AGI-2/tree/main/data
 - Reference: https://github.com/fchollet/ARC-AGI
+
+This project is designed to build upon that framework by adding a Space Force theme and making it accessible to a wider audience and especially young people and the colorblind.  It is also designed to be platform agnostic and can be run on any device with a web browser.
 
 ## Architecture Overview
 
@@ -129,7 +133,7 @@ Tasks are stored as individual JSON files in `server/data/tasks/` for easy maint
 Emoji sets follow ARC-AGI (Abstract and Reasoning Corpus for Artificial General Intelligence) conventions with exactly 10 emojis per set, mapping to numerical indices 0-9.
 
 #### Available Emoji Sets
-- `status_main`: Basic status indicators
+- `status_main`: Basic status indicators - These use colors and since my nephew is colorblind, I'm not using them.
 - `tech_set1`: Power and Fuel systems
 - `tech_set2`: Communication systems
 - `celestial_set1`: Planetary bodies

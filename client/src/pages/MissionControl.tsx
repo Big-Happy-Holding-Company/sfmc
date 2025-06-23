@@ -13,7 +13,7 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { OnboardingModal } from "@/components/game/OnboardingModal";
+
 import { Header } from "@/components/game/Header";
 import { MissionSelector } from "@/components/game/MissionSelector";
 import { Timer } from "@/components/game/Timer";
@@ -29,7 +29,7 @@ import type { EmojiSet } from "@/constants/spaceEmojis";
 
 export default function MissionControl() {
   // State management
-  const [showOnboarding, setShowOnboarding] = useState(true);
+
 
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
@@ -200,10 +200,7 @@ export default function MissionControl() {
         />
       </div>
 
-      <OnboardingModal 
-        open={showOnboarding} 
-        onClose={() => setShowOnboarding(false)} 
-      />
+
 
       <Header player={activePlayer} totalTasks={tasks.length} />
 
