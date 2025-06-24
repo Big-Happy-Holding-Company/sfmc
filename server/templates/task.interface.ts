@@ -23,9 +23,9 @@ export interface ExamplePair {
  * manually created and template-generated tasks
  */
 export interface TaskDefinition {
-  id: string;                    // Format: "COM-101"
-  title: string;
-  description: string;
+  id: string;                    // Format: "COM-101" or "PWR-101" or "PL-101" counting up sequentially
+  title: string;                 // Title of the task
+  description: string;           // Description of the task with flavor pulled from /data/ai_failure.json
   category: string;              // Full category name with emoji
   difficulty: "Basic" | "Intermediate" | "Advanced";
   gridSize: number;              // Usually 2-4
@@ -36,7 +36,8 @@ export interface TaskDefinition {
   examples: ExamplePair[];       // At least 2 examples
   testInput: number[][];         // Test case input grid
   testOutput: number[][];        // Expected output grid
-  hints: string[];               // 3 hints as per guidelines
+  hints: string[];               // 3 hints as per guidelines can also be sourced from /data/ai_failure.json
+  transformationType?: string;  // Transformation type used for validation
   // Optional metadata flag for generated vs manual
   generated?: boolean;           // true for template-generated tasks
 }

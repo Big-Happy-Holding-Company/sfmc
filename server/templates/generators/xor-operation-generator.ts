@@ -1,4 +1,4 @@
-/**
+/** THIS IS INCORRECT AND WILL BE REPLACED
  * XOR Operation grid generator for SFMC puzzles
  * 
  * This generator creates grid pairs where the output is the result of applying

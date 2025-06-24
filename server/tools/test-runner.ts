@@ -285,7 +285,7 @@ export class TestRunner {
     if (taskId.startsWith("NAV-")) return "rotation_90deg";
     if (taskId.startsWith("SEC-")) return "xor_operation";
     if (taskId.startsWith("PL-")) return "pattern_completion";
-    if (taskId.startsWith("OS-")) return "object_counting";
+    if (taskId.startsWith("OS-")) return "rotation_270deg";
     
     return undefined;
   }

@@ -112,7 +112,7 @@ export const TRANSFORMATION_TEMPLATES: TransformationTemplate[] = [
     descriptionPattern: "Analyze the {domain} by rotating the input grid 90 degrees clockwise.",
     gridGenerator: "Rotation90DegGenerator",
     hintPatterns: [
-      "Rotate the entire grid 90 degrees clockwise (¼ turn to the right).",
+      "Rotate the entire grid 90 degrees clockwise 🔃 (¼ turn to the right).",
       "The top row becomes the rightmost column, reading from top to bottom.",
       "Each column in the original becomes a row in the result, with order reversed."
     ],
@@ -135,37 +135,36 @@ export const TRANSFORMATION_TEMPLATES: TransformationTemplate[] = [
     difficulty: "Intermediate"
   },
   
-  // 4. XOR operation (logical)
+  // 4. Vertical reflection (geometric)
   {
-    type: "xor_operation",
-    name: "XOR Operation",
-    category: "logical",
-    titlePattern: "{context} Boolean Logic",
-    descriptionPattern: "Apply XOR (exclusive OR) operations to the {domain} by comparing adjacent cells in each row.",
-    gridGenerator: "XorOperationGenerator",
+    type: "vertical_reflection",
+    name: "Vertical Reflection",
+    category: "geometric",
+    titlePattern: "{context} Vertical Analysis",
+    descriptionPattern: "Analyze the {domain} by flipping the input grid vertically (top-to-bottom).",
+    gridGenerator: "VerticalReflectionGenerator",
     hintPatterns: [
-      "XOR returns 'true' when inputs differ and 'false' when they're the same.",
-      "For numbers, think of XOR as: if values are different, the result is their sum; if the same, the result is 0.",
-      "Process each row independently, comparing pairs of adjacent cells."
+      "Flip the entire grid vertically (top ↔ bottom) 🔼🔽.",
+      "The top row becomes the bottom row, the second row from the top becomes the second row from the bottom, and so on.",
+      "Each row maintains its order from left to right, but rows swap positions vertically."
     ],
-    difficulty: "Advanced"
+    difficulty: "Intermediate"
   },
   
-  // 5. Object counting (object manipulation)
+  // 5. 270° rotation (geometric)
   {
-    type: "object_counting",
-    name: "Object Counting",
-    category: "object manipulation",
-    titlePattern: "{context} Inventory Analysis",
-    descriptionPattern: "Count the number of each type of object in the {domain} and represent the counts in the output grid.",
-    gridGenerator: "ObjectCountingGenerator",
+    type: "rotation_270deg",
+    name: "270° Rotation",
+    category: "geometric",
+    titlePattern: "{context} Rotation Analysis",
+    descriptionPattern: "Analyze the {domain} by rotating the input grid 270 degrees clockwise (or 90 degrees counter-clockwise).",
+    gridGenerator: "Rotation270DegGenerator",
     hintPatterns: [
-      "Count how many times each number (0-9) appears in the input grid.",
-      "The output grid shows the count of each value, with position 0 showing count of 0s, position 1 showing count of 1s, etc.",
-      "The black square (⬛) represents 0 and should be counted like any other value."
+      "Rotate the entire grid 270 degrees clockwise (¾ turn to the right).",
+      "The leftmost column becomes the top row, reading from left to right.",
+      "Each row in the original becomes a column in the result, with order shifted accordingly."
     ],
-    difficulty: "Basic",
-    contextVariations: ["inventory", "resource count", "object tally", "element census"]
+    difficulty: "Intermediate"
   }
 ];
 

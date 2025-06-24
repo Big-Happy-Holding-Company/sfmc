@@ -21,29 +21,80 @@ The Abstract and Reasoning Corpus for Artificial General Intelligence (ARC-AGI) 
 ### Directory Structure
 ```
 ├── client/                 # Frontend React application
-│   ├── src/
-│   │   ├── components/     # Reusable UI components
-│   │   │   ├── game/       # Game-specific components
-│   │   │   └── ui/         # Base UI components (shadcn)
-│   │   ├── constants/      # Emoji sets and game constants
-│   │   ├── pages/          # Route components
-│   │   └── types/          # TypeScript type definitions
+│   └── src/
+│       ├── components/     # Reusable UI components
+│       │   ├── game/       # Game-specific components
+│       │   └── ui/         # Base UI components (shadcn)
+│       ├── constants/      # Emoji sets and game constants
+│       ├── pages/          # Route components
+│       └── types/          # TypeScript type definitions
 ├── server/                 # Backend Express application
+│   ├── cli/                # CLI utilities (task generation, etc.)
 │   ├── data/
 │   │   └── tasks/          # Individual JSON task files
+│   ├── templates/          # Task and story templates
+│   │   ├── generators/
+│   │   ├── categories.ts
+│   │   ├── transformations.ts
+│   │   └── validators.ts
+│   ├── tools/              # Code-generation helpers
+│   │   ├── task-factory.ts
+│   │   └── story-factory.ts   # Narrative wrapper (NEW)
 │   ├── services/           # Business logic services
-│   ├── index.ts           # Server entry point
-│   ├── routes.ts          # API route handlers
-│   └── storage.ts         # Data storage interface
+│   ├── tests/              # Automated backend tests
+│   ├── index.ts            # Server entry point
+│   ├── routes.ts           # API route handlers
+│   └── storage.ts          # Data storage interface
+├── docs/                   # Technical and design documentation
+│   └── story_wrapper_system_plan.md   # Narrative wrapper plan (NEW)
 ├── shared/                 # Shared types and schemas
-│   └── schema.ts          # Database schema and types
-└── README.md              # This file
+│   └── schema.ts           # Database schema and types
+└── README.md               # This file
 ```
 
 ## Task System Architecture
 
+### Transformation System
+
+#### Available Transformations
+1. **Geometric Transformations**
+   - `horizontal_reflection`: Flip grid left-to-right
+   - `vertical_reflection`: Flip grid top-to-bottom (NEW)
+   - `rotation_90deg`: Rotate grid 90° clockwise
+   - `rotation_270deg`: Rotate grid 270° clockwise (replaces object_counting)
+
+2. **Logical Transformations**
+   - `pattern_completion`: Complete the pattern in the grid
+
+#### Transformation Properties
+Each transformation includes:
+- Unique type identifier
+- Name and description
+- Category (geometric/logical)
+- Difficulty level
+- Hint patterns
+- Associated grid generator
+
+### Task Generation
+
+#### CLI Commands
+```bash
+# Generate a single task
+npx tsx server/cli/generate-task.ts single -c CATEGORY -t TRANSFORMATION -s SIZE -o OUTPUT_FILE
+
+# Example: Generate SEC task with vertical reflection
+npx tsx server/cli/generate-task.ts single -c SEC -t vertical_reflection -s 4 -o server/data/tasks/SEC-100.json
+```
+
+#### Task Generation Process
+1. Selects transformation type based on category
+2. Generates appropriate grid examples
+3. Applies story wrapper with Space-Force theme
+4. Validates the task
+5. Saves to specified location
+
 ### Modular Task Loading
-Tasks are stored as individual JSON files in `server/data/tasks/` for easy maintenance and scalability.  The time limit on all tasks should be null unless otherwise specified.
+Tasks are stored as individual JSON files in `server/data/tasks/` for easy maintenance and scalability. The time limit on all tasks should be null unless otherwise specified.
 
 #### Task File Structure
 ```json
@@ -91,13 +142,7 @@ Emoji sets follow ARC-AGI (Abstract and Reasoning Corpus for Artificial General 
 
 ### Rank Progression
 Players advance through Space Force enlisted ranks by earning points:
-- Specialist 1-4 (E-1 to E-4)
-- Sergeant (E-5)
-- Staff Sergeant (E-6)
-- Technical Sergeant (E-7)
-- Master Sergeant (E-8)
-- Senior Master Sergeant (E-9)
-- Chief Master Sergeant (E-10)
+See `client/src/data/ranks.ts` for rank progression.
 
 ### Task Categories
 - **🛡️ O₂ Sensor Check**: Oxygen system diagnostics (OS-XXX)
@@ -107,10 +152,12 @@ Players advance through Space Force enlisted ranks by earning points:
 - **📡 Communications**: Communication systems (COM-XXX) 
 - **⚡ Power Systems**: Power flow and distribution (PWR-XXX)
 - **🔒 Security**: Security systems (SEC-XXX)
+See `server/templates/categories.ts` for category metadata.
+
 
 ### Timer System
 - **Speed Bonus**: Tasks count up, rewarding faster completion
-- **Time Limited**: Limits are all set to null for development, but can be added for expanded difficulty and point rewards.
+- **Time Limited**: Limits are all set to null for development, but can be added for expanded difficulty and point rewards. I personally hate timed missions so I'll probably never do it.
 
 ## Development Guidelines
 
@@ -270,6 +317,74 @@ See the comprehensive guide in `docs/task_generation_guide.md` for more details.
 - `GET /api/tasks/:id` - Get specific task
 
 
+
+## Narrative Story Wrapper System
+
+### Purpose
+Adds a light-hearted Space-Force-2050 story layer to every ARC-AGI puzzle without touching core puzzle data.
+
+### How It Works
+1. `server/data/problems.json` – Holds every narrative template.  Keys are transformation types; each array contains one template per task **category** (O₂ Sensor Check, Pre-Launch Ops, Fuel Systems, Navigation, Communications, Power Systems, Security).
+2. `server/data/antagonists.json` – List of mischievous characters (e.g. "Rick the Intern") that caused the mishap.
+3. `server/data/components.json` – List of ship components the antagonist fiddled with.
+4. `server/templates/storyTemplates.ts` – Loader that reads `problems.json` at runtime and exposes templates to the factory.
+5. `server/tools/story-factory.ts` – Pure function that:
+   - Randomly selects an antagonist + component.
+   - Picks the correct template for the task’s `transformationType` + `category`.
+   - Substitutes `{{antagonist}}` and `{{component}}` placeholders.
+   - Returns an enriched task object ready for the API/UI.
+
+### Updating Stories (Writers-Friendly)
+- Open `server/data/problems.json`.
+- Find the transformation type you want (e.g. `rotation_90deg`).
+- Add or edit an object in the array with fields: `id`, `category`, `title`, `description`.
+- Keep it short (<60-char title, <180-char description) and include placeholders where relevant.
+- No code changes are needed – the loader will pick it up automatically.
+
+## AI Failure Content System
+
+### Purpose
+Provides humorous and educational content about why AI struggles with different transformation types, adding both entertainment value and educational insights to tasks.
+
+### AI Failure Data Structure
+The `server/data/ai_failure.json` file contains content for each transformation type:
+
+```json
+{
+  "transformation_type": {
+    "ai_difficulty": "Technical explanation of why AI struggles with this transformation",
+    "comic_situation1": "Humorous scenario showing AI failing at the transformation",
+    "comic_situation2": "Another humorous scenario",
+    "comic_situation3": "A third humorous scenario",
+    "kids_explanation": "Simple explanation for younger players about why the transformation is hard for AI",
+    "kids_explanation1": "Second simple explanation",
+    "kids_explanation2": "Third simple explanation"
+  }
+}
+```
+
+### Transformation Types Covered
+- `horizontal_reflection`: Mirror flips left-to-right
+- `vertical_reflection`: Mirror flips top-to-bottom
+- `rotation_90deg`: 90° clockwise rotation
+- `rotation_270deg`: 270° clockwise (or 90° counter-clockwise) rotation
+- `pattern_completion`: Logical sequence pattern completion
+
+### Using the AI Failure Content
+- Use the `scripts/enhance-tasks.js` script to automatically enhance task descriptions and hints with this content
+- The enhancement script:
+  1. Detects the transformation type used in each task
+  2. Prepends a random comic situation and AI difficulty explanation to the task's description
+  3. Adds the three kids_explanation entries to the beginning of the hints array
+- For tasks that don't follow standard transformation naming patterns, manual enhancement is recommended
+
+### Updating AI Failure Content
+- Edit `server/data/ai_failure.json` to modify existing content
+- Maintain the structure of each transformation type entry
+- When adding new transformation types, ensure all seven fields are included
+- After updating, re-run the enhancement script to apply changes to task files
+
+---
 
 ## Future Enhancements
 

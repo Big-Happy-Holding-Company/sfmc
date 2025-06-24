@@ -34,8 +34,9 @@ export function MissionSelector({
     setExpandedCategories(newExpanded);
   };
   
-  const getCategoryMissions = (categoryName: string) => {
-    return availableMissions.filter(mission => mission.category === categoryName);
+  // Return missions whose ID starts with the category prefix (e.g. "FS-", "COM-")
+  const getCategoryMissions = (categoryId: string) => {
+    return availableMissions.filter(mission => mission.id.startsWith(`${categoryId}-`));
   };
 
   return (
@@ -49,16 +50,16 @@ export function MissionSelector({
         
         <div className="space-y-4">
           {MISSION_CATEGORIES.map((category) => {
-            const categoryMissions = getCategoryMissions(category.name);
+            const categoryMissions = getCategoryMissions(category.id);
             const hasAvailableMissions = categoryMissions.length > 0;
-            const isExpanded = expandedCategories.has(category.name);
+            const isExpanded = expandedCategories.has(category.id);
             
             return (
               <div key={category.id} className="border border-slate-600 rounded-lg overflow-hidden">
                 {/* Category Header */}
                 <Button
                   variant="ghost"
-                  onClick={() => toggleCategory(category.name)}
+                  onClick={() => toggleCategory(category.id)}
                   disabled={!hasAvailableMissions}
                   className={cn(
                     "w-full justify-between p-4 h-auto rounded-none",
@@ -66,16 +67,8 @@ export function MissionSelector({
                     !hasAvailableMissions && "opacity-50 cursor-not-allowed"
                   )}
                 >
-                  <div className="flex items-center space-x-3">
-                    <div className="text-xl">
-                      {category.name.includes('O₂') ? '🛡️' : 
-                       category.name.includes('Pre-Launch') ? '🚀' :
-                       category.name.includes('Fuel') ? '⚡' : 
-                       category.name.includes('Navigation') ? '🧭' :
-                       category.name.includes('Communications') ? '📡' :
-                       category.name.includes('Power') ? '⚡' :
-                       category.name.includes('Security') ? '🔐' : '🎖️'}
-                    </div>
+                  <div className="flex items-center">
+                    
                     <div className="text-left">
                       <div className="font-semibold text-slate-300">{category.name}</div>
                       <div className="text-xs text-slate-400">{category.description}</div>
@@ -116,13 +109,8 @@ export function MissionSelector({
                             )}
                           >
                             <div className="w-full text-left">
-                              <div className="flex items-start justify-between mb-2">
-                                <div className={`text-${difficultyColor} text-lg`}>
-                                  {mission.category.includes('O₂') ? '🛡️' : 
-                                   mission.category.includes('Pre-Launch') ? '🚀' :
-                                   mission.category.includes('Fuel') ? '⚡ ' :
-                                   mission.category.includes('Navigation') ? '🧭' : '🎖️'}
-                                </div>
+                              <div className="flex items-center justify-between mb-2">
+                                <h4 className="font-semibold text-sm text-slate-300">{mission.title}</h4>
                                 <div className={cn(
                                   "text-xs px-2 py-1 rounded",
                                   `bg-${difficultyColor} bg-opacity-20 text-${difficultyColor}`
@@ -130,7 +118,6 @@ export function MissionSelector({
                                   {mission.difficulty.toUpperCase()}
                                 </div>
                               </div>
-                              <h4 className="font-semibold text-sm text-slate-300 mb-1">{mission.title}</h4>
                               <p className="text-xs text-slate-400 mb-2">
                                 {mission.gridSize}×{mission.gridSize} Grid • {mission.basePoints} pts
                               </p>

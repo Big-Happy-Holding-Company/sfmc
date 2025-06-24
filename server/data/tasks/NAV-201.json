@@ -1,0 +1,184 @@
+{
+  "id": "NAV-201",
+  "title": "orbital paths Vertical Analysis",
+  "description": "Navigation displays showed star charts flipped vertically, but the AI tried to fix this by commanding the ship to literally fly upside-down. The crew spent 20 minutes floating around the bridge before someone manually corrected the display orientation. Vertical mirroring requires spatial visualization skills that AI finds challenging. While humans intuitively understand up-down flips, AI struggles to maintain consistent spatial orientation across different grid configurations. Analyze the orbital paths by flipping the input grid vertically (top-to-bottom).",
+  "category": "🧭 Navigation",
+  "difficulty": "Intermediate",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 2350,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [
+          0,
+          8,
+          3,
+          8
+        ],
+        [
+          7,
+          6,
+          4,
+          3
+        ],
+        [
+          0,
+          6,
+          7,
+          1
+        ],
+        [
+          1,
+          9,
+          0,
+          4
+        ]
+      ],
+      "output": [
+        [
+          1,
+          9,
+          0,
+          4
+        ],
+        [
+          0,
+          6,
+          7,
+          1
+        ],
+        [
+          7,
+          6,
+          4,
+          3
+        ],
+        [
+          0,
+          8,
+          3,
+          8
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          3,
+          3,
+          7,
+          3
+        ],
+        [
+          4,
+          1,
+          3,
+          0
+        ],
+        [
+          6,
+          6,
+          8,
+          9
+        ],
+        [
+          1,
+          7,
+          6,
+          8
+        ]
+      ],
+      "output": [
+        [
+          1,
+          7,
+          6,
+          8
+        ],
+        [
+          6,
+          6,
+          8,
+          9
+        ],
+        [
+          4,
+          1,
+          3,
+          0
+        ],
+        [
+          3,
+          3,
+          7,
+          3
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      5,
+      9,
+      8,
+      8
+    ],
+    [
+      0,
+      0,
+      1,
+      9
+    ],
+    [
+      2,
+      5,
+      8,
+      7
+    ],
+    [
+      9,
+      1,
+      0,
+      3
+    ]
+  ],
+  "testOutput": [
+    [
+      9,
+      1,
+      0,
+      3
+    ],
+    [
+      2,
+      5,
+      8,
+      7
+    ],
+    [
+      0,
+      0,
+      1,
+      9
+    ],
+    [
+      5,
+      9,
+      8,
+      8
+    ]
+  ],
+  "hints": [
+    "Imagine trying to read a book upside-down. You can flip it in your head easily, but computers get confused about which way is 'up' when they're looking at patterns. They don't have eyes like you do.",
+    "Think about when you do a handstand and see the world upside-down. You still know where everything is, just flipped. But a computer would get confused and think the ceiling became the floor and try to walk on it.",
+    "It's like looking at a picture of your family and then flipping it so everyone's head is at the bottom. You'd still recognize everyone, but a computer might think it's looking at completely different people hanging from the ceiling.",
+    "Flip the entire grid vertically (top ↔ bottom) 🔼🔽.",
+    "The top row becomes the bottom row, the second row from the top becomes the second row from the bottom, and so on.",
+    "Each row maintains its order from left to right, but rows swap positions vertically."
+  ],
+  "transformationType": "vertical_reflection",
+  "generated": true
+}

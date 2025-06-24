@@ -1,0 +1,184 @@
+{
+  "id": "SEC-103",
+  "title": "defense matrix Rotation Analysis",
+  "description": "Airlock control systems got confused trying to rotate safety protocols 270 degrees. Instead of one smooth turn, it performed three separate 90-degree rotations of the actual airlock chamber, cycling through pressurization three times and trapping two astronauts in the middle. 270-degree rotations are particularly challenging because they require understanding that three quarter-turns equal one three-quarter turn, not just applying 90-degree logic three times. This tests deeper spatial reasoning and transformation composition. Analyze the defense matrix by rotating the input grid 270 degrees clockwise 🔁🔁🔁.",
+  "category": "🔒 Security Systems",
+  "difficulty": "Intermediate",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 11425,
+  "requiredRankLevel": 1,
+  "emojiSet": "status_alerts",
+  "examples": [
+    {
+      "input": [
+        [
+          2,
+          7,
+          7,
+          3
+        ],
+        [
+          0,
+          6,
+          0,
+          5
+        ],
+        [
+          2,
+          9,
+          1,
+          2
+        ],
+        [
+          6,
+          3,
+          9,
+          3
+        ]
+      ],
+      "output": [
+        [
+          3,
+          5,
+          2,
+          3
+        ],
+        [
+          7,
+          0,
+          1,
+          9
+        ],
+        [
+          7,
+          6,
+          9,
+          3
+        ],
+        [
+          2,
+          0,
+          2,
+          6
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          4,
+          3,
+          6,
+          9
+        ],
+        [
+          8,
+          1,
+          3,
+          4
+        ],
+        [
+          3,
+          4,
+          5,
+          6
+        ],
+        [
+          8,
+          6,
+          6,
+          2
+        ]
+      ],
+      "output": [
+        [
+          9,
+          4,
+          6,
+          2
+        ],
+        [
+          6,
+          3,
+          5,
+          6
+        ],
+        [
+          3,
+          1,
+          4,
+          6
+        ],
+        [
+          4,
+          8,
+          3,
+          8
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      4,
+      8,
+      9,
+      2
+    ],
+    [
+      9,
+      0,
+      8,
+      5
+    ],
+    [
+      2,
+      9,
+      9,
+      5
+    ],
+    [
+      3,
+      4,
+      1,
+      5
+    ]
+  ],
+  "testOutput": [
+    [
+      2,
+      5,
+      5,
+      5
+    ],
+    [
+      9,
+      8,
+      9,
+      1
+    ],
+    [
+      8,
+      0,
+      9,
+      4
+    ],
+    [
+      4,
+      9,
+      2,
+      3
+    ]
+  ],
+  "hints": [
+    "This is like spinning a toy three times to the right instead of once to the left to end up in the same place. You know they're the same, but computers have to think step-by-step through each turn.",
+    "Imagine you're playing 'Simon Says' and Simon says 'turn around 3/4 of the way.' You'd just turn almost all the way around and stop. But a computer might think it has to turn a little bit, then turn again, then turn again, taking much longer to get to the same place.",
+    "It's like when you're unscrewing a jar lid. You know you need to turn it mostly around to the left, but a computer might think it needs to turn it a little to the right three times instead of just turning left once. Both ways work, but one is much sillier.",
+    "Rotate the entire grid 270 degrees clockwise 🔁🔁🔁 (¾ turn to the right). You can also think of this as 90 degrees counter-clockwise 🔄 (¼ turn to the left).",
+    "The leftmost column becomes the top row, reading from left to right.",
+    "Each row in the original becomes a column in the result, with order shifted accordingly."
+  ],
+  "transformationType": "rotation_270deg",
+  "generated": true
+}

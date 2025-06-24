@@ -92,9 +92,9 @@ export class TaskValidator {
       errors.push(`Invalid difficulty: ${task.difficulty}`);
     }
     
-    // Check grid size (2-4)
-    if (task.gridSize !== undefined && (task.gridSize < 2 || task.gridSize > 4)) {
-      errors.push(`Invalid grid size: ${task.gridSize} (should be 2-4)`); 
+    // Check grid size (minimum 2)
+    if (task.gridSize !== undefined && task.gridSize < 2) {
+      errors.push(`Invalid grid size: ${task.gridSize} (minimum 2)`); 
     }
     
     // Check emoji set exists
@@ -107,9 +107,9 @@ export class TaskValidator {
       errors.push(`Not enough examples: ${task.examples.length} (minimum 2)`); 
     }
     
-    // Check hints (exactly 3)
-    if (task.hints && task.hints.length !== 3) {
-      errors.push(`Invalid number of hints: ${task.hints.length} (should be 3)`); 
+    // Check hints (minimum 3)
+    if (task.hints && task.hints.length < 3) {
+      errors.push(`Not enough hints: ${task.hints.length} (minimum 3)`); 
     }
     
     return errors;
@@ -207,8 +207,8 @@ export class TaskValidator {
    * @param errors Array to add error messages to
    */
   private validateTransformationLogic(task: TaskDefinition, errors: string[]): void {
-    // Extract transformation type from the task ID (e.g., HOR from HOR-123)
-    const transformationType = this.inferTransformationType(task.id);
+    // Prefer explicit transformationType if present; otherwise infer from ID
+    const transformationType = task.transformationType || this.inferTransformationType(task.id);
     if (!transformationType) {
       errors.push(`Could not infer transformation type from task ID: ${task.id}`);
       return;
@@ -260,9 +260,9 @@ export class TaskValidator {
       // For now, we'll use the default transformation mapping based on category
       if (categoryPrefix === "COM") return "horizontal_reflection";
       if (categoryPrefix === "NAV") return "rotation_90deg";
-      if (categoryPrefix === "SEC") return "xor_operation";
+      if (categoryPrefix === "SEC") return "vertical_reflection";
       if (categoryPrefix === "PL") return "pattern_completion";
-      if (categoryPrefix === "OS") return "xor_operation"; // Change from object_counting to xor_operation for OS tasks
+      if (categoryPrefix === "OS") return "rotation_270deg"; // Change from object_counting to rotation_270deg for OS tasks
       if (categoryPrefix === "FS") return "rotation_90deg";
       if (categoryPrefix === "PWR") return "pattern_completion";
     }
@@ -271,9 +271,9 @@ export class TaskValidator {
     // Return a default transformation for each category (for backwards compatibility)
     if (categoryPrefix === "COM") return "horizontal_reflection";
     if (categoryPrefix === "NAV") return "rotation_90deg";
-    if (categoryPrefix === "SEC") return "xor_operation";
+    if (categoryPrefix === "SEC") return "vertical_reflection";
     if (categoryPrefix === "PL") return "pattern_completion";
-    if (categoryPrefix === "OS") return "object_counting"; // Keep the original mapping for reference tasks
+    if (categoryPrefix === "OS") return "rotation_270deg"; // Change from object_counting to rotation_270deg
     if (categoryPrefix === "FS") return "rotation_90deg";
     if (categoryPrefix === "PWR") return "pattern_completion";
     

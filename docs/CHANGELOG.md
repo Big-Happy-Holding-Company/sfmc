@@ -1,5 +1,46 @@
 # Changelog
 
+
+
+## 2025-06-22 - Transformation System Updates
+
+### Core Changes
+- Replaced `object_counting` transformation with `rotation_270deg` for better puzzle clarity
+- Added new `vertical_reflection` transformation to replace `xor_operation`
+- Updated task generation system to support new transformations
+- Enhanced story templates with Space-Force-themed narratives
+- Added new `rotation_270deg` transformation to replace `object_counting`
+
+
+### Technical Updates
+- Created new `vertical-reflection-generator.ts` based on horizontal reflection pattern
+- Updated transformation registry and validators
+- Generated new SEC-100 through SEC-105 tasks with 4x4 grids
+- Ensured all transformations have consistent story templates
+- Fixed task display issues
+
+### Documentation
+- Updated transformation documentation in `transformations.ts`
+- Added detailed comments to new generator files
+- Ensured all transformations have clear, kid-friendly descriptions
+
+_Author: Cascade_
+
+## 2025-06-21 - Narrative Story Wrapper Added
+- Implemented modular "story wrapper" system (`server/tools/story-factory.ts`).
+- Added writer-editable templates in `server/templates/storyTemplates.ts` with multi-placeholder support.
+- Introduced data lists `server/data/antagonists.json` and `server/data/components.json`.
+- Updated README directory structure and added `docs/story_wrapper_system_plan.md` for contributor guidance.
+- Enhanced placeholder engine for multiple antagonists and arbitrary keys.
+- NOTE: Existing `object_counting` transformation flagged for removal; will be replaced by `rotation_270deg` in a future patch. 
+
+_Author: Cascade with o3 (high reasoning)_
+
+## 2025-06-20 - Vercel Deployment Setup
+- Added Vercel configuration with `vercel.json`
+- Fixed TypeScript error in `server/vite.ts` related to `allowedHosts` type
+- Documented build and deployment process
+
 ## 2025-06-19 - Templatization System Added
 - Added templatization system
 - Added task generation CLI

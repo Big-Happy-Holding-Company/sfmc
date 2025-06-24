@@ -66,6 +66,13 @@ export class MemStorage implements IStorage {
   private players: Map<number, Player>;
   private tasks: Map<string, Task>;
   private playerTasks: Map<string, PlayerTask>; // key: `${playerId}-${taskId}`
+  /**
+   * Promise that resolves once task initialization has completed. This is critical
+   * for serverless environments where the storage instance is constructed lazily
+   * for each request. Route handlers will await this promise to guarantee that
+   * task data is available before continuing.
+   */
+  private tasksInitPromise: Promise<void> = Promise.resolve();
   private gameStates: Map<number, GameState>; // key: playerId
   private currentUserId: number;
   private currentPlayerId: number;
@@ -83,8 +90,10 @@ export class MemStorage implements IStorage {
     this.currentPlayerTaskId = 1;
     this.currentGameStateId = 1;
 
-    // Initialize tasks from JSON files asynchronously
-    this.initializeTasks().catch(console.error);
+    // Initialize tasks from JSON files asynchronously and store the promise so
+    // that other methods can await it.
+    this.tasksInitPromise = this.initializeTasks();
+    this.tasksInitPromise.catch(console.error);
   }
 
   // User operations
@@ -120,8 +129,14 @@ export class MemStorage implements IStorage {
     const id = this.currentPlayerId++;
     const now = new Date();
     const player: Player = {
-      ...insertPlayer,
+      // Required fields with sensible defaults if not supplied
       id,
+      userId: insertPlayer.userId ?? null,
+      rank: insertPlayer.rank ?? "Specialist 1",
+      rankLevel: insertPlayer.rankLevel ?? 1,
+      totalPoints: insertPlayer.totalPoints ?? 0,
+      completedMissions: insertPlayer.completedMissions ?? 0,
+      currentTask: insertPlayer.currentTask ?? null,
       createdAt: now,
       updatedAt: now,
     };
@@ -146,21 +161,29 @@ export class MemStorage implements IStorage {
   }
 
   // Task operations
+  private async ensureTasksLoaded(): Promise<void> {
+    await this.tasksInitPromise;
+  }
+
   async getTask(id: string): Promise<Task | undefined> {
+    await this.ensureTasksLoaded();
     return this.tasks.get(id);
   }
 
   async getTasks(): Promise<Task[]> {
+    await this.ensureTasksLoaded();
     return Array.from(this.tasks.values());
   }
 
   async getTasksByCategory(category: string): Promise<Task[]> {
+    await this.ensureTasksLoaded();
     return Array.from(this.tasks.values()).filter(
       (task) => task.category === category,
     );
   }
 
   async getTasksForRank(rankLevel: number): Promise<Task[]> {
+    await this.ensureTasksLoaded();
     return Array.from(this.tasks.values()).filter(
       (task) => task.requiredRankLevel <= rankLevel,
     );
@@ -197,8 +220,14 @@ export class MemStorage implements IStorage {
   ): Promise<PlayerTask> {
     const id = this.currentPlayerTaskId++;
     const playerTask: PlayerTask = {
-      ...insertPlayerTask,
       id,
+      playerId: insertPlayerTask.playerId ?? null,
+      taskId: insertPlayerTask.taskId ?? null,
+      completed: insertPlayerTask.completed ?? false,
+      attempts: insertPlayerTask.attempts ?? 0,
+      bestTime: insertPlayerTask.bestTime ?? null,
+      pointsEarned: insertPlayerTask.pointsEarned ?? 0,
+      lastAttemptAt: insertPlayerTask.lastAttemptAt ?? new Date(),
     };
     this.playerTasks.set(
       `${insertPlayerTask.playerId}-${insertPlayerTask.taskId}`,
@@ -233,8 +262,13 @@ export class MemStorage implements IStorage {
     const id = this.currentGameStateId++;
     const now = new Date();
     const gameState: GameState = {
-      ...insertGameState,
       id,
+      playerId: insertGameState.playerId ?? null,
+      currentTaskId: insertGameState.currentTaskId ?? null,
+      currentGrid: insertGameState.currentGrid ?? null,
+      startTime: insertGameState.startTime ?? null,
+      timeRemaining: insertGameState.timeRemaining ?? null,
+      hintsUsed: insertGameState.hintsUsed ?? 0,
       createdAt: now,
       updatedAt: now,
     };

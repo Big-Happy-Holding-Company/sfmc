@@ -65,13 +65,12 @@ app.use((req, res, next) => {
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  const port = 5000;
-  // On Windows, using host '0.0.0.0' and reusePort can cause ENOTSUP errors.
-  // Use '127.0.0.1' and remove reusePort for compatibility.
-  server.listen({
-    port,
-    host: "127.0.0.1"
-  }, () => {
-    log(`serving on port ${port}`);
+  const port = parseInt(process.env.PORT ?? "5000", 10);
+  // In production (e.g., Railway), bind to all interfaces so the platform can route traffic.
+  // Locally we still bind to 127.0.0.1 for Windows compatibility.
+  const host = process.env.NODE_ENV === "production" ? "0.0.0.0" : "127.0.0.1";
+
+  server.listen({ port, host }, () => {
+    log(`serving on ${host}:${port}`);
   });
 })();

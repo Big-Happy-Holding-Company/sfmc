@@ -8,6 +8,9 @@
  */
 
 import { EmojiSet } from "../../client/src/constants/spaceEmojis";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 /**
  * CategoryTemplate defines task properties that are driven by category.
@@ -30,50 +33,50 @@ export const CATEGORY_TEMPLATES: Record<string, CategoryTemplate> = {
   OS: {
     categoryCode: "OS",
     categoryName: "🛡️ O₂ Sensor Check",
-    emojiSet: "status_main",
-    basePoints: 350,
+    emojiSet: "tech_set2",
+    basePoints: 1550,
     requiredRankLevel: 1
   },
   PL: {
     categoryCode: "PL",
     categoryName: "🚀 Pre-Launch Ops",
     emojiSet: "celestial_set1",
-    basePoints: 300,
+    basePoints: 2300,
     requiredRankLevel: 1
   },
   FS: {
     categoryCode: "FS",
     categoryName: "⚡ Fuel Systems",
     emojiSet: "tech_set1",
-    basePoints: 325,
+    basePoints: 2325,
     requiredRankLevel: 1
   },
   NAV: {
     categoryCode: "NAV",
     categoryName: "🧭 Navigation",
     emojiSet: "nav_alerts",
-    basePoints: 350,
+    basePoints: 2350,
     requiredRankLevel: 1
   },
   COM: {
     categoryCode: "COM",
     categoryName: "📡 Communications",
     emojiSet: "tech_set2",
-    basePoints: 400,
+    basePoints: 1400,
     requiredRankLevel: 1
   },
   PWR: {
     categoryCode: "PWR",
     categoryName: "⚡ Power Systems",
     emojiSet: "tech_set1",
-    basePoints: 375,
+    basePoints: 1675,
     requiredRankLevel: 1
   },
   SEC: {
     categoryCode: "SEC",
     categoryName: "🔒 Security",
     emojiSet: "status_alerts",
-    basePoints: 425,
+    basePoints: 5325,
     requiredRankLevel: 1
   }
 };
@@ -89,15 +92,35 @@ const lastUsedTaskNumbers: Record<string, number> = {};
  * @returns Task ID in the format "CAT-100", incrementing sequentially
  */
 export function getNextTaskId(categoryCode: string): string {
-  // Start from 100 if this category hasn't been used yet
+  // If this is the first time we need an ID for this category in this process,
+  // scan the tasks directory so we start AFTER the highest existing number.
   if (!lastUsedTaskNumbers[categoryCode]) {
-    lastUsedTaskNumbers[categoryCode] = 100;
+    const tasksDir = path.resolve(
+      path.dirname(fileURLToPath(import.meta.url)),
+      "..",
+      "data",
+      "tasks"
+    );
+    let highest = 99; // we will increment after determining current highest
+
+    if (fs.existsSync(tasksDir)) {
+      const files = fs.readdirSync(tasksDir);
+      const regex = new RegExp(`^${categoryCode}-(\\d{3})\\.json$`);
+      for (const file of files) {
+        const match = file.match(regex);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          if (num > highest) highest = num;
+        }
+      }
+    }
+
+    lastUsedTaskNumbers[categoryCode] = highest + 1;
   } else {
-    // Otherwise, increment the last used number
-    lastUsedTaskNumbers[categoryCode]++;
+    // Subsequent calls while the process is alive simply increment in-memory value
+    lastUsedTaskNumbers[categoryCode] += 1;
   }
-  
-  // Format the task ID with leading zeros (e.g., "COM-100")
-  const number = lastUsedTaskNumbers[categoryCode].toString().padStart(3, '0');
+
+  const number = lastUsedTaskNumbers[categoryCode].toString().padStart(3, "0");
   return `${categoryCode}-${number}`;
 }

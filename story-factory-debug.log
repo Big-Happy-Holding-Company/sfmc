@@ -1,0 +1,11 @@
+2025-06-22T22:26:53.343Z: ERROR loading ai_failure.json: ReferenceError: __dirname is not defined
+2025-06-22T22:26:53.346Z: Transformation type from task: 'vertical_reflection'
+2025-06-22T22:26:53.348Z: AI failure content keys: ["horizontal_reflection"]
+2025-06-22T22:26:53.349Z: WARNING: No AI failure content found for transformation type: vertical_reflection
+2025-06-22T22:28:23.523Z: Trying ESM-compatible paths: ["D:\\1Projects\\sfmc-vercel-deploy\\server\\data\\ai_failure.json","D:\\1Projects\\sfmc-vercel-deploy\\data\\ai_failure.json","D:\\1Projects\\sfmc-vercel-deploy\\server\\data\\ai_failure.json","D:\\1Projects\\sfmc-vercel-deploy\\data\\ai_failure.json","d:\\1Projects\\sfmc-vercel-deploy\\server\\data\\ai_failure.json"]
+2025-06-22T22:28:23.528Z: Checking path: D:\1Projects\sfmc-vercel-deploy\server\data\ai_failure.json, exists: true
+2025-06-22T22:28:23.530Z: Successfully loaded AI failure content from D:\1Projects\sfmc-vercel-deploy\server\data\ai_failure.json
+2025-06-22T22:28:23.531Z: Available transformation types in AI failure data: ["horizontal_reflection","vertical_reflection","rotation_90deg","rotation_270deg","pattern_completion"]
+2025-06-22T22:28:23.532Z: Transformation type from task: 'vertical_reflection'
+2025-06-22T22:28:23.533Z: AI failure content keys: ["horizontal_reflection","vertical_reflection","rotation_90deg","rotation_270deg","pattern_completion"]
+2025-06-22T22:28:23.534Z: Found matching content for transformation type: vertical_reflection
