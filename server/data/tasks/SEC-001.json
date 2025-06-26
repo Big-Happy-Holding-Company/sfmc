@@ -1,7 +1,7 @@
 {
   "id": "SEC-001",
   "title": "Security Grid Pattern Lock",
-  "description": "The security doors are stuck because the ship’s super-smart AI is overthinking the grid pattern—running a million fancy rules instead of spotting the easy checkerboard you see right away. Complete the missing tiles so the doors slide open and launch can begin, proving that quick human intuition beats tangled robot logic.",
+  "description": "The doors are stuck because the ship’s super-smart AI is overthinking the grid pattern—running a million fancy rules instead of spotting the easy answer you see right away. Fill in the missing symbol so the doors slide open and launch can begin, proving that quick human intuition beats tangled robot logic.",
   "category": "🔐 Security Systems",
   "difficulty": "Basic",
   "gridSize": 3,
@@ -36,14 +36,14 @@
     }
   ],
   "testInput": [
-    ["7", "8", "7"],
+    ["9", "8", "9"],
     ["8", "0", "8"],
-    ["7", "8", "7"]
+    ["9", "8", "9"]
   ],
   "testOutput": [
-    ["7", "8", "7"],
-    ["8", "7", "8"],
-    ["7", "8", "7"]
+    ["9", "8", "9"],
+    ["8", "9", "8"],
+    ["9", "8", "9"]
   ],
   "hints": [
     "The center cell should match the corner pattern.",
