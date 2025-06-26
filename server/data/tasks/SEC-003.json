@@ -12,30 +12,30 @@
   "examples": [
     {
       "input": [
-        ["🔴", "🟢", "🔵"],
-        ["🟡", "🟣", "🟠"],
-        ["🔵", "🔴", "🟢"]
+        ["1", "2", "3"],
+        ["5", "6", "7"],
+        ["3", "1", "2"]
       ],
       "output": [
-        ["⬛", "⬛", "🔵"],
-        ["⬛", "🟣", "⬛"],
-        ["🔵", "⬛", "⬛"]
+        ["0", "0", "3"],
+        ["0", "6", "0"],
+        ["3", "0", "0"]
       ]
     }
   ],
   "testInput": [
-    ["🟣", "🟠", "🔴"],
-    ["🔵", "🟡", "🟢"],
-    ["🔴", "🟣", "🔵"]
+    ["6", "8", "1"],
+    ["2", "3", "4"],
+    ["1", "6", "8"]
   ],
   "testOutput": [
-    ["⬛", "⬛", "🔴"],
-    ["⬛", "🟡", "⬛"],
-    ["🔴", "⬛", "⬛"]
+    ["0", "0", "1"],
+    ["0", "3", "0"],
+    ["1", "0", "0"]
   ],
   "hints": [
-    "Only elements on the anti-diagonal are preserved.",
-    "Anti-diagonal runs from top-right to bottom-left.",
-    "All other positions become empty spaces."
+    "Only elements on the anti-diagonal are kept.",
+    "The anti-diagonal runs from top-right to bottom-left.",
+    "All other positions become ⬛."
   ]
 }

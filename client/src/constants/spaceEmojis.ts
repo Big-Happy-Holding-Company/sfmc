@@ -5,8 +5,8 @@
 // in our grids: colour-0 (black) is explicitly the first emoji.
 // -------------------------------------------------------------
 export const SPACE_EMOJIS = {
-  // Status - Main Set (for basic sensor and status displays)
-  status_main: ['⬛', '🟡', '🔴', '🟠', '🔵', '🟣', '⚪', '🟢', '🟤', '🚫'],
+  // Status - Main Set (for basic sensor and status displays) Color based and thus deprecated for this project
+  //status_main: ['⬛', '🟡', '🔴', '🟠', '🔵', '🟣', '⚪', '🟢', '🟤', '🚫'],
 
   // Celestial Bodies - Set 1 (Earth and celestial bodies)
   celestial_set1: ['⬛', '🌍', '🌎', '🌏', '⭐', '🌟', '✨', '💫', '🌠', '🪐'],
