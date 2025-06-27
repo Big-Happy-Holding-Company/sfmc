@@ -151,7 +151,7 @@ See `client/src/data/ranks.ts` for rank progression.
 ### Task Categories
 - **🛡️ O₂ Sensor Check**: Oxygen system diagnostics (OS-XXX)
 - **🚀 Pre-Launch Ops**: Launch preparation tasks (PL-XXX)
-- **⚡ Fuel Systems**: Fuel flow and mixture analysis (FS-XXX)
+- **📊 Fuel Systems**: Fuel flow and mixture analysis (FS-XXX)
 - **🧭 Navigation**: Directional calibration (NAV-XXX)
 - **📡 Communications**: Communication systems (COM-XXX) 
 - **⚡ Power Systems**: Power flow and distribution (PWR-XXX)
