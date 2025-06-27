@@ -1,7 +1,7 @@
 {
   "id": "SEC-001",
   "title": "Security Grid Pattern Lock",
-  "description": "The doors are stuck because the ship’s super-smart AI is overthinking the grid pattern—running a million fancy rules instead of spotting the easy answer you see right away. Fill in the missing symbol so the doors slide open and launch can begin, proving that quick human intuition beats tangled robot logic.",
+  "description": "The doors are stuck because the ship’s super-smart AI is overthinking the grid pattern—running a million fancy rules instead of spotting the easy answer you see right away. Look at the mess the AI made in the output grid in example 2! We can't trust the AI for this one, so we need you to fix it so the doors slide open! Often, quick human intuition beats tangled robot 🤖 logic.",
   "category": "🔐 Security Systems",
   "difficulty": "Basic",
   "gridSize": 3,
@@ -29,9 +29,9 @@
         ["3", "4", "3"]
       ],
       "output": [
-        ["3", "4", "3"],
-        ["4", "3", "4"],
-        ["3", "4", "3"]
+        ["🤪", "🦄", "🚦"],
+        ["🎡", "🍕", "☀"],
+        ["✖", "🤖", "🤪"]
       ]
     }
   ],
