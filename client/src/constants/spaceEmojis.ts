@@ -6,7 +6,7 @@
 // -------------------------------------------------------------
 export const SPACE_EMOJIS = {
   // Status - Main Set (for basic sensor and status displays) Color based and thus deprecated for this project
-  //status_main: ['⬛', '🟡', '🔴', '🟠', '🔵', '🟣', '⚪', '🟢', '🟤', '🚫'],
+  status_main: ['⬛', '🟡', '🔴', '🟠', '🔵', '🟣', '⚪', '🟢', '🟤', '🚫'],
 
   // Celestial Bodies - Set 1 (Earth and celestial bodies)
   celestial_set1: ['⬛', '🌍', '🌎', '🌏', '⭐', '🌟', '✨', '💫', '🌠', '🪐'],
