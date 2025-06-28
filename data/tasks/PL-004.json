@@ -1,0 +1,29 @@
+{
+  "id": "PL-004",
+  "title": "Vertical Mirror Check",
+  "description": "Mirror pre-launch indicator grid vertically (top ↔ bottom) to verify symmetry.",
+  "category": "🚀 Pre-Launch Ops",
+  "difficulty": "Basic",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 5200,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [[1,0,0],[2,3,0],[4,0,5]],
+      "output": [[4,0,5],[2,3,0],[1,0,0]]
+    },
+    {
+      "input": [[0,6,0],[7,0,8],[0,9,0]],
+      "output": [[0,9,0],[7,0,8],[0,6,0]]
+    }
+  ],
+  "testInput": [[1,0,2],[0,3,0],[4,0,5]],
+  "testOutput": [[4,0,5],[0,3,0],[1,0,2]],
+  "hints": [
+    "Flip the grid top-to-bottom.",
+    "Rows swap positions; columns remain the same.",
+    "⬛ moves with the row like any other value."
+  ]
+}

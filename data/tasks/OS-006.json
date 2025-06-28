@@ -1,0 +1,41 @@
+{
+  "id": "OS-006",
+  "title": "Advanced Sensor Outer Ring Extraction",
+  "description": "Complex oxygen sensor networks require outer ring element preservation. Only the outermost ring of elements remains active.",
+  "category": "🛡️ O₂ Sensor Check",
+  "difficulty": "Officer (Expert)",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 21080,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        ["1", "2", "3"],
+        ["4", "5", "6"],
+        ["7", "8", "9"]
+      ],
+      "output": [
+        ["1", "2", "3"],
+        ["4", "0", "6"],
+        ["7", "8", "9"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["9", "8", "7"],
+    ["6", "5", "4"],
+    ["3", "2", "1"]
+  ],
+  "testOutput": [
+    ["9", "8", "7"],
+    ["6", "0", "4"],
+    ["3", "2", "1"]
+  ],
+  "hints": [
+    "Preserve all elements on the outer perimeter of the grid.",
+    "Clear the center element only.",
+    "The outer ring forms a border around the empty center."
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "id": "COM-100",
+  "title": "Flip the Solar Grid!",
+  "description": "🚀 Crisis! Someone was taking selfies 📱 near the control panel and knocked the solar array blueprint backwards ⇄! Now the panels face deep space instead of the Sun ☀️, and life support is failing! Study the before → after symbol grids to see the flip. Mirror today's entire grid left-to-right ↔️ to restore oxygen 💨 before time runs out ⏰!",
+  "category": "📡 Communications",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 4050,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [
+          7,
+          1
+        ],
+        [
+          7,
+          1
+        ]
+      ],
+      "output": [
+        [
+          1,
+          7
+        ],
+        [
+          1,
+          7
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          4,
+          1
+        ],
+        [
+          2,
+          6
+        ]
+      ],
+      "output": [
+        [
+          1,
+          4
+        ],
+        [
+          6,
+          2
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      3,
+      7
+    ],
+    [
+      5,
+      1
+    ]
+  ],
+  "testOutput": [
+    [
+      7,
+      3
+    ],
+    [
+      1,
+      5
+    ]
+  ],
+  "hints": [
+    "Think of the grid as being reflected in a mirror placed to the right side.",
+    "The first column becomes the last column, the second becomes the second-to-last, and so on.",
+    "The black square (⬛) reflects just like any other cell value."
+  ],
+  "transformationType": "horizontal_reflection",
+  "generated": true
+}

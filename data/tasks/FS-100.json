@@ -1,0 +1,129 @@
+{
+  "id": "FS-100",
+  "title": "propellant mixture Rotation Analysis",
+  "description": "The communications array got stuck trying to rotate antenna positioning data 90 degrees. Instead of simply turning the coordinate map, it began physically rotating the entire 50-ton antenna assembly, creating a slow-motion disaster as cables twisted into knots. 90-degree rotations combine spatial reasoning with coordinate transformation. AI must understand how positions change in 2D space while maintaining object relationships - a complex geometric abstraction that requires true spatial intelligence. Analyze the propellant mixture by rotating the input grid 90 degrees clockwise 🔁.",
+  "category": "⚡ Fuel Systems",
+  "difficulty": "Intermediate",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 325,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [
+        [
+          3,
+          7,
+          4
+        ],
+        [
+          3,
+          9,
+          3
+        ],
+        [
+          0,
+          2,
+          9
+        ]
+      ],
+      "output": [
+        [
+          0,
+          3,
+          3
+        ],
+        [
+          2,
+          9,
+          7
+        ],
+        [
+          9,
+          3,
+          4
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          8,
+          0,
+          6
+        ],
+        [
+          8,
+          8,
+          1
+        ],
+        [
+          2,
+          1,
+          1
+        ]
+      ],
+      "output": [
+        [
+          2,
+          8,
+          8
+        ],
+        [
+          1,
+          8,
+          0
+        ],
+        [
+          1,
+          1,
+          6
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      6,
+      0,
+      0
+    ],
+    [
+      6,
+      4,
+      1
+    ],
+    [
+      0,
+      3,
+      9
+    ]
+  ],
+  "testOutput": [
+    [
+      0,
+      6,
+      6
+    ],
+    [
+      3,
+      4,
+      0
+    ],
+    [
+      9,
+      1,
+      0
+    ]
+  ],
+  "hints": [
+    "When you turn a picture sideways, you just know what it looks like. But computers have to figure out where every single dot should move when you spin something. It's like doing a puzzle where every piece changes places.",
+    "Think about when you turn your head to look at something sideways. You don't have to think about it - you just do it. But a computer is like someone who has to carefully move every toy in your room to new spots just to see what it looks like from a different angle.",
+    "It's like playing with a kaleidoscope. When you turn it, all the pretty colors move to new places, but you can still see it's the same pattern. A computer would have to track where each tiny piece of color went and calculate its new home.",
+    "Rotate the entire grid 90 degrees clockwise (¼ turn to the right).",
+    "The top row becomes the rightmost column, reading from top to bottom.",
+    "Each column in the original becomes a row in the result, with order reversed."
+  ],
+  "generated": true
+}

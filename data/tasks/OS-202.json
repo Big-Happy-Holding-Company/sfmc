@@ -1,10 +1,10 @@
 {
-  "id": "OS-200",
+  "id": "OS-202",
   "title": "Primary Diagonal Reflection Task",
   "description": "Reflect the grid across the primary diagonal (top-left to bottom-right)",
   "category": "🛡️ O₂ Sensor Check",
-  "difficulty": "Basic",
-  "gridSize": 2,
+  "difficulty": "Intermediate",
+  "gridSize": 3,
   "timeLimit": null,
   "basePoints": 100,
   "requiredRankLevel": 1,
@@ -13,66 +13,108 @@
     {
       "input": [
         [
+          5,
           4,
-          3
+          6
         ],
         [
-          1,
-          9
+          3,
+          2,
+          5
+        ],
+        [
+          5,
+          5,
+          8
         ]
       ],
       "output": [
         [
-          9,
-          3
+          1,
+          8,
+          9
         ],
         [
-          7,
-          5
+          4,
+          0,
+          6
+        ],
+        [
+          9,
+          2,
+          7
         ]
       ]
     },
     {
       "input": [
         [
-          3,
-          8
+          8,
+          0,
+          7
         ],
         [
-          7,
-          9
+          4,
+          8,
+          4
+        ],
+        [
+          6,
+          9,
+          8
         ]
       ],
       "output": [
         [
-          1,
+          8,
+          6,
           6
         ],
         [
-          1,
-          8
+          2,
+          7,
+          5
+        ],
+        [
+          9,
+          0,
+          0
         ]
       ]
     }
   ],
   "testInput": [
     [
-      5,
-      6
+      8,
+      0,
+      9
     ],
     [
-      1,
-      0
+      4,
+      4,
+      7
+    ],
+    [
+      7,
+      5,
+      6
     ]
   ],
   "testOutput": [
     [
-      5,
-      1
+      8,
+      4,
+      7
     ],
     [
-      6,
-      0
+      0,
+      4,
+      5
+    ],
+    [
+      9,
+      7,
+      6
     ]
   ],
   "hints": [

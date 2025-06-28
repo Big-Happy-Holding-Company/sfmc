@@ -1,0 +1,127 @@
+{
+  "id": "PWR-233",
+  "title": "Secondary Diagonal Reflection Task",
+  "description": "Reflect the grid across the secondary diagonal (top-right to bottom-left)",
+  "category": "⚡ Power Systems",
+  "difficulty": "Intermediate",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 100,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [
+        [
+          8,
+          4,
+          2
+        ],
+        [
+          1,
+          5,
+          5
+        ],
+        [
+          2,
+          3,
+          3
+        ]
+      ],
+      "output": [
+        [
+          5,
+          6,
+          8
+        ],
+        [
+          2,
+          1,
+          1
+        ],
+        [
+          9,
+          1,
+          1
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          8,
+          4,
+          2
+        ],
+        [
+          3,
+          5,
+          1
+        ],
+        [
+          5,
+          9,
+          6
+        ]
+      ],
+      "output": [
+        [
+          9,
+          6,
+          3
+        ],
+        [
+          8,
+          3,
+          1
+        ],
+        [
+          2,
+          3,
+          0
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      8,
+      2,
+      4
+    ],
+    [
+      6,
+      6,
+      2
+    ],
+    [
+      9,
+      7,
+      2
+    ]
+  ],
+  "testOutput": [
+    [
+      2,
+      2,
+      4
+    ],
+    [
+      7,
+      6,
+      2
+    ],
+    [
+      9,
+      6,
+      8
+    ]
+  ],
+  "hints": [
+    "Imagine a line going from the top-right corner to the bottom-left corner of the grid ↙️. Flip the grid over this line.",
+    "The top-left corner will swap with the bottom-right corner, like a different kind of mirror.",
+    "Think of this as \"flipping the grid upside down\" and then \"flipping it left to right\" all at once."
+  ],
+  "transformationType": "secondary_diagonal_reflection",
+  "generated": true
+}

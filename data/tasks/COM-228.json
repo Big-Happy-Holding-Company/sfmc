@@ -1,0 +1,181 @@
+{
+  "id": "COM-228",
+  "title": "Primary Diagonal Reflection Task",
+  "description": "Reflect the grid across the primary diagonal (top-left to bottom-right)",
+  "category": "📡 Communications",
+  "difficulty": "Advanced",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 100,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [
+          8,
+          5,
+          5,
+          4
+        ],
+        [
+          7,
+          3,
+          1,
+          9
+        ],
+        [
+          1,
+          9,
+          1,
+          0
+        ],
+        [
+          5,
+          4,
+          4,
+          0
+        ]
+      ],
+      "output": [
+        [
+          8,
+          8,
+          3,
+          4
+        ],
+        [
+          8,
+          0,
+          4,
+          2
+        ],
+        [
+          3,
+          9,
+          3,
+          2
+        ],
+        [
+          3,
+          6,
+          9,
+          5
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          7,
+          6,
+          7,
+          3
+        ],
+        [
+          8,
+          4,
+          4,
+          7
+        ],
+        [
+          2,
+          4,
+          2,
+          5
+        ],
+        [
+          3,
+          5,
+          4,
+          3
+        ]
+      ],
+      "output": [
+        [
+          1,
+          2,
+          8,
+          8
+        ],
+        [
+          1,
+          7,
+          9,
+          4
+        ],
+        [
+          4,
+          2,
+          0,
+          8
+        ],
+        [
+          6,
+          9,
+          3,
+          9
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      3,
+      6,
+      6,
+      8
+    ],
+    [
+      8,
+      7,
+      3,
+      9
+    ],
+    [
+      8,
+      7,
+      8,
+      2
+    ],
+    [
+      8,
+      0,
+      2,
+      8
+    ]
+  ],
+  "testOutput": [
+    [
+      3,
+      8,
+      8,
+      8
+    ],
+    [
+      6,
+      7,
+      7,
+      0
+    ],
+    [
+      6,
+      3,
+      8,
+      2
+    ],
+    [
+      8,
+      9,
+      2,
+      8
+    ]
+  ],
+  "hints": [
+    "Imagine a line going from the top-left corner to the bottom-right corner of the grid ↘️. Flip the grid over this line.",
+    "This is like swapping rows and columns - the first row becomes the first column, the second row becomes the second column, and so on.",
+    "The number in the top-right corner will move to the bottom-left corner, like looking at the grid in a mirror along the diagonal."
+  ],
+  "transformationType": "primary_diagonal_reflection",
+  "generated": true
+}

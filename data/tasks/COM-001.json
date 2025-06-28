@@ -1,0 +1,128 @@
+{
+  "id": "COM-001",
+  "title": "Signal Relay Reflection",
+  "description": "The Tesla Corporation's quantum nav computer kept trying to calculate mirror reflections by asking 'Which pixel goes where?' for every single cell. It processed 847 calculations just to flip a 2x2 grid, while Rick the Intern figured it out by glancing at it. AI struggles with spatial reasoning and mirror symmetry because it processes data sequentially rather than understanding 2D spatial relationships. Unlike humans who instantly recognize left-right flips, AI must learn complex coordinate transformations. Analyze communication relay indicators by reflecting the grid horizontally.",
+  "category": "📡 Communications",
+  "difficulty": "Basic",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 4020,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          3,
+          0,
+          0
+        ],
+        [
+          4,
+          5,
+          0
+        ]
+      ],
+      "output": [
+        [
+          2,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          3
+        ],
+        [
+          0,
+          5,
+          4
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          0,
+          6,
+          0
+        ],
+        [
+          7,
+          0,
+          8
+        ],
+        [
+          0,
+          9,
+          0
+        ]
+      ],
+      "output": [
+        [
+          0,
+          6,
+          0
+        ],
+        [
+          8,
+          0,
+          7
+        ],
+        [
+          0,
+          9,
+          0
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      0,
+      1,
+      2
+    ],
+    [
+      0,
+      3,
+      0
+    ],
+    [
+      4,
+      0,
+      5
+    ]
+  ],
+  "testOutput": [
+    [
+      2,
+      1,
+      0
+    ],
+    [
+      0,
+      3,
+      0
+    ],
+    [
+      5,
+      0,
+      4
+    ]
+  ],
+  "hints": [
+    "Computers don't understand mirrors like you do. When you look in a bathroom mirror, you know your left hand looks like it's on the right side. But computers have to think really hard about where each tiny square should move to make a mirror image.",
+    "It's like when you write your name on paper and then try to read it by holding it up to a window backwards. You can figure it out easily, but a computer would have to think about where each letter should go one by one.",
+    "Imagine you're playing with building blocks and someone asks you to build the exact same tower but with everything flipped around. You'd just look at it and know what to do, but a computer would count every single block and calculate where it should move.",
+    "Flip the grid left-to-right.",
+    "First column becomes last column, second stays in middle (for 3×3).",
+    "⬛ cells flip along with all other values."
+  ]
+}

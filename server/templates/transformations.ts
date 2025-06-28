@@ -165,6 +165,38 @@ export const TRANSFORMATION_TEMPLATES: TransformationTemplate[] = [
       "Each row in the original becomes a column in the result, with order shifted accordingly."
     ],
     difficulty: "Intermediate"
+  },
+  
+  // 6. Primary diagonal reflection (geometric)
+  {
+    type: "primary_diagonal_reflection",
+    name: "Primary Diagonal Reflection",
+    category: "geometric",
+    titlePattern: "{context} Diagonal Analysis",
+    descriptionPattern: "Analyze the {domain} by reflecting the input grid across the primary diagonal (top-left to bottom-right).",
+    gridGenerator: "PrimaryDiagonalReflectionGenerator",
+    hintPatterns: [
+      "Imagine a line going from the top-left corner to the bottom-right corner of the grid ↘️. Flip the grid over this line.",
+      "This is like swapping rows and columns - the first row becomes the first column, the second row becomes the second column, and so on.",
+      "The number in the top-right corner will move to the bottom-left corner, like looking at the grid in a mirror along the diagonal."
+    ],
+    difficulty: "Intermediate"
+  },
+  
+  // 7. Secondary diagonal reflection (geometric)
+  {
+    type: "secondary_diagonal_reflection",
+    name: "Secondary Diagonal Reflection",
+    category: "geometric",
+    titlePattern: "{context} Diagonal Mirror Analysis",
+    descriptionPattern: "Analyze the {domain} by reflecting the input grid across the secondary diagonal (top-right to bottom-left).",
+    gridGenerator: "SecondaryDiagonalReflectionGenerator",
+    hintPatterns: [
+      "Imagine a line going from the top-right corner to the bottom-left corner of the grid ↙️. Flip the grid over this line.",
+      "The top-left corner will swap with the bottom-right corner, like a different kind of mirror.",
+      "Think of this as 'flipping the grid upside down' and then 'flipping it left to right' all at once."
+    ],
+    difficulty: "Advanced"
   }
 ];
 

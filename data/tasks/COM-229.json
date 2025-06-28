@@ -1,0 +1,181 @@
+{
+  "id": "COM-229",
+  "title": "Secondary Diagonal Reflection Task",
+  "description": "Reflect the grid across the secondary diagonal (top-right to bottom-left)",
+  "category": "📡 Communications",
+  "difficulty": "Advanced",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 100,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [
+          2,
+          5,
+          1,
+          4
+        ],
+        [
+          0,
+          4,
+          8,
+          6
+        ],
+        [
+          1,
+          2,
+          9,
+          7
+        ],
+        [
+          9,
+          6,
+          7,
+          3
+        ]
+      ],
+      "output": [
+        [
+          6,
+          5,
+          5,
+          3
+        ],
+        [
+          7,
+          7,
+          4,
+          0
+        ],
+        [
+          3,
+          1,
+          6,
+          3
+        ],
+        [
+          3,
+          1,
+          5,
+          6
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          2,
+          7,
+          9,
+          4
+        ],
+        [
+          4,
+          8,
+          0,
+          7
+        ],
+        [
+          1,
+          0,
+          1,
+          0
+        ],
+        [
+          2,
+          5,
+          3,
+          5
+        ]
+      ],
+      "output": [
+        [
+          2,
+          4,
+          5,
+          9
+        ],
+        [
+          3,
+          8,
+          7,
+          0
+        ],
+        [
+          7,
+          3,
+          0,
+          4
+        ],
+        [
+          4,
+          2,
+          0,
+          4
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      8,
+      4,
+      7,
+      2
+    ],
+    [
+      9,
+      3,
+      5,
+      9
+    ],
+    [
+      5,
+      5,
+      8,
+      0
+    ],
+    [
+      9,
+      7,
+      1,
+      8
+    ]
+  ],
+  "testOutput": [
+    [
+      8,
+      0,
+      9,
+      2
+    ],
+    [
+      1,
+      8,
+      5,
+      7
+    ],
+    [
+      7,
+      5,
+      3,
+      4
+    ],
+    [
+      9,
+      5,
+      9,
+      8
+    ]
+  ],
+  "hints": [
+    "Imagine a line going from the top-right corner to the bottom-left corner of the grid ↙️. Flip the grid over this line.",
+    "The top-left corner will swap with the bottom-right corner, like a different kind of mirror.",
+    "Think of this as \"flipping the grid upside down\" and then \"flipping it left to right\" all at once."
+  ],
+  "transformationType": "secondary_diagonal_reflection",
+  "generated": true
+}

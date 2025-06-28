@@ -1,0 +1,53 @@
+{
+  "id": "SEC-001",
+  "title": "Security Grid Pattern Lock",
+  "description": "The doors are stuck because the ship’s super-smart AI is overthinking the grid pattern—running a million fancy rules instead of spotting the easy answer you see right away. Look at the mess the AI made in the output grid in example 2! We can't trust the AI for this one, so we need you to fix it so the doors slide open! Often, quick human intuition beats tangled robot 🤖 logic.",
+  "category": "🔐 Security Systems",
+  "difficulty": "Basic",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 3180,
+  "requiredRankLevel": 1,
+  "emojiSet": "status_alerts",
+  "examples": [
+    {
+      "input": [
+        ["1", "2", "1"],
+        ["2", "0", "2"],
+        ["1", "2", "1"]
+      ],
+      "output": [
+        ["1", "2", "1"],
+        ["2", "1", "2"],
+        ["1", "2", "1"]
+      ]
+    },
+    {
+      "input": [
+        ["3", "4", "3"],
+        ["4", "0", "4"],
+        ["3", "4", "3"]
+      ],
+      "output": [
+        ["🤪", "🦄", "🚦"],
+        ["🎡", "🍕", "☀"],
+        ["✖", "🤖", "🤪"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["9", "8", "9"],
+    ["8", "0", "8"],
+    ["9", "8", "9"]
+  ],
+  "testOutput": [
+    ["9", "8", "9"],
+    ["8", "9", "8"],
+    ["9", "8", "9"]
+  ],
+  "hints": [
+    "The center cell should match the corner pattern.",
+    "Look at the alternating symbol pattern around the edges.",
+    "The missing center takes the symbol that appears in the corners."
+  ]
+}
