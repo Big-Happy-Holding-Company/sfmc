@@ -1,0 +1,85 @@
+{
+  "id": "COM-225",
+  "title": "Secondary Diagonal Reflection Task",
+  "description": "Reflect the grid across the secondary diagonal (top-right to bottom-left)",
+  "category": "📡 Communications",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 100,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [
+          2,
+          3
+        ],
+        [
+          4,
+          9
+        ]
+      ],
+      "output": [
+        [
+          7,
+          3
+        ],
+        [
+          3,
+          2
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          9,
+          1
+        ],
+        [
+          9,
+          5
+        ]
+      ],
+      "output": [
+        [
+          5,
+          1
+        ],
+        [
+          7,
+          1
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      1,
+      9
+    ],
+    [
+      2,
+      3
+    ]
+  ],
+  "testOutput": [
+    [
+      3,
+      9
+    ],
+    [
+      2,
+      1
+    ]
+  ],
+  "hints": [
+    "Imagine a line going from the top-right corner to the bottom-left corner of the grid ↙️. Flip the grid over this line.",
+    "The top-left corner will swap with the bottom-right corner, like a different kind of mirror.",
+    "Think of this as \"flipping the grid upside down\" and then \"flipping it left to right\" all at once."
+  ],
+  "transformationType": "secondary_diagonal_reflection",
+  "generated": true
+}

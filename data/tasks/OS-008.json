@@ -1,0 +1,53 @@
+{
+  "id": "OS-008",
+  "title": "Advanced Sensor Wave Propagation",
+  "description": "Complex oxygen sensor networks require wave propagation analysis. Signals emanate from center point in expanding wave patterns.",
+  "category": "🛡️ O₂ Sensor Check",
+  "difficulty": "Officer (Expert)",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 21180,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        ["0", "0", "0"],
+        ["0", "1", "0"],
+        ["0", "0", "0"]
+      ],
+      "output": [
+        ["1", "1", "1"],
+        ["1", "1", "1"],
+        ["1", "1", "1"]
+      ]
+    },
+    {
+      "input": [
+        ["0", "0", "0"],
+        ["0", "2", "0"],
+        ["0", "0", "0"]
+      ],
+      "output": [
+        ["2", "2", "2"],
+        ["2", "2", "2"],
+        ["2", "2", "2"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["0", "0", "0"],
+    ["0", "3", "0"],
+    ["0", "0", "0"]
+  ],
+  "testOutput": [
+    ["3", "3", "3"],
+    ["3", "3", "3"],
+    ["3", "3", "3"]
+  ],
+  "hints": [
+    "The center signal propagates to fill the entire grid.",
+    "All ⬛ spaces adopt the center element's properties.",
+    "Wave expansion covers the complete sensor array uniformly."
+  ]
+}

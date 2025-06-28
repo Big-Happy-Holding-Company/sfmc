@@ -1,78 +1,120 @@
 {
-  "id": "OS-200",
+  "id": "NAV-220",
   "title": "Primary Diagonal Reflection Task",
   "description": "Reflect the grid across the primary diagonal (top-left to bottom-right)",
-  "category": "🛡️ O₂ Sensor Check",
-  "difficulty": "Basic",
-  "gridSize": 2,
+  "category": "🧭 Navigation",
+  "difficulty": "Intermediate",
+  "gridSize": 3,
   "timeLimit": null,
   "basePoints": 100,
   "requiredRankLevel": 1,
-  "emojiSet": "tech_set2",
+  "emojiSet": "weather_climate",
   "examples": [
     {
       "input": [
         [
-          4,
-          3
+          1,
+          5,
+          6
         ],
         [
-          1,
+          2,
+          0,
+          4
+        ],
+        [
+          7,
+          2,
           9
         ]
       ],
       "output": [
         [
-          9,
-          3
+          1,
+          0,
+          5
         ],
         [
+          3,
+          8,
+          8
+        ],
+        [
+          6,
           7,
-          5
+          2
         ]
       ]
     },
     {
       "input": [
         [
-          3,
-          8
+          8,
+          0,
+          4
         ],
         [
-          7,
+          0,
+          5,
+          7
+        ],
+        [
+          5,
+          4,
           9
         ]
       ],
       "output": [
         [
-          1,
-          6
+          8,
+          9,
+          2
         ],
         [
-          1,
-          8
+          9,
+          4,
+          5
+        ],
+        [
+          7,
+          9,
+          6
         ]
       ]
     }
   ],
   "testInput": [
     [
-      5,
-      6
+      8,
+      8,
+      3
     ],
     [
-      1,
-      0
+      8,
+      0,
+      2
+    ],
+    [
+      3,
+      3,
+      7
     ]
   ],
   "testOutput": [
     [
-      5,
-      1
+      8,
+      8,
+      3
     ],
     [
-      6,
-      0
+      8,
+      0,
+      3
+    ],
+    [
+      3,
+      2,
+      7
     ]
   ],
   "hints": [

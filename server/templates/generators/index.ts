@@ -21,6 +21,8 @@ import { Rotation90DegGenerator } from './rotation90-deg-generator';
 import { PatternCompletionGenerator } from './pattern-completion-generator';
 import { VerticalReflectionGenerator } from './vertical-reflection-generator';
 import { Rotation270DegGenerator } from './rotation270-deg-generator';
+import { PrimaryDiagonalReflectionGenerator } from './primary-diagonal-reflection-generator';
+import { SecondaryDiagonalReflectionGenerator } from './secondary-diagonal-reflection-generator';
 
 // Export generator implementations
 export {
@@ -28,7 +30,9 @@ export {
   Rotation90DegGenerator,
   PatternCompletionGenerator,
   VerticalReflectionGenerator,
-  Rotation270DegGenerator
+  Rotation270DegGenerator,
+  PrimaryDiagonalReflectionGenerator,
+  SecondaryDiagonalReflectionGenerator
 };
 
 // Register all generators with the registry
@@ -39,4 +43,6 @@ registerGridGenerator('Rotation90DegGenerator', Rotation90DegGenerator);
 registerGridGenerator('PatternCompletionGenerator', PatternCompletionGenerator);
 registerGridGenerator('VerticalReflectionGenerator', VerticalReflectionGenerator);
 registerGridGenerator('Rotation270DegGenerator', Rotation270DegGenerator);
+registerGridGenerator('PrimaryDiagonalReflectionGenerator', PrimaryDiagonalReflectionGenerator);
+registerGridGenerator('SecondaryDiagonalReflectionGenerator', SecondaryDiagonalReflectionGenerator);
 

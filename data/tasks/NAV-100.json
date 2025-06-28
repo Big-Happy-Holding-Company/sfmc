@@ -1,0 +1,183 @@
+{
+  "id": "NAV-100",
+  "title": "course plotting Rotation Analysis",
+  "description": "The communications array got stuck trying to rotate antenna positioning data 90 degrees. Instead of simply turning the coordinate map, it began physically rotating the entire 50-ton antenna assembly, creating a slow-motion disaster as cables twisted into knots. 90-degree rotations combine spatial reasoning with coordinate transformation. AI must understand how positions change in 2D space while maintaining object relationships - a complex geometric abstraction that requires true spatial intelligence. Analyze the course plotting by rotating the input grid 90 degrees clockwise 🔁.",
+  "category": "🧭 Navigation",
+  "difficulty": "Intermediate",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 11350,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [
+          6,
+          2,
+          6,
+          2
+        ],
+        [
+          0,
+          1,
+          0,
+          0
+        ],
+        [
+          3,
+          6,
+          3,
+          2
+        ],
+        [
+          3,
+          7,
+          6,
+          6
+        ]
+      ],
+      "output": [
+        [
+          3,
+          3,
+          0,
+          6
+        ],
+        [
+          7,
+          6,
+          1,
+          2
+        ],
+        [
+          6,
+          3,
+          0,
+          6
+        ],
+        [
+          6,
+          2,
+          0,
+          2
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          4,
+          8,
+          6,
+          6
+        ],
+        [
+          4,
+          1,
+          3,
+          4
+        ],
+        [
+          5,
+          9,
+          8,
+          1
+        ],
+        [
+          2,
+          7,
+          4,
+          4
+        ]
+      ],
+      "output": [
+        [
+          2,
+          5,
+          4,
+          4
+        ],
+        [
+          7,
+          9,
+          1,
+          8
+        ],
+        [
+          4,
+          8,
+          3,
+          6
+        ],
+        [
+          4,
+          1,
+          4,
+          6
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      2,
+      3,
+      8,
+      8
+    ],
+    [
+      8,
+      2,
+      3,
+      5
+    ],
+    [
+      2,
+      1,
+      5,
+      2
+    ],
+    [
+      6,
+      6,
+      3,
+      9
+    ]
+  ],
+  "testOutput": [
+    [
+      6,
+      2,
+      8,
+      2
+    ],
+    [
+      6,
+      1,
+      2,
+      3
+    ],
+    [
+      3,
+      5,
+      3,
+      8
+    ],
+    [
+      9,
+      2,
+      5,
+      8
+    ]
+  ],
+  "hints": [
+    "When you turn a picture sideways, you just know what it looks like. But computers have to figure out where every single dot should move when you spin something. It's like doing a puzzle where every piece changes places.",
+    "Think about when you turn your head to look at something sideways. You don't have to think about it - you just do it. But a computer is like someone who has to carefully move every toy in your room to new spots just to see what it looks like from a different angle.",
+    "It's like playing with a kaleidoscope. When you turn it, all the pretty colors move to new places, but you can still see it's the same pattern. A computer would have to track where each tiny piece of color went and calculate its new home.",
+    "Rotate the entire grid 90 degrees clockwise 🔁 (¼ turn to the right).",
+    "The top row becomes the rightmost column, reading from top to bottom.",
+    "Each column in the original becomes a row in the result, with order reversed."
+  ],
+  "generated": true
+}

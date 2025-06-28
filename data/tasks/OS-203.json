@@ -1,0 +1,127 @@
+{
+  "id": "OS-203",
+  "title": "Secondary Diagonal Reflection Task",
+  "description": "Reflect the grid across the secondary diagonal (top-right to bottom-left)",
+  "category": "🛡️ O₂ Sensor Check",
+  "difficulty": "Intermediate",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 100,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [
+          9,
+          0,
+          1
+        ],
+        [
+          2,
+          6,
+          6
+        ],
+        [
+          8,
+          9,
+          5
+        ]
+      ],
+      "output": [
+        [
+          1,
+          7,
+          8
+        ],
+        [
+          6,
+          7,
+          8
+        ],
+        [
+          1,
+          4,
+          2
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          9,
+          5,
+          1
+        ],
+        [
+          5,
+          8,
+          1
+        ],
+        [
+          4,
+          1,
+          9
+        ]
+      ],
+      "output": [
+        [
+          3,
+          9,
+          0
+        ],
+        [
+          6,
+          9,
+          2
+        ],
+        [
+          5,
+          6,
+          6
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      3,
+      5,
+      7
+    ],
+    [
+      3,
+      2,
+      7
+    ],
+    [
+      3,
+      0,
+      6
+    ]
+  ],
+  "testOutput": [
+    [
+      6,
+      7,
+      7
+    ],
+    [
+      0,
+      2,
+      5
+    ],
+    [
+      3,
+      3,
+      3
+    ]
+  ],
+  "hints": [
+    "Imagine a line going from the top-right corner to the bottom-left corner of the grid ↙️. Flip the grid over this line.",
+    "The top-left corner will swap with the bottom-right corner, like a different kind of mirror.",
+    "Think of this as \"flipping the grid upside down\" and then \"flipping it left to right\" all at once."
+  ],
+  "transformationType": "secondary_diagonal_reflection",
+  "generated": true
+}
