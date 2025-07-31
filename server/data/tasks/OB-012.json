@@ -1,0 +1,49 @@
+{
+  "id": "OB-012",
+  "title": "Gravity Generator Test",
+  "description": "Test the gravity generator by performing a 180-degree rotation (H+V reflection) of the control matrix.",
+  "category": "⚙️ Onboard Systems",
+  "difficulty": "Intermediate",
+  "gridSize": 5,
+  "timeLimit": null,
+  "basePoints": 2500,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [1, 2, 3, 4, 5],
+        [6, 7, 8, 9, 0],
+        [1, 1, 2, 2, 3],
+        [4, 4, 5, 5, 6],
+        [7, 7, 8, 8, 9]
+      ],
+      "output": [
+        [9, 8, 8, 7, 7],
+        [6, 5, 5, 4, 4],
+        [3, 2, 2, 1, 1],
+        [0, 9, 8, 7, 6],
+        [5, 4, 3, 2, 1]
+      ]
+    }
+  ],
+  "testInput": [
+    [1, 0, 1, 0, 1],
+    [0, 2, 0, 2, 0],
+    [3, 0, 3, 0, 3],
+    [0, 4, 0, 4, 0],
+    [5, 0, 5, 0, 5]
+  ],
+  "testOutput": [
+    [5, 0, 5, 0, 5],
+    [0, 4, 0, 4, 0],
+    [3, 0, 3, 0, 3],
+    [0, 2, 0, 2, 0],
+    [1, 0, 1, 0, 1]
+  ],
+  "hints": [
+    "Reflect the grid both horizontally and vertically.",
+    "This is the same as rotating the grid 180 degrees.",
+    "The value at [row, col] moves to [gridSize - 1 - row, gridSize - 1 - col]."
+  ]
+}

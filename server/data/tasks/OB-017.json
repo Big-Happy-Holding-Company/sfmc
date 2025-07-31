@@ -1,0 +1,21 @@
+{
+  "id": "OB-017",
+  "title": "Asteroid Surface Mapping",
+  "description": "Rotate the grid 90 degrees clockwise as the probe orbits to track surface features.",
+  "category": "⚙️ Onboard Systems",
+  "difficulty": "Intermediate",
+  "gridSize": 5,
+  "timeLimit": null,
+  "basePoints": 3000,
+  "requiredRankLevel": 2,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [[1,0,0,0,0], [0,1,0,0,0], [0,0,1,0,0], [0,0,0,1,0], [0,0,0,0,1]],
+      "output": [[0,0,0,0,1], [0,0,0,1,0], [0,0,1,0,0], [0,1,0,0,0], [1,0,0,0,0]]
+    }
+  ],
+  "testInput": [[1,0,0,0,0], [0,1,0,0,0], [0,0,1,0,0], [0,0,0,1,0], [0,0,0,0,1]],
+  "testOutput": [[0,0,0,0,1], [0,0,0,1,0], [0,0,1,0,0], [0,1,0,0,0], [1,0,0,0,0]],
+  "hints": ["Rotate 90 degrees clockwise.", "Top row becomes right column.", "Value at [row, col] moves to [col, gridSize - 1 - row]."]
+}

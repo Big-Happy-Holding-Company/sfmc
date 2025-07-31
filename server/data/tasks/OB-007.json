@@ -1,0 +1,45 @@
+{
+  "id": "OB-007",
+  "title": "Cargo Bay Loading",
+  "description": "Load the cargo bay by vertically reflecting the item placement. This ensures the load is balanced from top to bottom.",
+  "category": "⚙️ Onboard Systems",
+  "difficulty": "Basic",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 2000,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [1, 2, 3, 4],
+        [5, 6, 7, 8],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0]
+      ],
+      "output": [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [5, 6, 7, 8],
+        [1, 2, 3, 4]
+      ]
+    }
+  ],
+  "testInput": [
+    [1, 2, 3, 4],
+    [5, 6, 7, 8],
+    [9, 0, 1, 2],
+    [3, 4, 5, 6]
+  ],
+  "testOutput": [
+    [3, 4, 5, 6],
+    [9, 0, 1, 2],
+    [5, 6, 7, 8],
+    [1, 2, 3, 4]
+  ],
+  "hints": [
+    "Reflect the grid vertically (top ↔ bottom).",
+    "The first row swaps with the fourth, and the second row swaps with the third.",
+    "Imagine flipping the grid upside down."
+  ]
+}

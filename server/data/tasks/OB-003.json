@@ -1,0 +1,45 @@
+{
+  "id": "OB-003",
+  "title": "Satellite Dish Calibration",
+  "description": "Calibrate the satellite dish by ensuring its receiver elements are a perfect horizontal mirror image. This guarantees optimal signal reception.",
+  "category": "⚙️ Onboard Systems",
+  "difficulty": "Basic",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 2000,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [1, 2, 0, 0],
+        [3, 4, 0, 0],
+        [0, 0, 5, 6],
+        [0, 0, 7, 8]
+      ],
+      "output": [
+        [0, 0, 2, 1],
+        [0, 0, 4, 3],
+        [6, 5, 0, 0],
+        [8, 7, 0, 0]
+      ]
+    }
+  ],
+  "testInput": [
+    [1, 2, 3, 4],
+    [5, 6, 7, 8],
+    [9, 0, 1, 2],
+    [3, 4, 5, 6]
+  ],
+  "testOutput": [
+    [4, 3, 2, 1],
+    [8, 7, 6, 5],
+    [2, 1, 0, 9],
+    [6, 5, 4, 3]
+  ],
+  "hints": [
+    "Reflect the grid horizontally (left ↔ right).",
+    "The first column swaps with the fourth, and the second column swaps with the third.",
+    "Each row's elements are reversed."
+  ]
+}

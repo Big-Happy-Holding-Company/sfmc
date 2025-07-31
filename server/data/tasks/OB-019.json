@@ -1,0 +1,21 @@
+{
+  "id": "OB-019",
+  "title": "Emergency Beacon Patterns",
+  "description": "Rotate the signal patterns 270 degrees clockwise for omnidirectional emergency beacon coverage.",
+  "category": "⚙️ Onboard Systems",
+  "difficulty": "Intermediate",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 3000,
+  "requiredRankLevel": 2,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [[1, 0], [0, 1]],
+      "output": [[0, 1], [1, 0]]
+    }
+  ],
+  "testInput": [[1, 0], [0, 1]],
+  "testOutput": [[0, 1], [1, 0]],
+  "hints": ["Rotate 270 degrees clockwise.", "Equivalent to 90-degree counter-clockwise rotation.", "Value at [row, col] moves to [gridSize - 1 - col, row]."]
+}

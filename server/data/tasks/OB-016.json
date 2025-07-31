@@ -1,0 +1,21 @@
+{
+  "id": "OB-016",
+  "title": "Navigation Display Rotation",
+  "description": "Rotate the navigation display 90 degrees clockwise as the spacecraft orientation changes to maintain correct readings.",
+  "category": "⚙️ Onboard Systems",
+  "difficulty": "Intermediate",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 3000,
+  "requiredRankLevel": 2,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [[1, 2], [3, 4]],
+      "output": [[3, 1], [4, 2]]
+    }
+  ],
+  "testInput": [[1, 2], [3, 4]],
+  "testOutput": [[3, 1], [4, 2]],
+  "hints": ["Rotate the grid 90 degrees clockwise.", "The top row becomes the right column.", "The value at [row, col] moves to [col, gridSize - 1 - row]."]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "OB-008",
+  "title": "Navigation System Alignment",
+  "description": "Align the navigation system sensors by vertically reflecting their configuration. This ensures accurate star tracking.",
+  "category": "⚙️ Onboard Systems",
+  "difficulty": "Basic",
+  "gridSize": 5,
+  "timeLimit": null,
+  "basePoints": 2000,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [1, 2, 3, 4, 5],
+        [6, 7, 8, 9, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0]
+      ],
+      "output": [
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0],
+        [6, 7, 8, 9, 0],
+        [1, 2, 3, 4, 5]
+      ]
+    }
+  ],
+  "testInput": [
+    [1, 2, 3, 4, 5],
+    [6, 7, 8, 9, 0],
+    [1, 1, 2, 2, 3],
+    [4, 4, 5, 5, 6],
+    [7, 7, 8, 8, 9]
+  ],
+  "testOutput": [
+    [7, 7, 8, 8, 9],
+    [4, 4, 5, 5, 6],
+    [1, 1, 2, 2, 3],
+    [6, 7, 8, 9, 0],
+    [1, 2, 3, 4, 5]
+  ],
+  "hints": [
+    "Reflect the grid vertically (top ↔ bottom).",
+    "The first row swaps with the fifth, the second with the fourth, and the middle row stays put.",
+    "Imagine flipping the grid upside down."
+  ]
+}

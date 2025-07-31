@@ -1,0 +1,21 @@
+{
+  "id": "OB-018",
+  "title": "Cargo Bay Loading Rotation",
+  "description": "Rotate containers 90 degrees clockwise to fit through the cargo bay hatch during loading operations.",
+  "category": "⚙️ Onboard Systems",
+  "difficulty": "Intermediate",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 3000,
+  "requiredRankLevel": 2,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [[1,0,0], [0,1,0], [0,0,1]],
+      "output": [[0,0,1], [0,1,0], [0,0,1]]
+    }
+  ],
+  "testInput": [[1,0,0], [0,1,0], [0,0,1]],
+  "testOutput": [[0,0,1], [0,1,0], [0,0,1]],
+  "hints": ["Rotate 90 degrees clockwise.", "Top row becomes right column.", "Value at [row, col] moves to [col, gridSize - 1 - row]."]
+}

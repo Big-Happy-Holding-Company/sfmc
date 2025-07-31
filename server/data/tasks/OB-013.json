@@ -1,0 +1,47 @@
+{
+  "id": "OB-013",
+  "title": "Communication Dish Rotation",
+  "description": "Rotate the communication dish 90 degrees clockwise to track a satellite. This requires rotating the control grid accordingly.",
+  "category": "⚙️ Onboard Systems",
+  "difficulty": "Intermediate",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 3000,
+  "requiredRankLevel": 2,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [1, 2],
+        [3, 4]
+      ],
+      "output": [
+        [3, 1],
+        [4, 2]
+      ]
+    },
+    {
+      "input": [
+        [5, 0],
+        [0, 6]
+      ],
+      "output": [
+        [0, 5],
+        [6, 0]
+      ]
+    }
+  ],
+  "testInput": [
+    [7, 8],
+    [9, 0]
+  ],
+  "testOutput": [
+    [9, 7],
+    [0, 8]
+  ],
+  "hints": [
+    "Rotate the grid 90 degrees clockwise.",
+    "The top row becomes the right column.",
+    "The value at [row, col] moves to [col, gridSize - 1 - row]."
+  ]
+}

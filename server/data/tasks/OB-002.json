@@ -1,0 +1,53 @@
+{
+  "id": "OB-002",
+  "title": "Docking Port Alignment",
+  "description": "To dock successfully, the alignment pattern must be horizontally reflected. This simulates the view from inside the station versus the approaching ship.",
+  "category": "⚙️ Onboard Systems",
+  "difficulty": "Basic",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 2000,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [1, 0, 0],
+        [0, 2, 0],
+        [0, 0, 3]
+      ],
+      "output": [
+        [0, 0, 1],
+        [0, 2, 0],
+        [3, 0, 0]
+      ]
+    },
+    {
+      "input": [
+        [4, 5, 6],
+        [0, 0, 0],
+        [7, 8, 9]
+      ],
+      "output": [
+        [6, 5, 4],
+        [0, 0, 0],
+        [9, 8, 7]
+      ]
+    }
+  ],
+  "testInput": [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+  ],
+  "testOutput": [
+    [3, 2, 1],
+    [6, 5, 4],
+    [9, 8, 7]
+  ],
+  "hints": [
+    "Reflect the grid horizontally (left ↔ right).",
+    "The first column swaps with the third column, while the middle column stays in place.",
+    "Imagine a mirror placed vertically in the center of the grid."
+  ]
+}
