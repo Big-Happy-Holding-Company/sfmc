@@ -6,8 +6,8 @@
   "difficulty": "Intermediate",
   "gridSize": 5,
   "timeLimit": null,
-  "basePoints": 3000,
-  "requiredRankLevel": 2,
+  "basePoints": 2,
+  "requiredRankLevel": 1,
   "emojiSet": "tech_set2",
   "examples": [
     {

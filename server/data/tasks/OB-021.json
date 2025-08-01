@@ -1,21 +1,21 @@
 {
   "id": "OB-021",
-  "title": "Planetary Survey Patterns",
-  "description": "Rotate the grid 270 degrees clockwise to simulate systematic surface coverage during planetary surveys.",
+  "title": "Star Tracker Alignment",
+  "description": "Rotate the grid 270 degrees clockwise to align constellation patterns during spacecraft roll.",
   "category": "⚙️ Onboard Systems",
   "difficulty": "Intermediate",
   "gridSize": 4,
   "timeLimit": null,
-  "basePoints": 3000,
-  "requiredRankLevel": 2,
-  "emojiSet": "tech_set2",
+  "basePoints": 2,
+  "requiredRankLevel": 1,
+  "emojiSet": "celestial_set1",
   "examples": [
     {
-      "input": [[1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,1]],
-      "output": [[0,0,0,1], [0,0,1,0], [0,1,0,0], [1,0,0,0]]
+      "input": [[2,3,0],[5,6,7]],
+      "output": [[2,3,4],[5,6,7]]
     }
   ],
-  "testInput": [[1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,1]],
-  "testOutput": [[0,0,0,1], [0,0,1,0], [0,1,0,0], [1,0,0,0]],
-  "hints": ["Rotate 270 degrees clockwise.", "Equivalent to 90-degree counter-clockwise rotation.", "Value at [row, col] moves to [gridSize - 1 - col, row]."]
+  "testInput": [[2,3,0],[5,6,7]],
+  "testOutput": [[2,3,4],[5,6,7]],
+  "hints": ["Look for missing numbers in sequences.", "Find patterns in the grid rows."]
 }

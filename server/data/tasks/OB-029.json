@@ -1,21 +1,21 @@
 {
   "id": "OB-029",
-  "title": "Orbital Path Adjustment",
-  "description": "Rotate the grid 270 degrees clockwise to refine orbital paths for efficient fuel usage.",
+  "title": "Solar Panel Efficiency",
+  "description": "Complete the pattern to predict power output variations in solar panels throughout the mission day.",
   "category": "⚙️ Onboard Systems",
   "difficulty": "Intermediate",
-  "gridSize": 4,
+  "gridSize": 5,
   "timeLimit": null,
-  "basePoints": 3000,
-  "requiredRankLevel": 2,
+  "basePoints": 2,
+  "requiredRankLevel": 1,
   "emojiSet": "tech_set2",
   "examples": [
     {
-      "input": [[1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,1]],
-      "output": [[0,0,0,1], [0,0,1,0], [0,1,0,0], [1,0,0,0]]
+      "input": [[100,90,80,70],[60,50,40,30],[20,10,0,0],[0,0,0,0],[0,0,0,0]],
+      "output": [[100,90,80,70],[60,50,40,30],[20,10,0,10],[0,0,0,20],[0,0,0,30]]
     }
   ],
-  "testInput": [[1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,1]],
-  "testOutput": [[0,0,0,1], [0,0,1,0], [0,1,0,0], [1,0,0,0]],
-  "hints": ["Rotate 270 degrees clockwise.", "Equivalent to 90-degree counter-clockwise rotation.", "Value at [row, col] moves to [gridSize - 1 - col, row]."]
+  "testInput": [[100,90,80,70],[60,50,40,30],[20,10,0,0],[0,0,0,0],[0,0,0,0]],
+  "testOutput": [[100,90,80,70],[60,50,40,30],[20,10,0,10],[0,0,0,20],[0,0,0,30]],
+  "hints": ["Identify efficiency decay patterns.", "Look for decreasing sequences to complete the grid."]
 }

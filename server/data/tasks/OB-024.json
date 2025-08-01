@@ -1,13 +1,13 @@
 {
   "id": "OB-024",
   "title": "Landing Pad Markers",
-  "description": "Rotate the approach lights 270 degrees clockwise to adjust for different wind directions during landing.",
+  "description": "Rotate the grid 270 degrees clockwise to adjust approach light sequences for different wind directions.",
   "category": "⚙️ Onboard Systems",
   "difficulty": "Intermediate",
   "gridSize": 4,
   "timeLimit": null,
-  "basePoints": 3000,
-  "requiredRankLevel": 2,
+  "basePoints": 2,
+  "requiredRankLevel": 1,
   "emojiSet": "tech_set2",
   "examples": [
     {

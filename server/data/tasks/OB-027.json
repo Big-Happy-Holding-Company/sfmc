@@ -1,21 +1,21 @@
 {
   "id": "OB-027",
-  "title": "Radar Scan Rotation",
-  "description": "Rotate the grid 270 degrees clockwise to simulate radar scans for comprehensive threat detection.",
+  "title": "Orbit Altitude Readings",
+  "description": "Complete the pattern to predict decay in orbit altitude readings over successive passes.",
   "category": "⚙️ Onboard Systems",
   "difficulty": "Intermediate",
   "gridSize": 4,
   "timeLimit": null,
-  "basePoints": 3000,
-  "requiredRankLevel": 2,
+  "basePoints": 2,
+  "requiredRankLevel": 1,
   "emojiSet": "tech_set2",
   "examples": [
     {
-      "input": [[1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,1]],
-      "output": [[0,0,0,1], [0,0,1,0], [0,1,0,0], [1,0,0,0]]
+      "input": [[10,9,8,7],[6,5,4,3],[2,1,0,0],[0,0,0,0]],
+      "output": [[10,9,8,7],[6,5,4,3],[2,1,0,1],[0,0,0,2]]
     }
   ],
-  "testInput": [[1,0,0,0], [0,1,0,0], [0,0,1,0], [0,0,0,1]],
-  "testOutput": [[0,0,0,1], [0,0,1,0], [0,1,0,0], [1,0,0,0]],
-  "hints": ["Rotate 270 degrees clockwise.", "Equivalent to 90-degree counter-clockwise rotation.", "Value at [row, col] moves to [gridSize - 1 - col, row]."]
+  "testInput": [[10,9,8,7],[6,5,4,3],[2,1,0,0],[0,0,0,0]],
+  "testOutput": [[10,9,8,7],[6,5,4,3],[2,1,0,1],[0,0,0,2]],
+  "hints": ["Identify decay patterns in the sequence.", "Look for linear or exponential trends to complete the grid."]
 }

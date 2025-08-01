@@ -1,21 +1,21 @@
 {
   "id": "OB-026",
-  "title": "Thermal Shield Adjustment",
-  "description": "Rotate the grid 270 degrees clockwise to adjust thermal shields for varying heat exposure during re-entry.",
+  "title": "Beacon Flash Patterns",
+  "description": "Complete the pattern to predict emergency signal sequences in beacon flashes.",
   "category": "⚙️ Onboard Systems",
   "difficulty": "Intermediate",
-  "gridSize": 3,
+  "gridSize": 2,
   "timeLimit": null,
-  "basePoints": 3000,
-  "requiredRankLevel": 2,
+  "basePoints": 2,
+  "requiredRankLevel": 1,
   "emojiSet": "tech_set2",
   "examples": [
     {
-      "input": [[1,0,0], [0,1,0], [0,0,1]],
-      "output": [[0,0,1], [0,1,0], [0,0,1]]
+      "input": [[1,2],[3,0]],
+      "output": [[1,2],[3,4]]
     }
   ],
-  "testInput": [[1,0,0], [0,1,0], [0,0,1]],
-  "testOutput": [[0,0,1], [0,1,0], [0,0,1]],
-  "hints": ["Rotate 270 degrees clockwise.", "Equivalent to 90-degree counter-clockwise rotation.", "Value at [row, col] moves to [gridSize - 1 - col, row]."]
+  "testInput": [[1,2],[3,0]],
+  "testOutput": [[1,2],[3,4]],
+  "hints": ["Look for numerical sequences.", "Identify the missing number based on arithmetic progression."]
 }
