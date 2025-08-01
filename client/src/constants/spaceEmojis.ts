@@ -2,11 +2,9 @@
 // -------------------------------------------------------------
 // Every list is exactly length-10, enabling a direct mapping of
 // emoji index → ARC colour digit (0-9).  This avoids null cells
-// in our grids: colour-0 (black) is explicitly the first emoji.
+// in our grids: colour-0 (black or 'empty') is explicitly the first emoji.
 // -------------------------------------------------------------
 export const SPACE_EMOJIS = {
-  // Status - Main Set (for basic sensor and status displays) Color based and thus deprecated for this project
-  status_main: ['⬛', '🟡', '🔴', '🟠', '🔵', '🟣', '⚪', '🟢', '🟤', '🚫'],
 
   // Celestial Bodies - Set 1 (Earth and celestial bodies)
   celestial_set1: ['⬛', '🌍', '🌎', '🌏', '⭐', '🌟', '✨', '💫', '🌠', '🪐'],
@@ -20,23 +18,30 @@ export const SPACE_EMOJIS = {
   // Technology & Equipment - Set 2 (communication)
   tech_set2: ['⬛', '📡', '🛰️', '📱', '⌨️', '📶', '📋', '💻', '🎚️', '🎧'],
 
-  // Navigation & Alerts (directional and compass)
+  // Navigation & Alerts (directional and compass) - Avoid using!!
   nav_alerts: ['⬛', '⬆️', '⬇️', '⬅️', '➡️', '↗️', '↖️', '↘️', '↙️', '🧭'],
 
   // Status & Alerts (warning and safety systems)
   status_alerts: ['⬛', '✅', '❌', '⚠️', '🚨', '🦺', '🔥', '❄️', '📍', '🎯'],
 
   // Weather & Climate (atmospheric conditions)
-  weather_climate: ['⬛', '🌞', '🌝', '🌛', '🌜', '🌧️', '⛈️', '🌩️', '🌨️', '❄️']
+  weather_climate: ['⬛', '🌞', '🌝', '🌛', '🌜', '🌧️', '⛈️', '🌩️', '🌨️', '❄️'],
+
+  // Status - Human Crew and Coworkers
+  status_emojis: ['⬛', '😂', '😶', '😐', '🙄', '😴', '😵', '🤗', '🤔', '😣'],
+
+  // Status - AI and Computer Systems
+  ai_emojis: ['⬛', '🤖', '💡', '🧠', '🔗', '⚙️', '🔧', '🔄', '⚡', '🚫'],
+
+  // Vague Symbols - For the hardest tasks
+  vague_symbols: ['⬛', '♊', '💕', '💢', '🆎', '🆒', '🈚', '🛃', '💠', '☣'],
+
+  // Alien Language - For the hardest tasks
+  alien_language: ['⬛', '👽', '👤', '🪐', '🌍', '🛸', '☄️', '♥️', '⚠️'],
 } as const;
 
 // Emoji set metadata for UI display
 export const EMOJI_SET_INFO = {
-  status_main: {
-    name: 'Status Indicators',
-    description: 'Basic sensor readings and system status',
-    theme: 'Operational Status'
-  },
   celestial_set1: {
     name: 'Planetary Bodies',
     description: 'Earth variants and lunar phases',
@@ -71,6 +76,26 @@ export const EMOJI_SET_INFO = {
     name: 'Atmospheric Data',
     description: 'Weather patterns and climate conditions',
     theme: 'Environmental'
+  },
+  status_emojis: {
+    name: 'Human Crew and Coworkers',
+    description: 'Human crew and coworkers',
+    theme: 'Mission Safety'
+  },
+  ai_emojis: {
+    name: 'AI and Computer Systems',
+    description: 'AI and computer systems',
+    theme: 'Mission Safety'
+  },
+  vague_symbols: {
+    name: 'Vague Symbols',
+    description: 'Vague symbols',
+    theme: 'Officer Candidate'
+  },
+  alien_language: {
+    name: 'Alien Language',
+    description: 'Alien language',
+    theme: 'Officer Candidate'
   }
 } as const;
 
