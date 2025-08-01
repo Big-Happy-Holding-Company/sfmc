@@ -1,21 +1,32 @@
 {
   "id": "OB-023",
-  "title": "Communication Array Deployment",
-  "description": "Unfold the communication array with a 270-degree clockwise rotation sequence for counter-clockwise deployment.",
+  "title": "Communication Array Patterns",
+  "description": "Identify and complete the binary signal patterns for the communication array deployment sequence.",
   "category": "⚙️ Onboard Systems",
   "difficulty": "Intermediate",
-  "gridSize": 5,
+  "gridSize": 3,
   "timeLimit": null,
   "basePoints": 2,
   "requiredRankLevel": 1,
-  "emojiSet": "tech_set2",
+  "emojiSet": "celestial_set1",
   "examples": [
     {
-      "input": [[1,0,0,0,0], [0,1,0,0,0], [0,0,1,0,0], [0,0,0,1,0], [0,0,0,0,1]],
-      "output": [[0,0,0,0,1], [0,0,0,1,0], [0,0,1,0,0], [0,1,0,0,0], [1,0,0,0,0]]
+      "input": [[1,0,1], [0,0,1], [1,1,0]],
+      "output": [[1,0,1], [0,1,1], [1,1,0]]
+    },
+    {
+      "input": [[0,1,0], [1,0,1], [0,1,0]],
+      "output": [[0,1,0], [1,1,1], [0,1,0]]
+    },
+    {
+      "input": [[1,1,1], [1,0,1], [0,0,0]],
+      "output": [[1,1,1], [1,0,1], [1,0,1]]
     }
   ],
-  "testInput": [[1,0,0,0,0], [0,1,0,0,0], [0,0,1,0,0], [0,0,0,1,0], [0,0,0,0,1]],
-  "testOutput": [[0,0,0,0,1], [0,0,0,1,0], [0,0,1,0,0], [0,1,0,0,0], [1,0,0,0,0]],
-  "hints": ["Rotate 270 degrees clockwise.", "Equivalent to 90-degree counter-clockwise rotation.", "Value at [row, col] moves to [gridSize - 1 - col, row]."]
+  "testInput": [[0,0,0], [1,0,1], [0,1,0]],
+  "testOutput": [[0,0,0], [1,1,1], [0,1,0]],
+  "hints": [
+    "Look for patterns in rows, columns, and diagonals.",
+    "Binary signals follow symmetry and balance principles."
+  ]
 }

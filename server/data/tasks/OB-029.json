@@ -4,18 +4,29 @@
   "description": "Complete the pattern to predict power output variations in solar panels throughout the mission day.",
   "category": "⚙️ Onboard Systems",
   "difficulty": "Intermediate",
-  "gridSize": 5,
+  "gridSize": 4,
   "timeLimit": null,
   "basePoints": 2,
   "requiredRankLevel": 1,
-  "emojiSet": "tech_set2",
+  "emojiSet": "celestial_set1",
   "examples": [
     {
-      "input": [[100,90,80,70],[60,50,40,30],[20,10,0,0],[0,0,0,0],[0,0,0,0]],
-      "output": [[100,90,80,70],[60,50,40,30],[20,10,0,10],[0,0,0,20],[0,0,0,30]]
+      "input": [[9,8,7,0],[6,5,4,3],[2,1,0,9],[8,7,6,5]],
+      "output": [[9,8,7,6],[6,5,4,3],[2,1,0,9],[8,7,6,5]]
+    },
+    {
+      "input": [[1,2,3,0],[5,6,7,8],[9,0,1,2],[3,4,5,6]],
+      "output": [[1,2,3,4],[5,6,7,8],[9,0,1,2],[3,4,5,6]]
+    },
+    {
+      "input": [[2,4,6,0],[1,3,5,7],[8,0,2,4],[6,8,0,2]],
+      "output": [[2,4,6,8],[1,3,5,7],[8,0,2,4],[6,8,0,2]]
     }
   ],
-  "testInput": [[100,90,80,70],[60,50,40,30],[20,10,0,0],[0,0,0,0],[0,0,0,0]],
-  "testOutput": [[100,90,80,70],[60,50,40,30],[20,10,0,10],[0,0,0,20],[0,0,0,30]],
-  "hints": ["Identify efficiency decay patterns.", "Look for decreasing sequences to complete the grid."]
+  "testInput": [[3,6,9,0],[2,5,8,1],[4,7,0,3],[6,9,2,5]],
+  "testOutput": [[3,6,9,2],[2,5,8,1],[4,7,0,3],[6,9,2,5]],
+  "hints": [
+    "Look for patterns within each row.",
+    "The missing value follows the sequence in its row."
+  ]
 }

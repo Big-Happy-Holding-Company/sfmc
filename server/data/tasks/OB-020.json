@@ -6,16 +6,27 @@
   "difficulty": "Intermediate",
   "gridSize": 3,
   "timeLimit": null,
-  "basePoints": 3000,
+  "basePoints": 2,
   "requiredRankLevel": 1,
-  "emojiSet": "status_alerts",
+  "emojiSet": "tech_set1",
   "examples": [
     {
       "input": [[1,2,3], [6,1,2], [3,6,1]],
       "output": [[3,2,1], [6,1,2], [1,6,3]]
+    },
+    {
+      "input": [[4,5,6], [7,8,9], [0,1,2]],
+      "output": [[6,5,4], [9,8,7], [2,1,0]]
+    },
+    {
+      "input": [[9,8,7], [6,5,4], [3,2,1]],
+      "output": [[7,8,9], [4,5,6], [1,2,3]]
     }
   ],
-  "testInput": [[2,3,6], [1,2,3], [6,1,2]],
-  "testOutput": [[6,3,2], [1,2,3], [2,1,6]],
-  "hints": ["Rotate 270 degrees clockwise.", "Equivalent to 90-degree counter-clockwise rotation.", "Value at [row, col] moves to [gridSize - 1 - col, row]."]
+  "testInput": [[5,0,3], [8,4,7], [9,2,6]],
+  "testOutput": [[3,0,5], [7,4,8], [6,2,9]],
+  "hints": [
+    "Think of the grid rotating three times in the same direction.",
+    "Notice how the middle number always stays in place."
+  ]
 }

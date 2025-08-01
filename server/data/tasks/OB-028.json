@@ -8,14 +8,25 @@
   "timeLimit": null,
   "basePoints": 2,
   "requiredRankLevel": 1,
-  "emojiSet": "tech_set2",
+  "emojiSet": "status_alerts",
   "examples": [
     {
-      "input": [[20,25,30],[35,40,0],[45,50,55]],
-      "output": [[20,25,30],[35,40,45],[45,50,55]]
+      "input": [[1,2,3],[4,5,0],[7,8,9]],
+      "output": [[1,2,3],[4,5,6],[7,8,9]]
+    },
+    {
+      "input": [[2,4,6],[8,0,2],[4,6,8]],
+      "output": [[2,4,6],[8,0,2],[4,6,8]]
+    },
+    {
+      "input": [[9,7,5],[3,1,0],[7,5,3]],
+      "output": [[9,7,5],[3,1,9],[7,5,3]]
     }
   ],
-  "testInput": [[20,25,30],[35,40,0],[45,50,55]],
-  "testOutput": [[20,25,30],[35,40,45],[45,50,55]],
-  "hints": ["Identify cyclic or arithmetic patterns.", "Look for consistent increments to fill missing values."]
+  "testInput": [[3,5,7],[9,1,0],[3,5,7]],
+  "testOutput": [[3,5,7],[9,1,3],[3,5,7]],
+  "hints": [
+    "Look for patterns that repeat across rows.",
+    "The missing value completes a numerical sequence."
+  ]
 }

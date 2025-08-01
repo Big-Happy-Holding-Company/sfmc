@@ -6,16 +6,27 @@
   "difficulty": "Intermediate",
   "gridSize": 2,
   "timeLimit": null,
-  "basePoints": 3000,
+  "basePoints": 2,
   "requiredRankLevel": 1,
   "emojiSet": "status_alerts",
   "examples": [
     {
       "input": [[1, 3], [6, 2]],
       "output": [[3, 2], [1, 6]]
+    },
+    {
+      "input": [[5, 8], [4, 9]],
+      "output": [[8, 9], [5, 4]]
+    },
+    {
+      "input": [[0, 7], [2, 3]],
+      "output": [[7, 3], [0, 2]]
     }
   ],
-  "testInput": [[1, 3], [6, 2]],
-  "testOutput": [[3, 2], [1, 6]],
-  "hints": ["Rotate 270 degrees clockwise.", "Equivalent to 90-degree counter-clockwise rotation.", "Value at [row, col] moves to [gridSize - 1 - col, row]."]
+  "testInput": [[9, 4], [7, 5]],
+  "testOutput": [[4, 5], [9, 7]],
+  "hints": [
+    "Think of turning the grid three quarters of the way around.",
+    "The numbers swap diagonal positions in this rotation."
+  ]
 }
