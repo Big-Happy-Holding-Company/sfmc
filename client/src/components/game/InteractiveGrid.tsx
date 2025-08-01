@@ -34,7 +34,7 @@ export function InteractiveGrid({
     const newGrid = grid.map((gridRow, r) =>
       gridRow.map((cell, c) => {
         if (r === row && c === col) {
-          const currentIndex = emojis.indexOf(cell);
+          const currentIndex = emojis.findIndex(emoji => emoji === cell);
           const nextIndex = (currentIndex + 1) % emojis.length;
           return emojis[nextIndex];
         }

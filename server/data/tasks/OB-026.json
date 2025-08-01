@@ -1,0 +1,32 @@
+{
+  "id": "OB-026",
+  "title": "Beacon Flash Patterns",
+  "description": "Complete the pattern to predict emergency signal sequences in beacon flashes.",
+  "category": "⚙️ Onboard Systems",
+  "difficulty": "Intermediate",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 2,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [[1,2],[3,0]],
+      "output": [[1,2],[3,4]]
+    },
+    {
+      "input": [[5,0],[6,7]],
+      "output": [[5,9],[6,7]]
+    },
+    {
+      "input": [[7,3],[0,4]],
+      "output": [[7,3],[2,4]]
+    }
+  ],
+  "testInput": [[8,6],[0,1]],
+  "testOutput": [[8,6],[4,1]],
+  "hints": [
+    "Check how each value relates to its neighbors.",
+    "There may be a pattern across rows or within columns."
+  ]
+}

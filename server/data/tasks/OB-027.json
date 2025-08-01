@@ -1,0 +1,32 @@
+{
+  "id": "OB-027",
+  "title": "Orbit Altitude Readings",
+  "description": "Complete the pattern to predict decay in orbit altitude readings over successive passes.",
+  "category": "⚙️ Onboard Systems",
+  "difficulty": "Intermediate",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 2,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [[10,9,8,7],[6,5,4,3],[2,1,0,0],[0,0,0,0]],
+      "output": [[10,9,8,7],[6,5,4,3],[2,1,0,9],[0,0,0,8]]
+    },
+    {
+      "input": [[5,4,3,2],[1,0,9,8],[7,6,5,0],[4,3,0,0]],
+      "output": [[5,4,3,2],[1,0,9,8],[7,6,5,4],[4,3,2,1]]
+    },
+    {
+      "input": [[8,7,6,5],[4,3,2,1],[0,9,8,0],[0,0,0,0]],
+      "output": [[8,7,6,5],[4,3,2,1],[0,9,8,7],[6,5,4,3]]
+    }
+  ],
+  "testInput": [[9,8,7,6],[5,4,3,2],[1,0,9,0],[0,0,0,0]],
+  "testOutput": [[9,8,7,6],[5,4,3,2],[1,0,9,8],[7,6,5,4]],
+  "hints": [
+    "Look for decreasing patterns across rows and columns.",
+    "The missing numbers continue the established sequence."
+  ]
+}
