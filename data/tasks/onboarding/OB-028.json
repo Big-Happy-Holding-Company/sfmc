@@ -1,0 +1,32 @@
+{
+  "id": "OB-028",
+  "title": "Temperature Cycles",
+  "description": "Complete the pattern for heating and cooling cycles during orbit day and night.",
+  "category": "⚙️ Onboard Systems",
+  "difficulty": "Intermediate",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 2,
+  "requiredRankLevel": 1,
+  "emojiSet": "status_alerts",
+  "examples": [
+    {
+      "input": [[1,2,3],[4,5,0],[7,8,9]],
+      "output": [[1,2,3],[4,5,6],[7,8,9]]
+    },
+    {
+      "input": [[2,4,6],[8,0,2],[4,6,8]],
+      "output": [[2,4,6],[8,0,2],[4,6,8]]
+    },
+    {
+      "input": [[9,7,5],[3,1,0],[7,5,3]],
+      "output": [[9,7,5],[3,1,9],[7,5,3]]
+    }
+  ],
+  "testInput": [[3,5,7],[9,1,0],[3,5,7]],
+  "testOutput": [[3,5,7],[9,1,3],[3,5,7]],
+  "hints": [
+    "Look for patterns that repeat across rows.",
+    "The missing value completes a numerical sequence."
+  ]
+}

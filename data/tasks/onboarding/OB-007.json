@@ -1,0 +1,53 @@
+{
+  "id": "OB-007",
+  "title": "Rocket Fuel System Reconfiguration",
+  "description": "Reconfigure the rocket fuel system by vertically reflecting the layout, then replacing all fuel type 1 with fuel type 2 for launch optimization.",
+  "category": "⚙️ Onboard Systems",
+  "difficulty": "Intermediate",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 2500,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [1, 0, 3],
+        [0, 2, 0],
+        [3, 0, 1]
+      ],
+      "output": [
+        [3, 0, 2],
+        [0, 2, 0],
+        [2, 0, 3]
+      ]
+    },
+    {
+      "input": [
+        [1, 1, 4],
+        [0, 0, 0],
+        [4, 1, 1]
+      ],
+      "output": [
+        [4, 2, 2],
+        [0, 0, 0],
+        [2, 2, 4]
+      ]
+    }
+  ],
+  "testInput": [
+    [1, 3, 0],
+    [5, 1, 6],
+    [0, 3, 1]
+  ],
+  "testOutput": [
+    [0, 3, 2],
+    [5, 2, 6],
+    [2, 3, 0]
+  ],
+  "hints": [
+    "First, reflect the grid vertically (top ↔ bottom).",
+    "Then replace all fuel type 1 with fuel type 2.",
+    "The rocket system needs this dual transformation for launch readiness."
+  ]
+}

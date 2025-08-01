@@ -1,0 +1,56 @@
+{
+  "id": "OB-012",
+  "title": "Thruster Configuration Matrix",
+  "description": "Configure thruster arrays by reflecting across the secondary diagonal, then applying OR logic with the original pattern. Upper and lower thruster arrangements combine for stability.",
+  "category": "⚙️ Onboard Systems",
+  "difficulty": "Advanced",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 3000,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [1, 0, 2],
+        [0, 3, 0],
+        [4, 0, 5]
+      ],
+      "output": [
+        [5, 3, 4],
+        [2, 3, 1],
+        [2, 3, 5]
+      ]
+    },
+    {
+      "input": [
+        [0, 2, 0],
+        [1, 0, 3],
+        [0, 4, 0]
+      ],
+      "output": [
+        [4, 2, 1],
+        [2, 4, 3],
+        [3, 4, 4]
+      ]
+    }
+  ],
+  "testInput": [
+    [3, 0, 1],
+    [0, 2, 0],
+    [4, 0, 6]
+  ],
+  "testOutput": [
+    [6, 2, 4],
+    [1, 2, 3],
+    [4, 2, 6]
+  ],
+  "hints": [
+    "First, reflect across secondary diagonal (top-right to bottom-left): [i][j] becomes [n-1-j][n-1-i].",
+    "Then apply OR operation: output[i][j] = original[i][j] OR reflected[i][j]. Non-zero values from either position remain.",
+    "Thruster arrays need redundant signal paths - if either original or mirrored thruster fires, the position stays active.",
+    "Secondary diagonal reflection simulates thruster layout symmetry for spacecraft stability control.",
+    "OR logic ensures backup systems activate when primary OR secondary thrusters engage.",
+    "Created by: Cascade with Claude 4 Sonnet Thinking based on types.md. Combined Secondary Diagonal Reflection (#7) with OR Operation (#22) to simulate thruster redundancy systems where symmetric thruster pairs provide backup coverage through logical union operations, testing both geometric mirror recognition and binary logical reasoning."
+  ]
+}

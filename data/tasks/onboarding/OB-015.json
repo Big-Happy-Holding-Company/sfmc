@@ -1,0 +1,45 @@
+{
+  "id": "OB-015",
+  "title": "Asteroid Deflection System",
+  "description": "To deflect an incoming asteroid, the tractor beam emitters must be rotated 90 degrees clockwise. Adjust the power matrix accordingly.",
+  "category": "⚙️ Onboard Systems",
+  "difficulty": "Intermediate",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 3000,
+  "requiredRankLevel": 2,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [1, 2, 3, 4],
+        [5, 6, 7, 8],
+        [9, 0, 1, 2],
+        [3, 4, 5, 6]
+      ],
+      "output": [
+        [3, 9, 5, 1],
+        [4, 0, 6, 2],
+        [5, 1, 7, 3],
+        [6, 2, 8, 4]
+      ]
+    }
+  ],
+  "testInput": [
+    [1, 1, 2, 2],
+    [3, 3, 4, 4],
+    [5, 5, 6, 6],
+    [7, 7, 8, 8]
+  ],
+  "testOutput": [
+    [7, 5, 3, 1],
+    [7, 5, 3, 1],
+    [8, 6, 4, 2],
+    [8, 6, 4, 2]
+  ],
+  "hints": [
+    "Rotate the grid 90 degrees clockwise.",
+    "The top row becomes the right column, the right column becomes the bottom row, and so on.",
+    "The value at [row, col] moves to [col, gridSize - 1 - row]."
+  ]
+}
