@@ -1,49 +1,53 @@
 {
   "id": "OB-012",
-  "title": "Gravity Generator Test",
-  "description": "Test the gravity generator by performing a 180-degree rotation (H+V reflection) of the control matrix.",
+  "title": "Thruster Configuration Matrix",
+  "description": "Configure thruster arrays by reflecting across the secondary diagonal, then applying OR logic with the original pattern. Upper and lower thruster arrangements combine for stability.",
   "category": "⚙️ Onboard Systems",
-  "difficulty": "Intermediate",
-  "gridSize": 5,
+  "difficulty": "Advanced",
+  "gridSize": 3,
   "timeLimit": null,
-  "basePoints": 2500,
+  "basePoints": 3000,
   "requiredRankLevel": 1,
   "emojiSet": "tech_set2",
   "examples": [
     {
       "input": [
-        [1, 2, 3, 4, 5],
-        [6, 7, 8, 9, 0],
-        [1, 1, 2, 2, 3],
-        [4, 4, 5, 5, 6],
-        [7, 7, 8, 8, 9]
+        [1, 0, 2],
+        [0, 3, 0],
+        [4, 0, 5]
       ],
       "output": [
-        [9, 8, 8, 7, 7],
-        [6, 5, 5, 4, 4],
-        [3, 2, 2, 1, 1],
-        [0, 9, 8, 7, 6],
-        [5, 4, 3, 2, 1]
+        [5, 3, 4],
+        [2, 3, 1],
+        [2, 3, 5]
+      ]
+    },
+    {
+      "input": [
+        [0, 2, 0],
+        [1, 0, 3],
+        [0, 4, 0]
+      ],
+      "output": [
+        [4, 2, 1],
+        [2, 4, 3],
+        [3, 4, 4]
       ]
     }
   ],
   "testInput": [
-    [1, 0, 1, 0, 1],
-    [0, 2, 0, 2, 0],
-    [3, 0, 3, 0, 3],
-    [0, 4, 0, 4, 0],
-    [5, 0, 5, 0, 5]
+    [3, 0, 1],
+    [0, 2, 0],
+    [4, 0, 6]
   ],
   "testOutput": [
-    [5, 0, 5, 0, 5],
-    [0, 4, 0, 4, 0],
-    [3, 0, 3, 0, 3],
-    [0, 2, 0, 2, 0],
-    [1, 0, 1, 0, 1]
+    [6, 2, 4],
+    [1, 2, 3],
+    [4, 2, 6]
   ],
   "hints": [
-    "Reflect the grid both horizontally and vertically.",
-    "This is the same as rotating the grid 180 degrees.",
-    "The value at [row, col] moves to [gridSize - 1 - row, gridSize - 1 - col]."
+    "First, reflect across secondary diagonal: [i][j] becomes [n-1-j][n-1-i].",
+    "Then apply OR operation: output[i][j] = original[i][j] OR reflected[i][j].",
+    "Thruster redundancy requires signal from either original or mirrored position."
   ]
 }

@@ -1,47 +1,53 @@
 {
   "id": "OB-009",
-  "title": "Escape Pod Launch Sequence",
-  "description": "To initiate the escape pod launch, the final activation pattern must be a combined horizontal and vertical reflection of the initial state. This ensures all safety checks are passed.",
+  "title": "Landing Radar Signal Processing",
+  "description": "Process landing radar signals by horizontally reflecting the pattern, then applying AND logic - only positions where both original and reflected have signals (non-zero) remain active.",
   "category": "⚙️ Onboard Systems",
-  "difficulty": "Intermediate",
-  "gridSize": 2,
+  "difficulty": "Advanced",
+  "gridSize": 3,
   "timeLimit": null,
-  "basePoints": 2500,
+  "basePoints": 3000,
   "requiredRankLevel": 1,
   "emojiSet": "tech_set2",
   "examples": [
     {
       "input": [
-        [1, 2],
-        [3, 4]
+        [1, 0, 2],
+        [3, 4, 0],
+        [0, 5, 6]
       ],
       "output": [
-        [4, 3],
-        [2, 1]
+        [0, 0, 0],
+        [0, 4, 0],
+        [0, 5, 0]
       ]
     },
     {
       "input": [
-        [5, 0],
-        [0, 6]
+        [2, 3, 2],
+        [0, 1, 0],
+        [4, 0, 4]
       ],
       "output": [
-        [6, 0],
-        [0, 5]
+        [2, 3, 2],
+        [0, 1, 0],
+        [4, 0, 4]
       ]
     }
   ],
   "testInput": [
-    [7, 8],
-    [9, 0]
+    [1, 2, 0],
+    [0, 3, 4],
+    [5, 0, 6]
   ],
   "testOutput": [
-    [0, 9],
-    [8, 7]
+    [0, 2, 0],
+    [0, 3, 0],
+    [0, 0, 6]
   ],
   "hints": [
-    "Reflect the grid both horizontally and vertically.",
-    "This is equivalent to rotating the grid 180 degrees.",
-    "The top-left value moves to the bottom-right, and the top-right value moves to the bottom-left."
+    "First, create horizontal reflection: [i][j] becomes [i][n-1-j].",
+    "Then apply AND logic: output[i][j] = input[i][j] if both original and reflected positions are non-zero.",
+    "Radar needs signal confirmation from both original and mirrored positions."
   ]
 }

@@ -2,7 +2,7 @@
 
 My nephew Wyatt was the inspiration for this app.  AI is rapidly changing the world we live in. He is 6 years old and wants to be a mission control specialist.  The US Space Force was formed in 2019 and is the branch of the U.S. Armed Forces that is responsible for space operations, including space situational awareness, space traffic management, and space-based missile defense. I wonder what that will look like in 2050.  I want to give him a fun way to learn about the types of tasks he might actually encounter in the future based upon the reasoning and logic that are difficult for AI to perform.  I envision a future where AI can perform most tasks, but there are still some tasks that require human intuition and reasoning.  This Space Force-themed puzzle game has recruits complete operational tasks to advance through enlisted ranks and all the tasks are based upon the Abstract Reasoning Corpus (ARC) puzzles. The puzzles are transformed to fit the Space Force theme and the game is designed to be platform agnostic. One challenge as a developer has been accomodating the challenges that individuals with unique disabilities (such as colorblindness) face, while still maintaining a fun and engaging experience for all players and staying true to the structure of the ARC-AGI test framework. 
 
-In 2050 this game will hopefully serve as an interesting temporal artifact of a very specific moment in the development of AI and AI reasoning towards what we today call AGI.  (And in 25 years will probably call something totally different!)  
+In 2050 this game will hopefully serve as an interesting temporal artifact of a very specific moment in the development of AI and AI reasoning towards what we today call AGI. ARC-AGI is measuring the ability to adapt to tasks you cannot prepare for. These puzzles we are using are unique, cannot be anticipated, can be understood from 2-3 examples, and still apparently require human intuition and reasoning. 
 
 ## ARC-AGI Framework - Like holy sh*t these people are way smarter than me...
 
@@ -11,6 +11,8 @@ The Abstract and Reasoning Corpus for Artificial General Intelligence (ARC-AGI) 
 - Official ARC Prize: https://arcprize.org/arc-agi
 - Puzzle datasets: https://github.com/arcprize/ARC-AGI-2/tree/main/data
 - Reference: https://github.com/fchollet/ARC-AGI
+- https://www.youtube.com/watch?v=5QcCeSsNRks&ab_channel=YCombinator
+- https://arahim3.github.io/arc-agi-guide/ 
 
 This project is designed to build upon that framework by adding a Space Force theme and making it accessible to a wider audience and especially young people and the colorblind.  It is also designed to be platform agnostic and can be run on any device with a web browser.
 
@@ -26,76 +28,37 @@ This project is designed to build upon that framework by adding a Space Force th
 ```
 ├── client/                 # Frontend React application
 │   └── src/
-│       ├── components/     # Reusable UI components
-│       │   ├── game/       # Game-specific components
-│       │   └── ui/         # Base UI components (shadcn)
-│       ├── constants/      # Emoji sets and game constants
-│       ├── pages/          # Route components
-│       └── types/          # TypeScript type definitions
-├── server/                 # Backend Express application
-│   ├── cli/                # CLI utilities (task generation, etc.)
+│       ├── components/     # Reusable UI components (CORE SYSTEMS!)
+│       │   ├── game/       # Game-specific components (CORE SYSTEMS!)
+│       │   └── ui/         # Base UI components (shadcn) (CORE SYSTEMS!)
+│       ├── constants/      # Emoji sets and game constants (CORE SYSTEMS!)
+│       ├── pages/          # Route components (CORE SYSTEMS!)
+│       └── types/          # TypeScript type definitions (CORE SYSTEMS!)
+├── server/                 # Backend Express application (CORE SYSTEMS!)
+│   ├── cli/                # CLI utilities (task generation, etc.) (Questionable utility)
 │   ├── data/
-│   │   └── tasks/          # Individual JSON task files
-│   ├── templates/          # Task and story templates
+│   │   └── tasks/          # Individual JSON task files (CORE SYSTEMS!)
+│   ├── templates/          # Task and story templates  (Not working very well)
 │   │   ├── generators/
 │   │   ├── categories.ts
 │   │   ├── transformations.ts
 │   │   └── validators.ts
-│   ├── tools/              # Code-generation helpers
+│   ├── tools/              # Code-generation helpers  (Questionable utility)
 │   │   ├── task-factory.ts
-│   │   └── story-factory.ts   # Narrative wrapper (NEW)
-│   ├── services/           # Business logic services
-│   ├── tests/              # Automated backend tests
-│   ├── index.ts            # Server entry point
-│   ├── routes.ts           # API route handlers
-│   └── storage.ts          # Data storage interface
+│   │   └── story-factory.ts   # Narrative wrapper
+│   ├── services/           # Business logic services (CORE SYSTEMS!)
+│   ├── tests/              # Automated backend tests (Questionable utility)
+│   ├── index.ts            # Server entry point (CORE SYSTEMS!)
+│   ├── routes.ts           # API route handlers (CORE SYSTEMS!)
+│   └── storage.ts          # Data storage interface (CORE SYSTEMS!)
 ├── docs/                   # Technical and design documentation
-│   └── story_wrapper_system_plan.md   # Narrative wrapper plan (NEW)
-├── shared/                 # Shared types and schemas
-│   └── schema.ts           # Database schema and types
+│   └── story_wrapper_system_plan.md   # Narrative wrapper plan
+├── shared/                 # Shared types and schemas (CORE SYSTEMS!)
+│   └── schema.ts           # Database schema and types (CORE SYSTEMS!)
 └── README.md               # This file
 ```
 
-## Task System Architecture
 
-### Transformation System
-
-#### Available Transformations
-1. **Geometric Transformations**
-   - `horizontal_reflection`: Flip grid left-to-right
-   - `vertical_reflection`: Flip grid top-to-bottom (NEW)
-   - `rotation_90deg`: Rotate grid 90° clockwise
-   - `rotation_270deg`: Rotate grid 270° clockwise (replaces object_counting)
-
-2. **Logical Transformations**
-   - `pattern_completion`: Complete the pattern in the grid
-
-#### Transformation Properties
-Each transformation includes:
-- Unique type identifier
-- Name and description
-- Category (geometric/logical)
-- Difficulty level
-- Hint patterns
-- Associated grid generator
-
-### Task Generation
-
-#### CLI Commands
-```bash
-# Generate a single task
-npx tsx server/cli/generate-task.ts single -c CATEGORY -t TRANSFORMATION -s SIZE -o OUTPUT_FILE
-
-# Example: Generate SEC task with vertical reflection
-npx tsx server/cli/generate-task.ts single -c SEC -t vertical_reflection -s 4 -o server/data/tasks/SEC-100.json
-```
-
-#### Task Generation Process
-1. Selects transformation type based on category
-2. Generates appropriate grid examples
-3. Applies story wrapper with Space-Force theme
-4. Validates the task
-5. Saves to specified location
 
 ### Modular Task Loading
 Tasks are stored as individual JSON files in `server/data/tasks/` for easy maintenance and scalability. The time limit on all tasks should be null unless otherwise specified.
@@ -194,11 +157,12 @@ See the comprehensive guide in `docs/task_generation_guide.md` for more details.
 
 ### Adding New Tasks
 1. Create a new JSON file in `server/data/tasks/`
-2. Follow the task file structure above
+2. Follow the task file structure and definitions in docs/types.md
 3. **IMPORTANT**: Use numbers 0-9 in the logic/data files, not emojis
 4. Emojis are only mapped in the UI layer using `client/src/constants/spaceEmojis.ts`
 5. Test the task transformation logic
 6. Add progressive hints for player assistance
+7. You should credit yourself with the puzzle creation in the final hint and explain what your thinking was when you created this file.  Don't be afraid to go slowly and methodically. Spend a lot of time creating and validating the puzzle. 
 
 ### Standard for Puzzle Representation
 - **Logic/Data Files**: Always use integers 0-9 in data files (input, output arrays)
