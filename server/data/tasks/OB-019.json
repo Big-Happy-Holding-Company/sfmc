@@ -7,15 +7,15 @@
   "gridSize": 2,
   "timeLimit": null,
   "basePoints": 3000,
-  "requiredRankLevel": 2,
-  "emojiSet": "tech_set2",
+  "requiredRankLevel": 1,
+  "emojiSet": "status_alerts",
   "examples": [
     {
-      "input": [[1, 0], [0, 1]],
-      "output": [[0, 1], [1, 0]]
+      "input": [[1, 3], [6, 2]],
+      "output": [[3, 2], [1, 6]]
     }
   ],
-  "testInput": [[1, 0], [0, 1]],
-  "testOutput": [[0, 1], [1, 0]],
+  "testInput": [[1, 3], [6, 2]],
+  "testOutput": [[3, 2], [1, 6]],
   "hints": ["Rotate 270 degrees clockwise.", "Equivalent to 90-degree counter-clockwise rotation.", "Value at [row, col] moves to [gridSize - 1 - col, row]."]
 }
