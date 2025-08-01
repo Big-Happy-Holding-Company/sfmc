@@ -318,7 +318,7 @@ export default function MissionControl() {
                     YOUR TASK: SOLVE THE PATTERN
                   </h3>
                   
-                  <div className="flex items-center justify-center space-x-8 mb-6">
+                  <div className="flex items-center justify-center space-x-4 mb-6">
                     <div>
                       {renderExampleGrid(currentTask.testInput as string[][], "TEST INPUT")}
                     </div>
@@ -332,6 +332,7 @@ export default function MissionControl() {
                         emojiSet={currentTask.emojiSet as EmojiSet}
                         onGridChange={setPlayerGrid}
                         disabled={validateSolutionMutation.isPending}
+                        inputGrid={currentTask.testInput as string[][]}
                       />
                     </div>
                   </div>

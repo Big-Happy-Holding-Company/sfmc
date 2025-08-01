@@ -10,6 +10,7 @@ interface InteractiveGridProps {
   onGridChange?: (grid: string[][]) => void;
   initialGrid?: string[][];
   disabled?: boolean;
+  inputGrid?: string[][];
 }
 
 export function InteractiveGrid({ 
@@ -17,7 +18,8 @@ export function InteractiveGrid({
   emojiSet = "tech_set1", 
   onGridChange,
   initialGrid,
-  disabled = false
+  disabled = false,
+  inputGrid
 }: InteractiveGridProps) {
   const emojis = SPACE_EMOJIS[emojiSet];
   
@@ -51,6 +53,14 @@ export function InteractiveGrid({
     const emptyGrid = createEmptyGrid();
     setGrid(emptyGrid);
     onGridChange?.(emptyGrid);
+  };
+
+  const copyFromInput = () => {
+    if (disabled || !inputGrid) return;
+    // Create a deep copy of the input grid
+    const copiedGrid = inputGrid.map(row => [...row]);
+    setGrid(copiedGrid);
+    onGridChange?.(copiedGrid);
   };
 
   const emojiSetInfo = EMOJI_SET_INFO[emojiSet];
@@ -108,7 +118,17 @@ export function InteractiveGrid({
       </div>
       
       {!disabled && (
-        <div className="flex justify-center">
+        <div className="flex justify-center space-x-2">
+          {inputGrid && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={copyFromInput}
+              className="bg-blue-500 hover:bg-blue-600 text-slate-50 border-blue-500"
+            >
+              <i className="fas fa-copy mr-2"></i>COPY INPUT
+            </Button>
+          )}
           <Button
             variant="outline"
             size="sm"
