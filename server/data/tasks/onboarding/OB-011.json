@@ -46,8 +46,11 @@
     [6, 2, 8]
   ],
   "hints": [
-    "First, reflect across primary diagonal: [i][j] becomes [j][i].",
-    "Then increment all non-zero values by 2 (mod 10 for values ≥ 8).",
-    "Satellite sensors need diagonal orientation flip plus calibration offset."
+    "First, reflect across primary diagonal: [i][j] becomes [j][i]. This transforms rows into columns.",
+    "Then increment all non-zero values by 2, using modulo 10 for overflow (8→0, 9→1).",
+    "Satellite imagery systems require diagonal flip for north-up vs south-up orientation processing.",
+    "The calibration offset (increment by 2) compensates for sensor drift in different orientations.",
+    "This combination tests both spatial transformation recognition and arithmetic sequence patterns.",
+    "Created by: Cascade with Claude 4 Sonnet Thinking based on types.md. Combined Primary Diagonal Reflection (#6) with Sequence Increment (#14) to create a realistic satellite calibration scenario that tests geometric transformation followed by systematic value adjustment, simulating how real satellite sensors need both orientation correction and calibration offsets."
   ]
 }
