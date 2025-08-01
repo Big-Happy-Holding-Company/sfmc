@@ -1,10 +1,10 @@
 {
   "id": "OB-004",
-  "title": "Life Support System Check",
-  "description": "Verify the integrity of the life support system by confirming the horizontal symmetry of its control panel layout.",
+  "title": "Life Support Matrix Synchronization",
+  "description": "Synchronize life support systems through primary diagonal reflection and sequence progression. Critical life support requires both matrix transposition and temporal value advancement for redundant system activation.",
   "category": "⚙️ Onboard Systems",
   "difficulty": "Basic",
-  "gridSize": 5,
+  "gridSize": 4,
   "timeLimit": null,
   "basePoints": 2000,
   "requiredRankLevel": 1,
@@ -12,38 +12,51 @@
   "examples": [
     {
       "input": [
-        [1, 2, 3, 0, 0],
-        [4, 5, 6, 0, 0],
-        [7, 8, 9, 0, 0],
-        [0, 0, 0, 1, 2],
-        [0, 0, 0, 3, 4]
+        [1, 2, 0, 3],
+        [4, 0, 5, 6],
+        [0, 7, 8, 0],
+        [9, 0, 1, 2]
       ],
       "output": [
-        [0, 0, 3, 2, 1],
-        [0, 0, 6, 5, 4],
-        [0, 0, 9, 8, 7],
-        [2, 1, 0, 0, 0],
-        [4, 3, 0, 0, 0]
+        [2, 5, 1, 1],
+        [3, 1, 8, 1],
+        [1, 6, 9, 2],
+        [4, 7, 1, 3]
+      ]
+    },
+    {
+      "input": [
+        [0, 1, 2, 0],
+        [3, 4, 0, 5],
+        [6, 0, 7, 8],
+        [0, 9, 1, 0]
+      ],
+      "output": [
+        [1, 4, 1, 1],
+        [2, 5, 1, 1],
+        [3, 1, 8, 2],
+        [1, 6, 9, 1]
       ]
     }
   ],
   "testInput": [
-    [1, 2, 3, 4, 5],
-    [6, 7, 8, 9, 0],
-    [1, 1, 2, 2, 3],
-    [4, 4, 5, 5, 6],
-    [7, 7, 8, 8, 9]
+    [1, 0, 2, 3],
+    [0, 4, 5, 0],
+    [6, 7, 0, 8],
+    [9, 0, 1, 0]
   ],
   "testOutput": [
-    [5, 4, 3, 2, 1],
-    [0, 9, 8, 7, 6],
-    [3, 2, 2, 1, 1],
-    [6, 5, 5, 4, 4],
-    [9, 8, 8, 7, 7]
+    [2, 1, 7, 1],
+    [1, 5, 8, 1],
+    [3, 6, 1, 2],
+    [4, 1, 9, 1]
   ],
   "hints": [
-    "Reflect the grid horizontally (left ↔ right).",
-    "The first column swaps with the fifth, the second with the fourth, and the middle column stays put.",
-    "Each row's elements are reversed."
+    "Space Force Protocol: Life support synchronization requires matrix transposition and temporal sequence advancement for redundant system activation.",
+    "Phase 1 - Matrix Transposition: Apply primary diagonal reflection to transpose the life support grid. Element at position (row,col) moves to position (col,row).",
+    "Phase 2 - Sequence Advancement: Increment all non-zero values by 1 to represent temporal progression of life support cycles, with 0 values remaining unchanged.",
+    "Technical Implementation: First transpose along primary diagonal (swap rows/columns), then increment all non-zero values by 1 for temporal synchronization.",
+    "Validation Check: Verify the grid structure has been transposed and all active systems (non-zero values) show temporal progression (incremented by 1).",
+    "Created by: Cascade with Claude 4 Sonnet Thinking. Design rationale: Combines Primary Diagonal Reflection with Sequence Increment to simulate life support matrix synchronization requiring both structural reorientation and temporal advancement protocols."
   ]
 }

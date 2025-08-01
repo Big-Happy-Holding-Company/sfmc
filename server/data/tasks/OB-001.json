@@ -1,10 +1,10 @@
 {
   "id": "OB-001",
-  "title": "Solar Panel Deployment",
-  "description": "To ensure balanced power generation, the left and right solar panel wings must mirror each other. Verify the deployment by performing a horizontal reflection.",
+  "title": "Solar Panel Deployment Protocol",
+  "description": "Deploy solar panels with proper horizontal reflection and border reinforcement. Critical systems require both mirrored configuration and perimeter marking for structural integrity.",
   "category": "Onboard Systems",
   "difficulty": "Basic",
-  "gridSize": 2,
+  "gridSize": 3,
   "timeLimit": null,
   "basePoints": 2000,
   "requiredRankLevel": 1,
@@ -12,36 +12,45 @@
   "examples": [
     {
       "input": [
-        [1, 2],
-        [3, 4]
+        [1, 2, 3],
+        [0, 4, 0],
+        [5, 6, 7]
       ],
       "output": [
-        [2, 1],
-        [4, 3]
+        [9, 2, 9],
+        [0, 4, 0],
+        [9, 6, 9]
       ]
     },
     {
       "input": [
-        [5, 0],
-        [0, 6]
+        [0, 1, 0],
+        [2, 3, 4],
+        [0, 5, 0]
       ],
       "output": [
-        [0, 5],
-        [6, 0]
+        [9, 1, 9],
+        [4, 3, 2],
+        [9, 5, 9]
       ]
     }
   ],
   "testInput": [
-    [7, 8],
-    [9, 0]
+    [1, 0, 2],
+    [3, 4, 5],
+    [6, 0, 7]
   ],
   "testOutput": [
-    [8, 7],
-    [0, 9]
+    [9, 0, 9],
+    [5, 4, 3],
+    [9, 0, 9]
   ],
   "hints": [
-    "Reflect the grid horizontally (left ↔ right).",
-    "For each row, the values in the columns are reversed.",
-    "The first column swaps with the second column."
+    "Space Force Protocol: Solar panel deployment requires two-phase transformation for operational safety and structural integrity.",
+    "Phase 1 - Mirror Configuration: Apply horizontal reflection to flip the panel layout left-to-right. Each row's elements reverse order while maintaining vertical structure.",
+    "Phase 2 - Border Reinforcement: Mark all border positions (edges and corners) with value 9 to indicate structural reinforcement points required for space deployment.",
+    "Technical Implementation: First reflect horizontally (swap columns), then replace all border elements with 9. This ensures both proper orientation and safety marking.",
+    "Validation Check: Verify center elements remain unchanged from reflection, while all edge positions show reinforcement marking (value 9).",
+    "Created by: Cascade with Claude 4 Sonnet Thinking. Design rationale: Combines Horizontal Reflection with Border Marking to create a realistic solar panel deployment scenario requiring both structural mirroring and safety reinforcement protocols."
   ]
 }
