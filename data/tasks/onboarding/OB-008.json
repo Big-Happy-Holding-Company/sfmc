@@ -8,7 +8,7 @@
   "timeLimit": null,
   "basePoints": 2500,
   "requiredRankLevel": 1,
-  "emojiSet": "tech_set2",
+  "emojiSet": "vague_symbols",
   "examples": [
     {
       "input": [
@@ -48,6 +48,7 @@
   "hints": [
     "First, rotate the grid 90° clockwise: [i][j] becomes [j][n-1-i].",
     "Then fill missing values (0s) by completing the orbital pattern.",
-    "Orbital mechanics follows predictable trajectory sequences."
+    "Orbital mechanics follows predictable trajectory sequences.",
+    "Created by: Cascade with Claude 4 Sonnet Thinking based on types.md"
   ]
 }

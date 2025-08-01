@@ -8,7 +8,7 @@
   "timeLimit": null,
   "basePoints": 2500,
   "requiredRankLevel": 1,
-  "emojiSet": "tech_set2",
+  "emojiSet": "alien_language",
   "examples": [
     {
       "input": [
@@ -48,6 +48,7 @@
   "hints": [
     "First, reflect the grid vertically (top ↔ bottom).",
     "Then replace all fuel type 1 with fuel type 2.",
-    "The rocket system needs this dual transformation for launch readiness."
+    "The rocket system needs this dual transformation for launch readiness.",
+    "Created by: Cascade with Claude 4 Sonnet Thinking based on types.md"
   ]
 }
