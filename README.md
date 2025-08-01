@@ -103,8 +103,9 @@ Emoji sets are my unique wrapper around the ARC-AGI basis set which is mapping t
 - `nav_alerts`: Navigation vectors
 - `status_alerts`: Warning systems
 - `weather_climate`: Atmospheric conditions
+- `vague_symbols`: Vague symbols
+- `alien_language`: Alien language
 
-(- `status_colors`: DEPRECATED - Basic status indicators - These use colors and since my nephew is colorblind, I'm not using them.)  
 
 ## Game Mechanics
 
