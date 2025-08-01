@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Link } from "wouter";
 import { MISSION_CATEGORIES, DIFFICULTY_COLORS } from "@/data/missions";
 import { getRankProgress } from "@/data/ranks";
 import type { Task, Player } from "@shared/schema";
@@ -43,10 +44,18 @@ export function MissionSelector({
     <div className="space-y-6">
       {/* Mission Categories with Expandable Tasks */}
       <div className="bg-slate-800 border border-slate-600 rounded-lg p-6">
-        <h2 className="text-cyan-400 font-semibold mb-6 flex items-center">
-          <i className="fas fa-clipboard-list mr-2"></i>
-          MISSION CONTROL DASHBOARD
-        </h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-cyan-400 font-semibold flex items-center">
+            <i className="fas fa-clipboard-list mr-2"></i>
+            MISSION CONTROL DASHBOARD
+          </h2>
+          <Link href="/fiq-test">
+            <Button className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold text-sm px-4 py-2">
+              <i className="fas fa-brain mr-2"></i>
+              TEST FIQ
+            </Button>
+          </Link>
+        </div>
         
         <div className="space-y-4">
           {MISSION_CATEGORIES.map((category) => {

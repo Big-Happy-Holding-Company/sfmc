@@ -8,7 +8,7 @@
   "timeLimit": null,
   "basePoints": 2500,
   "requiredRankLevel": 1,
-  "emojiSet": "tech_set2",
+  "emojiSet": "alien_language",
   "examples": [
     {
       "input": [
@@ -54,6 +54,7 @@
   "hints": [
     "First identify the border/perimeter elements (non-zero outer edge values).",
     "Then horizontally reflect the entire pattern (left ↔ right).",
-    "Emergency systems on borders must mirror for redundant safety coverage."
+    "Emergency systems on borders must mirror for redundant safety coverage.",
+    "Created by: Cascade with Claude 4 Sonnet Thinking based on types.md"
   ]
 }

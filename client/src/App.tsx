@@ -5,6 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import MissionControl from "@/pages/MissionControl";
+import FIQTest from "@/pages/FIQTest";
 import NotFound from "@/pages/not-found";
 import { LoadingSplash } from "@/components/game/LoadingSplash";
 import { OnboardingModal } from "@/components/game/OnboardingModal";
@@ -13,6 +14,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={MissionControl} />
+      <Route path="/fiq-test" component={FIQTest} />
       <Route component={NotFound} />
     </Switch>
   );

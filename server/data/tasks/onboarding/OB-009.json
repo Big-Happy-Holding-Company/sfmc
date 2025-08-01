@@ -8,7 +8,7 @@
   "timeLimit": null,
   "basePoints": 3000,
   "requiredRankLevel": 1,
-  "emojiSet": "tech_set2",
+  "emojiSet": "vague_symbols",
   "examples": [
     {
       "input": [
@@ -48,6 +48,7 @@
   "hints": [
     "First, create horizontal reflection: [i][j] becomes [i][n-1-j].",
     "Then apply AND logic: output[i][j] = input[i][j] if both original and reflected positions are non-zero.",
-    "Radar needs signal confirmation from both original and mirrored positions."
+    "Radar needs signal confirmation from both original and mirrored positions.",
+    "Created by: Cascade with Claude 4 Sonnet Thinking based on types.md"
   ]
 }

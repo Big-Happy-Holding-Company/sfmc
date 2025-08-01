@@ -14,7 +14,7 @@ interface InteractiveGridProps {
 
 export function InteractiveGrid({ 
   gridSize, 
-  emojiSet = "status_main", 
+  emojiSet = "tech_set1", 
   onGridChange,
   initialGrid,
   disabled = false
