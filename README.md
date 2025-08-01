@@ -123,16 +123,11 @@ See `client/src/data/ranks.ts` for rank progression.
 - **🔒 Security**: Security systems (SEC-XXX)
 See `server/templates/categories.ts` for category metadata.
 
-
-### Timer System
-- **Speed Bonus**: Tasks count up, rewarding faster completion
-- **Time Limited**: Limits are all set to null for development, but can be added for expanded difficulty and point rewards. I personally hate timed missions so I'll probably never do it.
-
 ## Development Guidelines
 
 ### Task Generation Tools
 
-The project includes CLI tools for generating puzzle tasks programmatically:
+The project includes CLI tools for generating basic puzzle grids programmatically:
 
 ```powershell
 # Generate a single task
@@ -207,7 +202,7 @@ See the comprehensive guide in `docs/task_generation_guide.md` for more details.
 }
 ```
 
-# ARC-AGI Transformation Types
+# ARC-AGI Transformation Types will involve one or more of these:
 
 ## Geometric Transformations
 - Rotation (90°, 180°, 270°)
@@ -291,7 +286,7 @@ See the comprehensive guide in `docs/task_generation_guide.md` for more details.
 ## Narrative Story Wrapper System
 
 ### Purpose
-Adds a light-hearted Space-Force-2050 story layer to every ARC-AGI puzzle without touching core puzzle data.
+Adds a light-hearted Space-Force-2050 story layer to mundane training tasks without touching core puzzle data.
 
 ### How It Works
 1. `server/data/problems.json` – Holds every narrative template.  Keys are transformation types; each array contains one template per task **category** (O₂ Sensor Check, Pre-Launch Ops, Fuel Systems, Navigation, Communications, Power Systems, Security).
@@ -365,3 +360,4 @@ The `server/data/ai_failure.json` file contains content for each transformation 
 - Unity port
 - UI/UX improvements
 - Officer track with complex transformations
+- Onboarding system
