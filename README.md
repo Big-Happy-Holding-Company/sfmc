@@ -73,7 +73,7 @@ Tasks are stored as individual JSON files in `server/data/tasks/` for easy maint
   "difficulty": "Basic",
   "gridSize": 2,
   "timeLimit": null,
-  "basePoints": 350,
+  "basePoints": 3,
   "requiredRankLevel": 1,
   "emojiSet": "status_main",
   "examples": [
@@ -93,10 +93,9 @@ Tasks are stored as individual JSON files in `server/data/tasks/` for easy maint
 ```
 
 ### Emoji Set System
-Emoji sets follow ARC-AGI (Abstract and Reasoning Corpus for Artificial General Intelligence) conventions with exactly 10 emojis per set, mapping to numerical indices 0-9.
+Emoji sets are my unique wrapper around the ARC-AGI basis set which is mapping to numerical indices 0-9.
 
 #### Available Emoji Sets
-- `status_main`: Basic status indicators - These use colors and since my nephew is colorblind, I'm not using them.
 - `tech_set1`: Power and Fuel systems
 - `tech_set2`: Communication systems
 - `celestial_set1`: Planetary bodies
@@ -104,6 +103,8 @@ Emoji sets follow ARC-AGI (Abstract and Reasoning Corpus for Artificial General 
 - `nav_alerts`: Navigation vectors
 - `status_alerts`: Warning systems
 - `weather_climate`: Atmospheric conditions
+
+(- `status_colors`: DEPRECATED - Basic status indicators - These use colors and since my nephew is colorblind, I'm not using them.)  
 
 ## Game Mechanics
 
