@@ -1,32 +1,56 @@
 {
   "id": "OB-019",
-  "title": "Emergency Beacon Patterns",
-  "description": "Rotate the signal patterns 270 degrees clockwise for omnidirectional emergency beacon coverage.",
+  "title": "Emergency Signal Matrix Harmonization",
+  "description": "Harmonize emergency signals through primary diagonal reflection and exclusive interference detection. Critical emergency systems require both structural transformation and interference elimination for reliable distress transmission.",
   "category": "⚙️ Onboard Systems",
   "difficulty": "Intermediate",
-  "gridSize": 2,
+  "gridSize": 3,
   "timeLimit": null,
-  "basePoints": 2,
-  "requiredRankLevel": 1,
-  "emojiSet": "status_alerts",
+  "basePoints": 3000,
+  "requiredRankLevel": 2,
+  "emojiSet": "vague_symbols",
   "examples": [
     {
-      "input": [[1, 3], [6, 2]],
-      "output": [[3, 2], [1, 6]]
+      "input": [
+        [1, 0, 2],
+        [3, 4, 0],
+        [0, 5, 6]
+      ],
+      "output": [
+        [2, 3, 1],
+        [1, 0, 5],
+        [0, 1, 0]
+      ]
     },
     {
-      "input": [[5, 8], [4, 9]],
-      "output": [[8, 9], [5, 4]]
-    },
-    {
-      "input": [[0, 7], [2, 3]],
-      "output": [[7, 3], [0, 2]]
+      "input": [
+        [0, 1, 0],
+        [2, 0, 3],
+        [4, 0, 5]
+      ],
+      "output": [
+        [4, 2, 0],
+        [1, 2, 1],
+        [5, 3, 0]
+      ]
     }
   ],
-  "testInput": [[9, 4], [7, 5]],
-  "testOutput": [[4, 5], [9, 7]],
+  "testInput": [
+    [1, 2, 0],
+    [0, 3, 4],
+    [5, 0, 6]
+  ],
+  "testOutput": [
+    [5, 0, 1],
+    [2, 1, 0],
+    [6, 4, 0]
+  ],
   "hints": [
-    "Think of turning the grid three quarters of the way around.",
-    "The numbers swap diagonal positions in this rotation."
+    "Space Force Protocol: Emergency signal harmonization requires diagonal transformation and interference detection to ensure reliable distress transmission coverage.",
+    "Phase 1 - Signal Reorientation: Apply primary diagonal reflection to transpose the emergency signal matrix. Element at position (row,col) moves to position (col,row).",
+    "Phase 2 - Interference Detection: Perform XOR operation between the reflected matrix and the original matrix to identify exclusive signal patterns and eliminate overlapping interference.",
+    "Technical Implementation: First transpose along primary diagonal (swap rows/columns), then apply element-wise XOR operation between original and reflected grids.",
+    "Validation Check: Verify the grid has been transposed and only positions with exclusive signals (present in one grid but not both) remain active for clear transmission.",
+    "Created by: Cascade with Claude 4 Sonnet Thinking. Design rationale: Combines Primary Diagonal Reflection with XOR Operation to simulate emergency signal harmonization requiring both structural reorientation and interference elimination protocols."
   ]
 }

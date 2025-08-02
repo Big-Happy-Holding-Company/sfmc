@@ -1,0 +1,187 @@
+{
+  "id": "NAV-204",
+  "title": "stellar mapping Vertical Analysis",
+  "description": "Navigation displays showed star charts flipped vertically, but the AI tried to fix this by commanding the ship to literally fly upside-down. The crew spent 20 minutes floating around the bridge before someone manually corrected the display orientation. Vertical mirroring requires spatial visualization skills that AI finds challenging. While humans intuitively understand up-down flips, AI struggles to maintain consistent spatial orientation across different grid configurations. The solar panel alignment system got confused trying to flip maintenance schedules vertically. It started rotating all the panels upside-down instead of just rearranging the repair checklist, causing a 40% power loss across the entire station. Vertical mirroring requires spatial visualization skills that AI finds challenging. While humans intuitively understand up-down flips, AI struggles to maintain consistent spatial orientation across different grid configurations. Analyze the stellar mapping by flipping the input grid vertically (top-to-bottom).",
+  "category": "🧭 Navigation",
+  "difficulty": "Intermediate",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 2350,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",  
+  "examples": [
+    {
+      "input": [
+        [
+          9,
+          7,
+          5,
+          2
+        ],
+        [
+          5,
+          8,
+          9,
+          9
+        ],
+        [
+          3,
+          7,
+          9,
+          1
+        ],
+        [
+          8,
+          1,
+          4,
+          3
+        ]
+      ],
+      "output": [
+        [
+          8,
+          1,
+          4,
+          3
+        ],
+        [
+          3,
+          7,
+          9,
+          1
+        ],
+        [
+          5,
+          8,
+          9,
+          9
+        ],
+        [
+          9,
+          7,
+          5,
+          2
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          7,
+          7,
+          2,
+          2
+        ],
+        [
+          8,
+          5,
+          3,
+          5
+        ],
+        [
+          4,
+          7,
+          0,
+          1
+        ],
+        [
+          1,
+          7,
+          4,
+          9
+        ]
+      ],
+      "output": [
+        [
+          1,
+          7,
+          4,
+          9
+        ],
+        [
+          4,
+          7,
+          0,
+          1
+        ],
+        [
+          8,
+          5,
+          3,
+          5
+        ],
+        [
+          7,
+          7,
+          2,
+          2
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      4,
+      3,
+      4,
+      1
+    ],
+    [
+      2,
+      4,
+      6,
+      8
+    ],
+    [
+      7,
+      2,
+      0,
+      0
+    ],
+    [
+      8,
+      7,
+      6,
+      1
+    ]
+  ],
+  "testOutput": [
+    [
+      8,
+      7,
+      6,
+      1
+    ],
+    [
+      7,
+      2,
+      0,
+      0
+    ],
+    [
+      2,
+      4,
+      6,
+      8
+    ],
+    [
+      4,
+      3,
+      4,
+      1
+    ]
+  ],
+  "hints": [
+    "Imagine trying to read a book upside-down. You can flip it in your head easily, but computers get confused about which way is 'up' when they're looking at patterns. They don't have eyes like you do.",
+    "Think about when you do a handstand and see the world upside-down. You still know where everything is, just flipped. But a computer would get confused and think the ceiling became the floor and try to walk on it.",
+    "It's like looking at a picture of your family and then flipping it so everyone's head is at the bottom. You'd still recognize everyone, but a computer might think it's looking at completely different people hanging from the ceiling.",
+    "Imagine trying to read a book upside-down. You can flip it in your head easily, but computers get confused about which way is 'up' when they're looking at patterns. They don't have eyes like you do.",
+    "Think about when you do a handstand and see the world upside-down. You still know where everything is, just flipped. But a computer would get confused and think the ceiling became the floor and try to walk on it.",
+    "It's like looking at a picture of your family and then flipping it so everyone's head is at the bottom. You'd still recognize everyone, but a computer might think it's looking at completely different people hanging from the ceiling.",
+    "Flip the entire grid vertically (top ↔ bottom) 🔼🔽.",
+    "The top row becomes the bottom row, the second row from the top becomes the second row from the bottom, and so on.",
+    "Each row maintains its order from left to right, but rows swap positions vertically."
+  ],
+  "transformationType": "vertical_reflection",
+  "generated": true
+}

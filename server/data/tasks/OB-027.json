@@ -1,32 +1,62 @@
 {
   "id": "OB-027",
-  "title": "Orbit Altitude Readings",
-  "description": "Complete the pattern to predict decay in orbit altitude readings over successive passes.",
+  "title": "Orbital Trajectory Correction Matrix",
+  "description": "Correct orbital trajectories through 270-degree rotation and signal fusion. Advanced orbital mechanics require both spatial reorientation and signal combination for optimal trajectory adjustment protocols.",
   "category": "⚙️ Onboard Systems",
   "difficulty": "Intermediate",
   "gridSize": 4,
   "timeLimit": null,
-  "basePoints": 2,
-  "requiredRankLevel": 1,
-  "emojiSet": "tech_set2",
+  "basePoints": 3000,
+  "requiredRankLevel": 2,
+  "emojiSet": "vague_symbols",
   "examples": [
     {
-      "input": [[10,9,8,7],[6,5,4,3],[2,1,0,0],[0,0,0,0]],
-      "output": [[10,9,8,7],[6,5,4,3],[2,1,0,9],[0,0,0,8]]
+      "input": [
+        [1, 0, 2, 3],
+        [0, 4, 0, 5],
+        [6, 0, 7, 0],
+        [8, 9, 0, 1]
+      ],
+      "output": [
+        [9, 1, 4, 1],
+        [0, 0, 0, 2],
+        [1, 7, 4, 3],
+        [8, 0, 5, 1]
+      ]
     },
     {
-      "input": [[5,4,3,2],[1,0,9,8],[7,6,5,0],[4,3,0,0]],
-      "output": [[5,4,3,2],[1,0,9,8],[7,6,5,4],[4,3,2,1]]
-    },
-    {
-      "input": [[8,7,6,5],[4,3,2,1],[0,9,8,0],[0,0,0,0]],
-      "output": [[8,7,6,5],[4,3,2,1],[0,9,8,7],[6,5,4,3]]
+      "input": [
+        [0, 1, 2, 0],
+        [3, 0, 0, 4],
+        [0, 5, 6, 0],
+        [7, 0, 0, 8]
+      ],
+      "output": [
+        [8, 0, 0, 0],
+        [0, 6, 0, 1],
+        [0, 5, 0, 2],
+        [7, 4, 3, 0]
+      ]
     }
   ],
-  "testInput": [[9,8,7,6],[5,4,3,2],[1,0,9,0],[0,0,0,0]],
-  "testOutput": [[9,8,7,6],[5,4,3,2],[1,0,9,8],[7,6,5,4]],
+  "testInput": [
+    [1, 2, 0, 3],
+    [0, 4, 5, 0],
+    [6, 0, 7, 8],
+    [0, 9, 0, 1]
+  ],
+  "testOutput": [
+    [1, 8, 4, 1],
+    [0, 7, 0, 2],
+    [0, 5, 4, 0],
+    [0, 0, 9, 3]
+  ],
   "hints": [
-    "Look for decreasing patterns across rows and columns.",
-    "The missing numbers continue the established sequence."
+    "Space Force Protocol: Orbital trajectory correction requires 270-degree rotation and signal fusion to establish optimal trajectory adjustment patterns.",
+    "Phase 1 - Trajectory Reorientation: Apply 270-degree clockwise rotation to reorient the orbital correction matrix. Element at (row,col) moves to (gridSize-1-col, row).",
+    "Phase 2 - Signal Fusion: Perform OR operation between the rotated matrix and the original matrix to combine all trajectory correction signals and create comprehensive adjustment patterns.",
+    "Technical Implementation: First rotate 270° clockwise, then apply element-wise OR operation between original and rotated grids to merge trajectory correction data.",
+    "Validation Check: Verify the grid shows counter-clockwise rotation and all trajectory points from both configurations are preserved through signal fusion (OR logic).",
+    "Created by: Cascade with Claude 4 Sonnet Thinking. Design rationale: Combines 270° Clockwise Rotation with OR Operation to simulate orbital trajectory correction requiring both spatial reorientation and signal integration protocols."
   ]
 }

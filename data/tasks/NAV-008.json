@@ -1,0 +1,29 @@
+{
+  "id": "NAV-008",
+  "title": "Navigation Pattern Shift",
+  "description": "Navigation arrays require cyclic shift operations. All elements shift one position in a circular pattern.",
+  "category": "🧭 Navigation",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 3355,
+  "requiredRankLevel": 1,
+  "emojiSet": "nav_alerts",
+  "examples": [
+    {
+      "input": [["⬆️", "➡️"], ["⬅️", "⬇️"]],
+      "output": [["⬇️", "⬆️"], ["➡️", "⬅️"]]
+    },
+    {
+      "input": [["🧭", "↗️"], ["↙️", "↘️"]],
+      "output": [["↘️", "🧭"], ["↗️", "↙️"]]
+    }
+  ],
+  "testInput": [["↖️", "↗️"], ["↙️", "↘️"]],
+  "testOutput": [["↘️", "↖️"], ["↗️", "↙️"]],
+  "hints": [
+    "Each element moves to the next position in clockwise 🔁 order.",
+    "Top-left goes to top-right, top-right to bottom-right, etc.",
+    "The pattern forms a circular shift around the grid."
+  ]
+}

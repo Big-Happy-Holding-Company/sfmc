@@ -1,0 +1,85 @@
+{
+  "id": "SEC-236",
+  "title": "Primary Diagonal Reflection Task",
+  "description": "Reflect the grid across the primary diagonal (top-left to bottom-right)",
+  "category": "🔒 Security",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 100,
+  "requiredRankLevel": 1,
+  "emojiSet": "celestial_set2",
+  "examples": [
+    {
+      "input": [
+        [
+          7,
+          0
+        ],
+        [
+          3,
+          8
+        ]
+      ],
+      "output": [
+        [
+          8,
+          8
+        ],
+        [
+          1,
+          7
+        ]
+      ]
+    },
+    {
+      "input": [
+        [
+          9,
+          2
+        ],
+        [
+          6,
+          4
+        ]
+      ],
+      "output": [
+        [
+          5,
+          3
+        ],
+        [
+          0,
+          4
+        ]
+      ]
+    }
+  ],
+  "testInput": [
+    [
+      5,
+      5
+    ],
+    [
+      5,
+      3
+    ]
+  ],
+  "testOutput": [
+    [
+      5,
+      5
+    ],
+    [
+      5,
+      3
+    ]
+  ],
+  "hints": [
+    "Imagine a line going from the top-left corner to the bottom-right corner of the grid ↘️. Flip the grid over this line.",
+    "This is like swapping rows and columns - the first row becomes the first column, the second row becomes the second column, and so on.",
+    "The number in the top-right corner will move to the bottom-left corner, like looking at the grid in a mirror along the diagonal."
+  ],
+  "transformationType": "primary_diagonal_reflection",
+  "generated": true
+}

@@ -1,0 +1,62 @@
+{
+  "id": "OB-003",
+  "title": "Satellite Array Reconfiguration",
+  "description": "Reconfigure satellite array through 90-degree rotation and logical masking. Advanced communications require both spatial reorientation and selective signal filtering for optimal deep space transmission.",
+  "category": "⚙️ Onboard Systems",
+  "difficulty": "Basic",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 2000,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [1, 2, 0, 3],
+        [4, 0, 5, 0],
+        [0, 6, 0, 7],
+        [8, 0, 9, 1]
+      ],
+      "output": [
+        [8, 0, 4, 1],
+        [0, 0, 0, 2],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0]
+      ]
+    },
+    {
+      "input": [
+        [0, 1, 2, 0],
+        [3, 4, 0, 5],
+        [0, 0, 6, 7],
+        [8, 9, 0, 0]
+      ],
+      "output": [
+        [8, 0, 3, 0],
+        [0, 0, 4, 1],
+        [0, 0, 0, 2],
+        [0, 0, 0, 0]
+      ]
+    }
+  ],
+  "testInput": [
+    [1, 0, 2, 3],
+    [0, 4, 0, 5],
+    [6, 0, 7, 0],
+    [0, 8, 0, 9]
+  ],
+  "testOutput": [
+    [0, 6, 0, 1],
+    [8, 0, 4, 0],
+    [0, 0, 0, 2],
+    [0, 0, 0, 3]
+  ],
+  "hints": [
+    "Space Force Protocol: Satellite array reconfiguration requires rotation and logical filtering to optimize signal transmission patterns.",
+    "Phase 1 - Array Rotation: Apply 90-degree clockwise rotation to reorient the satellite array. Each element moves: (row,col) → (col, gridSize-1-row).",
+    "Phase 2 - Signal Masking: Apply AND operation with the original grid to filter signals. Only positions where both original and rotated grids have non-zero values remain active.",
+    "Technical Implementation: First rotate the grid 90° clockwise, then perform element-wise AND operation between original and rotated grids.",
+    "Validation Check: Verify the grid orientation has changed 90° and only positions with double-active signals (non-zero in both grids) remain illuminated.",
+    "Created by: Cascade with Claude 4 Sonnet Thinking. Design rationale: Combines 90° Clockwise Rotation with AND Operation to simulate satellite array reconfiguration requiring both physical reorientation and signal filtering protocols."
+  ]
+}

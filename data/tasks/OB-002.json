@@ -1,0 +1,56 @@
+{
+  "id": "OB-002",
+  "title": "Docking Port Calibration Matrix",
+  "description": "Establish docking port alignment through vertical reflection and pattern completion. Critical docking systems require both orientation adjustment and missing component identification for safe spacecraft linkage.",
+  "category": "⚙️ Onboard Systems",
+  "difficulty": "Basic",
+  "gridSize": 3,
+  "timeLimit": null,
+  "basePoints": 2000,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set2",
+  "examples": [
+    {
+      "input": [
+        [1, 0, 2],
+        [3, 4, 5],
+        [0, 6, 0]
+      ],
+      "output": [
+        [7, 6, 7],
+        [3, 4, 5],
+        [2, 7, 1]
+      ]
+    },
+    {
+      "input": [
+        [0, 1, 0],
+        [2, 0, 3],
+        [4, 5, 6]
+      ],
+      "output": [
+        [4, 5, 6],
+        [3, 7, 2],
+        [7, 1, 7]
+      ]
+    }
+  ],
+  "testInput": [
+    [1, 2, 0],
+    [0, 3, 4],
+    [5, 0, 6]
+  ],
+  "testOutput": [
+    [5, 7, 6],
+    [4, 3, 7],
+    [7, 2, 1]
+  ],
+  "hints": [
+    "Space Force Protocol: Docking port calibration requires dual-phase transformation to ensure proper spacecraft alignment and structural completion.",
+    "Phase 1 - Mirror Adjustment: Apply vertical reflection by flipping the grid top-to-bottom. The first row becomes the last row, middle row stays in place.",
+    "Phase 2 - Pattern Completion: Fill all empty spaces (value 0) with value 7 to represent completed docking mechanisms and structural integrity points.",
+    "Technical Implementation: First reflect vertically (swap rows), then replace all 0 values with 7. This ensures proper orientation and full system activation.",
+    "Validation Check: Verify the grid orientation is inverted vertically and no empty spaces remain - all positions must show active components (no zeros).",
+    "Created by: Cascade with Claude 4 Sonnet Thinking. Design rationale: Combines Vertical Reflection with Pattern Completion to simulate realistic docking procedures requiring both spatial reorientation and system activation protocols."
+  ]
+}

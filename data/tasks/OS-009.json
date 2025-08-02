@@ -1,0 +1,29 @@
+{
+  "id": "OS-009",
+  "title": "Sensor Row-Column Intersection",
+  "description": "Oxygen sensor arrays require intersection analysis. Only elements that appear in both their row and column patterns remain active.",
+  "category": "🛡️ O₂ Sensor Check",
+  "difficulty": "Officer (Expert)",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 23180,
+  "requiredRankLevel": 1,
+  "emojiSet": "celestial_set1",
+  "examples": [
+    {
+      "input": [["3", "8"], ["3", "9"]],
+      "output": [["3", "0"], ["3", "0"]]
+    },
+    {
+      "input": [["4", "2"], ["4", "7"]],
+      "output": [["4", "0"], ["4", "0"]]
+    }
+  ],
+  "testInput": [["1", "7"], ["1", "8"]],
+  "testOutput": [["1", "0"], ["1", "0"]],
+  "hints": [
+    "Find elements that appear in both row and column positions.",
+    "Elements that repeat across row/column boundaries are preserved.",
+    "Unique elements in their row or column become ⬛."
+  ]
+}

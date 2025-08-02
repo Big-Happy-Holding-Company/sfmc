@@ -1,32 +1,62 @@
 {
   "id": "OB-017",
-  "title": "Asteroid Surface Mapping",
-  "description": "Rotate the grid 90 degrees clockwise as the probe orbits to track surface features.",
+  "title": "Asteroid Mineral Survey Analysis",
+  "description": "Analyze asteroid mineral composition through secondary diagonal reflection and exclusive pattern identification. Advanced geological survey requires both structural transformation and exclusive mineral detection for accurate resource assessment.",
   "category": "⚙️ Onboard Systems",
   "difficulty": "Intermediate",
-  "gridSize": 5,
+  "gridSize": 4,
   "timeLimit": null,
-  "basePoints": 2,
-  "requiredRankLevel": 1,
-  "emojiSet": "tech_set1",
+  "basePoints": 3000,
+  "requiredRankLevel": 2,
+  "emojiSet": "vague_symbols",
   "examples": [
     {
-      "input": [[1,2,3,1,2], [3,1,2,3,1], [2,3,1,2,3], [1,2,3,1,2], [3,1,2,3,1]],
-      "output": [[3,1,2,3,1], [1,2,3,1,2], [2,3,1,2,3], [3,1,2,3,1], [1,2,3,1,2]]
+      "input": [
+        [1, 0, 2, 3],
+        [0, 4, 0, 5],
+        [6, 0, 7, 0],
+        [8, 9, 0, 1]
+      ],
+      "output": [
+        [8, 6, 0, 1],
+        [9, 0, 4, 0],
+        [0, 7, 0, 2],
+        [8, 0, 5, 3]
+      ]
     },
     {
-      "input": [[5,6,7,8,9], [0,1,2,3,4], [5,6,7,8,9], [0,1,2,3,4], [5,6,7,8,9]],
-      "output": [[5,0,5,0,5], [6,1,6,1,6], [7,2,7,2,7], [8,3,8,3,8], [9,4,9,4,9]]
-    },
-    {
-      "input": [[0,0,1,1,2], [2,3,3,4,4], [5,5,6,6,7], [7,8,8,9,9], [0,1,2,3,4]],
-      "output": [[0,7,5,2,0], [1,8,5,3,0], [2,8,6,3,1], [3,9,6,4,1], [4,9,7,4,2]]
+      "input": [
+        [0, 1, 2, 0],
+        [3, 0, 0, 4],
+        [0, 5, 6, 0],
+        [7, 0, 0, 8]
+      ],
+      "output": [
+        [7, 0, 3, 0],
+        [0, 5, 0, 1],
+        [0, 6, 0, 2],
+        [7, 0, 4, 0]
+      ]
     }
   ],
-  "testInput": [[4,5,6,7,8], [9,0,1,2,3], [4,5,6,7,8], [9,0,1,2,3], [4,5,6,7,8]],
-  "testOutput": [[4,9,4,9,4], [5,0,5,0,5], [6,1,6,1,6], [7,2,7,2,7], [8,3,8,3,8]],
+  "testInput": [
+    [1, 2, 0, 3],
+    [0, 4, 5, 0],
+    [6, 0, 7, 8],
+    [0, 9, 0, 1]
+  ],
+  "testOutput": [
+    [0, 6, 0, 1],
+    [9, 0, 4, 2],
+    [0, 7, 5, 0],
+    [0, 0, 0, 3]
+  ],
   "hints": [
-    "Visualize the entire grid rotating like a wheel.",
-    "Each corner moves to a new corner position after rotation."
+    "Space Force Protocol: Asteroid mineral survey requires secondary diagonal transformation and exclusive pattern identification to isolate unique geological formations.",
+    "Phase 1 - Geological Reorientation: Apply secondary diagonal reflection to transform the mineral matrix. Element at position (row,col) moves to position (gridSize-1-col, gridSize-1-row).",
+    "Phase 2 - Exclusive Detection: Perform XOR operation between the reflected matrix and the original matrix to identify exclusive mineral deposits present in only one configuration.",
+    "Technical Implementation: First reflect along secondary diagonal (anti-diagonal), then apply element-wise XOR operation between original and reflected grids.",
+    "Validation Check: Verify the grid shows secondary diagonal transformation and only positions with exclusive readings (present in one grid but not both) remain illuminated.",
+    "Created by: Cascade with Claude 4 Sonnet Thinking. Design rationale: Combines Secondary Diagonal Reflection with XOR Operation to simulate asteroid mineral survey requiring both geological reorientation and exclusive mineral detection protocols."
   ]
 }

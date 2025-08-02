@@ -1,0 +1,25 @@
+{
+  "id": "OS-002",
+  "title": "Atmospheric Pressure Check",
+  "description": "Secondary oxygen sensors need recalibration. Here's what worked before, can you recalibrate our setting to restore proper atmospheric readings?",
+  "category": "🛡️ O₂ Sensor Check",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 1400,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [[1, 2], [3, 4]],
+      "output": [[4, 3], [2, 1]]
+    }
+  ],
+  "testInput": [[5, 6], [0, 1]],
+  "testOutput": [[1, 0], [6, 5]],
+  "hints": [
+    "Notice the rotation pattern in the transformation.",
+    "The grid rotates 180 degrees clockwise 🔁.",
+    "Bottom-right becomes top-left, top-left becomes bottom-right."
+  ]
+}

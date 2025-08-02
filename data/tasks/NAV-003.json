@@ -1,0 +1,45 @@
+{
+  "id": "NAV-003",
+  "title": "Gravitational Field Mapping",
+  "description": "Navigation requires understanding object attraction patterns. Objects move toward the center of gravitational influence.",
+  "category": "🧭 Navigation",
+  "difficulty": "Advanced",
+  "gridSize": 4,
+  "timeLimit": null,
+  "basePoints": 8580,
+  "requiredRankLevel": 1,
+  "emojiSet": "nav_alerts",
+  "examples": [
+    {
+      "input": [
+        ["⬆️", "⬛", "⬛", "⬇️"],
+        ["⬛", "⬛", "⬛", "⬛"],
+        ["⬛", "⬛", "🧭", "⬛"],
+        ["⬅️", "⬛", "⬛", "➡️"]
+      ],
+      "output": [
+        ["⬛", "⬛", "⬛", "⬛"],
+        ["⬛", "⬇️", "➡️", "⬛"],
+        ["⬛", "⬅️", "🧭", "⬆️"],
+        ["⬛", "⬛", "⬛", "⬛"]
+      ]
+    }
+  ],
+  "testInput": [
+    ["↗️", "⬛", "⬛", "↖️"],
+    ["⬛", "⬛", "⬛", "⬛"],
+    ["⬛", "⬛", "🧭", "⬛"],
+    ["↘️", "⬛", "⬛", "↙️"]
+  ],
+  "testOutput": [
+    ["⬛", "⬛", "⬛", "⬛"],
+    ["⬛", "↙️", "↖️", "⬛"],
+    ["⬛", "↘️", "🧭", "↗️"],
+    ["⬛", "⬛", "⬛", "⬛"]
+  ],
+  "hints": [
+    "Objects are attracted toward the central gravitational source.",
+    "Each arrow moves one step closer to the center position.",
+    "The gravitational center (🧭) remains stationary."
+  ]
+}

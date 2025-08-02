@@ -1,0 +1,29 @@
+{
+  "id": "PL-001",
+  "title": "Pre-Launch Sequence Alpha",
+  "description": "Mirror pre-launch panel indicators across the vertical axis to verify symmetry before ignition.",
+  "category": "🚀 Pre-Launch Ops",
+  "difficulty": "Basic",
+  "gridSize": 2,
+  "timeLimit": null,
+  "basePoints": 4350,
+  "requiredRankLevel": 1,
+  "emojiSet": "tech_set1",
+  "examples": [
+    {
+      "input": [[1, 0], [2, 0]],
+      "output": [[0, 1], [0, 2]]
+    },
+    {
+      "input": [[0, 3], [4, 5]],
+      "output": [[3, 0], [5, 4]]
+    }
+  ],
+  "testInput": [[6, 0], [0, 7]],
+  "testOutput": [[0, 6], [7, 0]],
+  "hints": [
+    "Reflect the grid left-to-right.",
+    "Columns swap positions; rows stay the same.",
+    "⬛ represents background and remains where no component exists."
+  ]
+}

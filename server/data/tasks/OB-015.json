@@ -1,45 +1,62 @@
 {
   "id": "OB-015",
-  "title": "Asteroid Deflection System",
-  "description": "To deflect an incoming asteroid, the tractor beam emitters must be rotated 90 degrees clockwise. Adjust the power matrix accordingly.",
+  "title": "Asteroid Defense Array Reconfiguration",
+  "description": "Configure asteroid defense through horizontal translation and border extraction. Critical defense systems require both positional shift and perimeter identification for optimal asteroid interception trajectory.",
   "category": "⚙️ Onboard Systems",
   "difficulty": "Intermediate",
   "gridSize": 4,
   "timeLimit": null,
   "basePoints": 3000,
   "requiredRankLevel": 2,
-  "emojiSet": "tech_set2",
+  "emojiSet": "vague_symbols",
   "examples": [
     {
       "input": [
-        [1, 2, 3, 4],
-        [5, 6, 7, 8],
-        [9, 0, 1, 2],
-        [3, 4, 5, 6]
+        [1, 2, 0, 3],
+        [0, 4, 5, 0],
+        [6, 0, 7, 8],
+        [0, 9, 0, 1]
       ],
       "output": [
-        [3, 9, 5, 1],
-        [4, 0, 6, 2],
-        [5, 1, 7, 3],
-        [6, 2, 8, 4]
+        [9, 9, 9, 9],
+        [9, 2, 4, 9],
+        [9, 5, 6, 9],
+        [9, 9, 9, 9]
+      ]
+    },
+    {
+      "input": [
+        [0, 1, 2, 0],
+        [3, 0, 0, 4],
+        [0, 5, 6, 0],
+        [7, 0, 0, 8]
+      ],
+      "output": [
+        [9, 9, 9, 9],
+        [9, 1, 2, 9],
+        [9, 3, 0, 9],
+        [9, 9, 9, 9]
       ]
     }
   ],
   "testInput": [
-    [1, 1, 2, 2],
-    [3, 3, 4, 4],
-    [5, 5, 6, 6],
-    [7, 7, 8, 8]
+    [1, 0, 2, 3],
+    [0, 4, 0, 5],
+    [6, 0, 7, 0],
+    [8, 9, 0, 1]
   ],
   "testOutput": [
-    [7, 5, 3, 1],
-    [7, 5, 3, 1],
-    [8, 6, 4, 2],
-    [8, 6, 4, 2]
+    [9, 9, 9, 9],
+    [9, 0, 1, 9],
+    [9, 4, 0, 9],
+    [9, 9, 9, 9]
   ],
   "hints": [
-    "Rotate the grid 90 degrees clockwise.",
-    "The top row becomes the right column, the right column becomes the bottom row, and so on.",
-    "The value at [row, col] moves to [col, gridSize - 1 - row]."
+    "Space Force Protocol: Asteroid defense array requires horizontal translation and perimeter marking to establish optimal interception coordinates.",
+    "Phase 1 - Array Translation: Apply horizontal shift by moving each element one position right, with rightmost elements wrapping to the left side of the grid.",
+    "Phase 2 - Border Identification: Mark all border positions (edges and corners) with value 9 to indicate critical defense perimeter zones for asteroid tracking.",
+    "Technical Implementation: First shift all elements right by one position (with wraparound), then replace all border elements with 9 for perimeter marking.",
+    "Validation Check: Verify elements have shifted horizontally and all edge positions show defense perimeter marking (value 9) for asteroid interception coverage.",
+    "Created by: Cascade with Claude 4 Sonnet Thinking. Design rationale: Combines Translation/Shift with Border Extraction to simulate asteroid defense requiring both positional adjustment and perimeter identification protocols."
   ]
 }
