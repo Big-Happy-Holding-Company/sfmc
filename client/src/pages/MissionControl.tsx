@@ -251,7 +251,7 @@ export default function MissionControl() {
                 
                 {/* Example Transformations */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  {((currentTask.examples || []) as MissionExample[]).map((example, index) => (
+                  {((currentTask.examples || []) as MissionExample[]).map<JSX.Element>((example, index) => (
                     <div key={index} className="bg-slate-900 border border-slate-600 rounded p-4">
                       <h3 className="text-green-400 font-semibold mb-3 flex items-center">
                         <i className="fas fa-eye mr-2"></i>
