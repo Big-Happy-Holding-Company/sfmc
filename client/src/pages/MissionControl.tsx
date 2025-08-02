@@ -158,7 +158,7 @@ export default function MissionControl() {
     setIsTimerActive(false);
   };
 
-  const renderExampleGrid = (grid: string[][], title: string) => (
+  const renderExampleGrid = (grid: string[][], title: string): JSX.Element => (
     <div>
       <div className="text-xs text-slate-400 mb-2 text-center">{title}</div>
       <div 

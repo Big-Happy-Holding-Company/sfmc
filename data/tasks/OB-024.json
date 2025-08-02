@@ -1,32 +1,62 @@
 {
   "id": "OB-024",
-  "title": "Landing Pad Sequences",
-  "description": "Identify and complete the approach light sequence patterns for safe landing procedures.",
+  "title": "Landing Pad Approach Vector Matrix",
+  "description": "Configure landing pad approach vectors through secondary diagonal reflection and value substitution. Advanced landing systems require both spatial transformation and component replacement for optimal approach trajectory calculation.",
   "category": "⚙️ Onboard Systems",
   "difficulty": "Intermediate",
   "gridSize": 4,
   "timeLimit": null,
-  "basePoints": 2,
-  "requiredRankLevel": 1,
-  "emojiSet": "tech_set2",
+  "basePoints": 3000,
+  "requiredRankLevel": 2,
+  "emojiSet": "alien_language",
   "examples": [
     {
-      "input": [[1,2,3,0], [2,3,4,5], [3,4,5,6], [4,5,6,7]],
-      "output": [[1,2,3,4], [2,3,4,5], [3,4,5,6], [4,5,6,7]]
+      "input": [
+        [1, 0, 2, 3],
+        [0, 4, 0, 5],
+        [6, 0, 7, 0],
+        [8, 9, 0, 1]
+      ],
+      "output": [
+        [1, 7, 4, 1],
+        [7, 7, 7, 2],
+        [5, 7, 7, 7],
+        [3, 7, 9, 8]
+      ]
     },
     {
-      "input": [[9,8,7,0], [7,6,5,4], [5,4,3,2], [3,2,1,0]],
-      "output": [[9,8,7,6], [7,6,5,4], [5,4,3,2], [3,2,1,0]]
-    },
-    {
-      "input": [[1,3,5,0], [3,5,7,9], [5,7,9,1], [7,9,1,3]],
-      "output": [[1,3,5,7], [3,5,7,9], [5,7,9,1], [7,9,1,3]]
+      "input": [
+        [0, 1, 2, 0],
+        [3, 0, 0, 4],
+        [0, 5, 6, 0],
+        [7, 0, 0, 8]
+      ],
+      "output": [
+        [8, 7, 3, 7],
+        [7, 6, 5, 1],
+        [4, 7, 7, 2],
+        [7, 7, 7, 7]
+      ]
     }
   ],
-  "testInput": [[2,4,6,0], [4,6,8,0], [6,8,0,2], [8,0,2,4]],
-  "testOutput": [[2,4,6,8], [4,6,8,0], [6,8,0,2], [8,0,2,4]],
+  "testInput": [
+    [1, 2, 0, 3],
+    [0, 4, 5, 0],
+    [6, 0, 7, 8],
+    [0, 9, 0, 1]
+  ],
+  "testOutput": [
+    [1, 7, 4, 1],
+    [9, 7, 7, 2],
+    [8, 5, 7, 7],
+    [3, 7, 9, 7]
+  ],
   "hints": [
-    "Look for sequential patterns across each row.",
-    "Each row follows the same incrementing or decrementing pattern."
+    "Space Force Protocol: Landing pad approach vector configuration requires secondary diagonal transformation and component replacement for optimal trajectory calculation.",
+    "Phase 1 - Vector Reorientation: Apply secondary diagonal reflection to transform the approach matrix. Element at position (row,col) moves to position (gridSize-1-col, gridSize-1-row).",
+    "Phase 2 - Component Replacement: Replace all inactive approach vectors (value 0) with value 7 to represent active guidance beacons and trajectory markers.",
+    "Technical Implementation: First reflect along secondary diagonal (anti-diagonal), then replace all 0 values with 7 for complete approach guidance coverage.",
+    "Validation Check: Verify the grid has been transformed along the secondary diagonal and all positions show active guidance systems (no zeros remain).",
+    "Created by: Cascade with Claude 4 Sonnet Thinking. Design rationale: Combines Secondary Diagonal Reflection with Value Replacement to simulate landing pad approach vector configuration requiring both geometric transformation and guidance system activation protocols."
   ]
 }

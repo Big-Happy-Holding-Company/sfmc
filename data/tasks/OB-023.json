@@ -1,32 +1,56 @@
 {
   "id": "OB-023",
-  "title": "Communication Array Patterns",
-  "description": "Identify and complete the binary signal patterns for the communication array deployment sequence.",
+  "title": "Communication Array Signal Processing",
+  "description": "Process communication array signals through corner marking and sequence progression. Advanced communication systems require both structural marking and temporal advancement for optimal signal transmission protocols.",
   "category": "⚙️ Onboard Systems",
   "difficulty": "Intermediate",
   "gridSize": 3,
   "timeLimit": null,
-  "basePoints": 2,
-  "requiredRankLevel": 1,
-  "emojiSet": "celestial_set1",
+  "basePoints": 3000,
+  "requiredRankLevel": 2,
+  "emojiSet": "vague_symbols",
   "examples": [
     {
-      "input": [[1,0,1], [0,0,1], [1,1,0]],
-      "output": [[1,0,1], [0,1,1], [1,1,0]]
+      "input": [
+        [1, 0, 2],
+        [3, 4, 0],
+        [0, 5, 6]
+      ],
+      "output": [
+        [9, 1, 9],
+        [4, 5, 1],
+        [9, 6, 9]
+      ]
     },
     {
-      "input": [[0,1,0], [1,0,1], [0,1,0]],
-      "output": [[0,1,0], [1,1,1], [0,1,0]]
-    },
-    {
-      "input": [[1,1,1], [1,0,1], [0,0,0]],
-      "output": [[1,1,1], [1,0,1], [1,0,1]]
+      "input": [
+        [0, 1, 0],
+        [2, 0, 3],
+        [4, 0, 5]
+      ],
+      "output": [
+        [9, 2, 9],
+        [3, 1, 4],
+        [9, 1, 9]
+      ]
     }
   ],
-  "testInput": [[0,0,0], [1,0,1], [0,1,0]],
-  "testOutput": [[0,0,0], [1,1,1], [0,1,0]],
+  "testInput": [
+    [1, 2, 0],
+    [0, 3, 4],
+    [5, 0, 6]
+  ],
+  "testOutput": [
+    [9, 3, 9],
+    [1, 4, 5],
+    [9, 1, 9]
+  ],
   "hints": [
-    "Look for patterns in rows, columns, and diagonals.",
-    "Binary signals follow symmetry and balance principles."
+    "Space Force Protocol: Communication array signal processing requires corner marking and temporal sequence advancement for optimal transmission coverage.",
+    "Phase 1 - Corner Marking: Mark all corner positions (four corners of the grid) with value 9 to indicate primary transmission nodes and signal amplification points.",
+    "Phase 2 - Sequence Progression: Increment all non-zero values by 1 to represent temporal advancement of communication cycles, with 0 values remaining unchanged.",
+    "Technical Implementation: First mark corners with 9, then increment all non-zero values by 1 for temporal progression of signal transmission cycles.",
+    "Validation Check: Verify all corner positions show transmission nodes (value 9) and all active communication systems show temporal progression (incremented by 1).",
+    "Created by: Cascade with Claude 4 Sonnet Thinking. Design rationale: Combines Corner Marking with Sequence Increment to simulate communication array signal processing requiring both structural node identification and temporal advancement protocols."
   ]
 }

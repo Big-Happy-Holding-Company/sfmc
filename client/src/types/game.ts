@@ -23,7 +23,7 @@ export interface MissionExample {
 }
 
 export interface GridCell {
-  emoji: string;
+  emoji: string[];
   row: number;
   col: number;
 }
