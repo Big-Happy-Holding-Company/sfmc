@@ -122,6 +122,12 @@ shared/
 - Logical: AND/OR/XOR/NOT operations, conditional logic
 - Spatial: inside/outside, adjacent, containment, proximity relationships
 - Object: counting, sorting, grouping, filtering
+- More to be added based on ARC-AGI puzzle types
+
+**Difficulty Scaling:**
+- Basic: Simple transformations, single step solutions
+- Intermediate: Combined transformations, multi-step reasoning
+- Advanced: Complex combinations, abstract concepts, higher-order logic
 
 ## Development Guidelines
 
