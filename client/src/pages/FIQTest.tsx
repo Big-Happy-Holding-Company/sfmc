@@ -16,7 +16,7 @@
  * HOW THE PROJECT USES IT:
  * - Accessed via the "Test FIQ" button in the MissionSelector component
  * - Serves as a standalone page for FIQ testing and onboarding task inspection
- * - Integrates with the server's /api/tasks endpoint to fetch onboarding task data
+ * - Integrates with PlayFab service to fetch onboarding task data from Title Data
  * - Provides developers and users a way to test available onboarding content
  */
 
