@@ -1,9 +1,12 @@
 # railway.toml
 # Project deployment configuration for Railway
+# Full-stack React + Node.js deployment
 # Author: Cascade AI
 
 [build]
-command = "npm run build"
+# Build both React client (Vite) and Node.js server (esbuild)
+command = "npm ci && npm run build"
 
 [deploy]
+# Start the bundled Node.js server (serves both API and static client)
 command = "node dist/index.js"

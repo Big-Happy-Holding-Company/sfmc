@@ -1,5 +1,6 @@
 # nixpacks.toml
 # Nixpacks build configuration for Railway
+# Full-stack React + Node.js with PlayFab integration
 # Author: Cascade AI
 
 [phases.setup]
@@ -11,9 +12,10 @@ nixPkgs = ["nodejs_18"]
 cmds = ["npm ci"]
 
 [phases.build]
-# Build both the client and server bundles
+# Build both the React client (Vite) and Node.js server (esbuild)
+# Vite builds client to dist/public, esbuild bundles server to dist/index.js
 cmds = ["npm run build"]
 
 [start]
-# Start the bundled Node.js server
+# Start the bundled Node.js server (serves API + static client files)
 cmd = "node dist/index.js"
