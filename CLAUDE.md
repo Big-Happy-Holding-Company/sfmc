@@ -5,14 +5,13 @@ This should use the repo at https://github.com/Big-Happy-Holding-Company/sfmc-ap
 
 ## Architecture
 
-**Full-Stack TypeScript Application:**
+**Frontend-Only TypeScript Application:**
 - **Frontend**: React + Vite (client/)
-- **Backend**: Express.js (server/)  Converting to PlayFab now!!
-- **Database**: None currently? Moving to PlayFab.
+- **Task Data**: Local JSON file (public/data/tasks.json) - matches Unity implementation
+- **User Features**: PlayFab (authentication, progress, leaderboards, profiles)
 - **Styling**: Tailwind CSS + shadcn/ui components
-- **PlayFab SDK**: playfab-sdk (installed via npm already)
-- **PlayFab Web SDK**: playfab-web-sdk (installed via npm already)
-- **Deployment**: Railway.app using existing account, deploys from main branch
+- **PlayFab Web SDK**: playfab-web-sdk for client-side user features only
+- **Deployment**: Railway.app static frontend deployment
 
 **Directory Structure:**
 ```
@@ -21,33 +20,28 @@ client/src/
 ├── components/ui/       # shadcn UI components
 ├── constants/           # Emoji sets and game constants
 ├── types/              # TypeScript type definitions
+├── services/           # PlayFab service integration
 └── pages/              # Route components
-THIS IS NOW DEPRECATED BECAUSE IT IS IN PlayFab!
-server/
-├── data/tasks/         # Individual JSON task files (CORE SYSTEM)
-├── templates/          # Task generation templates
-├── tools/              # Task/story generation utilities
-├── services/           # Business logic services
-├── cli/                # CLI tools for task generation
-├── index.ts            # Server entry point
-├── routes.ts           # API route handlers
-└── storage.ts          # Data storage interface
 
-shared/
-└── schema.ts           # Database schema and types  THIS IS NOW DEPRECATED BECAUSE IT IS IN PlayFab!
+public/
+└── data/tasks.json     # Consolidated task data (matches Unity implementation)
+
+DEPRECATED (TO BE REMOVED):
+server/                 # Express server - REMOVE ENTIRELY
+shared/schema.ts        # Database types - REMOVE ENTIRELY
 ```
 
 **Path Aliases:**
 - `@/` → `client/src/`
-- `@shared/` → `shared/`
 
 ## Task System
 
-**Task File Structure:**
-- Tasks stored as individual JSON files in `server/data/tasks/`
-- **CRITICAL**: Use integers 0-9 in task data files, NOT emojis
+**Task Data Storage:**
+- Tasks stored in consolidated `public/data/tasks.json` file
+- **CRITICAL**: Use integers 0-9 in task data, NOT emojis
 - Emojis are mapped only in UI layer via `client/src/constants/spaceEmojis.ts`
 - Task ID format: `CATEGORY-XXX` (e.g., COM-001, NAV-100, PWR-230)
+- Matches Unity implementation: local JSON file, NOT PlayFab storage
 
 **Task Categories:**
 - `COM-XXX`: 📡 Communications
@@ -104,7 +98,32 @@ shared/
 - Intermediate: Combined transformations, multi-step reasoning
 - Advanced: Complex combinations, abstract concepts, higher-order logic
 
-## Development Guidelines
-We are moving to PlayFab for data storage.  The PlayFab instance is already configured and the user can log in with their Microsoft account and provide you with their PlayFab ID or any other identifier you need to access their account.
+## PlayFab Integration
 
-Use https://learn.microsoft.com/en-us/gaming/playfab/sdks/nodejs/ to find any information you need about the PlayFab SDK for Node.js.  
+**PlayFab Usage (User Features Only):**
+- **Title ID:** 19FACB
+- **Authentication:** `LoginWithCustomID` for user sessions
+- **User Progress:** `UpdateUserData` and `GetUserData` for task completion tracking
+- **Leaderboards:** `UpdatePlayerStatistics` and `GetLeaderboard` for global rankings
+- **Player Profiles:** `GetPlayerProfile` for user information and avatars
+
+**PlayFab is NOT used for:**
+- ❌ Task/puzzle data storage (use local JSON file)
+- ❌ CloudScript functions
+- ❌ Title Data for game content
+- ❌ Game configuration data
+
+**Environment Configuration:**
+```
+VITE_PLAYFAB_TITLE_ID=19FACB
+```
+
+## Development Guidelines
+
+**Data Access Pattern:**
+1. **Task Data:** Load from `public/data/tasks.json` using `fetch()`
+2. **User Authentication:** PlayFab `LoginWithCustomID`
+3. **User Progress:** PlayFab UserData APIs
+4. **Leaderboards:** PlayFab Statistics APIs
+
+This matches the Unity implementation exactly: local task data + PlayFab for user features.  
