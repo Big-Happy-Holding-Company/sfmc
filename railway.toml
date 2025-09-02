@@ -1,9 +1,12 @@
 # railway.toml
-# Project deployment configuration for Railway
+# Static site deployment configuration for Railway
+# React app with PlayFab integration (no server needed)
 # Author: Cascade AI
 
 [build]
-command = "npm run build"
+# Build React client only - PlayFab handles all backend functionality
+command = "npm ci && npm run build:client"
 
 [deploy]
-command = "node dist/index.js"
+# Static site deployment - no server process needed
+staticPublishPath = "dist"

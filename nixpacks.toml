@@ -1,9 +1,10 @@
 # nixpacks.toml
-# Nixpacks build configuration for Railway
+# Static site build configuration for Railway
+# React app with PlayFab integration (no server needed)
 # Author: Cascade AI
 
 [phases.setup]
-# Ensure Node.js 18 and any other system dependencies
+# Ensure Node.js 18 for Vite build process
 nixPkgs = ["nodejs_18"]
 
 [phases.install]
@@ -11,9 +12,6 @@ nixPkgs = ["nodejs_18"]
 cmds = ["npm ci"]
 
 [phases.build]
-# Build both the client and server bundles
-cmds = ["npm run build"]
-
-[start]
-# Start the bundled Node.js server
-cmd = "node dist/index.js"
+# Build React client only - PlayFab handles all backend functionality
+# Vite builds client to dist/ for static deployment
+cmds = ["npm run build:client"]
