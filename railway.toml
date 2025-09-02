@@ -1,12 +1,12 @@
 # railway.toml
-# Project deployment configuration for Railway
-# Full-stack React + Node.js deployment
+# Static site deployment configuration for Railway
+# React app with PlayFab integration (no server needed)
 # Author: Cascade AI
 
 [build]
-# Build both React client (Vite) and Node.js server (esbuild)
-command = "npm ci && npm run build"
+# Build React client only - PlayFab handles all backend functionality
+command = "npm ci && npm run build:client"
 
 [deploy]
-# Start the bundled Node.js server (serves both API and static client)
-command = "node dist/index.js"
+# Static site deployment - no server process needed
+staticPublishPath = "dist"
