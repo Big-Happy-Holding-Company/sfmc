@@ -37,7 +37,7 @@ export const SPACE_EMOJIS = {
   vague_symbols: ['⬛', '♊', '💕', '💢', '🆎', '🆒', '🈚', '🛃', '💠', '☣'],
 
   // Alien Language - For the hardest tasks
-  alien_language: ['⬛', '👽', '👤', '🪐', '🌍', '🛸', '☄️', '♥️', '⚠️', '🔮'],
+  alien_language: ['⬛', '👽', '👤', '🪐', '🌍', '🛸', '☄️', '♥️', '⚠️', '🛰'],
 } as const;
 
 // Emoji set metadata for UI display
