@@ -5,14 +5,14 @@ This should use the repo at https://github.com/Big-Happy-Holding-Company/sfmc-ap
 
 ## Architecture
 
-**Unified Full-Stack Application (Matches Unity Implementation):**
-- **Frontend**: React + Vite (client/)
-- **Backend**: Express.js server (server/) - SHARED with Unity version
-- **Task Data**: Server API endpoint `/api/tasks` with optional local caching
+**Static Web Application with PlayFab Backend (Matches Unity Implementation):**
+- **Frontend**: React + Vite (client/) - STATIC SITE DEPLOYMENT
+- **Backend**: PlayFab Cloud Services ONLY - NO SERVER REQUIRED
+- **Task Data**: PlayFab Title Data (155 tasks) - SINGLE SOURCE OF TRUTH
 - **User Features**: PlayFab (authentication, progress, leaderboards, profiles, events)
 - **Styling**: Tailwind CSS + shadcn/ui components
-- **PlayFab Web SDK**: playfab-web-sdk for user features and CloudScript
-- **Deployment**: Railway.app for frontend, PlayFab for backend services
+- **PlayFab Web SDK**: playfab-web-sdk for all backend functionality
+- **Deployment**: Railway.app static site deployment, PlayFab for all data
 
 Secret key for PlayFab is in the .env file as SECRET_PLAYFAB_KEY and this is needed for some some scripts and API calls.
 
@@ -23,15 +23,15 @@ client/src/
 ├── components/ui/       # shadcn UI components
 ├── constants/           # Emoji sets and game constants
 ├── types/              # TypeScript type definitions
-├── services/           # PlayFab service integration
+├── services/           # PlayFab service integration (ONLY backend)
 └── pages/              # Route components
 
-public/
-└── data/tasks.json     # Consolidated task data (matches Unity implementation)
+client/public/           # Static assets only
+└── (images, icons)     # No task data - all in PlayFab
 
-DEPRECATED (TO BE REMOVED):
-server/                 # Express server - REMOVE ENTIRELY
-shared/schema.ts        # Database types - REMOVE ENTIRELY
+LEGACY (NOT USED IN PRODUCTION):
+server/                 # Legacy server code - NOT DEPLOYED
+shared/schema.ts        # Legacy types - client uses PlayFab types
 ```
 
 **Path Aliases:**
@@ -40,11 +40,11 @@ shared/schema.ts        # Database types - REMOVE ENTIRELY
 ## Task System
 
 **Task Data Storage:**
-- Tasks stored in consolidated `public/data/tasks.json` file
+- Tasks stored in **PlayFab Title Data** (155 tasks) - SINGLE SOURCE OF TRUTH
 - **CRITICAL**: Use integers 0-9 in task data, NOT emojis
 - Emojis are mapped only in UI layer via `client/src/constants/spaceEmojis.ts`
 - Task ID format: `CATEGORY-XXX` (e.g., COM-001, NAV-100, PWR-230)
-- Matches Unity implementation: local JSON file, NOT PlayFab storage
+- Matches Unity implementation: PlayFab Title Data, NOT local files
 
 **Task Categories:**
 - `COM-XXX`: 📡 Communications
@@ -123,10 +123,11 @@ VITE_PLAYFAB_TITLE_ID=19FACB
 
 ## Development Guidelines
 
-**Data Access Pattern:**
-1. **Task Data:** Load from `public/data/tasks.json` using `fetch()`
+**Data Access Pattern (PlayFab-Only):**
+1. **Task Data:** Load from PlayFab Title Data using `GetTitleData()`
 2. **User Authentication:** PlayFab `LoginWithCustomID`
 3. **User Progress:** PlayFab UserData APIs
 4. **Leaderboards:** PlayFab Statistics APIs
+5. **Validation:** Client-side logic with PlayFab progress updates
 
-This matches the Unity implementation exactly: local task data + PlayFab for user features.  
+This matches the Unity implementation exactly: PlayFab Title Data + PlayFab for user features.  

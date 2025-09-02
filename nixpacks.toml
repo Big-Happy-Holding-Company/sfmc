@@ -1,6 +1,6 @@
 # nixpacks.toml
-# Static site build configuration for Railway
-# React app with PlayFab integration (no server needed)
+# Static site build configuration for Railway  
+# React app with PlayFab-only backend (no server needed)
 # Author: Cascade AI
 
 [phases.setup]
@@ -13,5 +13,5 @@ cmds = ["npm ci"]
 
 [phases.build]
 # Build React client only - PlayFab handles all backend functionality
-# Vite builds client to dist/ for static deployment
+# Vite builds static site to dist/
 cmds = ["npm run build:client"]

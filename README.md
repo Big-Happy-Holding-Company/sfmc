@@ -15,6 +15,8 @@ A Space Force-themed puzzle game where players complete operational tasks to adv
 3. Start development server: `npm run dev`
 4. Open `http://localhost:5173` in your browser
 
+**Note**: This is a static site that connects directly to PlayFab. No server setup required!
+
 ## Key Features
 
 - **Task Categories**: Various space operations themes (Oxygen Systems, Navigation, Power, etc.)
@@ -24,24 +26,37 @@ A Space Force-themed puzzle game where players complete operational tasks to adv
 ## Technical Stack
 
 ### Core Technologies
-- **Frontend**: React + TypeScript with Vite
-- **Backend**: Express.js with TypeScript
+- **Frontend**: React + TypeScript with Vite (Static Site)
+- **Backend**: PlayFab Cloud Services (No Server Required)
 - **UI Components**: Tailwind CSS + shadcn/ui
-- **Cloud Services**: PlayFab for task management and user progress
+- **Data Storage**: PlayFab Title Data & User Data
+- **Authentication**: PlayFab Anonymous Login
 
-### Project Structure
+### Architecture Overview
+
+This is a **static web application** that runs entirely in the browser, with all backend functionality handled by PlayFab cloud services.
 
 ```
-├── client/           # Frontend React application
-│   └── src/
-│       ├── components/  # UI components
-│       ├── constants/   # Game constants and emoji sets
-│       └── services/    # API clients and services
-├── server/           # Backend services
-│   ├── data/         # Task definitions
-│   └── services/     # Business logic
-└── shared/          # Shared types and utilities
+PlayFab Cloud (Single Source of Truth)
+├── Title Data: Task definitions (155 tasks)
+├── User Data: Player progress & stats
+├── Statistics: Leaderboards & rankings
+└── Events: Game analytics & logging
+    ↓
+Static React App (client/)
+├── components/    # UI components
+├── constants/     # Game constants and emoji sets  
+├── services/      # PlayFab integration
+└── pages/         # Route components
 ```
+
+### Data Flow
+1. **Tasks**: Loaded from PlayFab Title Data on app start
+2. **Authentication**: Anonymous PlayFab login with device ID
+3. **Progress**: Stored in PlayFab User Data  
+4. **Validation**: Client-side with PlayFab progress updates
+5. **Leaderboards**: PlayFab Statistics API
+6. **Deployment**: Static files served from CDN (Railway)
 
 
 
@@ -99,26 +114,30 @@ Players advance through Space Force enlisted ranks by earning points from solvin
 
 1. Clone the repository
 2. Install dependencies: `npm install`
-3. Set up environment variables (see `.env.example`)
+3. Set up environment variables: Copy `.env` and add `VITE_PLAYFAB_TITLE_ID`
 4. Start development server: `npm run dev`
 
 ### Adding New Tasks
 
-1. Create a new JSON file in `server/data/tasks/`
+Tasks are now managed in **PlayFab Title Data**. To add new tasks:
+
+1. Use the PlayFab dashboard to update Title Data
 2. Follow the task structure shown above
 3. Use numbers 0-9 in input/output arrays (emojis are mapped in the UI)
-4. Test your task thoroughly
-5. Add progressive hints to help players
+4. Tasks are loaded automatically on app refresh
+5. No server restart required - it's a static site!
 
-### Task Generation
+### Deployment
 
 ```bash
-# Generate a single task
-npx tsx server/cli/generate-task.ts single -c <CATEGORY> -t <TRANSFORMATION> -s <SIZE>
+# Build static site
+npm run build
 
-# List available categories and transformations
-npx tsx server/cli/generate-task.ts list
+# Preview production build locally  
+npm start
 ```
+
+Static files are deployed to Railway and served from CDN.
 
 ## Contributing
 
@@ -210,16 +229,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Use existing shadcn components for consistency
 - Follow space theme with dark backgrounds and cyan accents
 
-## API Endpoints
+## PlayFab Integration
 
-### Players
-- `GET /api/players/:id` - Get player data
-- `POST /api/players` - Create new player
-- `POST /api/players/:id/validate-solution` - Submit task solution
+### Task Management
+- **GetTitleData**: Loads all 155 tasks from PlayFab Title Data
+- **Client Validation**: Solution validation happens in browser
+- **Progress Tracking**: Results stored in PlayFab User Data
 
-### Tasks
-- `GET /api/tasks` - Get all available tasks
-- `GET /api/tasks/:id` - Get specific task
+### User Features  
+- **Anonymous Authentication**: Automatic device-based login
+- **Statistics**: Global leaderboards via PlayFab Statistics API
+- **Event Logging**: Game analytics via PlayFab Events API
 
 
 
