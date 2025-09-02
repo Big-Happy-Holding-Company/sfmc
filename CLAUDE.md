@@ -5,13 +5,14 @@ This should use the repo at https://github.com/Big-Happy-Holding-Company/sfmc-ap
 
 ## Architecture
 
-**Frontend-Only TypeScript Application:**
+**Unified Full-Stack Application (Matches Unity Implementation):**
 - **Frontend**: React + Vite (client/)
-- **Task Data**: Local JSON file (public/data/tasks.json) - matches Unity implementation
-- **User Features**: PlayFab (authentication, progress, leaderboards, profiles)
+- **Backend**: Express.js server (server/) - SHARED with Unity version
+- **Task Data**: Server API endpoint `/api/tasks` with optional local caching
+- **User Features**: PlayFab (authentication, progress, leaderboards, profiles, events)
 - **Styling**: Tailwind CSS + shadcn/ui components
-- **PlayFab Web SDK**: playfab-web-sdk for client-side user features only
-- **Deployment**: Railway.app static frontend deployment
+- **PlayFab Web SDK**: playfab-web-sdk for user features and CloudScript
+- **Deployment**: Railway.app full-stack deployment
 
 **Directory Structure:**
 ```

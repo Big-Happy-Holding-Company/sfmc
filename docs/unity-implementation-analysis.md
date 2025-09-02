@@ -18,16 +18,19 @@ public List<TaskData> LoadTasksFromFile()
 **Reality**: Unity loads tasks from local `tasks.json` file in persistent data path, NOT from PlayFab
 
 ### PlayFab Usage in Unity (ACTUAL)
-PlayFab is used ONLY for:
+PlayFab is used for:
 1. **Leaderboards** (`GetLeaderboard`, `UpdatePlayerStatistics`) - Lines 267-307, 747-769
 2. **Player Profiles/Avatars** (`GetPlayerProfile`) - Lines 309-330  
-3. **Analytics/Logging** (PuzzleEventLogger references)
+3. **CloudScript Functions** (`GenerateAnonymousName`) - PlayFabAnonDeviceLogin.cs:168-172
+4. **User Authentication** (`LoginWithCustomID`, `LoginWithAndroidDeviceID`, etc.)
+5. **User Data Storage** (`UpdateUserData`, `GetUserData`)
+6. **Analytics/Logging** (PuzzleEventLogger references)
 
 PlayFab is NOT used for:
-- ❌ Task/puzzle data storage
-- ❌ CloudScript functions  
-- ❌ Title Data storage
-- ❌ Game content management
+- ❌ Task/puzzle data storage (uses local JSON file)
+- ❌ Task-related CloudScript functions  
+- ❌ Title Data for game content
+- ❌ Game configuration data
 
 ### Server API Still Referenced (MainManager.cs:28)
 ```csharp

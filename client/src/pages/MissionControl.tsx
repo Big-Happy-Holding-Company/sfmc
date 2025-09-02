@@ -12,7 +12,8 @@
  */
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { playFabService } from "@/services/playfab";
+import type { PlayFabTask } from "@/services/playfab";
 
 import { Header } from "@/components/game/Header";
 import { MissionSelector } from "@/components/game/MissionSelector";
@@ -23,16 +24,13 @@ import { ResultModal } from "@/components/game/ResultModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SPACE_EMOJIS } from "@/constants/spaceEmojis";
-import type { Task, Player } from "@shared/schema";
 import type { GameResult, MissionExample } from "@/types/game";
 import type { EmojiSet } from "@/constants/spaceEmojis";
 
 export default function MissionControl() {
   // State management
-
-
-  const [currentTask, setCurrentTask] = useState<Task | null>(null);
-  const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+  const [currentTask, setCurrentTask] = useState<PlayFabTask | null>(null);
+  const [currentPlayer, setCurrentPlayer] = useState<{ id: string; username: string; totalPoints: number } | null>(null);
   const [playerGrid, setPlayerGrid] = useState<string[][]>([]);
   const [gameResult, setGameResult] = useState<GameResult | null>(null);
   const [showResult, setShowResult] = useState(false);
