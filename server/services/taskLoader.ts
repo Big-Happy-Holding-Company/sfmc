@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 
 export class TaskLoader {
   private tasksCache: Map<string, Task> = new Map();
-  private tasksDirectory = path.join(__dirname, '../../data/tasks');
+  private tasksDirectory = path.join(__dirname, '../data/tasks');
 
   async loadAllTasks(): Promise<Task[]> {
     try {

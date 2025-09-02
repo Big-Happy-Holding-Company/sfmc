@@ -9,8 +9,8 @@
  * - Event logging
  */
 
-// @ts-ignore - PlayFab web SDK types may not be perfect
-import { PlayFabClient } from 'playfab-web-sdk';
+// Global PlayFab object from CDN
+declare const PlayFab: any;
 
 // PlayFab configuration
 const PLAYFAB_TITLE_ID = import.meta.env.VITE_PLAYFAB_TITLE_ID;
@@ -20,7 +20,7 @@ if (!PLAYFAB_TITLE_ID) {
 }
 
 // Initialize PlayFab
-PlayFabClient.settings.titleId = PLAYFAB_TITLE_ID;
+PlayFab.Client.settings.titleId = PLAYFAB_TITLE_ID;
 
 export interface PlayFabTask {
   id: string;
@@ -70,13 +70,13 @@ class PlayFabService {
     return new Promise((resolve, reject) => {
       const customId = this.getOrCreateDeviceId();
       
-      PlayFabClient.LoginWithCustomID({
+      PlayFab.Client.LoginWithCustomID({
         CustomId: customId,
         CreateAccount: true,
         InfoRequestParameters: {
           GetPlayerProfile: true
         }
-      }, (result, error) => {
+      }, (result: any, error: any) => {
         if (error) {
           console.error('PlayFab login error:', error);
           reject(error);
@@ -102,9 +102,9 @@ class PlayFabService {
     }
 
     return new Promise((resolve, reject) => {
-      PlayFabClient.GetTitleData({
+      PlayFab.Client.GetTitleData({
         Keys: ['AllTasks']
-      }, (result, error) => {
+      }, (result: any, error: any) => {
         if (error) {
           console.error('PlayFab GetTitleData error:', error);
           reject(error);
@@ -137,12 +137,12 @@ class PlayFabService {
     }
 
     return new Promise((resolve, reject) => {
-      PlayFabClient.UpdatePlayerStatistics({
+      PlayFab.Client.UpdatePlayerStatistics({
         Statistics: [{
           StatisticName: 'LevelPoints', // Same as Unity
           Value: score
         }]
-      }, (result, error) => {
+      }, (result: any, error: any) => {
         if (error) {
           console.error('PlayFab score submission error:', error);
           reject(error);
@@ -163,11 +163,11 @@ class PlayFabService {
     }
 
     return new Promise((resolve, reject) => {
-      PlayFabClient.GetLeaderboard({
+      PlayFab.Client.GetLeaderboard({
         StatisticName: 'LevelPoints',
         StartPosition: 0,
         MaxResultsCount: 10
-      }, (result, error) => {
+      }, (result: any, error: any) => {
         if (error) {
           console.error('PlayFab leaderboard error:', error);
           reject(error);
@@ -193,10 +193,10 @@ class PlayFabService {
     }
 
     return new Promise((resolve, reject) => {
-      PlayFabClient.WritePlayerEvent({
+      PlayFab.Client.WriteEvent({
         EventName: eventName,
         Body: eventData
-      }, (result, error) => {
+      }, (result: any, error: any) => {
         if (error) {
           console.error('PlayFab event logging error:', error);
           reject(error);
@@ -242,10 +242,10 @@ class PlayFabService {
    */
   private async generateAnonymousName(): Promise<void> {
     return new Promise((resolve, reject) => {
-      PlayFabClient.ExecuteCloudScript({
+      PlayFab.Client.ExecuteCloudScript({
         FunctionName: 'GenerateAnonymousName',
         GeneratePlayStreamEvent: false
-      }, (result, error) => {
+      }, (result: any, error: any) => {
         if (error || result.data.Error) {
           reject(error || result.data.Error);
         } else {
@@ -265,9 +265,9 @@ class PlayFabService {
    */
   private async setDisplayName(displayName: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      PlayFabClient.UpdateUserTitleDisplayName({
+      PlayFab.Client.UpdateUserTitleDisplayName({
         DisplayName: displayName
-      }, (result, error) => {
+      }, (result: any, error: any) => {
         if (error) {
           reject(error);
         } else {
