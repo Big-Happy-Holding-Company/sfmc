@@ -60,6 +60,7 @@
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "playfab-sdk": "^2.180.250815",
+    "playfab-web-sdk": "^1.198.250815",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",

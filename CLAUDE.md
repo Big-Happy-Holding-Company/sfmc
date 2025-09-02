@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
+This should use the repo at https://github.com/Big-Happy-Holding-Company/sfmc-app as a source of truth for how things should work. Especially regarding the specific implementation of PlayFab!!!
 
 ## Architecture
 
@@ -10,6 +10,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Backend**: Express.js (server/)  Converting to PlayFab now!!
 - **Database**: None currently? Moving to PlayFab.
 - **Styling**: Tailwind CSS + shadcn/ui components
+- **PlayFab SDK**: playfab-sdk (installed via npm already)
+- **PlayFab Web SDK**: playfab-web-sdk (installed via npm already)
+- **Deployment**: Railway.app using existing account, deploys from main branch
 
 **Directory Structure:**
 ```
