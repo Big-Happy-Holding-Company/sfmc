@@ -1,5 +1,7 @@
 # Simple Feature Parity Plan - React to Match Unity
 
+**STATUS: UPDATED - See [2SeptPlayfabTasks.md](./2SeptPlayfabTasks.md) for current implementation plan**
+
 ## What Unity Currently Does (Keep It Simple)
 
 ### Task Loading
@@ -13,33 +15,28 @@
 - Unity: Event logging (`WritePlayerEvent`)
 - **React needs**: Exact same PlayFab calls
 
-### Data Migration (One Time)
-- Move all 155+ tasks from `d:\1Projects\sfmc\data\tasks\` to PlayFab
-- Unity switches from server API to PlayFab  
-- React fetches from PlayFab
-- Done.
+## REVISED Implementation Order (Sept 2, 2025)
 
-## Implementation Steps
+**Critical Insight**: Task migration must come FIRST to avoid breaking React's PlayFab service.
 
-### 1. One-Time Task Migration
-- Build sync script to upload all JSON files to PlayFab Title Data
-- Test that PlayFab returns all tasks correctly
+### Phase 1: Task Migration (DO FIRST) ✅ IN PROGRESS
+- Build migration script to upload all server tasks to PlayFab Title Data  
+- Validate all 155+ tasks are properly stored and retrievable
+- Ensure PlayFab becomes single source of truth
 
-### 2. Update Unity 
+### Phase 2: Update React (DO SECOND) ✅ IN PROGRESS  
+- Switch React from `/api/tasks` to PlayFab service (already implemented)
+- Update FIQTest and other task-consuming pages
+- Test all React functionality with PlayFab data
+
+### Phase 3: Update Unity (DO THIRD)
 - Replace `https://sfmc.up.railway.app/api/tasks` with PlayFab `GetTitleData()`
-- Keep everything else exactly the same
+- Keep all other PlayFab functionality (auth, leaderboards, events)
+- Test Unity with PlayFab task data
 
-### 3. Update React
-- Add same PlayFab calls Unity uses:
-  - `LoginWithCustomID` for auth
-  - `GetTitleData()` for tasks  
-  - `UpdatePlayerStatistics` for scores
-  - `GetLeaderboard` for rankings
-  - `WritePlayerEvent` for tracking
-
-### 4. Remove Railway Dependency
+### Phase 4: Remove Railway Dependency (DO LAST)
 - Both platforms use PlayFab
-- Server eliminated
+- Server API eliminated
 
 ## Result: Feature Parity
 - Both Unity and React do exactly the same thing
