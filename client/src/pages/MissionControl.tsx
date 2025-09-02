@@ -4,15 +4,26 @@
  * Author: Cascade AI
  * Description:
  *   Handles the core game UI including mission selection, grid interaction,
- *   timer controls, and hint system. This modification enhances the hint UI:
- *     - Removes explicit point penalty text from the hint button and guidance.
- *     - Displays Sergeant Wyatt avatar alongside hint header and each hint
- *       message to create a narrative delivery experience.
- *   All functionality remains unchanged aside from visual/UX updates.
+ *   timer controls, and hint system using PlayFab for all data management.
+ *   Features:
+ *     - PlayFab authentication and player data management
+ *     - Task loading from PlayFab Title Data
+ *     - Client-side solution validation and progress tracking
+ *     - Real-time leaderboard integration
+ *     - Hint system with Sergeant Wyatt avatar guidance
+ *   How it works:
+ *     - Loads player data from PlayFab User Data on initialization
+ *     - Fetches all tasks from PlayFab Title Data
+ *     - Validates solutions locally and updates PlayFab player progress
+ *     - Submits scores to PlayFab leaderboards
+ *   How the project uses it:
+ *     - Primary game interface accessed from splash screen
+ *     - Integrates with PlayFab service for all backend functionality
+ *     - Uses local state management instead of React Query
  */
 import { useState, useEffect } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { playFabService } from "@/services/playfab";
+import type { PlayFabTask, PlayFabPlayer, TaskValidationResult } from "@/services/playfab";
 
 import { Header } from "@/components/game/Header";
 import { MissionSelector } from "@/components/game/MissionSelector";
@@ -23,86 +34,54 @@ import { ResultModal } from "@/components/game/ResultModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SPACE_EMOJIS } from "@/constants/spaceEmojis";
-import type { Task, Player } from "@shared/schema";
-import type { GameResult, MissionExample } from "@/types/game";
+import type { MissionExample } from "@/types/game";
 import type { EmojiSet } from "@/constants/spaceEmojis";
 
 export default function MissionControl() {
-  // State management
-
-
-  const [currentTask, setCurrentTask] = useState<Task | null>(null);
-  const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+  // PlayFab-only state management
+  const [currentTask, setCurrentTask] = useState<PlayFabTask | null>(null);
+  const [currentPlayer, setCurrentPlayer] = useState<PlayFabPlayer | null>(null);
+  const [tasks, setTasks] = useState<PlayFabTask[]>([]);
   const [playerGrid, setPlayerGrid] = useState<string[][]>([]);
-  const [gameResult, setGameResult] = useState<GameResult | null>(null);
+  const [gameResult, setGameResult] = useState<TaskValidationResult | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [isTimerActive, setIsTimerActive] = useState(false);
   const [hintsUsed, setHintsUsed] = useState(0);
   const [currentHintIndex, setCurrentHintIndex] = useState(-1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [validating, setValidating] = useState(false);
 
-  // Create default player on load
-  const createPlayerMutation = useMutation({
-    mutationFn: async () => {
-      const response = await apiRequest("POST", "/api/players", { username: "Wyatt" });
-      return response.json();
-    },
-    onSuccess: (player: Player) => {
-      setCurrentPlayer(player);
-    },
-  });
-
-  // Fetch tasks
-  const { data: tasks = [] } = useQuery<Task[]>({
-    queryKey: ["/api/tasks"],
-    enabled: !!currentPlayer,
-  });
-
-  // Validate solution mutation
-  const validateSolutionMutation = useMutation({
-    mutationFn: async ({ playerId, taskId, solution, timeElapsed, hintsUsed }: {
-      playerId: number;
-      taskId: string;
-      solution: string[][];
-      timeElapsed?: number;
-      hintsUsed?: number;
-    }) => {
-      const response = await apiRequest("POST", `/api/players/${playerId}/validate-solution`, {
-        taskId,
-        solution,
-        timeElapsed,
-        hintsUsed,
-      });
-      return response.json();
-    },
-    onSuccess: (result: GameResult) => {
-      setGameResult(result);
-      setShowResult(true);
-      setIsTimerActive(false);
-      
-      // Refresh player data
-      if (result.correct && currentPlayer) {
-        queryClient.invalidateQueries({ queryKey: [`/api/players/${currentPlayer.id}`] });
-      }
-    },
-  });
-
-  // Initialize player on mount
+  // Initialize PlayFab data on mount
   useEffect(() => {
-    if (!currentPlayer) {
-      createPlayerMutation.mutate();
-    }
+    const initializePlayFab = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        // Login and get player data
+        await playFabService.loginAnonymously();
+        const playerData = await playFabService.getPlayerData();
+        setCurrentPlayer(playerData);
+        
+        // Load all tasks
+        const allTasks = await playFabService.getAllTasks();
+        setTasks(allTasks);
+        
+        console.log('✅ PlayFab initialization complete');
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to initialize PlayFab');
+        console.error('❌ PlayFab initialization failed:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializePlayFab();
   }, []);
 
-  // Fetch updated player data
-  const { data: updatedPlayer } = useQuery<Player>({
-    queryKey: [`/api/players/${currentPlayer?.id}`],
-    enabled: !!currentPlayer,
-  });
-
-  const activePlayer = updatedPlayer || currentPlayer;
-
-  const handleSelectTask = (task: Task) => {
+  const handleSelectTask = (task: PlayFabTask) => {
     setCurrentTask(task);
     setStartTime(Date.now());
     setIsTimerActive(true); // Always start timer for speed tracking
@@ -118,23 +97,40 @@ export default function MissionControl() {
     setPlayerGrid(emptyGrid);
   };
 
-  const handleSolveTask = () => {
-    if (!currentTask || !activePlayer || !startTime) return;
+  const handleSolveTask = async () => {
+    if (!currentTask || !currentPlayer || !startTime) return;
     
+    setValidating(true);
     const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
     
-    validateSolutionMutation.mutate({
-      playerId: activePlayer.id,
-      taskId: currentTask.id,
-      solution: playerGrid,
-      timeElapsed,
-      hintsUsed,
-    });
+    try {
+      const result = await playFabService.validateSolution(
+        currentTask.id,
+        playerGrid,
+        timeElapsed,
+        hintsUsed
+      );
+      
+      setGameResult(result);
+      setShowResult(true);
+      setIsTimerActive(false);
+      
+      // Refresh player data after successful validation
+      if (result.correct) {
+        const updatedPlayer = await playFabService.getPlayerData();
+        setCurrentPlayer(updatedPlayer);
+      }
+    } catch (err) {
+      console.error('❌ Solution validation failed:', err);
+      setError(err instanceof Error ? err.message : 'Validation failed');
+    } finally {
+      setValidating(false);
+    }
   };
 
   const handleTimeUp = () => {
     // Auto-submit when time runs out
-    if (currentTask && activePlayer) {
+    if (currentTask && currentPlayer) {
       handleSolveTask();
     }
   };
@@ -179,10 +175,42 @@ export default function MissionControl() {
     </div>
   );
 
-  if (!activePlayer) {
+  // Loading state
+  if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="text-slate-400">Loading Operations Center...</div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400 mx-auto mb-4"></div>
+          <div className="text-slate-400">Loading Mission Control...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-400 text-4xl mb-4">⚠️</div>
+          <div className="text-red-400 font-semibold mb-2">Connection Failed</div>
+          <div className="text-slate-400 mb-4">{error}</div>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // No player data
+  if (!currentPlayer) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-slate-400">Initializing Player Data...</div>
       </div>
     );
   }
@@ -202,12 +230,12 @@ export default function MissionControl() {
 
 
 
-      <Header player={activePlayer} totalTasks={tasks.length} />
+      <Header player={currentPlayer} totalTasks={tasks.length} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {!currentTask ? (
           <MissionSelector
-            player={activePlayer}
+            player={currentPlayer}
             missions={tasks}
             onSelectMission={handleSelectTask}
           />
@@ -331,7 +359,7 @@ export default function MissionControl() {
                         gridSize={currentTask.gridSize}
                         emojiSet={currentTask.emojiSet as EmojiSet}
                         onGridChange={setPlayerGrid}
-                        disabled={validateSolutionMutation.isPending}
+                        disabled={validating}
                         inputGrid={currentTask.testInput as string[][]}
                       />
                     </div>
@@ -340,10 +368,11 @@ export default function MissionControl() {
                   <div className="flex justify-center space-x-4">
                     <Button
                       onClick={handleSolveTask}
-                      disabled={validateSolutionMutation.isPending}
+                      disabled={validating}
                       className="bg-green-400 hover:bg-green-500 text-slate-900"
                     >
-                      <i className="fas fa-check mr-2"></i>EXECUTE TASK
+                      <i className="fas fa-check mr-2"></i>
+                      {validating ? 'VALIDATING...' : 'EXECUTE TASK'}
                     </Button>
                     <Button
                       variant="outline"

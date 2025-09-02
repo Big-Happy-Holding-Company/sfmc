@@ -1,8 +1,8 @@
 import { RANK_ICONS } from "@/data/ranks";
-import type { Player } from "@shared/schema";
+import type { PlayFabPlayer } from "@/services/playfab";
 
 interface RankBadgeProps {
-  player: Player;
+  player: PlayFabPlayer;
 }
 
 export function RankBadge({ player }: RankBadgeProps) {

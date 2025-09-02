@@ -13,6 +13,7 @@ The Abstract and Reasoning Corpus for Artificial General Intelligence (ARC-AGI) 
 - Reference: https://github.com/fchollet/ARC-AGI
 - https://www.youtube.com/watch?v=5QcCeSsNRks&ab_channel=YCombinator
 - https://arahim3.github.io/arc-agi-guide/ 
+- https://github.com/Big-Happy-Holding-Company/sfmc-app  //  Source of truth for code and data
 
 This project is designed to build upon that framework by adding a Space Force theme and making it accessible to a wider audience and especially young people and the colorblind.  It is also designed to be platform agnostic and can be run on any device with a web browser.
 
@@ -283,7 +284,7 @@ See the comprehensive guide in `docs/task_generation_guide.md` for more details.
 
 
 
-## Narrative Story Wrapper System
+## Narrative Story Wrapper System  //  BEING REMOVED WITH PLAYFAB!
 
 ### Purpose
 Adds a light-hearted Space-Force-2050 story layer to mundane training tasks without touching core puzzle data.

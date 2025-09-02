@@ -1,7 +1,24 @@
-import { useState, useEffect } from 'react';
+/*
+ * App.tsx
+ * Author: Cascade
+ * 
+ * PURPOSE:
+ * Main application component that handles routing, splash screen, and onboarding flow.
+ * Updated to use PlayFab-only data flow, removing React Query dependency.
+ * 
+ * HOW IT WORKS:
+ * - Shows splash screen on initial load (5 seconds)
+ * - Displays onboarding modal after splash completion
+ * - Routes to main game interface (MissionControl) or FIQ test page
+ * - All data management now handled directly by PlayFab service
+ * 
+ * HOW THE PROJECT USES IT:
+ * - Entry point for the React application
+ * - Manages app-level state and routing
+ * - No longer depends on React Query for server communication
+ */
+import { useState } from 'react';
 import { Switch, Route } from "wouter";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import MissionControl from "@/pages/MissionControl";
@@ -37,19 +54,17 @@ function App() {
   };
   
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        {showSplash ? (
-          <LoadingSplash onComplete={handleSplashComplete} duration={5000} />
-        ) : (
-          <>
-            <Toaster />
-            <Router />
-            <OnboardingModal open={showOnboarding} onClose={handleOnboardingComplete} />
-          </>
-        )}
-      </TooltipProvider>
-    </QueryClientProvider>
+    <TooltipProvider>
+      {showSplash ? (
+        <LoadingSplash onComplete={handleSplashComplete} duration={5000} />
+      ) : (
+        <>
+          <Toaster />
+          <Router />
+          <OnboardingModal open={showOnboarding} onClose={handleOnboardingComplete} />
+        </>
+      )}
+    </TooltipProvider>
   );
 }
 

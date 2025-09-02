@@ -16,7 +16,7 @@
  * HOW THE PROJECT USES IT:
  * - Accessed via the "Test FIQ" button in the MissionSelector component
  * - Serves as a standalone page for FIQ testing and onboarding task inspection
- * - Integrates with the server's /api/tasks endpoint to fetch onboarding task data
+ * - Integrates with PlayFab service to fetch onboarding task data from Title Data
  * - Provides developers and users a way to test available onboarding content
  */
 
@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { InteractiveGrid } from "@/components/game/InteractiveGrid";
 import { SPACE_EMOJIS } from "@/constants/spaceEmojis";
+import { playFabService, type PlayFabTask } from "@/services/playfab";
 import type { Task } from "@shared/schema";
 import type { MissionExample } from "@/types/game";
 import type { EmojiSet } from "@/constants/spaceEmojis";
@@ -44,12 +45,7 @@ export default function FIQTest() {
       setError(null);
       
       try {
-        const response = await fetch('/api/tasks');
-        if (!response.ok) {
-          throw new Error('Failed to fetch tasks');
-        }
-        
-        const allTasks: Task[] = await response.json();
+        const allTasks = await playFabService.getAllTasks();
         // Filter for onboarding tasks (any task with OB- in the name)
         const obTasks = allTasks.filter(task => task.id.includes('OB-'));
         

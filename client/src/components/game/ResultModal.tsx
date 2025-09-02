@@ -4,17 +4,25 @@
  * Author: Cascade AI
  * Description: 
  *   Shows the result of puzzle attempt with Sgt Wyatt providing encouragement.
+ *   Updated to use PlayFab TaskValidationResult instead of server GameResult.
  *   For incorrect solutions, allows the player to try again without penalty.
  *   For correct solutions, displays score information and congratulations.
+ * How it works:
+ *   - Receives TaskValidationResult from PlayFab service validation
+ *   - Displays appropriate success/failure messaging with Sgt Wyatt avatar
+ *   - Shows detailed scoring breakdown for successful completions
+ * How the project uses it:
+ *   - Called from MissionControl after task solution validation
+ *   - Integrates with PlayFab-only data flow for game results
  */
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import type { GameResult } from "@/types/game";
+import type { TaskValidationResult } from "@/services/playfab";
 
 interface ResultModalProps {
   open: boolean;
   onClose: () => void;
-  result: GameResult | null;
+  result: TaskValidationResult | null;
   
   /**
    * Optional retry handler that allows player to try the puzzle again
@@ -79,7 +87,7 @@ export function ResultModal({ open, onClose, result, onRetry }: ResultModalProps
                 )}
                 <div className="col-span-2 border-t border-slate-600 pt-2">
                   <div className="text-green-400 font-semibold text-lg">
-                    Total: <span>{result.totalPoints} pts</span>
+                    Total: <span>{result.pointsEarned} pts</span>
                   </div>
                 </div>
               </div>

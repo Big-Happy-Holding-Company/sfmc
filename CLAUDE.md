@@ -1,43 +1,20 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-## Commands
-
-**Development Server:**
-- `npm run dev` - Start development server on port 5000 (always running in development)
-- Visit at `localhost:5000`
-
-**Build & Deployment:**
-- `npm run build` - Production build (Vite frontend + esbuild backend)
-- `npm run start` - Start production server
-- `npm run check` - TypeScript type checking
-
-**Database:**
-- `npm run db:push` - Push Drizzle schema changes to database
-
-**Task Generation CLI:**
-```powershell
-# Generate single task
-npx tsx server\cli\generate-task.ts single -c <CATEGORY> -t <TRANSFORMATION> -o <OUTPUT_PATH>
-
-# Generate all tasks for category
-npx tsx server\cli\generate-task.ts category -c <CATEGORY> -o <OUTPUT_DIR>
-
-# Generate all tasks
-npx tsx server\cli\generate-task.ts all -o <OUTPUT_DIR>
-
-# List available categories/transformations
-npx tsx server\cli\generate-task.ts list
-```
+This should use the repo at https://github.com/Big-Happy-Holding-Company/sfmc-app as a source of truth for how things should work. Especially regarding the specific implementation of PlayFab!!! D:\1Projects\sfmc-app Is the local version.
 
 ## Architecture
 
-**Full-Stack TypeScript Application:**
+**Unified Full-Stack Application (Matches Unity Implementation):**
 - **Frontend**: React + Vite (client/)
-- **Backend**: Express.js (server/)
-- **Database**: Drizzle ORM with PostgreSQL (production), in-memory (development)
+- **Backend**: Express.js server (server/) - SHARED with Unity version
+- **Task Data**: Server API endpoint `/api/tasks` with optional local caching
+- **User Features**: PlayFab (authentication, progress, leaderboards, profiles, events)
 - **Styling**: Tailwind CSS + shadcn/ui components
+- **PlayFab Web SDK**: playfab-web-sdk for user features and CloudScript
+- **Deployment**: Railway.app for frontend, PlayFab for backend services
+
+Secret key for PlayFab is in the .env file as SECRET_PLAYFAB_KEY and this is needed for some some scripts and API calls.
 
 **Directory Structure:**
 ```
@@ -46,33 +23,28 @@ client/src/
 ├── components/ui/       # shadcn UI components
 ├── constants/           # Emoji sets and game constants
 ├── types/              # TypeScript type definitions
+├── services/           # PlayFab service integration
 └── pages/              # Route components
 
-server/
-├── data/tasks/         # Individual JSON task files (CORE SYSTEM)
-├── templates/          # Task generation templates
-├── tools/              # Task/story generation utilities
-├── services/           # Business logic services
-├── cli/                # CLI tools for task generation
-├── index.ts            # Server entry point
-├── routes.ts           # API route handlers
-└── storage.ts          # Data storage interface
+public/
+└── data/tasks.json     # Consolidated task data (matches Unity implementation)
 
-shared/
-└── schema.ts           # Database schema and types
+DEPRECATED (TO BE REMOVED):
+server/                 # Express server - REMOVE ENTIRELY
+shared/schema.ts        # Database types - REMOVE ENTIRELY
 ```
 
 **Path Aliases:**
 - `@/` → `client/src/`
-- `@shared/` → `shared/`
 
 ## Task System
 
-**Task File Structure:**
-- Tasks stored as individual JSON files in `server/data/tasks/`
-- **CRITICAL**: Use integers 0-9 in task data files, NOT emojis
+**Task Data Storage:**
+- Tasks stored in consolidated `public/data/tasks.json` file
+- **CRITICAL**: Use integers 0-9 in task data, NOT emojis
 - Emojis are mapped only in UI layer via `client/src/constants/spaceEmojis.ts`
 - Task ID format: `CATEGORY-XXX` (e.g., COM-001, NAV-100, PWR-230)
+- Matches Unity implementation: local JSON file, NOT PlayFab storage
 
 **Task Categories:**
 - `COM-XXX`: 📡 Communications
@@ -129,27 +101,32 @@ shared/
 - Intermediate: Combined transformations, multi-step reasoning
 - Advanced: Complex combinations, abstract concepts, higher-order logic
 
+## PlayFab Integration
+
+**PlayFab Usage (User Features Only):**
+- **Title ID:** 19FACB
+- **Authentication:** `LoginWithCustomID` for user sessions
+- **User Progress:** `UpdateUserData` and `GetUserData` for task completion tracking
+- **Leaderboards:** `UpdatePlayerStatistics` and `GetLeaderboard` for global rankings
+- **Player Profiles:** `GetPlayerProfile` for user information and avatars
+
+**PlayFab is NOT used for:**
+- ❌ Task/puzzle data storage (use local JSON file)
+- ❌ CloudScript functions
+- ❌ Title Data for game content
+- ❌ Game configuration data
+
+**Environment Configuration:**
+```
+VITE_PLAYFAB_TITLE_ID=19FACB
+```
+
 ## Development Guidelines
 
-**Adding New Tasks:**
-1. Use CLI tools for systematic generation
-2. Follow integer-only format in JSON files
-3. Add progressive hints with final developer credit
-4. Test transformation logic thoroughly
-5. Use appropriate emoji set for theme
+**Data Access Pattern:**
+1. **Task Data:** Load from `public/data/tasks.json` using `fetch()`
+2. **User Authentication:** PlayFab `LoginWithCustomID`
+3. **User Progress:** PlayFab UserData APIs
+4. **Leaderboards:** PlayFab Statistics APIs
 
-**Story Wrapper System:**
-- `server/data/problems.json` - Narrative templates by transformation type
-- `server/data/antagonists.json` - Mischievous characters
-- `server/data/components.json` - Ship components
-- Stories auto-generated by `server/tools/story-factory.ts`
-
-**Game Mechanics:**
-- Rank progression through Space Force enlisted ranks
-- Points system with speed bonuses and hint penalties  
-- Task validation via `POST /api/players/:id/validate-solution`
-
-**API Endpoints:**
-- `GET/POST /api/players` - Player management
-- `GET /api/tasks` - Task retrieval
-- `POST /api/players/:id/validate-solution` - Solution submission
+This matches the Unity implementation exactly: local task data + PlayFab for user features.  

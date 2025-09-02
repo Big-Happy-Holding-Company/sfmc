@@ -8,10 +8,10 @@
  *   real data rather than a hard-coded value.
  */
 import { RankBadge } from "./RankBadge";
-import type { Player } from "@shared/schema";
+import type { PlayFabPlayer } from "@/services/playfab";
 
 interface HeaderProps {
-  player: Player;
+  player: PlayFabPlayer;
   /** Total number of tasks available in the game */
   totalTasks: number;
 }
