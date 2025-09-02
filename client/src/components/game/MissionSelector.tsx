@@ -3,14 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { MISSION_CATEGORIES, DIFFICULTY_COLORS } from "@/data/missions";
 import { getRankProgress } from "@/data/ranks";
-import type { Task, Player } from "@shared/schema";
+import type { PlayFabPlayer, PlayFabTask } from "@/services/playfab";
 import { cn } from "@/lib/utils";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 
 interface MissionSelectorProps {
-  player: Player;
-  missions: Task[];
-  onSelectMission: (task: Task) => void;
+  player: PlayFabPlayer;
+  missions: PlayFabTask[];
+  onSelectMission: (task: PlayFabTask) => void;
 }
 
 export function MissionSelector({ 

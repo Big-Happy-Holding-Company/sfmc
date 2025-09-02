@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-This should use the repo at https://github.com/Big-Happy-Holding-Company/sfmc-app as a source of truth for how things should work. Especially regarding the specific implementation of PlayFab!!!
+This should use the repo at https://github.com/Big-Happy-Holding-Company/sfmc-app as a source of truth for how things should work. Especially regarding the specific implementation of PlayFab!!! D:\1Projects\sfmc-app Is the local version.
 
 ## Architecture
 
@@ -12,7 +12,9 @@ This should use the repo at https://github.com/Big-Happy-Holding-Company/sfmc-ap
 - **User Features**: PlayFab (authentication, progress, leaderboards, profiles, events)
 - **Styling**: Tailwind CSS + shadcn/ui components
 - **PlayFab Web SDK**: playfab-web-sdk for user features and CloudScript
-- **Deployment**: Railway.app full-stack deployment
+- **Deployment**: Railway.app for frontend, PlayFab for backend services
+
+Secret key for PlayFab is in the .env file as SECRET_PLAYFAB_KEY and this is needed for some some scripts and API calls.
 
 **Directory Structure:**
 ```

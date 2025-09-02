@@ -6,6 +6,10 @@ import type { Task, InsertTask } from '../../shared/schema';
 import { EMBEDDED_TASKS } from '../data/taskData.js';
 import { GridFormatAdapter } from './gridFormatAdapter.js';
 
+// Load environment variables
+import dotenv from 'dotenv';
+dotenv.config();
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -13,8 +17,75 @@ export class TaskLoader {
   private tasksCache: Map<string, Task> = new Map();
   private tasksDirectory = path.join(__dirname, '../data/tasks');
 
+  /**
+   * Fetch tasks from PlayFab Title Data
+   */
+  private async fetchTasksFromPlayFab(): Promise<Task[] | null> {
+    try {
+      const secretKey = process.env.PLAYFAB_SECRET_KEY;
+      const titleId = process.env.PLAYFAB_TITLE_ID;
+      
+      if (!secretKey || !titleId) {
+        console.log('PlayFab credentials not configured, falling back to local storage');
+        return null;
+      }
+      
+      const playfabUrl = `https://${titleId}.playfabapi.com/Admin/GetTitleData`;
+      
+      const requestBody = {
+        Keys: ['tasks.json']
+      };
+      
+      const response = await fetch(playfabUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-SecretKey': secretKey
+        },
+        body: JSON.stringify(requestBody)
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        console.error('PlayFab GetTitleData error:', result);
+        return null;
+      }
+      
+      if (result.data && result.data.Data && result.data.Data['tasks.json']) {
+        const tasksData = JSON.parse(result.data.Data['tasks.json']);
+        console.log(`✅ Loaded ${tasksData.length} tasks from PlayFab Title Data`);
+        return tasksData;
+      }
+      
+      console.log('No tasks found in PlayFab Title Data');
+      return null;
+      
+    } catch (error) {
+      console.error('Error fetching tasks from PlayFab:', error);
+      return null;
+    }
+  }
+
   async loadAllTasks(): Promise<Task[]> {
     try {
+      // First, try to fetch from PlayFab
+      console.log('🌐 Attempting to load tasks from PlayFab...');
+      const playfabTasks = await this.fetchTasksFromPlayFab();
+      
+      if (playfabTasks && playfabTasks.length > 0) {
+        // Process and cache PlayFab tasks
+        const processedTasks: Task[] = [];
+        for (const taskData of playfabTasks) {
+          const processedTask = GridFormatAdapter.processTaskForRendering(taskData);
+          this.tasksCache.set(taskData.id, processedTask);
+          processedTasks.push(processedTask);
+        }
+        return processedTasks.sort((a, b) => a.id.localeCompare(b.id));
+      }
+      
+      // Fallback to local filesystem
+      console.log('📂 Loading tasks from local filesystem...');
       const files = await fs.readdir(this.tasksDirectory);
       const taskFiles = files.filter((file: string) => file.endsWith('.json'));
       
