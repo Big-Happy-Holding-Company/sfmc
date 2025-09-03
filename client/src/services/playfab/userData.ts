@@ -34,6 +34,7 @@ export class PlayFabUserData {
     }
 
     try {
+      const PlayFab = playFabCore.getPlayFab();
       const result = await playFabCore.promisifyPlayFabCall(
         PlayFab.ClientApi.GetUserData,
         { TitleId: playFabCore.getTitleId() }
@@ -98,6 +99,7 @@ export class PlayFabUserData {
     dataToUpdate.updatedAt = new Date().toISOString();
 
     try {
+      const PlayFab = playFabCore.getPlayFab();
       await playFabCore.promisifyPlayFabCall(
         PlayFab.ClientApi.UpdateUserData,
         { TitleId: playFabCore.getTitleId(), Data: dataToUpdate }
@@ -225,7 +227,7 @@ export class PlayFabUserData {
       updatedAt: new Date().toISOString()
     };
 
-    const playFab = playFabCore.getPlayFab();
+    const PlayFab = playFabCore.getPlayFab();
     
     try {
       await playFabCore.promisifyPlayFabCall(
@@ -252,7 +254,7 @@ export class PlayFabUserData {
       updatedAt: new Date().toISOString()
     };
 
-    const playFab = playFabCore.getPlayFab();
+    const PlayFab = playFabCore.getPlayFab();
     
     try {
       await playFabCore.promisifyPlayFabCall(

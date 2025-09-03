@@ -51,6 +51,7 @@ export class PlayFabProfiles {
     };
 
     try {
+      const PlayFab = playFabCore.getPlayFab();
       const result = await playFabCore.promisifyPlayFabCall(
         PlayFab.ClientApi.GetPlayerProfile,
         request
@@ -193,6 +194,7 @@ export class PlayFabProfiles {
     };
 
     try {
+      const PlayFab = playFabCore.getPlayFab();
       await playFabCore.promisifyPlayFabCall(
         PlayFab.ClientApi.UpdateAvatarUrl,
         request

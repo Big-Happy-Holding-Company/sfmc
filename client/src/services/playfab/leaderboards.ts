@@ -40,6 +40,7 @@ export class PlayFabLeaderboards {
     };
 
     try {
+      const PlayFab = playFabCore.getPlayFab();
       await playFabCore.promisifyPlayFabCall(
         PlayFab.ClientApi.UpdatePlayerStatistics,
         request
@@ -79,6 +80,7 @@ export class PlayFabLeaderboards {
     };
 
     try {
+      const PlayFab = playFabCore.getPlayFab();
       const result = await playFabCore.promisifyPlayFabCall(
         PlayFab.ClientApi.GetLeaderboard,
         request
@@ -128,6 +130,7 @@ export class PlayFabLeaderboards {
     };
 
     try {
+      const PlayFab = playFabCore.getPlayFab();
       const result = await playFabCore.promisifyPlayFabCall(
         PlayFab.ClientApi.GetLeaderboardAroundPlayer,
         request

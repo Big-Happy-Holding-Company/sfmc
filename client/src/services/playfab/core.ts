@@ -4,13 +4,8 @@
  * Replaces CDN script loading approach with proper npm package imports
  */
 
-// PlayFab is loaded via CDN in index.html and available globally
-declare global {
-  interface Window {
-    PlayFab: any;
-  }
-  var PlayFab: any;
-}
+// Import PlayFab from npm package
+import PlayFab from 'playfab-web-sdk';
 
 // Minimal PlayFab type declarations for compilation
 declare interface PlayFabConfig {
@@ -52,6 +47,11 @@ export class PlayFabCore {
   public async initialize(config: PlayFabConfig): Promise<void> {
     this.titleId = config.titleId;
     this.secretKey = config.secretKey || null;
+
+    // Validate PlayFab import
+    if (!PlayFab || !PlayFab.settings) {
+      throw new Error('PlayFab Web SDK not properly loaded. Check npm package installation.');
+    }
 
     // Set PlayFab settings
     PlayFab.settings.titleId = this.titleId;

@@ -42,6 +42,7 @@ export class PlayFabAuth {
     };
 
     try {
+      const PlayFab = playFabCore.getPlayFab();
       const result = await playFabCore.promisifyPlayFabCall(
         PlayFab.ClientApi.LoginWithCustomID,
         request
@@ -120,6 +121,7 @@ export class PlayFabAuth {
     };
 
     try {
+      const PlayFab = playFabCore.getPlayFab();
       const result = await playFabCore.promisifyPlayFabCall(
         PlayFab.ClientApi.ExecuteCloudScript,
         request
@@ -152,6 +154,7 @@ export class PlayFabAuth {
     };
 
     try {
+      const PlayFab = playFabCore.getPlayFab();
       const result = await playFabCore.promisifyPlayFabCall(
         PlayFab.ClientApi.UpdateUserTitleDisplayName,
         request

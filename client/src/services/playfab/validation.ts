@@ -54,6 +54,7 @@ export class PlayFabValidation {
     playFabCore.logOperation('Solution Validation', `Task: ${request.taskId}`);
 
     try {
+      const PlayFab = playFabCore.getPlayFab();
       const result = await playFabCore.promisifyPlayFabCall(
         PlayFab.ClientApi.ExecuteCloudScript,
         cloudScriptRequest

@@ -77,6 +77,7 @@ export class PlayFabEvents {
     };
 
     try {
+      const PlayFab = playFabCore.getPlayFab();
       await playFabCore.promisifyPlayFabCall(
         PlayFab.ClientApi.WritePlayerEvent,
         request
@@ -107,6 +108,7 @@ export class PlayFabEvents {
     };
 
     try {
+      const PlayFab = playFabCore.getPlayFab();
       await playFabCore.promisifyPlayFabCall(
         PlayFab.ClientApi.WritePlayerEvent,
         request
