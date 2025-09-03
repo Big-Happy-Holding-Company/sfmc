@@ -8,12 +8,7 @@ A Space Force-themed puzzle game where players complete operational tasks to adv
 - **Inspiration**: Based on the ARC-AGI benchmark for measuring intelligence
 - **Platform**: Web-based, responsive design works on any device with a modern browser
 
-## Quick Start
-
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Start development server: `npm run dev`
-4. Open `http://localhost:5173` in your browser
+https://learn.microsoft.com/en-us/rest/api/playfab/server/?view=playfab-rest - PlayFab Server API Reference
 
 **Note**: This is a static site that connects directly to PlayFab. No server setup required!
 

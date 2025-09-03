@@ -3,6 +3,8 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 This should use the repo at https://github.com/Big-Happy-Holding-Company/sfmc-app as a source of truth for how things should work. Especially regarding the specific implementation of PlayFab!!! D:\1Projects\sfmc-app Is the local version.
 
+https://learn.microsoft.com/en-us/rest/api/playfab/server/?view=playfab-rest - PlayFab Server API Reference
+
 ## Architecture
 
 **Static Web Application with PlayFab Backend (Matches Unity Implementation):**
