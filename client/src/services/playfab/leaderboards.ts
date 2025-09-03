@@ -41,7 +41,7 @@ export class PlayFabLeaderboards {
 
     try {
       await playFabCore.promisifyPlayFabCall(
-        playFab.Client.UpdatePlayerStatistics,
+        playFab.UpdatePlayerStatistics,
         request
       );
 
@@ -80,7 +80,7 @@ export class PlayFabLeaderboards {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.Client.GetLeaderboard,
+        playFab.GetLeaderboard,
         request
       );
 
@@ -129,7 +129,7 @@ export class PlayFabLeaderboards {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.Client.GetLeaderboardAroundPlayer,
+        playFab.GetLeaderboardAroundPlayer,
         request
       );
 

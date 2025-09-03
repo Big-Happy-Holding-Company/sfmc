@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 ## Recent Commits (Latest First)
 
+**2025-09-03**: Fix PlayFab API method calls - remove incorrect Client namespace  
+- Fixed critical "Cannot read properties of undefined (reading 'GetUserData')" error  
+- Corrected all PlayFab service methods to use direct API calls instead of playFab.Client.MethodName  
+- Updated userData.ts, events.ts, leaderboards.ts, tasks.ts, validation.ts, profiles.ts  
+- Fixed core.ts promisifyPlayFabCall method context binding  
+- Resolved SDK detection inconsistencies between window.PlayFab and window.PlayFabClientSDK  
+- Simplified initialization logic to only require window.PlayFab (sufficient for all API calls)  
+- **Testing Required**: Anonymous login should now work completely without errors  
+
 **2024-12-28**: Fix critical issues: disable loading screen, fix PlayFab init, accessibility  
 - Removed loading splash screen - now goes directly to app for better UX  
 - Fixed PlayFab initialization error by removing duplicate initialize() call  

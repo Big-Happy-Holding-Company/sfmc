@@ -44,7 +44,7 @@ export class PlayFabCore {
     await this.loadPlayFabSDK();
 
     // Initialize PlayFab SDK
-    if (typeof window !== 'undefined' && getPlayFab() && getPlayFabClientSDK()) {
+    if (typeof window !== 'undefined' && getPlayFab()) {
       getPlayFab().settings.titleId = this.titleId;
       this.isInitialized = true;
       console.log(`✅ PlayFab Core initialized with Title ID: ${this.titleId}`);
@@ -66,7 +66,7 @@ export class PlayFabCore {
       }
 
       // Check if already loaded
-      if (getPlayFab() && getPlayFabClientSDK()) {
+      if (getPlayFab()) {
         console.log('PlayFab SDK already loaded');
         return resolve();
       }
@@ -81,29 +81,28 @@ export class PlayFabCore {
         console.log('window.PlayFab exists:', !!getPlayFab());
         if (getPlayFab()) {
           console.log('window.PlayFab keys:', Object.keys(getPlayFab()));
-          console.log('window.PlayFab.Client exists:', !!getPlayFab().Client);
           console.log('window.PlayFab structure:', getPlayFab());
         }
         
-        // Poll for PlayFab.Client availability
+        // Poll for PlayFab availability
         let attempts = 0;
         const pollForClient = () => {
           attempts++;
-          console.log(`Attempt ${attempts}: Checking for PlayFab.Client...`);
+          console.log(`Attempt ${attempts}: Checking for PlayFab SDK availability...`);
           
           if (getPlayFab()) {
             console.log(`Available keys: ${Object.keys(getPlayFab()).join(', ')}`);
           }
           
-          if (getPlayFab() && getPlayFabClientSDK()) {
-            console.log('✅ PlayFab SDK with ClientSDK loaded successfully');
+          // We only need window.PlayFab - it contains all the client API methods
+          if (getPlayFab()) {
+            console.log('✅ PlayFab SDK loaded successfully');
             resolve();
           } else if (attempts < 50) { // Try for 5 seconds
             setTimeout(pollForClient, 100);
           } else {
-            console.error('❌ PlayFabClientSDK never became available after 50 attempts');
+            console.error('❌ PlayFab SDK never became available after 50 attempts');
             console.log('Final window.PlayFab state:', getPlayFab());
-            console.log('Final window.PlayFabClientSDK state:', getPlayFabClientSDK());
             resolve();
           }
         };
@@ -121,17 +120,17 @@ export class PlayFabCore {
    * Check if PlayFab is properly initialized
    */
   public isReady(): boolean {
-    return this.isInitialized && this.titleId !== null && typeof window !== 'undefined' && getPlayFab() && getPlayFabClientSDK();
+    return this.isInitialized && this.titleId !== null && typeof window !== 'undefined' && getPlayFab();
   }
 
   /**
-   * Get the PlayFab ClientSDK object  
+   * Get the PlayFab SDK object  
    */
   public getPlayFab(): any {
     if (!this.isReady()) {
       throw new Error('PlayFab not initialized. Call initialize() first.');
     }
-    return getPlayFabClientSDK();
+    return getPlayFab();
   }
 
   /**
@@ -213,7 +212,7 @@ export class PlayFabCore {
     }
 
     return new Promise<TResult>((resolve, reject) => {
-      apiCall.call(this.getPlayFab().Client, request, (result: any, error: any) => {
+      apiCall.call(this.getPlayFab(), request, (result: any, error: any) => {
         if (error) {
           const playFabError = this.handleError(error);
           console.error(`❌ PlayFab API Error:`, playFabError);

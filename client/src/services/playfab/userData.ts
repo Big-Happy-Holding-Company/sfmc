@@ -37,7 +37,7 @@ export class PlayFabUserData {
     
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.Client.GetUserData,
+        playFab.GetUserData,
         {}
       );
 
@@ -102,7 +102,7 @@ export class PlayFabUserData {
 
     try {
       await playFabCore.promisifyPlayFabCall(
-        playFab.Client.UpdateUserData,
+        playFab.UpdateUserData,
         { Data: dataToUpdate }
       );
 
@@ -232,7 +232,7 @@ export class PlayFabUserData {
     
     try {
       await playFabCore.promisifyPlayFabCall(
-        playFab.Client.UpdateUserData,
+        playFab.UpdateUserData,
         { Data: initialData }
       );
 
@@ -259,7 +259,7 @@ export class PlayFabUserData {
     
     try {
       await playFabCore.promisifyPlayFabCall(
-        playFab.Client.UpdateUserData,
+        playFab.UpdateUserData,
         { Data: resetData }
       );
 
