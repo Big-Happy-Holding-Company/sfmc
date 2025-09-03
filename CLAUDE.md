@@ -7,7 +7,7 @@ https://learn.microsoft.com/en-us/rest/api/playfab/server/?view=playfab-rest - P
 
 **IMPORTANT**: When working with PlayFab, always check the PlayFab API Analysis document for the most up-to-date information about the PlayFab API.
 
-We are using the playfab-web-sdk for all backend functionality!!!!
+We tried using the sdk but it didn't work so we are using the CDN version of the rest api.
 Use npm run test to run the application and test PlayFab functionality.
 
 ## Architecture

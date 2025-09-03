@@ -1,13 +1,47 @@
 /**
- * PlayFab Leaderboards Service
+ * PlayFab Leaderboards Service - Pure HTTP Implementation  
  * Manages score submission, leaderboard retrieval, and ranking operations
- * Matches Unity's MainManager.cs GetLeaderboard functionality
+ * Direct REST API calls - no SDK dependencies
  */
 
 import type { LeaderboardEntry } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';
 import { PLAYFAB_CONSTANTS } from '@/types/playfab';
+
+// PlayFab UpdatePlayerStatistics request format
+interface UpdatePlayerStatisticsRequest {
+  Statistics: Array<{
+    StatisticName: string;
+    Value: number;
+  }>;
+}
+
+// PlayFab GetLeaderboard request format  
+interface GetLeaderboardRequest {
+  StatisticName: string;
+  StartPosition: number;
+  MaxResultsCount: number;
+}
+
+// PlayFab GetLeaderboardAroundPlayer request format
+interface GetLeaderboardAroundPlayerRequest {
+  StatisticName: string;
+  PlayFabId: string;
+  MaxResultsCount: number;
+}
+
+// PlayFab leaderboard response format
+interface LeaderboardResponse {
+  Leaderboard: Array<{
+    DisplayName?: string;
+    StatValue: number;
+    Position: number;
+    PlayFabId: string;
+  }>;
+  NextReset?: string;
+  Version: number;
+}
 
 export class PlayFabLeaderboards {
   private static instance: PlayFabLeaderboards;
@@ -25,14 +59,13 @@ export class PlayFabLeaderboards {
   }
 
   /**
-   * Submit score to leaderboard (matches Unity's UpdatePlayerStatistics)
-   * MainManager.cs uses "LevelPoints" statistic name
+   * Submit score to leaderboard (HTTP implementation)
+   * Matches Unity's UpdatePlayerStatistics functionality
    */
   public async submitScore(score: number): Promise<void> {
     await playFabAuth.ensureAuthenticated();
 
-    const playFab = playFabCore.getPlayFab();
-    const request = {
+    const request: UpdatePlayerStatisticsRequest = {
       Statistics: [{
         StatisticName: PLAYFAB_CONSTANTS.STATISTIC_NAMES.LEVEL_POINTS,
         Value: score
@@ -40,10 +73,10 @@ export class PlayFabLeaderboards {
     };
 
     try {
-      const PlayFab = playFabCore.getPlayFab();
-      await playFabCore.promisifyPlayFabCall(
-        PlayFab.ClientApi.UpdatePlayerStatistics,
-        request
+      await playFabCore.makeHttpRequest<UpdatePlayerStatisticsRequest, {}>(
+        '/Client/UpdatePlayerStatistics',
+        request,
+        true // Requires authentication
       );
 
       // Clear cache since scores have changed
@@ -60,8 +93,8 @@ export class PlayFabLeaderboards {
   }
 
   /**
-   * Get leaderboard (matches Unity's GetLeaderboard exactly)
-   * MainManager.cs:267-307 implementation
+   * Get leaderboard (HTTP implementation)
+   * Matches Unity's GetLeaderboard exactly
    */
   public async getLeaderboard(maxResults: number = 10): Promise<LeaderboardEntry[]> {
     // Check cache first
@@ -72,18 +105,17 @@ export class PlayFabLeaderboards {
 
     await playFabAuth.ensureAuthenticated();
 
-    const playFab = playFabCore.getPlayFab();
-    const request = {
+    const request: GetLeaderboardRequest = {
       StatisticName: PLAYFAB_CONSTANTS.STATISTIC_NAMES.LEVEL_POINTS,
       StartPosition: 0,
       MaxResultsCount: maxResults
     };
 
     try {
-      const PlayFab = playFabCore.getPlayFab();
-      const result = await playFabCore.promisifyPlayFabCall(
-        PlayFab.ClientApi.GetLeaderboard,
-        request
+      const result = await playFabCore.makeHttpRequest<GetLeaderboardRequest, LeaderboardResponse>(
+        '/Client/GetLeaderboard',
+        request,
+        true // Requires authentication
       );
 
       const entries: LeaderboardEntry[] = result.Leaderboard.map((entry: any) => ({
@@ -114,7 +146,7 @@ export class PlayFabLeaderboards {
   }
 
   /**
-   * Get leaderboard around a specific player
+   * Get leaderboard around a specific player (HTTP implementation)
    */
   public async getLeaderboardAroundPlayer(
     playerId: string, 
@@ -122,18 +154,17 @@ export class PlayFabLeaderboards {
   ): Promise<LeaderboardEntry[]> {
     await playFabAuth.ensureAuthenticated();
 
-    const playFab = playFabCore.getPlayFab();
-    const request = {
+    const request: GetLeaderboardAroundPlayerRequest = {
       StatisticName: PLAYFAB_CONSTANTS.STATISTIC_NAMES.LEVEL_POINTS,
       PlayFabId: playerId,
       MaxResultsCount: maxResults
     };
 
     try {
-      const PlayFab = playFabCore.getPlayFab();
-      const result = await playFabCore.promisifyPlayFabCall(
-        PlayFab.ClientApi.GetLeaderboardAroundPlayer,
-        request
+      const result = await playFabCore.makeHttpRequest<GetLeaderboardAroundPlayerRequest, LeaderboardResponse>(
+        '/Client/GetLeaderboardAroundPlayer',
+        request,
+        true // Requires authentication
       );
 
       const entries: LeaderboardEntry[] = result.Leaderboard.map((entry: any) => ({

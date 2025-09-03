@@ -1,9 +1,8 @@
 /**
- * PlayFab Validation Service
+ * PlayFab Validation Service - Pure HTTP Implementation
  * SECURITY CRITICAL: Server-side solution validation via CloudScript
- * Replaces client-side validation to prevent cheating
+ * Direct REST API calls - no SDK dependencies
  */
-
 
 import type { 
   CloudScriptValidationRequest, 
@@ -14,6 +13,26 @@ import { playFabCore } from './core';
 import { playFabAuth } from './auth';
 import { playFabTasks } from './tasks';
 import { PLAYFAB_CONSTANTS } from '@/types/playfab';
+
+// PlayFab ExecuteCloudScript request format
+interface ExecuteCloudScriptRequest {
+  FunctionName: string;
+  FunctionParameter?: any;
+  GeneratePlayStreamEvent?: boolean;
+}
+
+// PlayFab ExecuteCloudScript response format
+interface ExecuteCloudScriptResponse {
+  FunctionName: string;
+  FunctionResult?: any;
+  Error?: {
+    Error: string;
+    Message: string;
+  };
+  ExecutionTimeSeconds?: number;
+  ProcessorTimeSeconds?: number;
+  MemoryConsumedBytes?: number;
+}
 
 export class PlayFabValidation {
   private static instance: PlayFabValidation;
@@ -28,7 +47,7 @@ export class PlayFabValidation {
   }
 
   /**
-   * Validate task solution via CloudScript (SECURITY CRITICAL)
+   * Validate task solution via CloudScript (SECURITY CRITICAL) (HTTP implementation)
    * Replaces client-side validation to prevent cheating
    * 
    * This method calls the ValidateTaskSolution CloudScript function which:
@@ -41,11 +60,9 @@ export class PlayFabValidation {
   public async validateSolution(request: CloudScriptValidationRequest): Promise<TaskValidationResult> {
     // Ensure user is authenticated
     await playFabAuth.ensureAuthenticated();
-
-    const playFab = playFabCore.getPlayFab();
     
     // Prepare CloudScript request
-    const cloudScriptRequest = {
+    const cloudScriptRequest: ExecuteCloudScriptRequest = {
       FunctionName: PLAYFAB_CONSTANTS.CLOUDSCRIPT_FUNCTIONS.VALIDATE_SOLUTION,
       FunctionParameter: request,
       GeneratePlayStreamEvent: true // Enable for analytics
@@ -54,10 +71,10 @@ export class PlayFabValidation {
     playFabCore.logOperation('Solution Validation', `Task: ${request.taskId}`);
 
     try {
-      const PlayFab = playFabCore.getPlayFab();
-      const result = await playFabCore.promisifyPlayFabCall(
-        PlayFab.ClientApi.ExecuteCloudScript,
-        cloudScriptRequest
+      const result = await playFabCore.makeHttpRequest<ExecuteCloudScriptRequest, ExecuteCloudScriptResponse>(
+        '/Client/ExecuteCloudScript',
+        cloudScriptRequest,
+        true // Requires authentication
       );
 
       // Check for CloudScript execution errors

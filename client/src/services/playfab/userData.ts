@@ -1,12 +1,27 @@
 /**
- * PlayFab User Data Service
+ * PlayFab User Data Service - Pure HTTP Implementation
  * Manages player profiles, rank progression, and progress tracking
- * Maintains compatibility with Unity's player data structure
+ * Direct REST API calls - no SDK dependencies
  */
 
 import type { PlayFabPlayer, RankLevel } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';
+
+// PlayFab GetUserData response format
+interface GetUserDataResponse {
+  Data?: Record<string, {
+    Value: string;
+    LastUpdated: string;
+    Permission?: string;
+  }>;
+}
+
+// PlayFab UpdateUserData request format
+interface UpdateUserDataRequest {
+  Data: Record<string, string>;
+  Permission?: string;
+}
 
 export class PlayFabUserData {
   private static instance: PlayFabUserData;
@@ -22,7 +37,7 @@ export class PlayFabUserData {
   }
 
   /**
-   * Get current player data from PlayFab User Data
+   * Get current player data from PlayFab User Data (HTTP implementation)
    * Creates default player data for new users
    */
   public async getPlayerData(): Promise<PlayFabPlayer> {
@@ -34,10 +49,10 @@ export class PlayFabUserData {
     }
 
     try {
-      const PlayFab = playFabCore.getPlayFab();
-      const result = await playFabCore.promisifyPlayFabCall(
-        PlayFab.ClientApi.GetUserData,
-        { TitleId: playFabCore.getTitleId() }
+      const result = await playFabCore.makeHttpRequest<{}, GetUserDataResponse>(
+        '/Client/GetUserData',
+        {}, // Empty request body
+        true // Requires authentication
       );
 
       const userData = result?.Data || {};
@@ -77,7 +92,7 @@ export class PlayFabUserData {
   }
 
   /**
-   * Update player data in PlayFab User Data
+   * Update player data in PlayFab User Data (HTTP implementation)
    */
   public async updatePlayerData(updates: Partial<PlayFabPlayer>): Promise<void> {
     if (!this.currentPlayer) {
@@ -99,10 +114,14 @@ export class PlayFabUserData {
     dataToUpdate.updatedAt = new Date().toISOString();
 
     try {
-      const PlayFab = playFabCore.getPlayFab();
-      await playFabCore.promisifyPlayFabCall(
-        PlayFab.ClientApi.UpdateUserData,
-        { TitleId: playFabCore.getTitleId(), Data: dataToUpdate }
+      const request: UpdateUserDataRequest = {
+        Data: dataToUpdate
+      };
+
+      await playFabCore.makeHttpRequest<UpdateUserDataRequest, {}>(
+        '/Client/UpdateUserData',
+        request,
+        true // Requires authentication
       );
 
       playFabCore.logOperation('Player Data Updated', Object.keys(dataToUpdate));
@@ -214,7 +233,7 @@ export class PlayFabUserData {
   }
 
   /**
-   * Initialize new player with default data
+   * Initialize new player with default data (HTTP implementation)
    */
   private async initializeNewPlayer(player: PlayFabPlayer): Promise<void> {
     const initialData = {
@@ -226,13 +245,16 @@ export class PlayFabUserData {
       completedMissions: '0',
       updatedAt: new Date().toISOString()
     };
-
-    const PlayFab = playFabCore.getPlayFab();
     
     try {
-      await playFabCore.promisifyPlayFabCall(
-        PlayFab.ClientApi.UpdateUserData,
-        { TitleId: playFabCore.getTitleId(), Data: initialData }
+      const request: UpdateUserDataRequest = {
+        Data: initialData
+      };
+
+      await playFabCore.makeHttpRequest<UpdateUserDataRequest, {}>(
+        '/Client/UpdateUserData',
+        request,
+        true // Requires authentication
       );
 
       playFabCore.logOperation('New Player Initialized', player.username);
@@ -242,7 +264,7 @@ export class PlayFabUserData {
   }
 
   /**
-   * Reset player data (for testing purposes)
+   * Reset player data (for testing purposes) (HTTP implementation)
    */
   public async resetPlayerData(): Promise<void> {
     const resetData = {
@@ -253,13 +275,16 @@ export class PlayFabUserData {
       currentTask: '',
       updatedAt: new Date().toISOString()
     };
-
-    const PlayFab = playFabCore.getPlayFab();
     
     try {
-      await playFabCore.promisifyPlayFabCall(
-        PlayFab.ClientApi.UpdateUserData,
-        { TitleId: playFabCore.getTitleId(), Data: resetData }
+      const request: UpdateUserDataRequest = {
+        Data: resetData
+      };
+
+      await playFabCore.makeHttpRequest<UpdateUserDataRequest, {}>(
+        '/Client/UpdateUserData',
+        request,
+        true // Requires authentication
       );
 
       // Update local cache

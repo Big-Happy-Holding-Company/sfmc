@@ -1,13 +1,23 @@
 /**
- * PlayFab Tasks Service
+ * PlayFab Tasks Service - Pure HTTP Implementation
  * Manages task data retrieval from PlayFab Title Data
- * Handles caching and task lookup operations
+ * Direct REST API calls - no SDK dependencies
  */
 
 import type { PlayFabTask } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';
 import { PLAYFAB_CONSTANTS } from '@/types/playfab';
+
+// PlayFab GetTitleData request format
+interface GetTitleDataRequest {
+  Keys: string[];
+}
+
+// PlayFab GetTitleData response format
+interface GetTitleDataResponse {
+  Data?: Record<string, string>;
+}
 
 export class PlayFabTasks {
   private static instance: PlayFabTasks;
@@ -25,7 +35,7 @@ export class PlayFabTasks {
   }
 
   /**
-   * Get all tasks from PlayFab Title Data
+   * Get all tasks from PlayFab Title Data (HTTP implementation)
    * Uses caching to minimize API calls
    */
   public async getAllTasks(): Promise<PlayFabTask[]> {
@@ -38,16 +48,15 @@ export class PlayFabTasks {
     // Ensure user is authenticated
     await playFabAuth.ensureAuthenticated();
 
-    const request = {
-      TitleId: playFabCore.getTitleId(),
+    const request: GetTitleDataRequest = {
       Keys: [PLAYFAB_CONSTANTS.TITLE_DATA_KEYS.TASKS]
     };
 
     try {
-      const PlayFab = playFabCore.getPlayFab();
-      const result = await playFabCore.promisifyPlayFabCall(
-        PlayFab.ClientApi.GetTitleData,
-        request
+      const result = await playFabCore.makeHttpRequest<GetTitleDataRequest, GetTitleDataResponse>(
+        '/Client/GetTitleData',
+        request,
+        true // Requires authentication
       );
 
       const tasksData = result?.Data?.[PLAYFAB_CONSTANTS.TITLE_DATA_KEYS.TASKS];
