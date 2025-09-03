@@ -24,25 +24,76 @@ export class PlayFabCore {
   /**
    * Initialize PlayFab with configuration
    */
-  public initialize(config: PlayFabConfig): void {
+  public async initialize(config: PlayFabConfig): Promise<void> {
     this.titleId = config.titleId;
     this.secretKey = config.secretKey || null;
 
+    // Load PlayFab SDK first
+    await this.loadPlayFabSDK();
+
     // Initialize PlayFab SDK
-    if (typeof PlayFab !== 'undefined' && PlayFab.Client) {
-      PlayFab.Client.settings.titleId = this.titleId;
+    if (typeof window !== 'undefined' && window.PlayFab && window.PlayFab.Client) {
+      window.PlayFab.settings.titleId = this.titleId;
       this.isInitialized = true;
       console.log(`✅ PlayFab Core initialized with Title ID: ${this.titleId}`);
     } else {
-      throw new Error('PlayFab SDK not found. Make sure to include PlayFab CDN script.');
+      console.warn('PlayFab Client API not available, continuing in offline mode');
+      this.isInitialized = false;
     }
+  }
+
+  /**
+   * Load PlayFab SDK from CDN with timeout
+   */
+  private loadPlayFabSDK(): Promise<void> {
+    return new Promise<void>((resolve) => {
+      if (typeof window === 'undefined') {
+        console.error('PlayFab SDK can only be loaded in the browser');
+        return resolve();
+      }
+
+      // Check if already loaded
+      if (window.PlayFab && window.PlayFab.Client) {
+        console.log('PlayFab SDK already loaded');
+        return resolve();
+      }
+
+      // Add timeout to prevent hanging
+      const timeout = setTimeout(() => {
+        console.warn('PlayFab SDK loading timed out after 10 seconds');
+        resolve();
+      }, 10000);
+
+      // Load the SDK
+      const script = document.createElement('script');
+      script.src = 'https://download.playfab.com/PlayFabClientApi.js';
+      script.async = true;
+      script.onload = () => {
+        clearTimeout(timeout);
+        // Add delay to ensure Client API is fully loaded
+        setTimeout(() => {
+          if (window.PlayFab && window.PlayFab.Client) {
+            console.log('PlayFab SDK loaded successfully');
+          } else {
+            console.error('PlayFab Client API not available after loading');
+          }
+          resolve();
+        }, 100);
+      };
+      script.onerror = (error) => {
+        clearTimeout(timeout);
+        console.error('Error loading PlayFab SDK:', error);
+        resolve();
+      };
+      document.head.appendChild(script);
+    });
   }
 
   /**
    * Check if PlayFab is properly initialized
    */
   public isReady(): boolean {
-    return this.isInitialized && this.titleId !== null && typeof PlayFab !== 'undefined';
+    return this.isInitialized && this.titleId !== null && typeof window !== 'undefined' && window.PlayFab && window.PlayFab.Client;
   }
 
   /**
@@ -52,7 +103,7 @@ export class PlayFabCore {
     if (!this.isReady()) {
       throw new Error('PlayFab not initialized. Call initialize() first.');
     }
-    return PlayFab;
+    return window.PlayFab;
   }
 
   /**

@@ -54,22 +54,25 @@ export class PlayFabService {
   /**
    * Initialize PlayFab with configuration
    */
-  public initialize(): void {
+  public async initialize(): Promise<void> {
     const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
     if (!titleId) {
       throw new Error('VITE_PLAYFAB_TITLE_ID environment variable not found');
     }
 
-    this.core.validateEnvironment();
-    this.core.initialize({ 
-      titleId,
-      secretKey: import.meta.env.VITE_PLAYFAB_SECRET_KEY 
-    });
+    try {
+      await this.core.initialize({ 
+        titleId,
+        secretKey: import.meta.env.VITE_PLAYFAB_SECRET_KEY 
+      });
 
-    this.core.logOperation('PlayFab Service Initialized', { 
-      titleId, 
-      modulesLoaded: 8 
-    });
+      this.core.logOperation('PlayFab Service Initialized', { 
+        titleId, 
+        modulesLoaded: 8 
+      });
+    } catch (error) {
+      console.warn('PlayFab initialization failed, continuing in offline mode:', error);
+    }
   }
 
   // =============================================================================
@@ -370,8 +373,10 @@ export {
 export type * from '@/types/playfab';
 
 // Initialize service on module load
-try {
-  playFabService.initialize();
-} catch (error) {
-  console.error('Failed to initialize PlayFab Service:', error);
-}
+(async () => {
+  try {
+    await playFabService.initialize();
+  } catch (error) {
+    console.error('Failed to initialize PlayFab Service:', error);
+  }
+})();
