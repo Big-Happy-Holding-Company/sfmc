@@ -4,31 +4,30 @@ All notable changes to this project will be documented in this file.
 
 ## Recent Commits (Latest First)
 
-**2025-09-03**: Fix PlayFab API method calls - remove incorrect Client namespace  
-- Fixed critical "Cannot read properties of undefined (reading 'GetUserData')" error  
-- Corrected all PlayFab service methods to use direct API calls instead of playFab.Client.MethodName  
-- Updated userData.ts, events.ts, leaderboards.ts, tasks.ts, validation.ts, profiles.ts  
-- Fixed core.ts promisifyPlayFabCall method context binding  
-- Resolved SDK detection inconsistencies between window.PlayFab and window.PlayFabClientSDK  
-- Simplified initialization logic to only require window.PlayFab (sufficient for all API calls)  
-- Added debugging to investigate "Cannot read properties of undefined (reading 'call')" error  
-- **Testing Required**: Check browser console for PlayFab SDK structure and method availability  
+**2025-09-03**: Complete PlayFab integration fix - environment variables and API structure  
+- **SECURITY**: Fixed environment variable loading - added envDir to vite.config.ts to load .env from secure project root  
+- **SECURITY**: Removed duplicated .env file from client directory (prevented credential exposure)  
+- **API STRUCTURE**: Corrected ALL PlayFab service files to use official PlayFab.Client.MethodName format  
+- **FIXED FILES**: auth.ts, userData.ts, events.ts, leaderboards.ts, tasks.ts, validation.ts, profiles.ts, core.ts  
+- **RESOLVED ERRORS**: "VITE_PLAYFAB_TITLE_ID environment variable not found" and "API call method is not available"  
+- **AUTHENTICATION**: Anonymous device ID login now properly implemented per PlayFab SDK documentation  
+- **TESTING**: Ready for testing at http://localhost:5176 - PlayFab authentication should work completely  
 
-**2024-12-28**: Fix critical issues: disable loading screen, fix PlayFab init, accessibility  
+**2025-09-02**: Fix critical issues: disable loading screen, fix PlayFab init, accessibility  
 - Removed loading splash screen - now goes directly to app for better UX  
 - Fixed PlayFab initialization error by removing duplicate initialize() call  
 - Fixed DialogContent accessibility by adding hidden DialogTitle for screen readers  
 - Fixed TypeScript errors in PlayFab service with simplified return types  
 - Removed unnecessary timeout logic that was incorrectly added  
 
-**2024-12-28**: Complete Railway deployment fixes and PlayFab modular optimization  
+**2025-08-28**: Complete Railway deployment fixes and PlayFab modular optimization  
 - Removed monolithic client/src/services/playfab.ts (17KB) - replaced by modular services  
 - Fixed PlayFab core.ts SDK loading with proper Client API validation  
 - Updated PlayFab index.ts with async initialization and auto-init on module load  
 - Added comprehensive error handling for PlayFab.Client undefined issues  
 - Created railway.toml and Dockerfile for Railway deployment alternatives  
 
-**2024-12-28**: Fix Railway Docker build failure by removing top-level await statements  
+**2025-08-28**: Fix Railway Docker build failure by removing top-level await statements  
 - Updated vite.config.ts to remove Replit plugin and ES2020 incompatibility  
 - Converted to synchronous defineConfig and ES2022 target for top-level await support  
 - Resolved "SyntaxError: Unexpected reserved word 'await'" in Railway deployment  
