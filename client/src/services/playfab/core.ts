@@ -4,8 +4,13 @@
  * Replaces CDN script loading approach with proper npm package imports
  */
 
-// Import PlayFab from npm package
-import PlayFab from 'playfab-web-sdk';
+// PlayFab is loaded via CDN in index.html with proper loading synchronization
+declare global {
+  interface Window {
+    PlayFab: any;
+  }
+  var PlayFab: any;
+}
 
 // Minimal PlayFab type declarations for compilation
 declare interface PlayFabConfig {
@@ -42,22 +47,30 @@ export class PlayFabCore {
   }
 
   /**
-   * Initialize PlayFab with configuration using web-sdk
+   * Initialize PlayFab with configuration using CDN with proper loading detection
    */
   public async initialize(config: PlayFabConfig): Promise<void> {
     this.titleId = config.titleId;
     this.secretKey = config.secretKey || null;
 
-    // Validate PlayFab import
-    if (!PlayFab || !PlayFab.settings) {
-      throw new Error('PlayFab Web SDK not properly loaded. Check npm package installation.');
+    // Wait for PlayFab CDN script to load and be available
+    let attempts = 0;
+    const maxAttempts = 100; // 10 seconds max wait
+    while (typeof window.PlayFab === 'undefined' && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+
+    // Final validation that PlayFab is available
+    if (typeof window.PlayFab === 'undefined' || !PlayFab.settings) {
+      throw new Error('PlayFab CDN script failed to load. Check network connection.');
     }
 
     // Set PlayFab settings
     PlayFab.settings.titleId = this.titleId;
     
     this.isInitialized = true;
-    console.log(`✅ PlayFab Core initialized with Title ID: ${this.titleId}`);
+    console.log(`✅ PlayFab Core initialized with Title ID: ${this.titleId} (waited ${attempts * 100}ms for CDN)`);
   }
 
   /**
