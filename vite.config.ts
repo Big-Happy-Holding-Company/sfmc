@@ -27,6 +27,12 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
+    rollupOptions: {
+      external: ['playfab-web-sdk'],
+    },
+    commonjsOptions: {
+      include: /node_modules|playfab-web-sdk/
+    }
   },
   server: {
     fs: {
