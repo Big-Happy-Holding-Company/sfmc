@@ -9,9 +9,6 @@
  * - Event logging
  */
 
-// Global PlayFab object from CDN
-declare const PlayFab: any;
-
 // PlayFab configuration
 const PLAYFAB_TITLE_ID = import.meta.env.VITE_PLAYFAB_TITLE_ID;
 
@@ -19,8 +16,50 @@ if (!PLAYFAB_TITLE_ID) {
   console.error('PlayFab Title ID not found. Please set VITE_PLAYFAB_TITLE_ID in your environment.');
 }
 
+// Initialize PlayFab SDK
+declare global {
+  interface Window {
+    PlayFab: any;
+  }
+}
+
+// Load PlayFab SDK from CDN
+const loadPlayFabSDK = () => {
+  return new Promise<void>((resolve) => {
+    if (typeof window === 'undefined') {
+      console.error('PlayFab SDK can only be loaded in the browser');
+      return resolve();
+    }
+
+    // Check if already loaded
+    if (window.PlayFab) {
+      console.log('PlayFab SDK already loaded');
+      return resolve();
+    }
+
+    // Load the SDK
+    const script = document.createElement('script');
+    script.src = 'https://download.playfab.com/PlayFabClientApi.js';
+    script.async = true;
+    script.onload = () => {
+      if (window.PlayFab && PLAYFAB_TITLE_ID) {
+        window.PlayFab.settings.titleId = PLAYFAB_TITLE_ID;
+        console.log('PlayFab SDK loaded and initialized with Title ID:', PLAYFAB_TITLE_ID);
+      } else {
+        console.error('Failed to initialize PlayFab SDK');
+      }
+      resolve();
+    };
+    script.onerror = (error) => {
+      console.error('Error loading PlayFab SDK:', error);
+      resolve();
+    };
+    document.head.appendChild(script);
+  });
+};
+
 // Initialize PlayFab
-PlayFab.Client.settings.titleId = PLAYFAB_TITLE_ID;
+await loadPlayFabSDK();
 
 export interface PlayFabTask {
   id: string;
