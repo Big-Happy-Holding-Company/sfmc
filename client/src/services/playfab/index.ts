@@ -368,11 +368,4 @@ export {
 // Export types
 export type * from '@/types/playfab';
 
-// Initialize service on module load
-(async () => {
-  try {
-    await playFabService.initialize();
-  } catch (error) {
-    console.error('Failed to initialize PlayFab Service:', error);
-  }
-})();
+// Export service - initialization will be done explicitly by components
