@@ -4,7 +4,6 @@
  * Maintains compatibility with Unity's player data structure
  */
 
-import 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
 import type { PlayFabPlayer, RankLevel } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';
