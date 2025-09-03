@@ -8,7 +8,7 @@
     "build:client": "vite build", 
     "start": "vite preview",
     "check": "tsc",
-    "test": "npm run build",
+    "test": "npm run build && npm run dev",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
@@ -61,8 +61,6 @@
     "next-themes": "^0.4.6",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
-    "playfab-sdk": "^2.180.250815",
-    "playfab-web-sdk": "^1.198.250815",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
@@ -77,9 +75,7 @@
     "wouter": "^3.3.5",
     "ws": "^8.18.0",
     "zod": "^3.24.2",
-    "zod-validation-error": "^3.4.0"
-  },
-  "devDependencies": {
+    "zod-validation-error": "^3.4.0",
     "@replit/vite-plugin-cartographer": "^0.2.7",
     "@replit/vite-plugin-runtime-error-modal": "^0.0.3",
     "@tailwindcss/typography": "^0.5.15",

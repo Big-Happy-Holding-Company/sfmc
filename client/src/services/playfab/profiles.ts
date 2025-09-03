@@ -1,13 +1,44 @@
 /**
- * PlayFab Profiles Service
+ * PlayFab Profiles Service - Pure HTTP Implementation
  * Manages player profiles and avatar system
- * Matches Unity's MainManager.cs GetPlayerProfile functionality (lines 309-330)
+ * Direct REST API calls - no SDK dependencies
  */
-
 
 import type { PlayerProfile, LeaderboardEntry } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';
+
+// PlayFab GetPlayerProfile request format
+interface GetPlayerProfileRequest {
+  PlayFabId: string;
+  ProfileConstraints?: {
+    ShowAvatarUrl?: boolean;
+    ShowDisplayName?: boolean;
+    ShowLastLogin?: boolean;
+    ShowCreated?: boolean;
+  };
+}
+
+// PlayFab GetPlayerProfile response format
+interface GetPlayerProfileResponse {
+  PlayerProfile: {
+    PlayFabId: string;
+    DisplayName?: string;
+    AvatarUrl?: string;
+    LastLogin?: string;
+    Created?: string;
+  };
+}
+
+// PlayFab UpdateAvatarUrl request format
+interface UpdateAvatarUrlRequest {
+  ImageUrl: string;
+}
+
+// PlayFab UpdateAvatarUrl response format (typically empty)
+interface UpdateAvatarUrlResponse {
+  // Empty response
+}
 
 export class PlayFabProfiles {
   private static instance: PlayFabProfiles;
@@ -26,8 +57,8 @@ export class PlayFabProfiles {
   }
 
   /**
-   * Get player profile (matches Unity's GetPlayerProfile exactly)
-   * MainManager.cs:309-330 implementation
+   * Get player profile (HTTP implementation)
+   * Matches Unity's GetPlayerProfile exactly
    */
   public async getPlayerProfile(playerId: string): Promise<PlayerProfile> {
     // Check cache first
@@ -39,8 +70,7 @@ export class PlayFabProfiles {
 
     await playFabAuth.ensureAuthenticated();
 
-    const playFab = playFabCore.getPlayFab();
-    const request = {
+    const request: GetPlayerProfileRequest = {
       PlayFabId: playerId,
       ProfileConstraints: {
         ShowAvatarUrl: true,
@@ -51,9 +81,10 @@ export class PlayFabProfiles {
     };
 
     try {
-      const result = await playFabCore.promisifyPlayFabCall(
-        PlayFab.ClientApi.GetPlayerProfile,
-        request
+      const result = await playFabCore.makeHttpRequest<GetPlayerProfileRequest, GetPlayerProfileResponse>(
+        '/Client/GetPlayerProfile',
+        request,
+        true // Requires authentication
       );
 
       const profile: PlayerProfile = {
@@ -182,20 +213,20 @@ export class PlayFabProfiles {
   }
 
   /**
-   * Set player avatar URL
+   * Set player avatar URL (HTTP implementation)
    */
   public async setPlayerAvatar(avatarUrl: string): Promise<void> {
     await playFabAuth.ensureAuthenticated();
 
-    const playFab = playFabCore.getPlayFab();
-    const request = {
+    const request: UpdateAvatarUrlRequest = {
       ImageUrl: avatarUrl
     };
 
     try {
-      await playFabCore.promisifyPlayFabCall(
-        PlayFab.ClientApi.UpdateAvatarUrl,
-        request
+      await playFabCore.makeHttpRequest<UpdateAvatarUrlRequest, UpdateAvatarUrlResponse>(
+        '/Client/UpdateAvatarUrl',
+        request,
+        true // Requires authentication
       );
 
       // Clear cached profile for current player

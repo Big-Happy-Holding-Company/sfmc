@@ -1,12 +1,40 @@
 /**
- * PlayFab Authentication Service
+ * PlayFab Authentication Service - Pure HTTP Implementation
  * Handles anonymous login, display name generation, and session management
- * Matches Unity's PlayFabAnonDeviceLogin.cs functionality
+ * Direct REST API calls - no SDK dependencies
  */
 
 import type { AuthenticationResult, AnonymousNameResponse } from '@/types/playfab';
 import { playFabCore } from './core';
 import { PLAYFAB_CONSTANTS } from '@/types/playfab';
+
+// PlayFab login response format
+interface LoginWithCustomIDResponse {
+  PlayFabId: string;
+  SessionTicket: string;
+  NewlyCreated: boolean;
+  InfoResultPayload?: {
+    PlayerProfile?: {
+      DisplayName?: string;
+      PlayerId: string;
+    };
+  };
+}
+
+// CloudScript execution response format
+interface ExecuteCloudScriptResponse {
+  FunctionName: string;
+  FunctionResult?: any;
+  Error?: {
+    Error: string;
+    Message: string;
+  };
+}
+
+// Update display name response format
+interface UpdateUserTitleDisplayNameResponse {
+  DisplayName: string;
+}
 
 export class PlayFabAuth {
   private static instance: PlayFabAuth;
@@ -24,8 +52,7 @@ export class PlayFabAuth {
   }
 
   /**
-   * Anonymous authentication using device ID (matches Unity's approach)
-   * PlayFabAnonDeviceLogin.cs:168-172
+   * Anonymous authentication using device ID (HTTP implementation)
    */
   public async loginAnonymously(): Promise<AuthenticationResult> {
     playFabCore.logOperation('Anonymous Login', 'Starting...');
@@ -33,7 +60,6 @@ export class PlayFabAuth {
     const customId = this.getOrCreateDeviceId();
 
     const request = {
-      TitleId: playFabCore.getTitleId(),
       CustomId: customId,
       CreateAccount: true,
       InfoRequestParameters: {
@@ -42,15 +68,23 @@ export class PlayFabAuth {
     };
 
     try {
-      const result = await playFabCore.promisifyPlayFabCall(
-        PlayFab.ClientApi.LoginWithCustomID,
-        request
-      ) as any;
+      const result = await playFabCore.makeHttpRequest<typeof request, LoginWithCustomIDResponse>(
+        '/Client/LoginWithCustomID',
+        request,
+        false // No auth required for login
+      );
 
+      // Store session data
       this.isLoggedIn = true;
       this.playFabId = result.PlayFabId;
       
-      playFabCore.logOperation('Anonymous Login Success', result.PlayFabId);
+      // Store session token in core for authenticated requests
+      playFabCore.setSessionToken(result.SessionTicket);
+      
+      playFabCore.logOperation('Anonymous Login Success', {
+        playFabId: result.PlayFabId,
+        newlyCreated: result.NewlyCreated
+      });
 
       // Handle display name like Unity does
       await this.handleDisplayName(result);
@@ -82,9 +116,8 @@ export class PlayFabAuth {
 
   /**
    * Handle display name generation (matches Unity's approach)
-   * PlayFabAnonDeviceLogin.cs:166-172
    */
-  private async handleDisplayName(loginData: any): Promise<void> {
+  private async handleDisplayName(loginData: LoginWithCustomIDResponse): Promise<void> {
     const existingDisplayName = loginData.InfoResultPayload?.PlayerProfile?.DisplayName;
     
     if (!existingDisplayName) {
@@ -109,21 +142,20 @@ export class PlayFabAuth {
   }
 
   /**
-   * Call CloudScript to generate anonymous name (matches Unity exactly)
-   * PlayFabAnonDeviceLogin.cs:168-172
+   * Call CloudScript to generate anonymous name (HTTP implementation)
    */
   public async generateAnonymousName(): Promise<string> {
     const request = {
-      TitleId: playFabCore.getTitleId(),
       FunctionName: PLAYFAB_CONSTANTS.CLOUDSCRIPT_FUNCTIONS.GENERATE_ANONYMOUS_NAME,
       GeneratePlayStreamEvent: false
     };
 
     try {
-      const result = await playFabCore.promisifyPlayFabCall(
-        PlayFab.ClientApi.ExecuteCloudScript,
-        request
-      ) as any;
+      const result = await playFabCore.makeHttpRequest<typeof request, ExecuteCloudScriptResponse>(
+        '/Client/ExecuteCloudScript',
+        request,
+        true // Requires authentication
+      );
 
       // Check for CloudScript execution errors
       if (result.Error) {
@@ -143,19 +175,19 @@ export class PlayFabAuth {
   }
 
   /**
-   * Set user display name
+   * Set user display name (HTTP implementation)
    */
   public async setDisplayName(displayName: string): Promise<void> {
     const request = {
-      TitleId: playFabCore.getTitleId(),
       DisplayName: displayName
     };
 
     try {
-      const result = await playFabCore.promisifyPlayFabCall(
-        PlayFab.ClientApi.UpdateUserTitleDisplayName,
-        request
-      ) as any;
+      const result = await playFabCore.makeHttpRequest<typeof request, UpdateUserTitleDisplayNameResponse>(
+        '/Client/UpdateUserTitleDisplayName',
+        request,
+        true // Requires authentication
+      );
 
       this.displayName = result.DisplayName;
       playFabCore.logOperation('Display Name Updated', result.DisplayName);
@@ -193,6 +225,7 @@ export class PlayFabAuth {
     this.isLoggedIn = false;
     this.playFabId = null;
     this.displayName = null;
+    playFabCore.clearSession();
     playFabCore.logOperation('User Logged Out');
   }
 

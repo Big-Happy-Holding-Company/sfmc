@@ -1,13 +1,23 @@
 /**
- * PlayFab Events Service
+ * PlayFab Events Service - Pure HTTP Implementation
  * Enhanced event logging with Unity parity (16-parameter structure)
- * Matches PuzzleEventLogger.cs functionality exactly
+ * Direct REST API calls - no SDK dependencies
  */
-
 
 import type { PuzzleEventData, GameSession, GameStatus, EventType } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';
+
+// PlayFab WritePlayerEvent request format
+interface WritePlayerEventRequest {
+  EventName: string;
+  Body: Record<string, any>;
+}
+
+// PlayFab WritePlayerEvent response format (typically empty)
+interface WritePlayerEventResponse {
+  EventId?: string;
+}
 
 export class PlayFabEvents {
   private static instance: PlayFabEvents;
@@ -24,7 +34,7 @@ export class PlayFabEvents {
   }
 
   /**
-   * Log puzzle event with full Unity parity (16 parameters)
+   * Log puzzle event with full Unity parity (16 parameters) (HTTP implementation)
    * Matches PuzzleEventLogger.cs:LogPuzzleEvent exactly
    */
   public async logPuzzleEvent(
@@ -70,16 +80,16 @@ export class PlayFabEvents {
       eventBody.payloadSummary = payloadSummary;
     }
 
-    const playFab = playFabCore.getPlayFab();
-    const request = {
+    const request: WritePlayerEventRequest = {
       EventName: eventName,
       Body: eventBody
     };
 
     try {
-      await playFabCore.promisifyPlayFabCall(
-        PlayFab.ClientApi.WritePlayerEvent,
-        request
+      await playFabCore.makeHttpRequest<WritePlayerEventRequest, WritePlayerEventResponse>(
+        '/Client/WritePlayerEvent',
+        request,
+        true // Requires authentication
       );
 
       playFabCore.logOperation('Event Logged', {
@@ -95,21 +105,22 @@ export class PlayFabEvents {
   }
 
   /**
-   * Simplified event logging method matching the existing React implementation
+   * Simplified event logging method (HTTP implementation)
+   * Matches the existing React implementation
    */
   public async logEvent(eventName: string, eventData: Record<string, any>): Promise<void> {
     await playFabAuth.ensureAuthenticated();
 
-    const playFab = playFabCore.getPlayFab();
-    const request = {
+    const request: WritePlayerEventRequest = {
       EventName: eventName,
       Body: eventData
     };
 
     try {
-      await playFabCore.promisifyPlayFabCall(
-        PlayFab.ClientApi.WritePlayerEvent,
-        request
+      await playFabCore.makeHttpRequest<WritePlayerEventRequest, WritePlayerEventResponse>(
+        '/Client/WritePlayerEvent',
+        request,
+        true // Requires authentication
       );
 
       playFabCore.logOperation('Simple Event Logged', eventName);
