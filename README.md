@@ -117,6 +117,14 @@ Players advance through Space Force enlisted ranks by earning points from solvin
 3. Set up environment variables: Copy `.env` and add `VITE_PLAYFAB_TITLE_ID`
 4. Start development server: `npm run dev`
 
+### Documentation
+
+📚 **See [docs/](./docs/)** for comprehensive documentation:
+- **[PlayFab API Analysis](./docs/playfab-api-analysis.md)** - Complete API reference and security audit
+- **[Migration Plan](./docs/2SeptPlayfabTasks.md)** - PlayFab implementation phases
+
+⚠️ **Security Notice**: Current task validation is client-side only. See API Analysis for production security recommendations.
+
 ### Adding New Tasks
 
 Tasks are now managed in **PlayFab Title Data**. To add new tasks:
