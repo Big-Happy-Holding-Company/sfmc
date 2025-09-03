@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.1] - 2025-09-03 - COMPLETED
+
+### Railway Deployment Fix
+
+### Fixed
+- **Build Target**: Resolved top-level await compatibility issue for Railway Docker build
+- **vite.config.ts**: Converted top-level await import to conditional async function
+- **playfab.ts**: Converted top-level await to lazy initialization pattern  
+- **Build Configuration**: Updated target to ES2022 for modern JavaScript support
+
+### Known Issues (RESOLVED)
+- **Railway Build Failure**: Top-level await not supported in ES2020 target environment
+- **Error**: `Top-level await is not available in the configured target environment`
+- **Impact**: Static site deployment failing on Railway platform
+
+### Technical Details
+- **Root Cause**: Railway Docker build failing due to top-level await in ES2020 target
+- **Solution**: Removed all top-level await statements and updated build configuration
+- **Result**: Static site deployment compatible with Railway's build environment
+
+---
+
 ## [0.1.0] - 2025-09-02 - 
 
 ### Complete PlayFab Migration
