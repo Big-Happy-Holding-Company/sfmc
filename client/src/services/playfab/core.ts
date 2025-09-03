@@ -212,7 +212,18 @@ export class PlayFabCore {
     }
 
     return new Promise<TResult>((resolve, reject) => {
-      apiCall.call(this.getPlayFab(), request, (result: any, error: any) => {
+      // Debug the API call structure
+      const playfabSDK = this.getPlayFab();
+      console.log('PlayFab SDK object:', playfabSDK);
+      console.log('API call method:', apiCall);
+      console.log('API call type:', typeof apiCall);
+      
+      if (!apiCall || typeof apiCall !== 'function') {
+        reject(new Error(`API call method is not available: ${apiCall}`));
+        return;
+      }
+      
+      apiCall.call(playfabSDK, request, (result: any, error: any) => {
         if (error) {
           const playFabError = this.handleError(error);
           console.error(`❌ PlayFab API Error:`, playFabError);
