@@ -4,20 +4,14 @@
  * Replaces CDN script loading approach with proper npm package imports
  */
 
-// @ts-ignore - PlayFab SDK doesn't have TypeScript declarations
-import * as PlayFabSDK from 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
+import 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
 import type { PlayFabConfig, PlayFabError, PlayFabServiceResult } from '@/types/playfab';
 
-// Initialize PlayFab global
+// Global PlayFab types after importing the SDK
 declare global {
-  var PlayFab: any;
+  const PlayFab: any;
+  const PlayFabClientSDK: any;
 }
-
-// Set up the global PlayFab variable
-if (typeof window !== 'undefined') {
-  (window as any).PlayFab = PlayFabSDK;
-}
-const PlayFab = PlayFabSDK;
 
 export class PlayFabCore {
   private static instance: PlayFabCore;
