@@ -6,6 +6,18 @@
 
 import type { PlayFabConfig, PlayFabError, PlayFabServiceResult } from '@/types/playfab';
 
+// Global PlayFab types - SDK now uses PlayFabClientSDK
+declare global {
+  interface Window {
+    PlayFab: any;
+    PlayFabClientSDK: any;
+  }
+}
+
+// Type assertions for window objects
+const getPlayFab = () => (window as any).PlayFab;
+const getPlayFabClientSDK = () => (window as any).PlayFabClientSDK;
+
 export class PlayFabCore {
   private static instance: PlayFabCore;
   private titleId: string | null = null;
@@ -32,12 +44,14 @@ export class PlayFabCore {
     await this.loadPlayFabSDK();
 
     // Initialize PlayFab SDK
-    if (typeof window !== 'undefined' && window.PlayFab && window.PlayFab.Client) {
-      window.PlayFab.settings.titleId = this.titleId;
+    if (typeof window !== 'undefined' && getPlayFab() && getPlayFabClientSDK()) {
+      getPlayFab().settings.titleId = this.titleId;
       this.isInitialized = true;
       console.log(`✅ PlayFab Core initialized with Title ID: ${this.titleId}`);
     } else {
-      throw new Error('PlayFab SDK not loaded properly. Client API not available.');
+      console.warn('PlayFab SDK not available, running in offline mode');
+      this.isInitialized = false;
+      // Don't throw error - allow app to continue without PlayFab
     }
   }
 
@@ -52,28 +66,51 @@ export class PlayFabCore {
       }
 
       // Check if already loaded
-      if (window.PlayFab && window.PlayFab.Client) {
+      if (getPlayFab() && getPlayFabClientSDK()) {
         console.log('PlayFab SDK already loaded');
         return resolve();
       }
 
-      // Load the SDK
+      // Simple, reliable SDK loading
       const script = document.createElement('script');
       script.src = 'https://download.playfab.com/PlayFabClientApi.js';
-      script.async = true;
       script.onload = () => {
-        // Add small delay to ensure Client API is fully loaded
-        setTimeout(() => {
-          if (window.PlayFab && window.PlayFab.Client) {
-            console.log('PlayFab SDK loaded successfully');
-          } else {
-            console.error('PlayFab Client API not available after loading');
+        console.log('PlayFab SDK script loaded, inspecting window.PlayFab...');
+        
+        // Immediate inspection
+        console.log('window.PlayFab exists:', !!getPlayFab());
+        if (getPlayFab()) {
+          console.log('window.PlayFab keys:', Object.keys(getPlayFab()));
+          console.log('window.PlayFab.Client exists:', !!getPlayFab().Client);
+          console.log('window.PlayFab structure:', getPlayFab());
+        }
+        
+        // Poll for PlayFab.Client availability
+        let attempts = 0;
+        const pollForClient = () => {
+          attempts++;
+          console.log(`Attempt ${attempts}: Checking for PlayFab.Client...`);
+          
+          if (getPlayFab()) {
+            console.log(`Available keys: ${Object.keys(getPlayFab()).join(', ')}`);
           }
-          resolve();
-        }, 100);
+          
+          if (getPlayFab() && getPlayFabClientSDK()) {
+            console.log('✅ PlayFab SDK with ClientSDK loaded successfully');
+            resolve();
+          } else if (attempts < 50) { // Try for 5 seconds
+            setTimeout(pollForClient, 100);
+          } else {
+            console.error('❌ PlayFabClientSDK never became available after 50 attempts');
+            console.log('Final window.PlayFab state:', getPlayFab());
+            console.log('Final window.PlayFabClientSDK state:', getPlayFabClientSDK());
+            resolve();
+          }
+        };
+        setTimeout(pollForClient, 100); // Start polling after small delay
       };
-      script.onerror = (error) => {
-        console.error('Error loading PlayFab SDK:', error);
+      script.onerror = () => {
+        console.error('Failed to load PlayFab SDK');
         resolve();
       };
       document.head.appendChild(script);
@@ -84,17 +121,17 @@ export class PlayFabCore {
    * Check if PlayFab is properly initialized
    */
   public isReady(): boolean {
-    return this.isInitialized && this.titleId !== null && typeof window !== 'undefined' && window.PlayFab && window.PlayFab.Client;
+    return this.isInitialized && this.titleId !== null && typeof window !== 'undefined' && getPlayFab() && getPlayFabClientSDK();
   }
 
   /**
-   * Get the global PlayFab object
+   * Get the PlayFab ClientSDK object  
    */
   public getPlayFab(): any {
     if (!this.isReady()) {
       throw new Error('PlayFab not initialized. Call initialize() first.');
     }
-    return window.PlayFab;
+    return getPlayFabClientSDK();
   }
 
   /**

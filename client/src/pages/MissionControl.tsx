@@ -60,6 +60,9 @@ export default function MissionControl() {
       setError(null);
       
       try {
+        // Initialize PlayFab first
+        await playFabService.initialize();
+        
         // Login and get player data
         await playFabService.loginAnonymously();
         const playerData = await playFabService.getPlayerData();

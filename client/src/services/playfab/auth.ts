@@ -43,9 +43,9 @@ export class PlayFabAuth {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.Client.LoginWithCustomID,
+        playFab.LoginWithCustomID,
         request
-      );
+      ) as any;
 
       this.isLoggedIn = true;
       this.playFabId = result.PlayFabId;
@@ -57,7 +57,7 @@ export class PlayFabAuth {
 
       return {
         PlayFabId: result.PlayFabId,
-        DisplayName: this.displayName,
+        DisplayName: this.displayName || undefined,
         NewlyCreated: result.NewlyCreated
       };
     } catch (error) {
@@ -122,9 +122,9 @@ export class PlayFabAuth {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.Client.ExecuteCloudScript,
+        playFab.ExecuteCloudScript,
         request
-      );
+      ) as any;
 
       // Check for CloudScript execution errors
       if (result.Error) {
@@ -155,9 +155,9 @@ export class PlayFabAuth {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.Client.UpdateUserTitleDisplayName,
+        playFab.UpdateUserTitleDisplayName,
         request
-      );
+      ) as any;
 
       this.displayName = result.DisplayName;
       playFabCore.logOperation('Display Name Updated', result.DisplayName);
