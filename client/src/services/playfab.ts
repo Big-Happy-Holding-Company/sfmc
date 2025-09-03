@@ -58,8 +58,26 @@ const loadPlayFabSDK = () => {
   });
 };
 
-// Initialize PlayFab
-await loadPlayFabSDK();
+// PlayFab SDK lazy initialization
+let sdkInitialized = false;
+let sdkInitializing = false;
+let initPromise: Promise<void> | null = null;
+
+const ensurePlayFabSDK = async (): Promise<void> => {
+  if (sdkInitialized) return;
+  
+  if (sdkInitializing && initPromise) {
+    return initPromise;
+  }
+  
+  sdkInitializing = true;
+  initPromise = loadPlayFabSDK().then(() => {
+    sdkInitialized = true;
+    sdkInitializing = false;
+  });
+  
+  return initPromise;
+};
 
 export interface PlayFabTask {
   id: string;
@@ -136,6 +154,8 @@ class PlayFabService {
    * Anonymous authentication (matches Unity's device login)
    */
   async loginAnonymously(): Promise<void> {
+    await ensurePlayFabSDK();
+    
     return new Promise((resolve, reject) => {
       const customId = this.getOrCreateDeviceId();
       
