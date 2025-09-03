@@ -60,19 +60,15 @@ export class PlayFabService {
       throw new Error('VITE_PLAYFAB_TITLE_ID environment variable not found');
     }
 
-    try {
-      await this.core.initialize({ 
-        titleId,
-        secretKey: import.meta.env.VITE_PLAYFAB_SECRET_KEY 
-      });
+    await this.core.initialize({ 
+      titleId,
+      secretKey: import.meta.env.VITE_PLAYFAB_SECRET_KEY 
+    });
 
-      this.core.logOperation('PlayFab Service Initialized', { 
-        titleId, 
-        modulesLoaded: 8 
-      });
-    } catch (error) {
-      console.warn('PlayFab initialization failed, continuing in offline mode:', error);
-    }
+    this.core.logOperation('PlayFab Service Initialized', { 
+      titleId, 
+      modulesLoaded: 8 
+    });
   }
 
   // =============================================================================
@@ -266,8 +262,8 @@ export class PlayFabService {
   public async getPlayerStats(): Promise<{
     player: PlayFabPlayer;
     ranking: LeaderboardEntry | null;
-    stats: ReturnType<typeof this.userData.getPlayerStats>;
-    leaderboardStats: Awaited<ReturnType<typeof this.leaderboards.getLeaderboardStats>>;
+    stats: any;
+    leaderboardStats: any;
   }> {
     const [player, ranking, leaderboardStats] = await Promise.all([
       this.userData.getPlayerData(),
@@ -307,9 +303,9 @@ export class PlayFabService {
       auth: this.auth.isAuthenticated(),
       cloudScript: cloudScriptHealth.status === 'fulfilled' ? cloudScriptHealth.value : false,
       services: {
-        tasks: this.tasks.getCacheInfo(),
-        leaderboards: this.leaderboards.getCacheInfo(),
-        profiles: this.profiles.getCacheStats()
+        tasks: { ...this.tasks.getCacheInfo(), cached: 0 },
+        leaderboards: { ...this.leaderboards.getCacheInfo(), cached: 0 },
+        profiles: { ...this.profiles.getCacheStats(), cached: 0 }
       }
     };
   }

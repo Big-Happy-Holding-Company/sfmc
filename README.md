@@ -43,7 +43,6 @@ Static React App (client/)
 ├── constants/     # Game constants and emoji sets  
 ├── services/      # PlayFab integration
 └── pages/         # Route components
-```
 
 ### Data Flow
 1. **Tasks**: Loaded from PlayFab Title Data on app start

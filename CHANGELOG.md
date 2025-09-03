@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file.
 
+## Recent Commits (Latest First)
+
+**2024-12-28**: Fix critical issues: disable loading screen, fix PlayFab init, accessibility  
+- Removed loading splash screen - now goes directly to app for better UX  
+- Fixed PlayFab initialization error by removing duplicate initialize() call  
+- Fixed DialogContent accessibility by adding hidden DialogTitle for screen readers  
+- Fixed TypeScript errors in PlayFab service with simplified return types  
+- Removed unnecessary timeout logic that was incorrectly added  
+
+**2024-12-28**: Complete Railway deployment fixes and PlayFab modular optimization  
+- Removed monolithic client/src/services/playfab.ts (17KB) - replaced by modular services  
+- Fixed PlayFab core.ts SDK loading with proper Client API validation  
+- Updated PlayFab index.ts with async initialization and auto-init on module load  
+- Added comprehensive error handling for PlayFab.Client undefined issues  
+- Created railway.toml and Dockerfile for Railway deployment alternatives  
+
+**2024-12-28**: Fix Railway Docker build failure by removing top-level await statements  
+- Updated vite.config.ts to remove Replit plugin and ES2020 incompatibility  
+- Converted to synchronous defineConfig and ES2022 target for top-level await support  
+- Resolved "SyntaxError: Unexpected reserved word 'await'" in Railway deployment  
+
+**Status**: ✅ **RESOLVED** - All critical issues fixed. App loads directly, PlayFab works, builds clean.
+
+### Technical Details
+- **Root Cause**: Railway Docker build failing due to top-level await in ES2020 target
+- **Solution**: Removed all top-level await statements and updated build configuration
+- **Result**: Static site deployment compatible with Railway's build environment
+
+---
+
 ## [0.1.1] - 2025-09-03 - COMPLETED
 
 ### Railway Deployment Fix
