@@ -51,7 +51,7 @@ export class PlayFabEvents {
     const displayName = playFabAuth.getDisplayName() || 'Unknown';
 
     // Build event body matching Unity structure exactly
-    const eventBody = {
+    const eventBody: any = {
       sessionId,
       attemptId,
       game_id,
@@ -68,7 +68,7 @@ export class PlayFabEvents {
 
     // Add optional fields
     if (payloadSummary) {
-      eventBody['payloadSummary'] = payloadSummary;
+      eventBody.payloadSummary = payloadSummary;
     }
 
     const playFab = playFabCore.getPlayFab();

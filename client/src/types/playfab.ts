@@ -3,10 +3,7 @@
  * Comprehensive type definitions for PlayFab integration matching Unity implementation
  */
 
-// Global PlayFab object from CDN
-declare global {
-  const PlayFab: any;
-}
+// PlayFab global declared in core.ts
 
 // =============================================================================
 // TASK DATA TYPES
@@ -97,6 +94,7 @@ export interface TaskValidationResult extends CloudScriptValidationResponse {
   basePoints?: number;
   speedBonus?: number;
   totalPoints?: number;
+  hintsUsed?: number;
 }
 
 // =============================================================================

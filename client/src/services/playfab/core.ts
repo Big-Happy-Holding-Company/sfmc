@@ -120,7 +120,7 @@ export class PlayFabCore {
    * Wrap PlayFab API calls in promises with standardized error handling
    * Updated for playfab-web-sdk callback pattern
    */
-  public promisifyPlayFabCall<TRequest, TResult>(
+  public promisifyPlayFabCall<TRequest, TResult = any>(
     apiCall: (request: TRequest, callback: (error: any, result: any) => void) => void,
     request: TRequest
   ): Promise<TResult> {
