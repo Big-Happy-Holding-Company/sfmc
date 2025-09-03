@@ -4,6 +4,8 @@
  * Replaces client-side validation to prevent cheating
  */
 
+import 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
+
 import type { 
   CloudScriptValidationRequest, 
   CloudScriptValidationResponse,
@@ -54,7 +56,7 @@ export class PlayFabValidation {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.ExecuteCloudScript,
+        PlayFab.ClientApi.ExecuteCloudScript,
         cloudScriptRequest
       );
 

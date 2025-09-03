@@ -4,6 +4,7 @@
  * Maintains compatibility with Unity's player data structure
  */
 
+import 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
 import type { PlayFabPlayer, RankLevel } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';
@@ -33,12 +34,10 @@ export class PlayFabUserData {
       throw new Error('No PlayFab ID available');
     }
 
-    const playFab = playFabCore.getPlayFab();
-    
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.GetUserData,
-        {}
+        PlayFab.ClientApi.GetUserData,
+        { TitleId: playFabCore.getTitleId() }
       );
 
       const userData = result?.Data || {};
@@ -88,7 +87,6 @@ export class PlayFabUserData {
     // Update local player data
     this.currentPlayer = { ...this.currentPlayer, ...updates, updatedAt: new Date() };
 
-    const playFab = playFabCore.getPlayFab();
     const dataToUpdate: Record<string, string> = {};
 
     // Convert player data to PlayFab UserData format
@@ -102,8 +100,8 @@ export class PlayFabUserData {
 
     try {
       await playFabCore.promisifyPlayFabCall(
-        playFab.UpdateUserData,
-        { Data: dataToUpdate }
+        PlayFab.ClientApi.UpdateUserData,
+        { TitleId: playFabCore.getTitleId(), Data: dataToUpdate }
       );
 
       playFabCore.logOperation('Player Data Updated', Object.keys(dataToUpdate));
@@ -232,8 +230,8 @@ export class PlayFabUserData {
     
     try {
       await playFabCore.promisifyPlayFabCall(
-        playFab.UpdateUserData,
-        { Data: initialData }
+        PlayFab.ClientApi.UpdateUserData,
+        { TitleId: playFabCore.getTitleId(), Data: initialData }
       );
 
       playFabCore.logOperation('New Player Initialized', player.username);
@@ -259,8 +257,8 @@ export class PlayFabUserData {
     
     try {
       await playFabCore.promisifyPlayFabCall(
-        playFab.UpdateUserData,
-        { Data: resetData }
+        PlayFab.ClientApi.UpdateUserData,
+        { TitleId: playFabCore.getTitleId(), Data: resetData }
       );
 
       // Update local cache

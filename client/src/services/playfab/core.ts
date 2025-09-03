@@ -1,22 +1,17 @@
 /**
- * PlayFab Core Service
- * Base infrastructure for all PlayFab operations
- * Handles connection, configuration, and error management
+ * PlayFab Core Service - Web SDK Implementation
+ * Handles PlayFab initialization and API call management using playfab-web-sdk
+ * Replaces CDN script loading approach with proper npm package imports
  */
 
+import 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
 import type { PlayFabConfig, PlayFabError, PlayFabServiceResult } from '@/types/playfab';
 
-// Global PlayFab types - SDK now uses PlayFabClientSDK
+// Global PlayFab types after importing the SDK
 declare global {
-  interface Window {
-    PlayFab: any;
-    PlayFabClientSDK: any;
-  }
+  const PlayFab: any;
+  const PlayFabClientSDK: any;
 }
-
-// Type assertions for window objects
-const getPlayFab = () => (window as any).PlayFab;
-const getPlayFabClientSDK = () => (window as any).PlayFabClientSDK;
 
 export class PlayFabCore {
   private static instance: PlayFabCore;
@@ -34,103 +29,24 @@ export class PlayFabCore {
   }
 
   /**
-   * Initialize PlayFab with configuration
+   * Initialize PlayFab with configuration using web-sdk
    */
   public async initialize(config: PlayFabConfig): Promise<void> {
     this.titleId = config.titleId;
     this.secretKey = config.secretKey || null;
 
-    // Load PlayFab SDK first
-    await this.loadPlayFabSDK();
-
-    // Initialize PlayFab SDK
-    if (typeof window !== 'undefined' && getPlayFab()) {
-      getPlayFab().settings.titleId = this.titleId;
-      this.isInitialized = true;
-      console.log(`✅ PlayFab Core initialized with Title ID: ${this.titleId}`);
-    } else {
-      console.warn('PlayFab SDK not available, running in offline mode');
-      this.isInitialized = false;
-      // Don't throw error - allow app to continue without PlayFab
-    }
-  }
-
-  /**
-   * Load PlayFab SDK from CDN
-   */
-  private loadPlayFabSDK(): Promise<void> {
-    return new Promise<void>((resolve) => {
-      if (typeof window === 'undefined') {
-        console.error('PlayFab SDK can only be loaded in the browser');
-        return resolve();
-      }
-
-      // Check if already loaded
-      if (getPlayFab()) {
-        console.log('PlayFab SDK already loaded');
-        return resolve();
-      }
-
-      // Simple, reliable SDK loading
-      const script = document.createElement('script');
-      script.src = 'https://download.playfab.com/PlayFabClientApi.js';
-      script.onload = () => {
-        console.log('PlayFab SDK script loaded, inspecting window.PlayFab...');
-        
-        // Immediate inspection
-        console.log('window.PlayFab exists:', !!getPlayFab());
-        if (getPlayFab()) {
-          console.log('window.PlayFab keys:', Object.keys(getPlayFab()));
-          console.log('window.PlayFab structure:', getPlayFab());
-        }
-        
-        // Poll for PlayFab availability
-        let attempts = 0;
-        const pollForClient = () => {
-          attempts++;
-          console.log(`Attempt ${attempts}: Checking for PlayFab SDK availability...`);
-          
-          if (getPlayFab()) {
-            console.log(`Available keys: ${Object.keys(getPlayFab()).join(', ')}`);
-          }
-          
-          // We only need window.PlayFab - it contains all the client API methods
-          if (getPlayFab()) {
-            console.log('✅ PlayFab SDK loaded successfully');
-            resolve();
-          } else if (attempts < 50) { // Try for 5 seconds
-            setTimeout(pollForClient, 100);
-          } else {
-            console.error('❌ PlayFab SDK never became available after 50 attempts');
-            console.log('Final window.PlayFab state:', getPlayFab());
-            resolve();
-          }
-        };
-        setTimeout(pollForClient, 100); // Start polling after small delay
-      };
-      script.onerror = () => {
-        console.error('Failed to load PlayFab SDK');
-        resolve();
-      };
-      document.head.appendChild(script);
-    });
+    // Set PlayFab settings
+    PlayFab.settings.titleId = this.titleId;
+    
+    this.isInitialized = true;
+    console.log(`✅ PlayFab Core initialized with Title ID: ${this.titleId}`);
   }
 
   /**
    * Check if PlayFab is properly initialized
    */
   public isReady(): boolean {
-    return this.isInitialized && this.titleId !== null && typeof window !== 'undefined' && getPlayFab();
-  }
-
-  /**
-   * Get the PlayFab SDK object  
-   */
-  public getPlayFab(): any {
-    if (!this.isReady()) {
-      throw new Error('PlayFab not initialized. Call initialize() first.');
-    }
-    return getPlayFab();
+    return this.isInitialized && this.titleId !== null;
   }
 
   /**
@@ -202,9 +118,10 @@ export class PlayFabCore {
 
   /**
    * Wrap PlayFab API calls in promises with standardized error handling
+   * Updated for playfab-web-sdk callback pattern
    */
-  public promisifyPlayFabCall<TRequest, TResult>(
-    apiCall: (request: TRequest, callback: (result: any, error: any) => void) => void,
+  public promisifyPlayFabCall<TRequest, TResult = any>(
+    apiCall: (request: TRequest, callback: (error: any, result: any) => void) => void,
     request: TRequest
   ): Promise<TResult> {
     if (!this.isReady()) {
@@ -212,7 +129,7 @@ export class PlayFabCore {
     }
 
     return new Promise<TResult>((resolve, reject) => {
-      apiCall.call(this.getPlayFab(), request, (result: any, error: any) => {
+      apiCall(request, (error: any, result: any) => {
         if (error) {
           const playFabError = this.handleError(error);
           console.error(`❌ PlayFab API Error:`, playFabError);
@@ -234,16 +151,22 @@ export class PlayFabCore {
   }
 
   /**
+   * Get PlayFab instance (required by other service files)
+   */
+  public getPlayFab(): typeof PlayFab {
+    if (!this.isReady()) {
+      throw new Error('PlayFab not initialized. Call initialize() first.');
+    }
+    return PlayFab;
+  }
+
+  /**
    * Validate environment configuration
    */
   public validateEnvironment(): void {
     const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
     if (!titleId) {
       throw new Error('VITE_PLAYFAB_TITLE_ID environment variable not found');
-    }
-
-    if (typeof PlayFab === 'undefined') {
-      throw new Error('PlayFab SDK not loaded. Include PlayFab CDN script in your HTML.');
     }
   }
 }

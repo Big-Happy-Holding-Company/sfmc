@@ -4,6 +4,7 @@
  * Matches Unity's PlayFabAnonDeviceLogin.cs functionality
  */
 
+import 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
 import type { AuthenticationResult, AnonymousNameResponse } from '@/types/playfab';
 import { playFabCore } from './core';
 import { PLAYFAB_CONSTANTS } from '@/types/playfab';
@@ -31,9 +32,9 @@ export class PlayFabAuth {
     playFabCore.logOperation('Anonymous Login', 'Starting...');
     
     const customId = this.getOrCreateDeviceId();
-    const playFab = playFabCore.getPlayFab();
 
     const request = {
+      TitleId: playFabCore.getTitleId(),
       CustomId: customId,
       CreateAccount: true,
       InfoRequestParameters: {
@@ -43,7 +44,7 @@ export class PlayFabAuth {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.LoginWithCustomID,
+        PlayFab.ClientApi.LoginWithCustomID,
         request
       ) as any;
 
@@ -113,16 +114,15 @@ export class PlayFabAuth {
    * PlayFabAnonDeviceLogin.cs:168-172
    */
   public async generateAnonymousName(): Promise<string> {
-    const playFab = playFabCore.getPlayFab();
-    
     const request = {
+      TitleId: playFabCore.getTitleId(),
       FunctionName: PLAYFAB_CONSTANTS.CLOUDSCRIPT_FUNCTIONS.GENERATE_ANONYMOUS_NAME,
       GeneratePlayStreamEvent: false
     };
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.ExecuteCloudScript,
+        PlayFab.ClientApi.ExecuteCloudScript,
         request
       ) as any;
 
@@ -147,15 +147,14 @@ export class PlayFabAuth {
    * Set user display name
    */
   public async setDisplayName(displayName: string): Promise<void> {
-    const playFab = playFabCore.getPlayFab();
-
     const request = {
+      TitleId: playFabCore.getTitleId(),
       DisplayName: displayName
     };
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.UpdateUserTitleDisplayName,
+        PlayFab.ClientApi.UpdateUserTitleDisplayName,
         request
       ) as any;
 

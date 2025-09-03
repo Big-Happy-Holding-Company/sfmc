@@ -4,6 +4,8 @@
  * Matches Unity's MainManager.cs GetPlayerProfile functionality (lines 309-330)
  */
 
+import 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
+
 import type { PlayerProfile, LeaderboardEntry } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';
@@ -51,7 +53,7 @@ export class PlayFabProfiles {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.GetPlayerProfile,
+        PlayFab.ClientApi.GetPlayerProfile,
         request
       );
 
@@ -193,7 +195,7 @@ export class PlayFabProfiles {
 
     try {
       await playFabCore.promisifyPlayFabCall(
-        playFab.UpdateAvatarUrl,
+        PlayFab.ClientApi.UpdateAvatarUrl,
         request
       );
 

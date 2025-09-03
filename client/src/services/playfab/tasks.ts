@@ -4,6 +4,7 @@
  * Handles caching and task lookup operations
  */
 
+import 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
 import type { PlayFabTask } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';
@@ -38,14 +39,14 @@ export class PlayFabTasks {
     // Ensure user is authenticated
     await playFabAuth.ensureAuthenticated();
 
-    const playFab = playFabCore.getPlayFab();
     const request = {
+      TitleId: playFabCore.getTitleId(),
       Keys: [PLAYFAB_CONSTANTS.TITLE_DATA_KEYS.TASKS]
     };
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.GetTitleData,
+        PlayFab.ClientApi.GetTitleData,
         request
       );
 

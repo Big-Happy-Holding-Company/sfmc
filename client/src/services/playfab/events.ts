@@ -4,6 +4,8 @@
  * Matches PuzzleEventLogger.cs functionality exactly
  */
 
+import 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
+
 import type { PuzzleEventData, GameSession, GameStatus, EventType } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';
@@ -49,7 +51,7 @@ export class PlayFabEvents {
     const displayName = playFabAuth.getDisplayName() || 'Unknown';
 
     // Build event body matching Unity structure exactly
-    const eventBody = {
+    const eventBody: any = {
       sessionId,
       attemptId,
       game_id,
@@ -66,7 +68,7 @@ export class PlayFabEvents {
 
     // Add optional fields
     if (payloadSummary) {
-      eventBody['payloadSummary'] = payloadSummary;
+      eventBody.payloadSummary = payloadSummary;
     }
 
     const playFab = playFabCore.getPlayFab();
@@ -77,7 +79,7 @@ export class PlayFabEvents {
 
     try {
       await playFabCore.promisifyPlayFabCall(
-        playFab.WritePlayerEvent,
+        PlayFab.ClientApi.WritePlayerEvent,
         request
       );
 
@@ -107,7 +109,7 @@ export class PlayFabEvents {
 
     try {
       await playFabCore.promisifyPlayFabCall(
-        playFab.WritePlayerEvent,
+        PlayFab.ClientApi.WritePlayerEvent,
         request
       );
 
