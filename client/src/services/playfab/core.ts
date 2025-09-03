@@ -4,13 +4,29 @@
  * Replaces CDN script loading approach with proper npm package imports
  */
 
-import 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
-import type { PlayFabConfig, PlayFabError, PlayFabServiceResult } from '@/types/playfab';
-
-// Global PlayFab types after importing the SDK
+// PlayFab is loaded via CDN in index.html and available globally
 declare global {
-  const PlayFab: any;
-  const PlayFabClientSDK: any;
+  interface Window {
+    PlayFab: any;
+  }
+  var PlayFab: any;
+}
+
+// Minimal PlayFab type declarations for compilation
+declare interface PlayFabConfig {
+  titleId: string;
+  secretKey?: string;
+}
+
+declare interface PlayFabError {
+  errorMessage: string;
+  errorDetails?: Record<string, string[]>;
+}
+
+declare interface PlayFabServiceResult<T = any> {
+  data: T;
+  status: 'success' | 'error';
+  error?: PlayFabError;
 }
 
 export class PlayFabCore {
