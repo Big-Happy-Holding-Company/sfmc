@@ -11,7 +11,8 @@ All notable changes to this project will be documented in this file.
 - Fixed core.ts promisifyPlayFabCall method context binding  
 - Resolved SDK detection inconsistencies between window.PlayFab and window.PlayFabClientSDK  
 - Simplified initialization logic to only require window.PlayFab (sufficient for all API calls)  
-- **Testing Required**: Anonymous login should now work completely without errors  
+- Added debugging to investigate "Cannot read properties of undefined (reading 'call')" error  
+- **Testing Required**: Check browser console for PlayFab SDK structure and method availability  
 
 **2024-12-28**: Fix critical issues: disable loading screen, fix PlayFab init, accessibility  
 - Removed loading splash screen - now goes directly to app for better UX  

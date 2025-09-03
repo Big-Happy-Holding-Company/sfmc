@@ -5,6 +5,8 @@ This should use the repo at https://github.com/Big-Happy-Holding-Company/sfmc-ap
 
 https://learn.microsoft.com/en-us/rest/api/playfab/server/?view=playfab-rest - PlayFab Server API Reference
 
+**IMPORTANT**: When working with PlayFab, always check the PlayFab API Analysis document for the most up-to-date information about the PlayFab API.
+
 ## Architecture
 
 **Static Web Application with PlayFab Backend (Matches Unity Implementation):**
@@ -79,13 +81,13 @@ shared/schema.ts        # Legacy types - client uses PlayFab types
   "examples": [{"input": [[0,1],[1,0]], "output": [[1,0],[0,1]]}],
   "testInput": [[0,1],[1,0]],
   "testOutput": [[1,0],[0,1]],
-  "hints": ["Progressive hint 1", "Progressive hint 2", "Final solution with developer credit"]
+  "hints": ["Progressive hint 1", "Progressive hint 2", "Hint 3"]
 }
 ```
 
 ## ARC-AGI Integration
 
-**Space Force Mission Control 2045** is built on the Abstract Reasoning Corpus (ARC-AGI) framework:
+**Space Force Mission Control 2050** is built on the Abstract Reasoning Corpus (ARC-AGI) framework:
 - Transforms ARC-AGI puzzles into Space Force themed operational tasks
 - Maintains ARC-AGI's 0-9 integer system with space emoji overlay
 - Supports standard ARC-AGI file imports
@@ -112,7 +114,7 @@ shared/schema.ts        # Legacy types - client uses PlayFab types
 - **Leaderboards:** `UpdatePlayerStatistics` and `GetLeaderboard` for global rankings
 - **Player Profiles:** `GetPlayerProfile` for user information and avatars
 
-**PlayFab is NOT used for:**
+**PlayFab used for EVERYTHING!!!:**  CHECK THESE TO MAKE SURE THEY ARE USING IT CORRECTLY!!!!
 - ❌ Task/puzzle data storage (use local JSON file)
 - ❌ CloudScript functions
 - ❌ Title Data for game content
