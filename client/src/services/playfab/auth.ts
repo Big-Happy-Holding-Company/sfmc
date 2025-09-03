@@ -43,7 +43,7 @@ export class PlayFabAuth {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.LoginWithCustomID,
+        PlayFab.Client.LoginWithCustomID,
         request
       ) as any;
 
@@ -122,7 +122,7 @@ export class PlayFabAuth {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.ExecuteCloudScript,
+        PlayFab.Client.ExecuteCloudScript,
         request
       ) as any;
 
@@ -155,7 +155,7 @@ export class PlayFabAuth {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.UpdateUserTitleDisplayName,
+        PlayFab.Client.UpdateUserTitleDisplayName,
         request
       ) as any;
 

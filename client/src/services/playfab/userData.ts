@@ -33,11 +33,9 @@ export class PlayFabUserData {
       throw new Error('No PlayFab ID available');
     }
 
-    const playFab = playFabCore.getPlayFab();
-    
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.GetUserData,
+        PlayFab.Client.GetUserData,
         {}
       );
 
@@ -88,7 +86,6 @@ export class PlayFabUserData {
     // Update local player data
     this.currentPlayer = { ...this.currentPlayer, ...updates, updatedAt: new Date() };
 
-    const playFab = playFabCore.getPlayFab();
     const dataToUpdate: Record<string, string> = {};
 
     // Convert player data to PlayFab UserData format
@@ -102,7 +99,7 @@ export class PlayFabUserData {
 
     try {
       await playFabCore.promisifyPlayFabCall(
-        playFab.UpdateUserData,
+        PlayFab.Client.UpdateUserData,
         { Data: dataToUpdate }
       );
 
@@ -232,7 +229,7 @@ export class PlayFabUserData {
     
     try {
       await playFabCore.promisifyPlayFabCall(
-        playFab.UpdateUserData,
+        PlayFab.Client.UpdateUserData,
         { Data: initialData }
       );
 
@@ -259,7 +256,7 @@ export class PlayFabUserData {
     
     try {
       await playFabCore.promisifyPlayFabCall(
-        playFab.UpdateUserData,
+        PlayFab.Client.UpdateUserData,
         { Data: resetData }
       );
 

@@ -45,7 +45,7 @@ export class PlayFabTasks {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.GetTitleData,
+        PlayFab.Client.GetTitleData,
         request
       );
 

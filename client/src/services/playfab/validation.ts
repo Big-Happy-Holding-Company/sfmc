@@ -54,7 +54,7 @@ export class PlayFabValidation {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        playFab.ExecuteCloudScript,
+        PlayFab.Client.ExecuteCloudScript,
         cloudScriptRequest
       );
 
