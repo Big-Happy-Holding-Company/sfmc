@@ -1,70 +1,71 @@
 # Mission Control 2045
 
-My nephew Wyatt was the inspiration for this app.  AI is rapidly changing the world we live in. He is 6 years old and wants to be a mission control specialist.  The US Space Force was formed in 2019 and is the branch of the U.S. Armed Forces that is responsible for space operations, including space situational awareness, space traffic management, and space-based missile defense. I wonder what that will look like in 2050.  I want to give him a fun way to learn about the types of tasks he might actually encounter in the future based upon the reasoning and logic that are difficult for AI to perform.  I envision a future where AI can perform most tasks, but there are still some tasks that require human intuition and reasoning.  This Space Force-themed puzzle game has recruits complete operational tasks to advance through enlisted ranks and all the tasks are based upon the Abstract Reasoning Corpus (ARC) puzzles. The puzzles are transformed to fit the Space Force theme and the game is designed to be platform agnostic. One challenge as a developer has been accomodating the challenges that individuals with unique disabilities (such as colorblindness) face, while still maintaining a fun and engaging experience for all players and staying true to the structure of the ARC-AGI test framework. 
+A Space Force-themed puzzle game where players complete operational tasks to advance through enlisted ranks. Tasks are based on the Abstract Reasoning Corpus (ARC) puzzles, transformed to fit the Space Force theme while maintaining accessibility for all players, including those with color vision deficiencies.
 
-In 2050 this game will hopefully serve as an interesting temporal artifact of a very specific moment in the development of AI and AI reasoning towards what we today call AGI. ARC-AGI is measuring the ability to adapt to tasks you cannot prepare for. These puzzles we are using are unique, cannot be anticipated, can be understood from 2-3 examples, and still apparently require human intuition and reasoning. 
+## About
 
-## ARC-AGI Framework - Like holy sh*t these people are way smarter than me...
+- **Purpose**: Provide an engaging way to develop and test human reasoning skills through space operations-themed puzzles
+- **Inspiration**: Based on the ARC-AGI benchmark for measuring intelligence
+- **Platform**: Web-based, responsive design works on any device with a modern browser
 
-The Abstract and Reasoning Corpus for Artificial General Intelligence (ARC-AGI) is a benchmark designed to measure intelligence. (If you want to feel really dumb, go see what they consider to be "easy" puzzles for humans to solve! 😂) This project leverages puzzles and logic from:
+## Quick Start
 
-- Official ARC Prize: https://arcprize.org/arc-agi
-- Puzzle datasets: https://github.com/arcprize/ARC-AGI-2/tree/main/data
-- Reference: https://github.com/fchollet/ARC-AGI
-- https://www.youtube.com/watch?v=5QcCeSsNRks&ab_channel=YCombinator
-- https://arahim3.github.io/arc-agi-guide/ 
-- https://github.com/Big-Happy-Holding-Company/sfmc-app  //  Source of truth for code and data
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Start development server: `npm run dev`
+4. Open `http://localhost:5173` in your browser
 
-This project is designed to build upon that framework by adding a Space Force theme and making it accessible to a wider audience and especially young people and the colorblind.  It is also designed to be platform agnostic and can be run on any device with a web browser.
+**Note**: This is a static site that connects directly to PlayFab. No server setup required!
 
-## Architecture Overview
+## Key Features
 
-### System Design
-- **Frontend**: React + TypeScript with Vite
-- **Backend**: Express.js with TypeScript
-- **Storage**: In-memory with modular JSON task loading
-- **UI**: Tailwind CSS + shadcn/ui components  (This is just for the prototype)
+- **Task Categories**: Various space operations themes (Oxygen Systems, Navigation, Power, etc.)
+- **Rank Progression**: Advance through Space Force enlisted ranks by solving puzzles
+- **Accessibility**: Designed with colorblind-friendly emoji sets and clear visual feedback
 
-### Directory Structure
+## Technical Stack
+
+### Core Technologies
+- **Frontend**: React + TypeScript with Vite (Static Site)
+- **Backend**: PlayFab Cloud Services (No Server Required)
+- **UI Components**: Tailwind CSS + shadcn/ui
+- **Data Storage**: PlayFab Title Data & User Data
+- **Authentication**: PlayFab Anonymous Login
+
+### Architecture Overview
+
+This is a **static web application** that runs entirely in the browser, with all backend functionality handled by PlayFab cloud services.
+
 ```
-├── client/                 # Frontend React application
-│   └── src/
-│       ├── components/     # Reusable UI components (CORE SYSTEMS!)
-│       │   ├── game/       # Game-specific components (CORE SYSTEMS!)
-│       │   └── ui/         # Base UI components (shadcn) (CORE SYSTEMS!)
-│       ├── constants/      # Emoji sets and game constants (CORE SYSTEMS!)
-│       ├── pages/          # Route components (CORE SYSTEMS!)
-│       └── types/          # TypeScript type definitions (CORE SYSTEMS!)
-├── server/                 # Backend Express application (CORE SYSTEMS!)
-│   ├── cli/                # CLI utilities (task generation, etc.) (Questionable utility)
-│   ├── data/
-│   │   └── tasks/          # Individual JSON task files (CORE SYSTEMS!)
-│   ├── templates/          # Task and story templates  (Not working very well)
-│   │   ├── generators/
-│   │   ├── categories.ts
-│   │   ├── transformations.ts
-│   │   └── validators.ts
-│   ├── tools/              # Code-generation helpers  (Questionable utility)
-│   │   ├── task-factory.ts
-│   │   └── story-factory.ts   # Narrative wrapper
-│   ├── services/           # Business logic services (CORE SYSTEMS!)
-│   ├── tests/              # Automated backend tests (Questionable utility)
-│   ├── index.ts            # Server entry point (CORE SYSTEMS!)
-│   ├── routes.ts           # API route handlers (CORE SYSTEMS!)
-│   └── storage.ts          # Data storage interface (CORE SYSTEMS!)
-├── docs/                   # Technical and design documentation
-│   └── story_wrapper_system_plan.md   # Narrative wrapper plan
-├── shared/                 # Shared types and schemas (CORE SYSTEMS!)
-│   └── schema.ts           # Database schema and types (CORE SYSTEMS!)
-└── README.md               # This file
+PlayFab Cloud (Single Source of Truth)
+├── Title Data: Task definitions (155 tasks)
+├── User Data: Player progress & stats
+├── Statistics: Leaderboards & rankings
+└── Events: Game analytics & logging
+    ↓
+Static React App (client/)
+├── components/    # UI components
+├── constants/     # Game constants and emoji sets  
+├── services/      # PlayFab integration
+└── pages/         # Route components
 ```
 
+### Data Flow
+1. **Tasks**: Loaded from PlayFab Title Data on app start
+2. **Authentication**: Anonymous PlayFab login with device ID
+3. **Progress**: Stored in PlayFab User Data  
+4. **Validation**: Client-side with PlayFab progress updates
+5. **Leaderboards**: PlayFab Statistics API
+6. **Deployment**: Static files served from CDN (Railway)
 
 
-### Modular Task Loading
-Tasks are stored as individual JSON files in `server/data/tasks/` for easy maintenance and scalability. The time limit on all tasks should be null unless otherwise specified.
 
-#### Task File Structure
+## Task System
+
+### Task Structure
+
+Tasks are defined in JSON format with the following structure:
+
 ```json
 {
   "id": "OS-001",
@@ -77,127 +78,92 @@ Tasks are stored as individual JSON files in `server/data/tasks/` for easy maint
   "basePoints": 3,
   "requiredRankLevel": 1,
   "emojiSet": "status_main",
-  "examples": [
-    {
-      "input": [[0, 1], [1, 0]],
-      "output": [[1, 0], [0, 1]]
-    }
-  ],
-  "testInput": [[0, 1], [1, 0]],
-  "testOutput": [[1, 0], [0, 1]],
-  "hints": [
-    "Progressive hint 1",
-    "Progressive hint 2", 
-    "Final solution hint"
-  ]
+  "examples": [{"input": [[0,1],[1,0]], "output": [[1,0],[0,1]]}],
+  "testInput": [[0,1],[1,0]],
+  "testOutput": [[1,0],[0,1]],
+  "hints": ["Hint 1", "Hint 2", "Solution"]
 }
 ```
 
-### Emoji Set System
-Emoji sets are my unique wrapper around the ARC-AGI basis set which is mapping to numerical indices 0-9.
+### Emoji Sets
 
-#### Available Emoji Sets
-- `tech_set1`: Power and Fuel systems
-- `tech_set2`: Communication systems
-- `celestial_set1`: Planetary bodies
-- `celestial_set2`: Stellar objects
-- `nav_alerts`: Navigation vectors
-- `status_alerts`: Warning systems
-- `weather_climate`: Atmospheric conditions
-- `vague_symbols`: Vague symbols
-- `alien_language`: Alien language
+Tasks use emoji sets to represent different game elements. The mapping from numbers to emojis is handled automatically by the frontend.
+
+## Development
 
 
-## Game Mechanics
+## Gameplay
 
 ### Rank Progression
-Players advance through Space Force enlisted ranks by earning points:
-See `client/src/data/ranks.ts` for rank progression.
+
+Players advance through Space Force enlisted ranks by earning points from solving puzzles. Each rank requires more points to achieve than the previous one.
 
 ### Task Categories
-- **🛡️ O₂ Sensor Check**: Oxygen system diagnostics (OS-XXX)
-- **🚀 Pre-Launch Ops**: Launch preparation tasks (PL-XXX)
-- **📊 Fuel Systems**: Fuel flow and mixture analysis (FS-XXX)
-- **🧭 Navigation**: Directional calibration (NAV-XXX)
-- **📡 Communications**: Communication systems (COM-XXX) 
-- **⚡ Power Systems**: Power flow and distribution (PWR-XXX)
-- **🔒 Security**: Security systems (SEC-XXX)
-See `server/templates/categories.ts` for category metadata.
 
-## Development Guidelines
+- **🛡️ O₂ Sensor Check**: Oxygen system diagnostics
+- **🚀 Pre-Launch Ops**: Launch preparation tasks
+- **📊 Fuel Systems**: Fuel flow and mixture analysis
+- **🧭 Navigation**: Directional calibration
+- **📡 Communications**: Communication systems
+- **⚡ Power Systems**: Power distribution
+- **🔒 Security**: Security systems
 
-### Task Generation Tools
+## Development
 
-The project includes CLI tools for generating basic puzzle grids programmatically:
+### Getting Started
 
-```powershell
-# Generate a single task
-npx tsx server\cli\generate-task.ts single -c <CATEGORY> -t <TRANSFORMATION> -s <SIZE> -o <OUTPUT_PATH>
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Set up environment variables: Copy `.env` and add `VITE_PLAYFAB_TITLE_ID`
+4. Start development server: `npm run dev`
 
-# Generate all tasks for a category
-npx tsx server\cli\generate-task.ts category -c <CATEGORY> -o <OUTPUT_DIR>
+### Documentation
 
-# Generate all tasks for all categories
-npx tsx server\cli\generate-task.ts all -o <OUTPUT_DIR>
+📚 **See [docs/](./docs/)** for comprehensive documentation:
+- **[PlayFab API Analysis](./docs/playfab-api-analysis.md)** - Complete API reference and security audit
+- **[Migration Plan](./docs/2SeptPlayfabTasks.md)** - PlayFab implementation phases
 
-# List available categories and transformations
-npx tsx server\cli\generate-task.ts list
-```
-
-Parameters:
-- `-c, --category`: Category code (e.g., COM, NAV, FS)
-- `-t, --transformation`: Transformation type (e.g., horizontal_reflection, rotation_90deg)
-- `-s, --size`: Grid size (2-4)
-- `-d, --difficulty`: Difficulty level (Basic, Intermediate, Advanced)
-- `-o, --output`: Output file or directory
-
-See the comprehensive guide in `docs/task_generation_guide.md` for more details.
+⚠️ **Security Notice**: Current task validation is client-side only. See API Analysis for production security recommendations.
 
 ### Adding New Tasks
-1. Create a new JSON file in `server/data/tasks/`
-2. Follow the task file structure and definitions in docs/types.md
-3. **IMPORTANT**: Use numbers 0-9 in the logic/data files, not emojis
-4. Emojis are only mapped in the UI layer using `client/src/constants/spaceEmojis.ts`
-5. Test the task transformation logic
-6. Add progressive hints for player assistance
-7. You should credit yourself with the puzzle creation in the final hint and explain what your thinking was when you created this file.  Don't be afraid to go slowly and methodically. Spend a lot of time creating and validating the puzzle. 
 
-### Standard for Puzzle Representation
-- **Logic/Data Files**: Always use integers 0-9 in data files (input, output arrays)
-- **UI Rendering**: Numbers are mapped to emojis only during rendering
+Tasks are now managed in **PlayFab Title Data**. To add new tasks:
 
-- The app should be able to import standard ARC-AGI files like those from the official repositories
-- Note: Existing files in the tasks folder may use emojis directly, but all new files should follow the standard integer format
+1. Use the PlayFab dashboard to update Title Data
+2. Follow the task structure shown above
+3. Use numbers 0-9 in input/output arrays (emojis are mapped in the UI)
+4. Tasks are loaded automatically on app refresh
+5. No server restart required - it's a static site!
 
-### SOURCE Emoji Sets
-1.  `client/src/constants/spaceEmojis.ts` is the source of truth for emoji mapping!!
-2. Maintain exactly 10 emojis per set
-3. Keep index 0 as `⬛` (black background)
-4. `EMOJI_SET_INFO` is the source of truth for emoji set metadata!!
+### Deployment
 
-### SOURCE Task Sets 
-1. Tasks should have their transformation types in the description
-2. This allows for 40 different types of task in each category.
+```bash
+# Build static site
+npm run build
 
-### Ready-to-Use Template (copy & replace fields)
-```jsonc
-{
-  "id": "<CATEGORY-XXX>",
-  "title": "<Creative title incorporating the logic of the transformation>",
-  "description": "<Creative player-facing story about the task as it relates to the operations of ground control at the US Space Force>",
-  "category": "<COM-XXX Communications / FS-XXX Fuel Systems / NAV-XXX Navigation / OS-XXX Oxygen Sensors / PL-XXX Pre-Launch / PWR-XXX Power Systems / SEC-XXX Security>",
-  "difficulty": "Basic",
-  "gridSize": 3,
-  "timeLimit": null,
-  "basePoints": 1500,
-  "requiredRankLevel": 1,
-  "emojiSet": "<EMOJI-SET-NAME>",
-  "examples": [ /* two example objects */ ],
-  "testInput": [ /* grid */ ],
-  "testOutput": [ /* grid */ ],
-  "hints": [
-    "<Hint 1>",
-    "<Hint 2>",
+# Preview production build locally  
+npm start
+```
+
+Static files are deployed to Railway and served from CDN.
+
+## Contributing
+
+Contributions are welcome! Please follow these guidelines:
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+- [ARC-AGI](https://arcprize.org/arc-agi) for the puzzle framework
+- PlayFab for backend services
     "⬛ <background clarification>"
   ]
 }
@@ -271,16 +237,17 @@ See the comprehensive guide in `docs/task_generation_guide.md` for more details.
 - Use existing shadcn components for consistency
 - Follow space theme with dark backgrounds and cyan accents
 
-## API Endpoints
+## PlayFab Integration
 
-### Players
-- `GET /api/players/:id` - Get player data
-- `POST /api/players` - Create new player
-- `POST /api/players/:id/validate-solution` - Submit task solution
+### Task Management
+- **GetTitleData**: Loads all 155 tasks from PlayFab Title Data
+- **Client Validation**: Solution validation happens in browser
+- **Progress Tracking**: Results stored in PlayFab User Data
 
-### Tasks
-- `GET /api/tasks` - Get all available tasks
-- `GET /api/tasks/:id` - Get specific task
+### User Features  
+- **Anonymous Authentication**: Automatic device-based login
+- **Statistics**: Global leaderboards via PlayFab Statistics API
+- **Event Logging**: Game analytics via PlayFab Events API
 
 
 

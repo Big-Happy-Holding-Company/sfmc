@@ -1,0 +1,73 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [0.1.0] - 2025-09-02 - Complete PlayFab Migration
+
+### BREAKING CHANGES
+- **Architecture**: Converted from full-stack to static site with PlayFab-only backend
+- **Deployment**: Removed Express server, now deploys as static site via Railway
+- **Task Storage**: Removed 155 local task files, now uses PlayFab Title Data exclusively
+
+### Added
+- Complete static site deployment configuration (Railway + nixpacks)
+- PlayFab-only data flow (matches Unity implementation exactly)
+- Client-side task validation with PlayFab progress tracking
+- Pure CDN deployment with zero server infrastructure
+- **Documentation**: Comprehensive PlayFab API analysis and security audit
+- **API Reference**: Complete endpoint documentation in `docs/playfab-api-analysis.md`
+
+### Changed  
+- **package.json**: Removed server build/dev scripts, pure Vite workflow
+- **README**: Completely rewritten for static + PlayFab architecture
+- **CLAUDE.md**: Updated to reflect PlayFab-only data access patterns
+- **Build Process**: Static site build only, no server compilation
+
+### Removed
+- **server/data/tasks/**: 155 task JSON files (now in PlayFab Title Data)
+- **Express Server**: No longer deployed or needed in production
+- **API Endpoints**: All functionality moved to PlayFab cloud services
+
+### Security Findings ⚠️
+- **CRITICAL**: Task validation currently happens client-side (insecure)
+- **Risk**: Scores and leaderboards can be manipulated by players
+- **CloudScript**: `GenerateAnonymousName` function exists and works correctly
+- **Missing**: `ValidateTaskSolution` CloudScript function for secure validation
+- **Recommendation**: Implement server-side validation for production deployment
+
+### Migration Complete
+- ✅ **Phase 1**: 155 tasks migrated to PlayFab Title Data  
+- ✅ **Phase 2**: React components using PlayFab service
+- ✅ **Phase 3**: Static deployment configuration
+- ✅ **Phase 4**: Server cleanup and documentation updates
+- ✅ **Phase 5**: Security audit and API documentation
+
+### Available PlayFab APIs
+- **Admin API**: 30+ endpoints for title management (secret key required)
+- **Server API**: 15+ endpoints for server-authoritative operations (secret key required)
+- **Client API**: 20+ endpoints for player operations (public access, used by React app)
+
+**Result**: Pure static web app with PlayFab cloud backend - matches Unity implementation.  
+**Next**: Implement CloudScript validation for production security.
+
+---
+
+## [0.0.2] - 2025-09-02
+
+### Changed
+- Updated README with PlayFab integration details
+
+## [0.0.1] - 2025-09-02 7:41 PM - Claude 4 Sonnet Thinking via Cascade
+
+### Added
+- PlayFab service integration for task management
+- Task migration script for PlayFab
+- PlayFab Task Migration Plan documentation
+- Feature Parity Plan documentation
+
+### Changed
+- Updated FIQTest to use PlayFab service instead of server API
+- Refactored task loading to support PlayFab backend
+
+### Fixed
+- Various bug fixes and performance improvements
