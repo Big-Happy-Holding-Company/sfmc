@@ -4,7 +4,7 @@
  * Maintains compatibility with Unity's player data structure
  */
 
-// PlayFab loaded via core.ts import
+import 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
 import type { PlayFabPlayer, RankLevel } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';

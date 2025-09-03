@@ -4,7 +4,7 @@
  * Matches Unity's PlayFabAnonDeviceLogin.cs functionality
  */
 
-// PlayFab loaded via core.ts import
+import 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
 import type { AuthenticationResult, AnonymousNameResponse } from '@/types/playfab';
 import { playFabCore } from './core';
 import { PLAYFAB_CONSTANTS } from '@/types/playfab';
