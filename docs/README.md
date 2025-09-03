@@ -1,6 +1,6 @@
 # Documentation Directory
 
-This directory contains comprehensive documentation for the Mission Control 2045 project.
+This directory contains comprehensive documentation for the Mission Control 2050 project.
 
 ## Documents
 
