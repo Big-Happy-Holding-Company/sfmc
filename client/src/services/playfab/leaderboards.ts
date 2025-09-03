@@ -4,6 +4,7 @@
  * Matches Unity's MainManager.cs GetLeaderboard functionality
  */
 
+import { PlayFabClient } from 'playfab-web-sdk';
 import type { LeaderboardEntry } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';
@@ -41,7 +42,7 @@ export class PlayFabLeaderboards {
 
     try {
       await playFabCore.promisifyPlayFabCall(
-        PlayFab.Client.UpdatePlayerStatistics,
+        PlayFabClient.UpdatePlayerStatistics,
         request
       );
 

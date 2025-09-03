@@ -77,7 +77,7 @@ export class PlayFabEvents {
 
     try {
       await playFabCore.promisifyPlayFabCall(
-        PlayFab.Client.WritePlayerEvent,
+        PlayFabClient.WritePlayerEvent,
         request
       );
 
@@ -107,7 +107,7 @@ export class PlayFabEvents {
 
     try {
       await playFabCore.promisifyPlayFabCall(
-        PlayFab.Client.WritePlayerEvent,
+        PlayFabClient.WritePlayerEvent,
         request
       );
 
