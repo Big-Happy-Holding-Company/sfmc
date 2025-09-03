@@ -9,7 +9,7 @@ This should use the repo at https://github.com/Big-Happy-Holding-Company/sfmc-ap
 - **Frontend**: React + Vite (client/) - STATIC SITE DEPLOYMENT
 - **Backend**: PlayFab Cloud Services ONLY - NO SERVER REQUIRED
 - **Task Data**: PlayFab Title Data (155 tasks) - SINGLE SOURCE OF TRUTH
-- **User Features**: PlayFab (authentication, progress, leaderboards, profiles, events)
+- **User Features**: PlayFab (authentication, progress, leaderboards, profiles, events, tasks)
 - **Styling**: Tailwind CSS + shadcn/ui components
 - **PlayFab Web SDK**: playfab-web-sdk for all backend functionality
 - **Deployment**: Railway.app static site deployment, PlayFab for all data
