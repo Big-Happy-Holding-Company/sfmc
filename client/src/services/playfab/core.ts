@@ -151,6 +151,16 @@ export class PlayFabCore {
   }
 
   /**
+   * Get PlayFab instance (required by other service files)
+   */
+  public getPlayFab(): typeof PlayFab {
+    if (!this.isReady()) {
+      throw new Error('PlayFab not initialized. Call initialize() first.');
+    }
+    return PlayFab;
+  }
+
+  /**
    * Validate environment configuration
    */
   public validateEnvironment(): void {
