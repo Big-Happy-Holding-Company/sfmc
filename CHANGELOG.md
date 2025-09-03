@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.0.0] - 2025-09-02 - Complete PlayFab Migration
+## [0.1.0] - 2025-09-02 - Complete PlayFab Migration
 
 ### BREAKING CHANGES
 - **Architecture**: Converted from full-stack to static site with PlayFab-only backend
