@@ -4,6 +4,7 @@
  * Maintains compatibility with Unity's player data structure
  */
 
+import { PlayFabClient } from 'playfab-web-sdk';
 import type { PlayFabPlayer, RankLevel } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';
@@ -35,8 +36,8 @@ export class PlayFabUserData {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        PlayFab.Client.GetUserData,
-        {}
+        PlayFabClient.GetUserData,
+        { TitleId: playFabCore.getTitleId() }
       );
 
       const userData = result?.Data || {};
@@ -99,8 +100,8 @@ export class PlayFabUserData {
 
     try {
       await playFabCore.promisifyPlayFabCall(
-        PlayFab.Client.UpdateUserData,
-        { Data: dataToUpdate }
+        PlayFabClient.UpdateUserData,
+        { TitleId: playFabCore.getTitleId(), Data: dataToUpdate }
       );
 
       playFabCore.logOperation('Player Data Updated', Object.keys(dataToUpdate));
@@ -229,8 +230,8 @@ export class PlayFabUserData {
     
     try {
       await playFabCore.promisifyPlayFabCall(
-        PlayFab.Client.UpdateUserData,
-        { Data: initialData }
+        PlayFabClient.UpdateUserData,
+        { TitleId: playFabCore.getTitleId(), Data: initialData }
       );
 
       playFabCore.logOperation('New Player Initialized', player.username);
@@ -256,8 +257,8 @@ export class PlayFabUserData {
     
     try {
       await playFabCore.promisifyPlayFabCall(
-        PlayFab.Client.UpdateUserData,
-        { Data: resetData }
+        PlayFabClient.UpdateUserData,
+        { TitleId: playFabCore.getTitleId(), Data: resetData }
       );
 
       // Update local cache
