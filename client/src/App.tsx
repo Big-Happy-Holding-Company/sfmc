@@ -17,15 +17,12 @@
  * - Manages app-level state and routing
  * - No longer depends on React Query for server communication
  */
-import { useState } from 'react';
 import { Switch, Route } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import MissionControl from "@/pages/MissionControl";
 import FIQTest from "@/pages/FIQTest";
 import NotFound from "@/pages/not-found";
-import { LoadingSplash } from "@/components/game/LoadingSplash";
-import { OnboardingModal } from "@/components/game/OnboardingModal";
 
 function Router() {
   return (
@@ -37,33 +34,11 @@ function Router() {
   );
 }
 
-function App() {
-  // State to control which screen is shown
-  const [showSplash, setShowSplash] = useState(true);
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  
-  // When splash screen completes, show onboarding modal
-  const handleSplashComplete = () => {
-    setShowSplash(false);
-    setShowOnboarding(true);
-  };
-  
-  // When onboarding completes, continue to main app
-  const handleOnboardingComplete = () => {
-    setShowOnboarding(false);
-  };
-  
+function App() {  
   return (
     <TooltipProvider>
-      {showSplash ? (
-        <LoadingSplash onComplete={handleSplashComplete} duration={5000} />
-      ) : (
-        <>
-          <Toaster />
-          <Router />
-          <OnboardingModal open={showOnboarding} onClose={handleOnboardingComplete} />
-        </>
-      )}
+      <Toaster />
+      <Router />
     </TooltipProvider>
   );
 }

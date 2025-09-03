@@ -37,13 +37,12 @@ export class PlayFabCore {
       this.isInitialized = true;
       console.log(`✅ PlayFab Core initialized with Title ID: ${this.titleId}`);
     } else {
-      console.warn('PlayFab Client API not available, continuing in offline mode');
-      this.isInitialized = false;
+      throw new Error('PlayFab SDK not loaded properly. Client API not available.');
     }
   }
 
   /**
-   * Load PlayFab SDK from CDN with timeout
+   * Load PlayFab SDK from CDN
    */
   private loadPlayFabSDK(): Promise<void> {
     return new Promise<void>((resolve) => {
@@ -58,19 +57,12 @@ export class PlayFabCore {
         return resolve();
       }
 
-      // Add timeout to prevent hanging
-      const timeout = setTimeout(() => {
-        console.warn('PlayFab SDK loading timed out after 10 seconds');
-        resolve();
-      }, 10000);
-
       // Load the SDK
       const script = document.createElement('script');
       script.src = 'https://download.playfab.com/PlayFabClientApi.js';
       script.async = true;
       script.onload = () => {
-        clearTimeout(timeout);
-        // Add delay to ensure Client API is fully loaded
+        // Add small delay to ensure Client API is fully loaded
         setTimeout(() => {
           if (window.PlayFab && window.PlayFab.Client) {
             console.log('PlayFab SDK loaded successfully');
@@ -81,7 +73,6 @@ export class PlayFabCore {
         }, 100);
       };
       script.onerror = (error) => {
-        clearTimeout(timeout);
         console.error('Error loading PlayFab SDK:', error);
         resolve();
       };

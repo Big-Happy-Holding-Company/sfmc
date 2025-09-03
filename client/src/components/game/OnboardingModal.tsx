@@ -1,4 +1,4 @@
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
 interface OnboardingModalProps {
@@ -11,6 +11,7 @@ export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-slate-800 border-cyan-400 text-slate-50">
+        <DialogTitle className="sr-only">Mission Control 2050 Onboarding</DialogTitle>
         <div className="text-center space-y-4 p-2 sm:p-4">
           <div>
             <div className="flex justify-center mb-4">
