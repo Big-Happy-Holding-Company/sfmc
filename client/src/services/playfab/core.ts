@@ -131,9 +131,14 @@ export class PlayFabCore {
       headers['X-SecretKey'] = this.secretKey;
     }
 
+    // Prepare request body with required TitleId
+    const requestBody = requestData ? 
+      { ...requestData, TitleId: this.titleId } : 
+      { TitleId: this.titleId };
+
     try {
       this.logOperation(`HTTP ${endpoint}`, { 
-        requestData, 
+        requestData: requestBody, 
         requiresAuth,
         hasSessionToken: !!this.sessionToken 
       });
@@ -141,7 +146,7 @@ export class PlayFabCore {
       const response = await fetch(url, {
         method: 'POST',
         headers,
-        body: requestData ? JSON.stringify(requestData) : undefined
+        body: JSON.stringify(requestBody)
       });
 
       // Parse response
