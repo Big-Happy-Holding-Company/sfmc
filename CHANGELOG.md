@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## Recent Commits (Latest First)
 
+**2025-09-03**: CRITICAL PlayFab web-sdk integration fix - complete system repair
+- **ARCHITECTURE FIX**: Added missing getPlayFab() method to PlayFabCore - all service files require this method 
+- **IMPORT RESOLUTION**: Fixed broken ES6 import in leaderboards.ts - `import { PlayFabClient } from 'playfab-web-sdk'` 
+- **DEV SERVER**: Resolved "Failed to resolve entry for package playfab-web-sdk" Vite build errors
+- **API STANDARDIZATION**: Unified ALL PlayFab API calls to use consistent PlayFab.ClientApi.* pattern:
+  - leaderboards: PlayFabClient.* and PlayFab.Client.* → PlayFab.ClientApi.*
+  - events: PlayFabClient.WritePlayerEvent → PlayFab.ClientApi.WritePlayerEvent
+  - profiles: PlayFab.Client.* → PlayFab.ClientApi.* (GetPlayerProfile, UpdateAvatarUrl)
+  - validation: PlayFab.Client.ExecuteCloudScript → PlayFab.ClientApi.ExecuteCloudScript
+- **ROOT CAUSE**: Fixed hybrid migration state where core.ts was updated but dependent files used old patterns
+- **FILES FIXED**: core.ts, leaderboards.ts, events.ts, profiles.ts, validation.ts
+- **READY FOR TESTING**: Dev server should now start without errors, authentication flow should work properly
+
 **2025-09-03**: Complete PlayFab integration fix - environment variables and API structure  
 - **SECURITY**: Fixed environment variable loading - added envDir to vite.config.ts to load .env from secure project root  
 - **SECURITY**: Removed duplicated .env file from client directory (prevented credential exposure)  
