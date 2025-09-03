@@ -19,8 +19,10 @@ declare interface PlayFabConfig {
 }
 
 declare interface PlayFabError {
+  error: string;
+  errorCode: number;
   errorMessage: string;
-  errorDetails?: Record<string, string[]>;
+  errorDetails?: any;
 }
 
 declare interface PlayFabServiceResult<T = any> {
@@ -119,15 +121,15 @@ export class PlayFabCore {
   public createResult<T>(success: boolean, data?: T, error?: any): PlayFabServiceResult<T> {
     if (success) {
       return {
-        success: true,
-        data: data
+        status: 'success',
+        data: data as T
       };
     } else {
       const playFabError = this.handleError(error);
       return {
-        success: false,
-        error: playFabError.errorMessage,
-        errorDetails: playFabError
+        status: 'error',
+        data: undefined as unknown as T,
+        error: playFabError
       };
     }
   }
@@ -136,12 +138,12 @@ export class PlayFabCore {
    * Wrap PlayFab API calls in promises with standardized error handling
    * Updated for playfab-web-sdk callback pattern
    */
-  public promisifyPlayFabCall<TRequest, TResult = any>(
+  public async promisifyPlayFabCall<TRequest, TResult = any>(
     apiCall: (request: TRequest, callback: (error: any, result: any) => void) => void,
     request: TRequest
   ): Promise<TResult> {
     if (!this.isReady()) {
-      return Promise.reject(new Error('PlayFab not initialized'));
+      throw new Error('PlayFab not initialized');
     }
 
     return new Promise<TResult>((resolve, reject) => {
@@ -149,7 +151,7 @@ export class PlayFabCore {
         if (error) {
           const playFabError = this.handleError(error);
           console.error(`❌ PlayFab API Error:`, playFabError);
-          reject(playFabError);
+          reject(new Error(playFabError.errorMessage));
         } else {
           resolve(result.data as TResult);
         }
