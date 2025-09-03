@@ -4,7 +4,7 @@
  * Handles caching and task lookup operations
  */
 
-import { PlayFabClient } from 'playfab-web-sdk';
+// PlayFab loaded via core.ts import
 import type { PlayFabTask } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';
@@ -46,7 +46,7 @@ export class PlayFabTasks {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        PlayFabClient.GetTitleData,
+        PlayFab.ClientApi.GetTitleData,
         request
       );
 

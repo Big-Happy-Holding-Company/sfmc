@@ -4,8 +4,14 @@
  * Replaces CDN script loading approach with proper npm package imports
  */
 
-import { PlayFab, PlayFabClient } from 'playfab-web-sdk';
+import 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
 import type { PlayFabConfig, PlayFabError, PlayFabServiceResult } from '@/types/playfab';
+
+// Global PlayFab types after importing the SDK
+declare global {
+  const PlayFab: any;
+  const PlayFabClientSDK: any;
+}
 
 export class PlayFabCore {
   private static instance: PlayFabCore;

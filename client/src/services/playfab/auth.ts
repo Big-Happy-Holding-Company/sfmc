@@ -4,7 +4,7 @@
  * Matches Unity's PlayFabAnonDeviceLogin.cs functionality
  */
 
-import { PlayFabClient } from 'playfab-web-sdk';
+// PlayFab loaded via core.ts import
 import type { AuthenticationResult, AnonymousNameResponse } from '@/types/playfab';
 import { playFabCore } from './core';
 import { PLAYFAB_CONSTANTS } from '@/types/playfab';
@@ -44,7 +44,7 @@ export class PlayFabAuth {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        PlayFabClient.LoginWithCustomID,
+        PlayFab.ClientApi.LoginWithCustomID,
         request
       ) as any;
 
@@ -122,7 +122,7 @@ export class PlayFabAuth {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        PlayFabClient.ExecuteCloudScript,
+        PlayFab.ClientApi.ExecuteCloudScript,
         request
       ) as any;
 
@@ -154,7 +154,7 @@ export class PlayFabAuth {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        PlayFabClient.UpdateUserTitleDisplayName,
+        PlayFab.ClientApi.UpdateUserTitleDisplayName,
         request
       ) as any;
 

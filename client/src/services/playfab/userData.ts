@@ -4,7 +4,7 @@
  * Maintains compatibility with Unity's player data structure
  */
 
-import { PlayFabClient } from 'playfab-web-sdk';
+// PlayFab loaded via core.ts import
 import type { PlayFabPlayer, RankLevel } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';
@@ -36,7 +36,7 @@ export class PlayFabUserData {
 
     try {
       const result = await playFabCore.promisifyPlayFabCall(
-        PlayFabClient.GetUserData,
+        PlayFab.ClientApi.GetUserData,
         { TitleId: playFabCore.getTitleId() }
       );
 
@@ -100,7 +100,7 @@ export class PlayFabUserData {
 
     try {
       await playFabCore.promisifyPlayFabCall(
-        PlayFabClient.UpdateUserData,
+        PlayFab.ClientApi.UpdateUserData,
         { TitleId: playFabCore.getTitleId(), Data: dataToUpdate }
       );
 
@@ -230,7 +230,7 @@ export class PlayFabUserData {
     
     try {
       await playFabCore.promisifyPlayFabCall(
-        PlayFabClient.UpdateUserData,
+        PlayFab.ClientApi.UpdateUserData,
         { TitleId: playFabCore.getTitleId(), Data: initialData }
       );
 
@@ -257,7 +257,7 @@ export class PlayFabUserData {
     
     try {
       await playFabCore.promisifyPlayFabCall(
-        PlayFabClient.UpdateUserData,
+        PlayFab.ClientApi.UpdateUserData,
         { TitleId: playFabCore.getTitleId(), Data: resetData }
       );
 
