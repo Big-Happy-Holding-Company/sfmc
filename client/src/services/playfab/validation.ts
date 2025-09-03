@@ -4,7 +4,6 @@
  * Replaces client-side validation to prevent cheating
  */
 
-import 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
 
 import type { 
   CloudScriptValidationRequest, 

@@ -4,7 +4,6 @@
  * Matches PuzzleEventLogger.cs functionality exactly
  */
 
-import 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
 
 import type { PuzzleEventData, GameSession, GameStatus, EventType } from '@/types/playfab';
 import { playFabCore } from './core';

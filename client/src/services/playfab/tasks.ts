@@ -4,7 +4,6 @@
  * Handles caching and task lookup operations
  */
 
-import 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
 import type { PlayFabTask } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';

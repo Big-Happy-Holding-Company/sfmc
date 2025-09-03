@@ -4,7 +4,6 @@
  * Matches Unity's MainManager.cs GetLeaderboard functionality
  */
 
-import 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
 import type { LeaderboardEntry } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';

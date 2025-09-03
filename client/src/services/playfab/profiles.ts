@@ -4,7 +4,6 @@
  * Matches Unity's MainManager.cs GetPlayerProfile functionality (lines 309-330)
  */
 
-import 'playfab-web-sdk/src/PlayFab/PlayFabClientApi.js';
 
 import type { PlayerProfile, LeaderboardEntry } from '@/types/playfab';
 import { playFabCore } from './core';
