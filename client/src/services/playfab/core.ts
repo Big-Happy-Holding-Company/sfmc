@@ -213,7 +213,7 @@ export class PlayFabCore {
     }
 
     return new Promise<TResult>((resolve, reject) => {
-      apiCall.call(this.getPlayFab().Client, request, (result: any, error: any) => {
+      apiCall.call(this.getPlayFab(), request, (result: any, error: any) => {
         if (error) {
           const playFabError = this.handleError(error);
           console.error(`❌ PlayFab API Error:`, playFabError);
