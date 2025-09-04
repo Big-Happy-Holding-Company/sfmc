@@ -177,39 +177,27 @@ export class ARCDataService {
   }
 
   /**
-   * Load data from PlayFab Title Data
+   * Load data from PlayFab Title Data using authenticated core service
    */
   private async loadPlayFabTitleData(key: string): Promise<OfficerTrackPuzzle[] | null> {
     try {
-      // Use PlayFab Client API to get title data
-      const response = await fetch(`https://${import.meta.env.VITE_PLAYFAB_TITLE_ID}.playfabapi.com/Client/GetTitleData`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          Keys: [key]
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error(`PlayFab API error: ${response.status} ${response.statusText}`);
-      }
-
-      const result = await response.json();
+      // Import PlayFab core service for authenticated requests
+      const { playFabCore } = await import('./playfab/core');
       
-      if (result.code !== 200) {
-        throw new Error(`PlayFab error: ${result.errorMessage || 'Unknown error'}`);
-      }
+      // Make authenticated request to PlayFab Title Data
+      const result = await playFabCore.makeHttpRequest<{ Keys: string[] }, { Data?: Record<string, { Value: string }> }>(
+        '/Client/GetTitleData',
+        { Keys: [key] },
+        true // requiresAuth = true
+      );
 
-      const titleData = result.data?.Data;
-      if (!titleData || !titleData[key]) {
+      if (!result?.Data?.[key]) {
         console.warn(`No title data found for key: ${key}`);
         return null;
       }
 
       // Parse the JSON data
-      const puzzleData = JSON.parse(titleData[key]);
+      const puzzleData = JSON.parse(result.Data[key].Value);
       return Array.isArray(puzzleData) ? puzzleData : null;
 
     } catch (error) {
