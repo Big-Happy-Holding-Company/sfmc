@@ -190,8 +190,8 @@ export class PlayFabOfficerTrack {
   public async updateOfficerPlayerData(playerData: Partial<OfficerTrackPlayer>): Promise<void> {
     await playFabAuth.ensureAuthenticated();
 
-    // Merge with existing data if available
-    const currentData = this.officerPlayerCache || await this.getOfficerPlayerData();
+    // Use cached data if available, otherwise use the provided data directly (prevents infinite recursion)
+    const currentData = this.officerPlayerCache || playerData as OfficerTrackPlayer;
     const updatedData = { ...currentData, ...playerData, lastActive: new Date() };
 
     const request: UpdateOfficerUserDataRequest = {
