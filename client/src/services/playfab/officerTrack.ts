@@ -9,15 +9,14 @@ import type {
   OfficerLeaderboardEntry,
   ARCValidationResult,
   ARCSolutionAttempt,
-  OfficerRank,
   OfficerAchievement,
   ARCGrid
 } from '@/types/arcTypes';
+import { OfficerRank, ARC_CONSTANTS } from '@/types/arcTypes';
 import type { PlayFabServiceResult } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';
 import { PLAYFAB_CONSTANTS } from '@/types/playfab';
-import { ARC_CONSTANTS } from '@/types/arcTypes';
 
 // PlayFab request/response interfaces for Officer Track
 
@@ -163,7 +162,7 @@ export class PlayFabOfficerTrack {
       playerId,
       officerRank: OfficerRank.LIEUTENANT,
       officerPoints: 0,
-      pointsToNextRank: ARC_CONSTANTS.RANK_THRESHOLDS.CAPTAIN,
+      pointsToNextRank: ARC_CONSTANTS.RANK_THRESHOLDS[OfficerRank.CAPTAIN],
       completedPuzzles: [],
       currentStreak: 0,
       bestStreak: 0,
@@ -221,247 +220,14 @@ export class PlayFabOfficerTrack {
     }
   }
 
-  // =============================================================================
-  // OFFICER LEADERBOARDS (SEPARATE FROM MAIN GAME)
-  // =============================================================================
-
-  /**
-   * Submit score to officer track leaderboard
-   */
-  public async submitOfficerScore(points: number): Promise<void> {
-    await playFabAuth.ensureAuthenticated();
-
-    const request: UpdateOfficerStatisticsRequest = {
-      Statistics: [{
-        StatisticName: PLAYFAB_CONSTANTS.STATISTIC_NAMES.OFFICER_TRACK_POINTS,
-        Value: points
-      }]
-    };
-
-    try {
-      await playFabCore.makeHttpRequest<UpdateOfficerStatisticsRequest, {}>(
-        '/Client/UpdatePlayerStatistics',
-        request,
-        true
-      );
-
-      // Clear leaderboard cache since scores changed
-      this.clearLeaderboardCache();
-
-      playFabCore.logOperation('Officer Score Submitted', {
-        statistic: PLAYFAB_CONSTANTS.STATISTIC_NAMES.OFFICER_TRACK_POINTS,
-        points
-      });
-    } catch (error) {
-      playFabCore.logOperation('Officer Score Submission Failed', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get officer track leaderboard
-   */
-  public async getOfficerLeaderboard(maxResults: number = 20): Promise<OfficerLeaderboardEntry[]> {
-    // Check cache first
-    if (this.isLeaderboardCacheValid() && this.leaderboardCache.length > 0) {
-      playFabCore.logOperation('Officer Leaderboard Cache Hit', `${this.leaderboardCache.length} entries`);
-      return this.leaderboardCache.slice(0, maxResults);
-    }
-
-    await playFabAuth.ensureAuthenticated();
-
-    const request: GetOfficerLeaderboardRequest = {
-      StatisticName: PLAYFAB_CONSTANTS.STATISTIC_NAMES.OFFICER_TRACK_POINTS,
-      StartPosition: 0,
-      MaxResultsCount: maxResults
-    };
-
-    try {
-      const result = await playFabCore.makeHttpRequest<GetOfficerLeaderboardRequest, OfficerLeaderboardResponse>(
-        '/Client/GetLeaderboard',
-        request,
-        true
-      );
-
-      const entries: OfficerLeaderboardEntry[] = result.Leaderboard.map((entry: any) => ({
-        displayName: entry.DisplayName || 'Officer',
-        officerRank: this.getOfficerRankFromPoints(entry.StatValue),
-        officerPoints: entry.StatValue || 0,
-        position: entry.Position + 1, // Convert to 1-based
-        playerId: entry.PlayFabId,
-        completedPuzzles: 0, // Would need additional data lookup
-        currentStreak: 0 // Would need additional data lookup
-      }));
-
-      // Update cache
-      this.leaderboardCache = entries;
-      this.lastLeaderboardUpdate = Date.now();
-
-      playFabCore.logOperation('Officer Leaderboard Retrieved', `${entries.length} officers`);
-
-      return entries;
-    } catch (error) {
-      playFabCore.logOperation('Officer Leaderboard Retrieval Failed', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get current officer's ranking
-   */
-  public async getOfficerPlayerRanking(): Promise<OfficerLeaderboardEntry | null> {
-    const currentPlayerId = playFabAuth.getPlayFabId();
-    if (!currentPlayerId) return null;
-
-    try {
-      // Get leaderboard around player
-      const aroundPlayerRequest = {
-        StatisticName: PLAYFAB_CONSTANTS.STATISTIC_NAMES.OFFICER_TRACK_POINTS,
-        PlayFabId: currentPlayerId,
-        MaxResultsCount: 1
-      };
-
-      const result = await playFabCore.makeHttpRequest<any, OfficerLeaderboardResponse>(
-        '/Client/GetLeaderboardAroundPlayer',
-        aroundPlayerRequest,
-        true
-      );
-
-      if (result.Leaderboard && result.Leaderboard.length > 0) {
-        const entry = result.Leaderboard[0];
-        return {
-          displayName: entry.DisplayName || 'Officer',
-          officerRank: this.getOfficerRankFromPoints(entry.StatValue),
-          officerPoints: entry.StatValue,
-          position: entry.Position + 1,
-          playerId: entry.PlayFabId,
-          completedPuzzles: 0,
-          currentStreak: 0
-        };
-      }
-
-      return null;
-    } catch (error) {
-      playFabCore.logOperation('Officer Player Ranking Failed', error);
-      return null;
-    }
-  }
-
-  // =============================================================================
-  // ARC PUZZLE VALIDATION (CLOUDSCRIPT)
-  // =============================================================================
-
-  /**
-   * Validate ARC puzzle solution via CloudScript
-   */
-  public async validateARCSolution(attempt: ARCSolutionAttempt): Promise<ARCValidationResult> {
-    await playFabAuth.ensureAuthenticated();
-
-    const request: ExecuteCloudScriptRequest = {
-      FunctionName: PLAYFAB_CONSTANTS.CLOUDSCRIPT_FUNCTIONS.VALIDATE_ARC_SOLUTION,
-      FunctionParameter: {
-        puzzleId: attempt.puzzleId,
-        solution: attempt.solution,
-        timeElapsed: attempt.timeElapsed,
-        hintsUsed: attempt.hintsUsed || 0,
-        sessionId: attempt.sessionId,
-        attemptNumber: attempt.attemptNumber
-      }
-    };
-
-    try {
-      const result = await playFabCore.makeHttpRequest<ExecuteCloudScriptRequest, ExecuteCloudScriptResponse>(
-        '/Client/ExecuteCloudScript',
-        request,
-        true
-      );
-
-      if (result.Error) {
-        throw new Error(`CloudScript Error: ${result.Error.Message}`);
-      }
-
-      const validationResult: ARCValidationResult = result.FunctionResult;
-
-      // Update local player data if solution was correct
-      if (validationResult.correct && this.officerPlayerCache) {
-        const updatedData: Partial<OfficerTrackPlayer> = {
-          officerPoints: validationResult.newTotalPoints,
-          completedPuzzles: [...this.officerPlayerCache.completedPuzzles, attempt.puzzleId],
-          stats: {
-            ...this.officerPlayerCache.stats,
-            totalAttempts: this.officerPlayerCache.stats.totalAttempts + 1,
-            successfulSolves: this.officerPlayerCache.stats.successfulSolves + 1
-          }
-        };
-
-        if (validationResult.rankUp && validationResult.newRank) {
-          updatedData.officerRank = validationResult.newRank;
-        }
-
-        await this.updateOfficerPlayerData(updatedData);
-      }
-
-      playFabCore.logOperation('ARC Solution Validated', {
-        puzzleId: attempt.puzzleId,
-        correct: validationResult.correct,
-        points: validationResult.pointsEarned
-      });
-
-      return validationResult;
-    } catch (error) {
-      playFabCore.logOperation('ARC Solution Validation Failed', error);
-      throw error;
-    }
-  }
-
-  // =============================================================================
-  // OFFICER ACHIEVEMENTS
-  // =============================================================================
-
-  /**
-   * Award achievement to officer
-   */
-  public async awardAchievement(achievementId: string): Promise<void> {
-    const currentData = await this.getOfficerPlayerData();
-    
-    // Check if achievement already exists
-    if (currentData.achievements.some(a => a.id === achievementId)) {
-      return;
-    }
-
-    const achievement: OfficerAchievement = {
-      id: achievementId,
-      name: this.getAchievementName(achievementId),
-      description: this.getAchievementDescription(achievementId),
-      icon: this.getAchievementIcon(achievementId),
-      unlockedAt: new Date(),
-      rarity: this.getAchievementRarity(achievementId)
-    };
-
-    const updatedAchievements = [...currentData.achievements, achievement];
-    
-    await this.updateOfficerPlayerData({
-      achievements: updatedAchievements
-    });
-
-    playFabCore.logOperation('Officer Achievement Awarded', {
-      id: achievementId,
-      name: achievement.name
-    });
-  }
-
-  // =============================================================================
-  // UTILITY METHODS
-  // =============================================================================
-
   /**
    * Determine officer rank from points
    */
   private getOfficerRankFromPoints(points: number): OfficerRank {
-    if (points >= ARC_CONSTANTS.RANK_THRESHOLDS.GENERAL) return OfficerRank.GENERAL;
-    if (points >= ARC_CONSTANTS.RANK_THRESHOLDS.COLONEL) return OfficerRank.COLONEL;
-    if (points >= ARC_CONSTANTS.RANK_THRESHOLDS.MAJOR) return OfficerRank.MAJOR;
-    if (points >= ARC_CONSTANTS.RANK_THRESHOLDS.CAPTAIN) return OfficerRank.CAPTAIN;
+    if (points >= ARC_CONSTANTS.RANK_THRESHOLDS[OfficerRank.GENERAL]) return OfficerRank.GENERAL;
+    if (points >= ARC_CONSTANTS.RANK_THRESHOLDS[OfficerRank.COLONEL]) return OfficerRank.COLONEL;
+    if (points >= ARC_CONSTANTS.RANK_THRESHOLDS[OfficerRank.MAJOR]) return OfficerRank.MAJOR;
+    if (points >= ARC_CONSTANTS.RANK_THRESHOLDS[OfficerRank.CAPTAIN]) return OfficerRank.CAPTAIN;
     return OfficerRank.LIEUTENANT;
   }
 
@@ -473,73 +239,11 @@ export class PlayFabOfficerTrack {
   }
 
   /**
-   * Check if leaderboard cache is valid
-   */
-  private isLeaderboardCacheValid(): boolean {
-    const cacheAge = Date.now() - this.lastLeaderboardUpdate;
-    return this.leaderboardCache.length > 0 && cacheAge < this.CACHE_DURATION;
-  }
-
-  /**
-   * Clear leaderboard cache
-   */
-  private clearLeaderboardCache(): void {
-    this.leaderboardCache = [];
-    this.lastLeaderboardUpdate = 0;
-  }
-
-  /**
    * Clear all caches
    */
   public clearCache(): void {
     this.officerPlayerCache = null;
-    this.clearLeaderboardCache();
     playFabCore.logOperation('Officer Track Cache Cleared');
-  }
-
-  // Achievement helper methods (simplified for now)
-  private getAchievementName(id: string): string {
-    const names: Record<string, string> = {
-      'first_puzzle_solve': 'First Mission',
-      'rank_promotion': 'Promoted!',
-      'streak_achievement': 'On a Roll',
-      'speed_solve': 'Lightning Fast',
-      'complexity_master': 'Pattern Master'
-    };
-    return names[id] || 'Unknown Achievement';
-  }
-
-  private getAchievementDescription(id: string): string {
-    const descriptions: Record<string, string> = {
-      'first_puzzle_solve': 'Solved your first ARC puzzle',
-      'rank_promotion': 'Achieved a new officer rank',
-      'streak_achievement': 'Solved multiple puzzles in a row',
-      'speed_solve': 'Solved a puzzle in record time',
-      'complexity_master': 'Mastered complex pattern recognition'
-    };
-    return descriptions[id] || 'Achievement unlocked';
-  }
-
-  private getAchievementIcon(id: string): string {
-    const icons: Record<string, string> = {
-      'first_puzzle_solve': '🎯',
-      'rank_promotion': '⭐',
-      'streak_achievement': '🔥',
-      'speed_solve': '⚡',
-      'complexity_master': '🧠'
-    };
-    return icons[id] || '🏆';
-  }
-
-  private getAchievementRarity(id: string): 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' {
-    const rarities: Record<string, 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'> = {
-      'first_puzzle_solve': 'common',
-      'rank_promotion': 'uncommon',
-      'streak_achievement': 'rare',
-      'speed_solve': 'epic',
-      'complexity_master': 'legendary'
-    };
-    return rarities[id] || 'common';
   }
 }
 
