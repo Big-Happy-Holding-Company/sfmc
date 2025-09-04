@@ -28,6 +28,7 @@ import { playFabEvents } from './events';
 import { playFabUserData } from './userData';
 import { playFabLeaderboards } from './leaderboards';
 import { playFabProfiles } from './profiles';
+import { playFabOfficerTrack } from './officerTrack';
 
 export class PlayFabService {
   private static instance: PlayFabService;
@@ -41,6 +42,7 @@ export class PlayFabService {
   public readonly userData = playFabUserData;
   public readonly leaderboards = playFabLeaderboards;
   public readonly profiles = playFabProfiles;
+  public readonly officerTrack = playFabOfficerTrack;
 
   private constructor() {}
 
@@ -310,6 +312,52 @@ export class PlayFabService {
     };
   }
 
+  // =============================================================================
+  // OFFICER TRACK METHODS (UNIFIED API)
+  // =============================================================================
+
+  /**
+   * Get officer track player data (unified API)
+   */
+  public async getOfficerPlayerData(): Promise<import('@/types/arcTypes').OfficerTrackPlayer> {
+    return await this.officerTrack.getOfficerPlayerData();
+  }
+
+  /**
+   * Get officer track leaderboard (unified API)
+   */
+  public async getOfficerLeaderboard(maxResults?: number): Promise<import('@/types/arcTypes').OfficerLeaderboardEntry[]> {
+    return await this.officerTrack.getOfficerLeaderboard(maxResults);
+  }
+
+  /**
+   * Validate ARC puzzle solution (unified API)
+   */
+  public async validateARCSolution(attempt: import('@/types/arcTypes').ARCSolutionAttempt): Promise<import('@/types/arcTypes').ARCValidationResult> {
+    return await this.officerTrack.validateARCSolution(attempt);
+  }
+
+  /**
+   * Submit officer track score (unified API)
+   */
+  public async submitOfficerScore(points: number): Promise<void> {
+    return await this.officerTrack.submitOfficerScore(points);
+  }
+
+  /**
+   * Award officer achievement (unified API)
+   */
+  public async awardOfficerAchievement(achievementId: string): Promise<void> {
+    return await this.officerTrack.awardAchievement(achievementId);
+  }
+
+  /**
+   * Get current officer ranking (unified API)
+   */
+  public async getOfficerPlayerRanking(): Promise<import('@/types/arcTypes').OfficerLeaderboardEntry | null> {
+    return await this.officerTrack.getOfficerPlayerRanking();
+  }
+
   /**
    * Clear all caches (for testing/debugging)
    */
@@ -317,6 +365,7 @@ export class PlayFabService {
     this.tasks.clearCache();
     this.leaderboards.clearCache();
     this.profiles.clearAllProfileCaches();
+    this.officerTrack.clearCache();
     this.core.logOperation('All Caches Cleared');
   }
 
@@ -362,7 +411,8 @@ export {
   playFabEvents,
   playFabUserData,
   playFabLeaderboards,
-  playFabProfiles
+  playFabProfiles,
+  playFabOfficerTrack
 };
 
 // Export types
