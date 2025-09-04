@@ -76,10 +76,15 @@ export default function OfficerTrack() {
       try {
         console.log('🎖️  Initializing Officer Track...');
         
-        // Initialize PlayFab if needed
+        // Initialize PlayFab completely
+        await playFabService.initialize();
+        
+        // Login if not authenticated
         if (!playFabService.isAuthenticated()) {
           await playFabService.loginAnonymously();
         }
+        
+        console.log('✅ PlayFab initialized and authenticated');
         
         // Load officer player data
         const playerData = await playFabService.getOfficerPlayerData();
@@ -98,7 +103,7 @@ export default function OfficerTrack() {
         
         console.log('✅ Officer Track initialization complete');
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to initialize Officer Track';
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load officer player data';
         setError(errorMessage);
         console.error('❌ Officer Track initialization failed:', err);
       } finally {
