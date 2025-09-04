@@ -103,7 +103,7 @@ export class ARCDataService {
   }
 
   /**
-   * Load puzzles from a specific dataset
+   * Load puzzles from a specific dataset (from PlayFab Title Data)
    */
   private async loadDatasetPuzzles(
     dataset: ARCDatasetType, 
@@ -120,37 +120,101 @@ export class ARCDataService {
       return Array.from(cache.values());
     }
 
-    console.log(`🔄 Loading fresh ${dataset} puzzles from files...`);
+    console.log(`🔄 Loading fresh ${dataset} puzzles from PlayFab Title Data...`);
 
     try {
-      // Get all JSON files for this dataset
-      const files = await this.getDatasetFiles(dataset);
-      const puzzles: OfficerTrackPuzzle[] = [];
-
-      // Load files in batches to prevent memory issues
-      const batchSize = 50;
-      for (let i = 0; i < files.length; i += batchSize) {
-        const batch = files.slice(i, i + batchSize);
-        const batchPuzzles = await this.loadFileBatch(batch, dataset);
-        puzzles.push(...batchPuzzles);
-        
-        // Log progress for large datasets
-        if (files.length > 100) {
-          console.log(`📦 Loaded batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(files.length / batchSize)} (${puzzles.length}/${files.length})`);
-        }
-      }
+      const puzzles = await this.loadDatasetFromPlayFab(dataset);
 
       // Update cache
       cache.clear();
       puzzles.forEach(puzzle => cache.set(puzzle.id, puzzle));
       this.lastLoadTime.set(dataset, Date.now());
 
-      console.log(`✅ Successfully loaded ${puzzles.length} ${dataset} puzzles`);
+      console.log(`✅ Successfully loaded ${puzzles.length} ${dataset} puzzles from PlayFab`);
       return puzzles;
 
     } catch (error) {
-      console.error(`❌ Failed to load ${dataset} puzzles:`, error);
+      console.error(`❌ Failed to load ${dataset} puzzles from PlayFab:`, error);
       throw new Error(`Failed to load ARC dataset: ${dataset}`);
+    }
+  }
+
+  /**
+   * Load dataset puzzles from PlayFab Title Data (batched structure)
+   */
+  private async loadDatasetFromPlayFab(dataset: ARCDatasetType): Promise<OfficerTrackPuzzle[]> {
+    const allPuzzles: OfficerTrackPuzzle[] = [];
+
+    // Determine number of batches for this dataset
+    const batchCounts: Record<ARCDatasetType, number> = {
+      training: 4,      // 400 puzzles in 4 batches
+      training2: 10,    // 1000 puzzles in 10 batches  
+      evaluation: 4,    // 400 puzzles in 4 batches
+      evaluation2: 2    // 120 puzzles in 2 batches
+    };
+
+    const totalBatches = batchCounts[dataset];
+
+    // Load all batches for this dataset
+    for (let batchNum = 1; batchNum <= totalBatches; batchNum++) {
+      const titleDataKey = `officer-tasks-${dataset}-batch${batchNum}.json`;
+      
+      try {
+        const batchPuzzles = await this.loadPlayFabTitleData(titleDataKey);
+        if (batchPuzzles && Array.isArray(batchPuzzles)) {
+          allPuzzles.push(...batchPuzzles);
+          console.log(`📦 Loaded batch ${batchNum}/${totalBatches}: ${batchPuzzles.length} puzzles`);
+        } else {
+          console.warn(`⚠️  No data found for ${titleDataKey}`);
+        }
+      } catch (error) {
+        console.error(`❌ Failed to load batch ${batchNum} for ${dataset}:`, error);
+        // Continue with other batches rather than failing completely
+      }
+    }
+
+    return allPuzzles;
+  }
+
+  /**
+   * Load data from PlayFab Title Data
+   */
+  private async loadPlayFabTitleData(key: string): Promise<OfficerTrackPuzzle[] | null> {
+    try {
+      // Use PlayFab Client API to get title data
+      const response = await fetch(`https://${import.meta.env.VITE_PLAYFAB_TITLE_ID}.playfabapi.com/Client/GetTitleData`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          Keys: [key]
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`PlayFab API error: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.code !== 200) {
+        throw new Error(`PlayFab error: ${result.errorMessage || 'Unknown error'}`);
+      }
+
+      const titleData = result.data?.Data;
+      if (!titleData || !titleData[key]) {
+        console.warn(`No title data found for key: ${key}`);
+        return null;
+      }
+
+      // Parse the JSON data
+      const puzzleData = JSON.parse(titleData[key]);
+      return Array.isArray(puzzleData) ? puzzleData : null;
+
+    } catch (error) {
+      console.error(`Failed to load PlayFab title data for ${key}:`, error);
+      throw error;
     }
   }
 
@@ -598,3 +662,46 @@ export class ARCDataService {
 
 // Export singleton instance
 export const arcDataService = ARCDataService.getInstance();
+
+/**
+ * React hook for using ARC data service
+ */
+import { useState, useCallback, useEffect } from 'react';
+
+export function useARCData() {
+  const [puzzleFiles, setPuzzleFiles] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadDataset = useCallback(async (dataset: ARCDatasetType) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const puzzles = await arcDataService.loadARCPuzzles({
+        datasets: [dataset],
+        limit: 1000 // Load many puzzles for the selector
+      });
+      
+      // Convert to file format expected by components
+      const fileData = puzzles.puzzles.map(puzzle => ({
+        filename: `${puzzle.filename}.json`,
+        dataset: puzzle.dataset
+      }));
+      
+      setPuzzleFiles(fileData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load dataset');
+      setPuzzleFiles([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  return {
+    puzzleFiles,
+    isLoading,
+    error,
+    loadDataset
+  };
+}

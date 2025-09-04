@@ -19,6 +19,9 @@ const fs = require('fs').promises;
 const path = require('path');
 const https = require('https');
 
+// Load environment variables from .env file
+require('dotenv').config();
+
 // PlayFab Configuration - MUST SET THESE!
 const PLAYFAB_TITLE_ID = process.env.VITE_PLAYFAB_TITLE_ID || '19FACB';
 const PLAYFAB_SECRET_KEY = process.env.PLAYFAB_SECRET_KEY;
@@ -61,8 +64,8 @@ async function main() {
     console.log(`\n📊 Step 2: Generated ${officerTasks.length} officer track puzzles`);
     logDatasetStats(officerTasks);
     
-    console.log('\n☁️  Step 3: Uploading to PlayFab Title Data...');
-    await uploadToPlayFab(officerTasks);
+    console.log('\n☁️  Step 3: Uploading to PlayFab Title Data in batches...');
+    await uploadToPlayFabByDataset(officerTasks);
     
     console.log('\n✅ SUCCESS: Officer Track data uploaded to PlayFab!');
     console.log('   The Officer Academy is now ready for use.');
@@ -219,11 +222,59 @@ function analyzeGridSize(puzzle) {
 }
 
 /**
+ * Upload officer tasks to PlayFab Title Data by dataset (in smaller batches)
+ */
+async function uploadToPlayFabByDataset(allOfficerTasks) {
+  const BATCH_SIZE = 100; // 100 puzzles per batch
+  
+  // Group tasks by dataset
+  const tasksByDataset = {};
+  allOfficerTasks.forEach(task => {
+    if (!tasksByDataset[task.dataset]) {
+      tasksByDataset[task.dataset] = [];
+    }
+    tasksByDataset[task.dataset].push(task);
+  });
+
+  // Upload each dataset in smaller batches
+  for (const [dataset, tasks] of Object.entries(tasksByDataset)) {
+    console.log(`\n📤 Uploading ${dataset} dataset (${tasks.length} puzzles) in batches of ${BATCH_SIZE}...`);
+    
+    const totalBatches = Math.ceil(tasks.length / BATCH_SIZE);
+    
+    for (let batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
+      const startIndex = batchIndex * BATCH_SIZE;
+      const endIndex = Math.min(startIndex + BATCH_SIZE, tasks.length);
+      const batch = tasks.slice(startIndex, endIndex);
+      
+      const batchNumber = batchIndex + 1;
+      const titleDataKey = `officer-tasks-${dataset}-batch${batchNumber}.json`;
+      
+      console.log(`   📦 Batch ${batchNumber}/${totalBatches}: ${batch.length} puzzles (${titleDataKey})`);
+      
+      try {
+        await uploadToPlayFab(batch, titleDataKey);
+        console.log(`      ✅ Batch ${batchNumber} uploaded successfully!`);
+        
+        // Small delay between batches to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+      } catch (error) {
+        console.error(`      ❌ Failed to upload batch ${batchNumber}:`, error.message);
+        throw error; // Stop on first failure
+      }
+    }
+    
+    console.log(`   ✅ ${dataset} dataset completed (${totalBatches} batches)!`);
+  }
+}
+
+/**
  * Upload officer tasks to PlayFab Title Data
  */
-async function uploadToPlayFab(officerTasks) {
+async function uploadToPlayFab(officerTasks, titleDataKey = 'officer-tasks.json') {
   const titleDataPayload = {
-    Key: 'officer-tasks.json',
+    Key: titleDataKey,
     Value: JSON.stringify(officerTasks)
   };
 
