@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## Recent Commits (Latest First)
 
+**2025-09-04**: Officer Academy infinite loading and PlayFab data parsing fixes - Cascade
+- **INFINITE RECURSION FIX**: Fixed updateOfficerPlayerData() infinite loop causing GetUserData spam
+- **ROOT CAUSE**: createNewOfficerProfile() → updateOfficerPlayerData() → getOfficerPlayerData() → createNewOfficerProfile() recursion
+- **SOLUTION**: Changed updateOfficerPlayerData() to use provided playerData directly when no cache exists instead of fetching
+- **JSON PARSING FIX**: Fixed JSON.parse('undefined') error in arcDataService.loadPlayFabTitleData()
+- **ROOT CAUSE**: PlayFab Title Data keys exist but contain "undefined" string values instead of actual JSON data
+- **SOLUTION**: Added check for "undefined" string values before JSON.parse() attempt
+- **AUTHENTICATION FIX**: Updated arcDataService to use authenticated playFabCore.makeHttpRequest() instead of direct fetch
+- **RESULT**: Officer Academy loads without infinite loading or JSON parsing errors, shows 0 puzzles gracefully
+- **REMAINING ISSUE**: PlayFab Title Data keys exist but are empty - upload script needs to run successfully
+
 **2025-09-03**: FINAL PlayFab race condition fix - CDN loading synchronization
 - **ROOT CAUSE IDENTIFIED**: Race condition between React app initialization and PlayFab CDN script loading
 - **SOLUTION**: Added proper CDN loading detection with polling mechanism in core.ts initialization
