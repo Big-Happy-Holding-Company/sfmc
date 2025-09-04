@@ -21,10 +21,10 @@ const https = require('https');
 
 // PlayFab Configuration - MUST SET THESE!
 const PLAYFAB_TITLE_ID = process.env.VITE_PLAYFAB_TITLE_ID || '19FACB';
-const PLAYFAB_SECRET_KEY = process.env.SECRET_PLAYFAB_KEY;
+const PLAYFAB_SECRET_KEY = process.env.PLAYFAB_SECRET_KEY;
 
 if (!PLAYFAB_SECRET_KEY) {
-  console.error('❌ ERROR: SECRET_PLAYFAB_KEY environment variable not set!');
+  console.error('❌ ERROR: PLAYFAB_SECRET_KEY environment variable not set!');
   console.error('   Please set it in your .env file or environment');
   process.exit(1);
 }
