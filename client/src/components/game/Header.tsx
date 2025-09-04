@@ -8,6 +8,8 @@
  *   real data rather than a hard-coded value.
  */
 import { RankBadge } from "./RankBadge";
+import { Button } from "@/components/ui/button";
+import { useLocation } from "wouter";
 import type { PlayFabPlayer } from "@/services/playfab";
 
 interface HeaderProps {
@@ -17,6 +19,7 @@ interface HeaderProps {
 }
 
 export function Header({ player, totalTasks }: HeaderProps) {
+  const [, setLocation] = useLocation();
   return (
     <header className="bg-slate-800 border-b border-cyan-400 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -38,6 +41,15 @@ export function Header({ player, totalTasks }: HeaderProps) {
                 <div className="text-slate-400 font-mono">{player.completedMissions}/{totalTasks}</div>
               </div>
             </div>
+            
+            {/* Officer Academy Access */}
+            <Button
+              onClick={() => setLocation('/officer-track')}
+              className="bg-amber-600 hover:bg-amber-700 text-slate-900 font-semibold px-4 py-2 border border-amber-400"
+              size="sm"
+            >
+              🎖️ Officer Academy
+            </Button>
           </div>
         </div>
       </div>

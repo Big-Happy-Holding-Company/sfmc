@@ -2,6 +2,7 @@
   "permissions": {
     "allow": [
       "WebSearch",
+      "Read(d:\\1Projects\\sfmc/**)",
       "Read(d:\\1Projects\\sfmc-app\\Assets/**)",
       "Read(D:\\1Projects\\sfmc-app/**)",
       "Read(D:\\1Projects\\sfmc-app/**)",

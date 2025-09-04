@@ -15,10 +15,10 @@ import { SPACE_EMOJIS } from "@/constants/spaceEmojis";
 
 interface LoadingSplashProps {
   onComplete: () => void;
-  duration?: number; // Duration in ms (default 5000)
+  duration?: number; // Duration in ms (default 1000)
 }
 
-export function LoadingSplash({ onComplete, duration = 100 }: LoadingSplashProps) {
+export function LoadingSplash({ onComplete, duration = 1000 }: LoadingSplashProps) {
   const [progress, setProgress] = useState(0);
   const [emojiRow, setEmojiRow] = useState<string[]>([]);
   const [isExiting, setIsExiting] = useState(false);
