@@ -190,16 +190,25 @@ export type RankLevel = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11;
 export const PLAYFAB_CONSTANTS = {
   STATISTIC_NAMES: {
     LEVEL_POINTS: 'LevelPoints',
+    OFFICER_TRACK_POINTS: 'OfficerTrackPoints',
   },
   TITLE_DATA_KEYS: {
     TASKS: 'tasks.json',
+    OFFICER_TASKS: 'officer-tasks.json',
   },
   CLOUDSCRIPT_FUNCTIONS: {
     VALIDATE_SOLUTION: 'ValidateTaskSolution',
+    VALIDATE_ARC_SOLUTION: 'ValidateARCSolution',
     GENERATE_ANONYMOUS_NAME: 'GenerateAnonymousName',
+  },
+  USER_DATA_KEYS: {
+    OFFICER_PLAYER_DATA: 'officer-player-data',
+    OFFICER_ACHIEVEMENTS: 'officer-achievements',
+    OFFICER_PROGRESS: 'officer-progress',
   },
   STORAGE_KEYS: {
     DEVICE_ID: 'playfab_device_id',
     SESSION_ID: 'playfab_session_id',
+    OFFICER_SESSION_ID: 'officer_session_id',
   },
 } as const;
