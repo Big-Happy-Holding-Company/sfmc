@@ -191,7 +191,7 @@ export class ARCDataService {
         true // requiresAuth = true
       );
 
-      if (!result?.Data?.[key]) {
+      if (!result?.Data?.[key] || !result.Data[key].Value || result.Data[key].Value === "undefined") {
         console.warn(`No title data found for key: ${key}`);
         return null;
       }
