@@ -155,32 +155,37 @@ export class ARCDataService {
   }
 
   /**
-   * Get list of JSON files for a dataset
+   * Get list of actual JSON files for a dataset from file manifests
+   * Real implementation - loads actual file lists, no simulation
    */
   private async getDatasetFiles(dataset: ARCDatasetType): Promise<string[]> {
-    // In a real implementation, this would scan the filesystem or use a manifest
-    // For now, we'll simulate with known file patterns
-    const datasetPaths: Record<ARCDatasetType, string> = {
-      training: 'data/training/',
-      training2: 'data/training2/', 
-      evaluation: 'data/evaluation/',
-      evaluation2: 'data/evaluation2/'
+    const manifestPaths: Record<ARCDatasetType, string> = {
+      training: '/data/training-manifest.json',
+      training2: '/data/training2-manifest.json', 
+      evaluation: '/data/evaluation-manifest.json',
+      evaluation2: '/data/evaluation2-manifest.json'
     };
 
-    const basePath = datasetPaths[dataset];
-    
-    // This is a placeholder - in reality you'd use fs.readdir or a file manifest
-    // For now, return a simulated list based on the actual structure
-    const counts = { training: 400, training2: 1000, evaluation: 400, evaluation2: 120 };
-    const count = counts[dataset];
-    
-    // Generate filenames - this would be replaced with actual file scanning
-    const files: string[] = [];
-    for (let i = 0; i < Math.min(count, 100); i++) { // Limit for demo
-      files.push(`${basePath}puzzle_${i}.json`);
+    const basePaths: Record<ARCDatasetType, string> = {
+      training: '/data/training/',
+      training2: '/data/training2/', 
+      evaluation: '/data/evaluation/',
+      evaluation2: '/data/evaluation2/'
+    };
+
+    try {
+      // Try to load manifest file first
+      const manifestResponse = await fetch(manifestPaths[dataset]);
+      if (manifestResponse.ok) {
+        const filenames: string[] = await manifestResponse.json();
+        return filenames.map(name => `${basePaths[dataset]}${name}`);
+      }
+    } catch (error) {
+      console.warn(`Could not load manifest for ${dataset}, falling back to known files`);
     }
-    
-    return files;
+
+    // Fallback: Use hardcoded list of known files for each dataset
+    return this.getKnownFilesForDataset(dataset);
   }
 
   /**
@@ -222,28 +227,81 @@ export class ARCDataService {
   }
 
   /**
-   * Load individual puzzle file (placeholder - would use actual file loading)
+   * Load individual puzzle file using real browser fetch()
+   * REAL implementation - no simulation or placeholders
    */
   private async loadPuzzleFile(filePath: string): Promise<ARCPuzzle | null> {
     try {
-      // This is a placeholder - in reality would use fetch() or fs.readFile()
-      // For demo, we'll simulate loading one of the known files
-      const filename = filePath.split('/').pop() || '';
-      
-      // For demo, use the example files we know exist
-      if (filename === 'puzzle_0.json') {
-        const response = await fetch('/data/training/007bbfb7.json');
-        if (response.ok) {
-          return await response.json();
-        }
+      const response = await fetch(filePath);
+      if (!response.ok) {
+        console.warn(`Failed to fetch ${filePath}: ${response.status} ${response.statusText}`);
+        return null;
       }
+
+      const data = await response.json();
       
-      // Return null for simulated files for now
-      return null;
+      // Validate that this is a proper ARC puzzle format
+      if (!this.isValidARCPuzzle(data)) {
+        console.warn(`Invalid ARC puzzle format in ${filePath}`);
+        return null;
+      }
+
+      return data as ARCPuzzle;
     } catch (error) {
       console.error(`Failed to load file ${filePath}:`, error);
       return null;
     }
+  }
+
+  /**
+   * Validate that data is a proper ARC puzzle format
+   */
+  private isValidARCPuzzle(data: any): boolean {
+    if (!data || typeof data !== 'object') return false;
+    if (!Array.isArray(data.train) || !Array.isArray(data.test)) return false;
+    
+    // Check that train and test contain proper example structures
+    const validateExample = (example: any) => {
+      return example && 
+             Array.isArray(example.input) && 
+             Array.isArray(example.output) &&
+             example.input.every((row: any) => Array.isArray(row)) &&
+             example.output.every((row: any) => Array.isArray(row));
+    };
+
+    return data.train.every(validateExample) && data.test.every(validateExample);
+  }
+
+  /**
+   * Get known file lists for each dataset (fallback when manifest not available)
+   * Real file names from actual directories
+   */
+  private getKnownFilesForDataset(dataset: ARCDatasetType): string[] {
+    const basePaths: Record<ARCDatasetType, string> = {
+      training: '/data/training/',
+      training2: '/data/training2/', 
+      evaluation: '/data/evaluation/',
+      evaluation2: '/data/evaluation2/'
+    };
+
+    // Emergency fallback: Only if manifests completely fail to load
+    // These are just a few real files for absolute emergency fallback
+    const emergencyFallbackFiles: Record<ARCDatasetType, string[]> = {
+      training: [
+        '007bbfb7.json', '00d62c1b.json', '017c7c7b.json', '025d127b.json', '045e512c.json'
+      ],
+      training2: [],
+      evaluation: [
+        '00576224.json', '009d5c81.json', '00dbd492.json', '03560426.json', '05a7bcf2.json'
+      ],
+      evaluation2: []
+    };
+
+    const basePath = basePaths[dataset];
+    const files = emergencyFallbackFiles[dataset];
+    
+    console.warn(`Using emergency fallback files for ${dataset} - only ${files.length} puzzles available`);
+    return files.map(filename => `${basePath}${filename}`);
   }
 
   /**
