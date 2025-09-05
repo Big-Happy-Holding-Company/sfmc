@@ -185,19 +185,19 @@ export class ARCDataService {
       const { playFabCore } = await import('./playfab/core');
       
       // Make authenticated request to PlayFab Title Data
-      const result = await playFabCore.makeHttpRequest<{ Keys: string[] }, { Data?: Record<string, { Value: string }> }>(
+      const result = await playFabCore.makeHttpRequest<{ Keys: string[] }, { Data?: Record<string, string> }>(
         '/Client/GetTitleData',
         { Keys: [key] },
         true // requiresAuth = true
       );
 
-      if (!result?.Data?.[key] || !result.Data[key].Value || result.Data[key].Value === "undefined") {
+      if (!result?.Data?.[key] || result.Data[key] === "undefined") {
         console.warn(`No title data found for key: ${key}`);
         return null;
       }
 
       // Parse the JSON data
-      const puzzleData = JSON.parse(result.Data[key].Value);
+      const puzzleData = JSON.parse(result.Data[key]);
       return Array.isArray(puzzleData) ? puzzleData : null;
 
     } catch (error) {
