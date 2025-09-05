@@ -62,12 +62,12 @@ export default function OfficerTrack() {
   // Core state management
   const [currentPuzzle, setCurrentPuzzle] = useState<OfficerTrackPuzzle | null>(null);
   const [officerPlayer, setOfficerPlayer] = useState<OfficerTrackPlayer | null>(null);
-  const [mergedPuzzles, setMergedPuzzles] = useState<MergedPuzzleData[]>([]);
+  const [filteredPuzzles, setFilteredPuzzles] = useState<AIPuzzlePerformance[]>([]);
   const [playerSolution, setPlayerSolution] = useState<number[][]>([]);
   const [validationResult, setValidationResult] = useState<ARCValidationResult | null>(null);
   
-  // AI Performance Integration - using unified service
-  const [selectedDifficultyFilter, setSelectedDifficultyFilter] = useState<'impossible' | 'extremely_hard' | 'very_hard' | 'challenging' | null>(null);
+  // AI Performance Integration - direct from arc-explainer
+  const [selectedDifficultyFilter, setSelectedDifficultyFilter] = useState<'impossible' | 'extremely_hard' | 'very_hard' | 'challenging' | undefined>(undefined);
   
   // UI state
   const [loading, setLoading] = useState(true);
@@ -120,14 +120,8 @@ export default function OfficerTrack() {
         setOfficerPlayer(playerData);
         console.log(`👮 Officer loaded: ${playerData.officerRank} with ${playerData.officerPoints} points`);
         
-        // Load merged puzzle dataset (PlayFab + arc-explainer performance data)
-        const mergedData = await puzzlePerformanceService.getMergedPuzzleDataset({
-          datasets: ['training', 'evaluation', 'training2', 'evaluation2'],
-          difficulty: getAccessibleDifficulties(playerData.officerRank),
-          // Load all 1,920 puzzles from all datasets - no limits
-        });
-        setMergedPuzzles(mergedData);
-        console.log(`🧩 Loaded ${mergedData.length} merged puzzles for ${playerData.officerRank}`);
+        // Load initial filtered puzzles from arc-explainer API
+        await loadFilteredPuzzles();
         
         console.log('✅ Officer Track initialization complete');
       } catch (err) {
@@ -160,30 +154,59 @@ export default function OfficerTrack() {
   };
 
   /**
-   * Get AI performance for a specific puzzle from merged data
+   * Get AI performance for a specific puzzle from filtered data
    */
   const getAIPerformance = (puzzleId: string): AIPuzzlePerformance | null => {
-    const puzzle = mergedPuzzles.find(p => p.id === puzzleId);
-    return puzzle?.aiPerformance || null;
+    const puzzle = filteredPuzzles.find((p: AIPuzzlePerformance) => p.id === puzzleId);
+    return puzzle || null;
   };
 
   /**
-   * Get filtered puzzles based on AI difficulty selection using unified service
+   * Load filtered puzzles from arc-explainer API
    */
-  const getFilteredPuzzles = (): MergedPuzzleData[] => {
-    if (!selectedDifficultyFilter) return mergedPuzzles;
-    
-    return puzzlePerformanceService.filterByPerformance(mergedPuzzles, {
-      difficulty: selectedDifficultyFilter
-    });
+  const loadFilteredPuzzles = async () => {
+    try {
+      setLoading(true);
+      console.log('🔄 Loading puzzles from arc-explainer API...', { selectedDifficultyFilter });
+      
+      let puzzles: AIPuzzlePerformance[];
+      
+      if (!selectedDifficultyFilter) {
+        // No filter - get default worst performing puzzles
+        puzzles = await arcExplainerAPI.getWorstPerformingPuzzles({ limit: 50 });
+      } else {
+        // Use direct arc-explainer filtering
+        puzzles = await arcExplainerAPI.getFilteredPuzzles({
+          difficulty: selectedDifficultyFilter,
+          limit: 50
+        });
+      }
+      
+      setFilteredPuzzles(puzzles);
+      console.log(`✅ Loaded ${puzzles.length} puzzles from arc-explainer`);
+    } catch (error) {
+      console.error('❌ Failed to load filtered puzzles:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load puzzles');
+      setFilteredPuzzles([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   /**
-   * Handle AI difficulty category selection
+   * Handle AI difficulty category selection and reload puzzles
    */
   const handleDifficultyFilterSelect = (category: 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging') => {
-    setSelectedDifficultyFilter(category === selectedDifficultyFilter ? null : category);
+    const newFilter = category === selectedDifficultyFilter ? undefined : category;
+    setSelectedDifficultyFilter(newFilter);
   };
+
+  // Reload puzzles when difficulty filter changes
+  useEffect(() => {
+    if (officerPlayer) {
+      loadFilteredPuzzles();
+    }
+  }, [selectedDifficultyFilter]);
 
   /**
    * Enhanced Grid UX Utilities
@@ -815,12 +838,13 @@ export default function OfficerTrack() {
                 <CardTitle className="text-amber-400 flex items-center">
                   🧩 Advanced Reasoning Challenges
                   <Badge className="ml-3 bg-amber-600 text-slate-900">
-                    {getFilteredPuzzles().length} of {mergedPuzzles.length} Available
+                    {filteredPuzzles.length} Available
                   </Badge>
                   {selectedDifficultyFilter && (
                     <Badge className="ml-2 bg-blue-600 text-white">
                       Filtered: {selectedDifficultyFilter.replace('_', ' ').toUpperCase()}
                     </Badge>
+{{ ... }}
                   )}
                 </CardTitle>
               </CardHeader>

@@ -313,83 +313,108 @@ export class ArcExplainerAPI {
   }
 
   /**
-   * Get difficulty category based on accuracy score
+   * Get direct performance statistics from arc-explainer API
+   * This is the primary method for difficulty card data - no PlayFab dependency
    */
-  public getDifficultyCategory(accuracy: number): 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging' {
-    if (accuracy === 0) return 'impossible';
-    if (accuracy <= 0.25) return 'extremely_hard';
-    if (accuracy <= 0.50) return 'very_hard';
-    return 'challenging';
-  }
-
-  /**
-   * Get difficulty statistics from performance-stats endpoint (more accurate)
-   */
-  public async getDifficultyStats(): Promise<{
-    impossible: number;
-    extremely_hard: number;
-    very_hard: number;
-    challenging: number;
-    total: number;
-  }> {
+  public async getPerformanceStats(): Promise<{ impossible: number, extremely_hard: number, very_hard: number, challenging: number, total: number }> {
     try {
-      // Use dedicated performance stats endpoint for better accuracy
-      const response = await this.makeRequest('/api/puzzle/performance-stats');
-      const data = await response.json();
+      console.log('🔄 Fetching performance stats from arc-explainer API...');
       
-      if (data.success && data.data) {
-        // Process the performance stats data to create difficulty categories
-        // Note: The exact structure depends on what the endpoint returns
-        console.log('🔍 Performance stats data:', data.data);
+      // Try performance-stats endpoint first
+      try {
+        const response = await this.makeRequest('/api/puzzle/performance-stats');
+        const data = await response.json();
         
-        // Fallback to worst-performing if performance-stats doesn't provide what we need
-        return this.getFallbackDifficultyStats();
-      } else {
-        return this.getFallbackDifficultyStats();
+        if (data.success && data.data) {
+          // Extract bucket counts from performance stats response
+          const stats = data.data;
+          const result = {
+            impossible: stats.impossible || 0,
+            extremely_hard: stats.extremely_hard || stats.extremelyHard || 0,
+            very_hard: stats.very_hard || stats.veryHard || 0,
+            challenging: stats.challenging || 0,
+            total: stats.total || 0
+          };
+          
+          console.log('✅ Got performance stats:', result);
+          return result;
+        }
+      } catch (perfError) {
+        console.warn('⚠️ Performance-stats endpoint unavailable, using fallback');
       }
-    } catch (error) {
-      console.warn('Performance stats endpoint failed, using fallback:', error);
-      return this.getFallbackDifficultyStats();
-    }
-  }
-
-  /**
-   * Fallback method using worst-performing puzzles
-   */
-  private async getFallbackDifficultyStats(): Promise<{
-    impossible: number;
-    extremely_hard: number;
-    very_hard: number;
-    challenging: number;
-    total: number;
-  }> {
-    try {
-      // Get worst performing puzzles - no artificial limits
-      const puzzles = await this.getWorstPerformingPuzzles({});
       
-      const stats = {
+      // Fallback: get worst-performing puzzles and compute buckets
+      const puzzles = await this.getWorstPerformingPuzzles({ limit: 50 });
+      
+      const buckets = {
         impossible: 0,
-        extremely_hard: 0,
+        extremely_hard: 0, 
         very_hard: 0,
         challenging: 0,
         total: puzzles.length
       };
-
+      
       puzzles.forEach(puzzle => {
-        const category = this.getDifficultyCategory(puzzle.avgAccuracy);
-        stats[category]++;
+        const accuracy = puzzle.avgAccuracy;
+        if (accuracy === 0) {
+          buckets.impossible++;
+        } else if (accuracy <= 0.25) {
+          buckets.extremely_hard++;
+        } else if (accuracy <= 0.50) {
+          buckets.very_hard++;
+        } else if (accuracy <= 0.75) {
+          buckets.challenging++;
+        }
       });
-
-      return stats;
+      
+      console.log('✅ Computed difficulty stats from worst-performing:', buckets);
+      return buckets;
+      
     } catch (error) {
-      console.error('Failed to get fallback difficulty stats:', error);
-      return {
-        impossible: 0,
-        extremely_hard: 0,
-        very_hard: 0,
-        challenging: 0,
-        total: 0
+      console.error('❌ Failed to get difficulty stats:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get filtered puzzles from arc-explainer API for Officer Track
+   * This replaces complex PlayFab merging - arc-explainer is the source of truth
+   */
+  public async getFilteredPuzzles(filters: {
+    difficulty?: 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging';
+    zeroAccuracyOnly?: boolean;
+    limit?: number;
+  }): Promise<AIPuzzlePerformance[]> {
+    try {
+      console.log('🔄 Getting filtered puzzles from arc-explainer...', filters);
+      
+      const apiFilters: APIFilters = {
+        limit: filters.limit || 50, // Use server max
+        sortBy: 'composite'
       };
+      
+      // Apply difficulty filter as accuracy range
+      if (filters.difficulty === 'impossible' || filters.zeroAccuracyOnly) {
+        apiFilters.zeroAccuracyOnly = true;
+      } else if (filters.difficulty === 'extremely_hard') {
+        apiFilters.minAccuracy = 0.01; // Exclude 0%
+        apiFilters.maxAccuracy = 0.25;
+      } else if (filters.difficulty === 'very_hard') {
+        apiFilters.minAccuracy = 0.25;
+        apiFilters.maxAccuracy = 0.50;
+      } else if (filters.difficulty === 'challenging') {
+        apiFilters.minAccuracy = 0.50;
+        apiFilters.maxAccuracy = 0.75;
+      }
+      
+      const puzzles = await this.getWorstPerformingPuzzles(apiFilters);
+      console.log(`✅ Found ${puzzles.length} puzzles matching ${filters.difficulty || 'all'} difficulty`);
+      
+      return puzzles;
+      
+    } catch (error) {
+      console.error('❌ Failed to get filtered puzzles:', error);
+      throw error;
     }
   }
 
