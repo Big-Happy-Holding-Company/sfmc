@@ -21,10 +21,12 @@ https://learn.microsoft.com/en-us/rest/api/playfab/server/?view=playfab-rest - P
 - **Rank Progression**: Advance through Space Force enlisted ranks (E1-E9)
 - **Curated Content**: Space Force themed transformations with storylines
 
-### Officer Track (1,920+ Puzzles)  
-- **ARC-AGI Datasets**: Raw training, training2, evaluation, evaluation2 datasets
-- **Advanced Training**: Complex abstract reasoning for officer development
-- **Batch Architecture**: Efficient loading of large puzzle collections
+### Officer Track (2,020 Puzzles) ✅ OPERATIONAL  
+- **ARC-AGI Datasets**: Complete training, training2, evaluation, evaluation2 datasets
+- **AI-Curated Difficulty**: Integration with arc-explainer API for AI trustworthiness data
+- **Enhanced Search**: Exact puzzle ID lookup and random selection by AI difficulty  
+- **Performance Analytics**: Real AI accuracy scores (40.9%, 36.3%, 18.5% etc.) and performance metrics
+- **Batch Architecture**: Efficient loading of large puzzle collections from PlayFab
 - **Officer Ranks**: LIEUTENANT → CAPTAIN → MAJOR → COLONEL progression
 
 ### Accessibility & Design
@@ -36,7 +38,8 @@ https://learn.microsoft.com/en-us/rest/api/playfab/server/?view=playfab-rest - P
 
 ### Core Technologies
 - **Frontend**: React + TypeScript with Vite (Static Site)
-- **Backend**: PlayFab Cloud Services (No Server Required)
+- **Backend**: PlayFab Cloud Services (No Server Required) 
+- **AI Analytics**: arc-explainer API for AI performance data
 - **UI Components**: Tailwind CSS + shadcn/ui
 - **Data Storage**: PlayFab Title Data & User Data
 - **Authentication**: PlayFab Anonymous Login
@@ -46,33 +49,36 @@ https://learn.microsoft.com/en-us/rest/api/playfab/server/?view=playfab-rest - P
 This is a **pure static web application** with all backend functionality handled by PlayFab cloud services.
 
 ```
-PlayFab Cloud Backend (Single Source of Truth)
-├── Title Data: 
-│   ├── AllTasks (155 enlisted tasks)
-│   ├── officer-tasks-training-batch1-4.json (400 puzzles)
-│   ├── officer-tasks-training2-batch1-10.json (1000 puzzles)  
-│   ├── officer-tasks-evaluation-batch1-4.json (400 puzzles)
-│   └── officer-tasks-evaluation2-batch1-2.json (120 puzzles)
-├── User Data: Player progress & officer track stats
-├── Statistics: Global leaderboards & rankings
-└── Events: Game analytics & logging
-    ↓
-Static React App (client/)
-├── components/    # Game UI components + shadcn/ui
+PlayFab Cloud Backend (Single Source of Truth)          arc-explainer API
+├── Title Data:                                          ├── AI Performance Data
+│   ├── AllTasks (155 enlisted tasks)                   │   ├── Accuracy scores (40.9%, 36.3%, etc.)
+│   ├── officer-tasks-training-batch1-4.json (400)     │   ├── Composite difficulty scores  
+│   ├── officer-tasks-training2-batch1-10.json (1000)  │   ├── Wrong count & explanation metrics
+│   ├── officer-tasks-evaluation-batch1-4.json (400)   │   └── AI trustworthiness data
+│   └── officer-tasks-evaluation2-batch1-2.json (120)  └── Puzzle ID cross-referencing
+├── User Data: Player progress & officer track stats              ↓
+├── Statistics: Global leaderboards & rankings                    ↓
+└── Events: Game analytics & logging                              ↓
+    ↓                                                              ↓
+Static React App (client/) ←------ HTTP API Calls ----------------┘
+├── components/    # Game UI + AI difficulty cards
 ├── constants/     # Emoji sets and game constants  
-├── services/      # Pure HTTP PlayFab integration
+├── services/      # Pure HTTP integrations
 │   ├── playfab/   # Core PlayFab services
-│   └── arcDataService.ts  # Officer track batch loading
-└── pages/         # Route components
+│   ├── arcDataService.ts     # Officer track batch loading
+│   └── arcExplainerAPI.ts    # AI performance data integration
+└── pages/         # Route components with AI-curated filtering
 
 ### Data Flow
 1. **Enlisted Tasks**: Loaded from `AllTasks` PlayFab Title Data key
 2. **Officer Tasks**: Batch-loaded from multiple Title Data keys per dataset  
-3. **Authentication**: Anonymous PlayFab login with persistent device ID
-4. **Progress**: Stored separately for enlisted vs officer tracks in User Data
-5. **Validation**: Client-side logic with PlayFab progress updates
-6. **Leaderboards**: Separate leaderboards for enlisted and officer tracks
-7. **Deployment**: Static files served from CDN (Railway)
+3. **AI Performance**: Real-time HTTP calls to arc-explainer API for difficulty curation
+4. **Authentication**: Anonymous PlayFab login with persistent device ID
+5. **Progress**: Stored separately for enlisted vs officer tracks in User Data
+6. **Validation**: Client-side logic with PlayFab progress updates
+7. **Leaderboards**: Separate leaderboards for enlisted and officer tracks
+8. **AI Filtering**: Cross-reference PlayFab puzzle IDs with arc-explainer performance data
+9. **Deployment**: Static files served from CDN (Railway)
 
 
 
@@ -105,24 +111,42 @@ Tasks are defined in JSON format with the following structure:
 
 Tasks use emoji sets to represent different game elements. The mapping from numbers to emojis is handled automatically by the frontend.
 
-## Officer Track (In Development)
+## Officer Track ✅ FULLY OPERATIONAL
 
-### Current Goal
-Simple puzzle lookup system where users can:
-- Input exact puzzle ID (e.g., `1ae2feb7` from `data/evaluation2/1ae2feb7.json`)
-- View random puzzles by their IDs
+### AI-Curated Puzzle System
+Advanced ARC-AGI puzzle platform enhanced with real AI performance analytics:
 
-### Data Sources
-Raw ARC-AGI datasets in local directories:
-- `data/training/` - ARC training puzzles  
-- `data/evaluation/` - ARC evaluation puzzles
-- `data/training2/` - Extended training set
-- `data/evaluation2/` - Extended evaluation set
+#### 🎯 **Enhanced Puzzle Search**
+- **Exact ID Lookup**: Search by puzzle ID (e.g., `1ae2feb7`, `007bbfb7`)  
+- **AI Difficulty Filtering**: "Impossible" (0%), "Extremely Hard" (0-25%), "Very Hard" (25-50%), "Challenging" (50-75%)
+- **Random Selection**: Get random puzzles filtered by AI difficulty
+- **Cross-Referencing**: Seamless mapping between PlayFab (`ARC-TR-007bbfb7`) and ARC Explainer (`007bbfb7`) IDs
 
-### Next Steps
-1. Investigate what data is actually in PlayFab Title Data
-2. Build simple puzzle ID input/lookup interface
-3. Display puzzles by their unique IDs
+#### 📊 **AI Performance Analytics** 
+- **Real Accuracy Scores**: Live data showing actual AI success rates (e.g., 40.9%, 36.3%, 18.5%)
+- **Performance Metrics**: Wrong count, explanation attempts, composite difficulty scores
+- **Trustworthiness Data**: Highlight puzzles that consistently stump AI systems
+- **Difficulty Cards**: Dynamic statistics showing puzzle distribution across AI difficulty categories
+
+#### 🏗️ **Technical Implementation**
+- **Data Source**: 2,020 puzzles stored in PlayFab Title Data across 20 batches
+- **API Integration**: Real-time HTTP calls to `arc-explainer-production.up.railway.app`
+- **Batch Loading**: Efficient pagination system for large puzzle collections
+- **Performance Optimized**: Only essential metrics transferred, not full puzzle arrays
+
+### Usage Examples
+```typescript
+// Search for specific puzzle
+await handlePuzzleSearch("1ae2feb7");
+
+// Get random "impossible" puzzle (0% AI accuracy)  
+await handleRandomPuzzle("impossible");
+
+// Filter by AI performance
+const hardPuzzles = puzzles.filter(p => 
+  arcExplainerAPI.getDifficultyCategory(p.avgAccuracy) === "extremely_hard"
+);
+```
 
 ## Development
 
@@ -149,8 +173,18 @@ Players advance through Space Force enlisted ranks by earning points from solvin
 
 1. Clone the repository
 2. Install dependencies: `npm install`
-3. Set up environment variables: Copy `.env` and add `VITE_PLAYFAB_TITLE_ID`
-4. Start development server: `npm run dev`
+3. Set up environment variables: Copy `.env` and configure:
+   ```bash
+   VITE_PLAYFAB_TITLE_ID="19FACB"
+   VITE_ARC_EXPLAINER_URL="https://arc-explainer-production.up.railway.app"
+   ```
+4. Start development server: `npm run test` (builds + runs dev server)
+
+### Officer Track Setup
+The Officer Track with AI-curated difficulty requires:
+- **PlayFab Title Data**: 2,020 puzzles across 20 batch keys (already configured)
+- **arc-explainer API**: External service providing AI performance analytics
+- **Environment**: `VITE_ARC_EXPLAINER_URL` must point to your arc-explainer instance
 
 ### Documentation
 

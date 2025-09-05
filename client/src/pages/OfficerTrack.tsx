@@ -350,6 +350,97 @@ export default function OfficerTrack() {
   };
 
   /**
+   * Handle search for specific puzzle by ID
+   */
+  const handlePuzzleSearch = async (puzzleId: string) => {
+    if (!puzzleId.trim()) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      console.log(`🔍 Searching for puzzle: ${puzzleId}`);
+      
+      // Search using arcDataService
+      const puzzle = await arcDataService.searchPuzzleById(puzzleId);
+      
+      if (puzzle) {
+        console.log(`✅ Found puzzle: ${puzzle.id}`);
+        handleSelectPuzzle(puzzle);
+      } else {
+        setError(`Puzzle "${puzzleId}" not found in any dataset. Try a different ID.`);
+        console.warn(`❌ Puzzle not found: ${puzzleId}`);
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to search for puzzle';
+      setError(errorMessage);
+      console.error('❌ Puzzle search failed:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Handle random puzzle selection with optional difficulty filter
+   */
+  const handleRandomPuzzle = async (difficulty?: string) => {
+    if (!availablePuzzles) return;
+    
+    try {
+      console.log(`🎲 Selecting random puzzle with difficulty: ${difficulty || 'any'}`);
+      
+      // Filter puzzles based on difficulty
+      let candidatePuzzles = availablePuzzles.puzzles;
+      
+      if (difficulty && difficulty !== 'all') {
+        // Filter by AI difficulty category
+        candidatePuzzles = availablePuzzles.puzzles.filter(puzzle => {
+          const aiPerformance = getAIPerformance(puzzle.id);
+          if (!aiPerformance) return false;
+          
+          const category = arcExplainerAPI.getDifficultyCategory(aiPerformance.avgAccuracy);
+          return category === difficulty;
+        });
+        
+        if (candidatePuzzles.length === 0) {
+          setError(`No puzzles found with difficulty "${difficulty}". Try a different filter.`);
+          return;
+        }
+      }
+      
+      // Select random puzzle from candidates
+      const randomIndex = Math.floor(Math.random() * candidatePuzzles.length);
+      const randomPuzzle = candidatePuzzles[randomIndex];
+      
+      console.log(`✅ Selected random puzzle: ${randomPuzzle.id} (${candidatePuzzles.length} candidates)`);
+      handleSelectPuzzle(randomPuzzle);
+      
+    } catch (err) {
+      console.error('❌ Random puzzle selection failed:', err);
+      setError('Failed to select random puzzle');
+    }
+  };
+
+  /**
+   * Handle search filter changes from OfficerPuzzleSearch
+   */
+  const handleSearchFilterChange = async (filters: SearchFilters) => {
+    console.log(`🔧 Search filters changed:`, filters);
+    
+    // Update the AI difficulty filter to match search filters
+    if (filters.difficulty && filters.difficulty !== 'all') {
+      setSelectedDifficultyFilter(filters.difficulty);
+    } else {
+      setSelectedDifficultyFilter(null);
+    }
+    
+    // If zero accuracy filter is set, automatically select "impossible" difficulty
+    if (filters.zeroAccuracyOnly) {
+      setSelectedDifficultyFilter('impossible');
+    }
+  };
+
+  /**
    * Handle solution submission
    */
   const handleSubmitSolution = async () => {
@@ -671,6 +762,14 @@ export default function OfficerTrack() {
             <OfficerDifficultyCards 
               onCategorySelect={handleDifficultyFilterSelect}
               selectedCategory={selectedDifficultyFilter}
+            />
+
+            {/* Puzzle Search Component */}
+            <OfficerPuzzleSearch
+              onSearch={handlePuzzleSearch}
+              onRandomPuzzle={handleRandomPuzzle}
+              onFilterChange={handleSearchFilterChange}
+              isLoading={loading}
             />
             
             <Card className="bg-slate-800 border-amber-400">
