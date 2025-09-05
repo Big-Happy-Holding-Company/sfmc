@@ -38,7 +38,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { SPACE_EMOJIS } from "@/constants/spaceEmojis";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import { SPACE_EMOJIS, EMOJI_SET_INFO } from "@/constants/spaceEmojis";
+import type { EmojiSet } from "@/constants/spaceEmojis";
 
 // Officer Track specific styling constants
 const OFFICER_COLORS = {
@@ -65,7 +68,9 @@ export default function OfficerTrack() {
   const [validating, setValidating] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
-  const [selectedEmojiSet, setSelectedEmojiSet] = useState('tech_set1');
+  const [selectedEmojiSet, setSelectedEmojiSet] = useState<EmojiSet>('tech_set1');
+  const [selectedTestCase, setSelectedTestCase] = useState(0);
+  const [showNumbers, setShowNumbers] = useState(false);
 
   // Initialize Officer Track data
   useEffect(() => {
@@ -201,10 +206,77 @@ export default function OfficerTrack() {
   };
 
   /**
-   * Transform integer grid to emoji display
+   * Transform integer grid to emoji display or numbers
    */
   const transformGridForDisplay = (grid: number[][]): ARCDisplayGrid => {
+    if (showNumbers) {
+      return grid.map(row => row.map(cell => cell.toString()));
+    }
     return arcDataService.transformIntegersToEmojis(grid, selectedEmojiSet);
+  };
+
+  /**
+   * Strip ARC prefix from puzzle ID for clean display
+   */
+  const getCleanPuzzleId = (id: string): string => {
+    return id.replace(/^ARC-[A-Z0-9]+-/, '');
+  };
+
+  /**
+   * Get dataset badge info from puzzle ID
+   */
+  const getDatasetBadge = (puzzle: OfficerTrackPuzzle) => {
+    const dataset = puzzle.dataset;
+    const badgeMap = {
+      'training': { label: 'Training', className: 'bg-blue-600' },
+      'training2': { label: 'Training 2', className: 'bg-blue-700' },
+      'evaluation': { label: 'Evaluation', className: 'bg-green-600' },
+      'evaluation2': { label: 'Evaluation 2', className: 'bg-green-700' }
+    };
+    
+    return badgeMap[dataset] || { label: dataset.toUpperCase(), className: 'bg-gray-600' };
+  };
+
+  /**
+   * Calculate optimal grid layout for training examples
+   */
+  const calculateExampleLayout = (exampleCount: number, maxGridWidth: number) => {
+    // Determine columns based on example count and grid size
+    if (exampleCount <= 2) return 'grid-cols-1 lg:grid-cols-2';
+    if (exampleCount <= 4) return 'grid-cols-1 lg:grid-cols-2 xl:grid-cols-4';
+    if (exampleCount <= 6) return 'grid-cols-2 lg:grid-cols-3 xl:grid-cols-6';
+    // For 7-9 examples, use flexible layout
+    return 'grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5';
+  };
+
+  /**
+   * Handle test case selection for puzzles with multiple test cases
+   */
+  const handleTestCaseChange = (testIndex: number) => {
+    setSelectedTestCase(testIndex);
+    
+    // Reset solution grid to match new test case dimensions
+    if (currentPuzzle && currentPuzzle.test[testIndex]) {
+      const testCase = currentPuzzle.test[testIndex];
+      const emptyGrid = testCase.input.map(row => row.map(() => 0));
+      setPlayerSolution(emptyGrid);
+    }
+  };
+
+  /**
+   * Calculate optimal cell size based on grid dimensions
+   */
+  const calculateCellSize = (grid: number[][]) => {
+    const height = grid.length;
+    const width = grid[0]?.length || 0;
+    const maxDimension = Math.max(height, width);
+    
+    // Dynamic sizing based on grid dimensions
+    if (maxDimension <= 3) return { size: 'w-12 h-12', textSize: 'text-lg' };
+    if (maxDimension <= 5) return { size: 'w-10 h-10', textSize: 'text-base' };
+    if (maxDimension <= 8) return { size: 'w-8 h-8', textSize: 'text-sm' };
+    if (maxDimension <= 12) return { size: 'w-6 h-6', textSize: 'text-xs' };
+    return { size: 'w-4 h-4', textSize: 'text-xs' }; // Very large grids
   };
 
   /**
@@ -212,24 +284,28 @@ export default function OfficerTrack() {
    */
   const renderDisplayGrid = (grid: number[][], title: string): JSX.Element => {
     const emojiGrid = transformGridForDisplay(grid);
+    const { size, textSize } = calculateCellSize(grid);
     
     return (
       <div className="text-center">
         <div className="text-xs text-amber-300 mb-2 font-semibold">{title}</div>
         <div 
-          className="grid gap-1 bg-slate-800 p-3 rounded border border-amber-600"
+          className="grid gap-1 bg-slate-800 p-2 rounded border border-amber-600"
           style={{ gridTemplateColumns: `repeat(${grid[0]?.length || 1}, 1fr)` }}
         >
           {emojiGrid.map((row, rowIndex) =>
             row.map((cell, colIndex) => (
               <div
                 key={`${rowIndex}-${colIndex}`}
-                className="w-8 h-8 flex items-center justify-center bg-slate-700 rounded text-sm border border-amber-800"
+                className={`${size} flex items-center justify-center bg-slate-700 rounded ${textSize} border border-amber-800`}
               >
                 {cell}
               </div>
             ))
           )}
+        </div>
+        <div className="text-xs text-amber-600 mt-1">
+          {grid.length}×{grid[0]?.length || 0}
         </div>
       </div>
     );
@@ -241,21 +317,24 @@ export default function OfficerTrack() {
   const renderSolutionGrid = (): JSX.Element => {
     if (!currentPuzzle) return <div></div>;
     
-    const testCase = currentPuzzle.test[0];
+    const testCase = currentPuzzle.test[selectedTestCase];
     if (!testCase) return <div></div>;
+    
+    const { size, textSize } = calculateCellSize(playerSolution);
+    const solutionDisplay = transformGridForDisplay(playerSolution);
     
     return (
       <div className="text-center">
         <div className="text-xs text-amber-300 mb-2 font-semibold">YOUR SOLUTION</div>
         <div 
-          className="grid gap-1 bg-slate-800 p-3 rounded border-2 border-amber-400"
+          className="grid gap-1 bg-slate-800 p-2 rounded border-2 border-amber-400"
           style={{ gridTemplateColumns: `repeat(${playerSolution[0]?.length || 1}, 1fr)` }}
         >
-          {playerSolution.map((row, rowIndex) =>
+          {solutionDisplay.map((row, rowIndex) =>
             row.map((cell, colIndex) => (
               <button
                 key={`${rowIndex}-${colIndex}`}
-                className="w-10 h-10 flex items-center justify-center bg-slate-700 hover:bg-slate-600 rounded text-lg border border-amber-700 transition-colors"
+                className={`${size} flex items-center justify-center bg-slate-700 hover:bg-slate-600 rounded ${textSize} border border-amber-700 transition-colors hover:scale-105 active:scale-95`}
                 onClick={() => {
                   // Cycle through available integers 0-9
                   const newGrid = [...playerSolution];
@@ -263,14 +342,16 @@ export default function OfficerTrack() {
                   setPlayerSolution(newGrid);
                 }}
                 disabled={validating}
+                title={`Cell (${rowIndex}, ${colIndex}): ${playerSolution[rowIndex][colIndex]}`}
               >
-                {SPACE_EMOJIS[selectedEmojiSet as keyof typeof SPACE_EMOJIS][cell]}
+                {cell}
               </button>
             ))
           )}
         </div>
-        <div className="text-xs text-amber-600 mt-2">
-          Click cells to cycle through values (0-9)
+        <div className="text-xs text-amber-600 mt-2 space-y-1">
+          <div>Click cells to cycle through values (0-9)</div>
+          <div>{playerSolution.length}×{playerSolution[0]?.length || 0}</div>
         </div>
       </div>
     );
@@ -443,7 +524,10 @@ export default function OfficerTrack() {
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle className="text-amber-400 flex items-center space-x-3">
-                      <span>🎯 MISSION: {currentPuzzle.id}</span>
+                      <span>🎯 MISSION: {getCleanPuzzleId(currentPuzzle.id)}</span>
+                      <Badge className={getDatasetBadge(currentPuzzle).className}>
+                        {getDatasetBadge(currentPuzzle).label}
+                      </Badge>
                       <Badge className={`
                         ${currentPuzzle.difficulty === 'LIEUTENANT' ? 'bg-green-600' : ''}
                         ${currentPuzzle.difficulty === 'CAPTAIN' ? 'bg-blue-600' : ''}
@@ -471,23 +555,75 @@ export default function OfficerTrack() {
               </CardHeader>
               
               <CardContent className="space-y-6">
+                {/* Emoji Set and Display Controls */}
+                <div className="bg-slate-900 border border-amber-800 rounded-lg p-4">
+                  <div className="flex flex-wrap items-center gap-4">
+                    <div className="flex items-center space-x-2">
+                      <Label htmlFor="emojiSet" className="text-amber-300 text-sm font-medium">
+                        🎨 Display Style:
+                      </Label>
+                      <Select 
+                        value={selectedEmojiSet} 
+                        onValueChange={(value) => setSelectedEmojiSet(value as EmojiSet)}
+                      >
+                        <SelectTrigger id="emojiSet" className="w-48 bg-slate-700 border-amber-700">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(EMOJI_SET_INFO).map(([key, info]) => (
+                            <SelectItem key={key} value={key}>
+                              {info.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div className="flex items-center space-x-3">
+                      <Button
+                        variant={showNumbers ? "outline" : "default"}
+                        size="sm"
+                        onClick={() => setShowNumbers(false)}
+                        className={showNumbers ? "border-amber-600 text-amber-400" : "bg-amber-600 text-slate-900"}
+                      >
+                        🎭 Emojis
+                      </Button>
+                      <Button
+                        variant={showNumbers ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setShowNumbers(true)}
+                        className={showNumbers ? "bg-amber-600 text-slate-900" : "border-amber-600 text-amber-400"}
+                      >
+                        🔢 Numbers
+                      </Button>
+                    </div>
+                    
+                    {!showNumbers && (
+                      <div className="text-xs text-amber-500">
+                        <strong>{EMOJI_SET_INFO[selectedEmojiSet].name}:</strong> {EMOJI_SET_INFO[selectedEmojiSet].description}
+                      </div>
+                    )}
+                  </div>
+                </div>
                 {/* Training Examples */}
                 <div>
                   <h3 className="text-amber-300 font-semibold mb-3 flex items-center">
                     📚 TRAINING EXAMPLES - Study These Patterns
                   </h3>
                   
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className={`grid gap-4 ${calculateExampleLayout(currentPuzzle.train.length, Math.max(...currentPuzzle.train.map(ex => ex.input[0]?.length || 0)))}`}>
                     {currentPuzzle.train.map((example, index) => (
-                      <Card key={index} className="bg-slate-700 border-amber-700">
-                        <CardContent className="p-4">
-                          <div className="text-amber-400 text-sm font-semibold mb-3">
-                            Example {index + 1}
+                      <Card key={index} className="bg-slate-700 border-amber-700 hover:border-amber-500 transition-colors">
+                        <CardContent className="p-3">
+                          <div className="text-amber-400 text-xs font-semibold mb-2 text-center">
+                            Example {index + 1} of {currentPuzzle.train.length}
                           </div>
-                          <div className="flex items-center justify-center space-x-6">
-                            {renderDisplayGrid(example.input, "INPUT")}
-                            <div className="text-amber-400 text-2xl">→</div>
-                            {renderDisplayGrid(example.output, "OUTPUT")}
+                          <div className="flex flex-col items-center space-y-3">
+                            <div className="flex items-center justify-center space-x-3">
+                              {renderDisplayGrid(example.input, "INPUT")}
+                              <div className="text-amber-400 text-xl flex-shrink-0">→</div>
+                              {renderDisplayGrid(example.output, "OUTPUT")}
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
@@ -499,16 +635,46 @@ export default function OfficerTrack() {
                 
                 {/* Test Challenge */}
                 <div>
-                  <h3 className="text-amber-300 font-semibold mb-3 flex items-center">
-                    🎯 YOUR CHALLENGE - Apply the Pattern
-                  </h3>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-amber-300 font-semibold flex items-center">
+                      🎯 YOUR CHALLENGE - Apply the Pattern
+                    </h3>
+                    {currentPuzzle.test.length > 1 && (
+                      <div className="text-amber-400 text-sm">
+                        {currentPuzzle.test.length} test cases available
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Test Case Tabs (if multiple test cases) */}
+                  {currentPuzzle.test.length > 1 && (
+                    <div className="flex space-x-2 mb-4">
+                      {currentPuzzle.test.map((_, index) => (
+                        <Button
+                          key={index}
+                          variant={selectedTestCase === index ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => handleTestCaseChange(index)}
+                          className={
+                            selectedTestCase === index 
+                              ? "bg-amber-600 text-slate-900" 
+                              : "border-amber-600 text-amber-400 hover:bg-amber-600 hover:text-slate-900"
+                          }
+                        >
+                          Test Case {index + 1}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
                   
                   <Card className="bg-slate-700 border-amber-400">
                     <CardContent className="p-6">
-                      <div className="flex items-center justify-center space-x-8 mb-6">
-                        {renderDisplayGrid(currentPuzzle.test[0].input, "TEST INPUT")}
-                        <div className="text-amber-400 text-3xl">→</div>
-                        {renderSolutionGrid()}
+                      <div className="flex flex-col lg:flex-row items-center justify-center gap-6 mb-6">
+                        <div className="flex items-center space-x-6">
+                          {renderDisplayGrid(currentPuzzle.test[selectedTestCase].input, "TEST INPUT")}
+                          <div className="text-amber-400 text-3xl">→</div>
+                          {renderSolutionGrid()}
+                        </div>
                       </div>
                       
                       <div className="flex justify-center space-x-4">
@@ -523,8 +689,8 @@ export default function OfficerTrack() {
                         <Button
                           variant="outline"
                           onClick={() => {
-                            // Reset solution to empty
-                            const testCase = currentPuzzle.test[0];
+                            // Reset solution to empty using current test case
+                            const testCase = currentPuzzle.test[selectedTestCase];
                             if (testCase) {
                               const emptyGrid = testCase.input.map(row => row.map(() => 0));
                               setPlayerSolution(emptyGrid);
