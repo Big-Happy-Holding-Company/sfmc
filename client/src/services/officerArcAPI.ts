@@ -317,13 +317,20 @@ export async function loadPuzzleFromPlayFab(playFabId: string): Promise<any | nu
           
           if (puzzleDataStr && puzzleDataStr !== "undefined") {
             const puzzleArray = JSON.parse(puzzleDataStr);
+            console.log(`🔍 Checking batch ${datasetKey} with ${puzzleArray.length} puzzles for: ${playFabId}`);
             
-            // Find the specific puzzle by PlayFab ID
+            // Find the specific puzzle by PlayFab ID (this was working before)
             const puzzle = puzzleArray.find((p: any) => p.id === playFabId);
             
             if (puzzle) {
               console.log(`✅ Found puzzle in batch ${datasetKey}: ${playFabId}`);
               return puzzle;
+            } else {
+              console.log(`❌ Puzzle ${playFabId} not found in batch ${datasetKey}`);
+              // Show a sample of what IDs are actually in this batch
+              if (puzzleArray.length > 0) {
+                console.log(`🔍 Sample IDs in this batch:`, puzzleArray.slice(0, 3).map((p: any) => p.id));
+              }
             }
           }
         }

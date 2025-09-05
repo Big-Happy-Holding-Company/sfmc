@@ -198,7 +198,7 @@ export default function OfficerTrackSimple() {
                 <p className="text-red-300 text-sm mt-1">{error}</p>
               </div>
               <Button 
-                onClick={refresh} 
+                onClick={() => refresh()} 
                 variant="outline" 
                 size="sm" 
                 className="ml-auto border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
