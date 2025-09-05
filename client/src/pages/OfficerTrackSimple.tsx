@@ -21,12 +21,15 @@ export default function OfficerTrackSimple() {
   const { 
     filteredPuzzles, 
     stats, 
+    total,
     loading, 
     error, 
     filterByDifficulty, 
     searchById,
     currentFilter,
-    refresh 
+    currentLimit,
+    refresh,
+    setLimit 
   } = useOfficerPuzzles();
   
   const [currentPuzzle, setCurrentPuzzle] = useState<OfficerTrackPuzzle | null>(null);
@@ -198,15 +201,17 @@ export default function OfficerTrackSimple() {
           </div>
         )}
 
-        {/* Puzzle Search */}
+        {/* Puzzle Search & Controls */}
         <div className="bg-slate-800 border border-slate-600 rounded-lg p-6 mb-6">
           <h2 className="text-amber-400 font-semibold mb-4 flex items-center">
-            🔍 PUZZLE SEARCH
+            🔍 PUZZLE SEARCH & FILTERS
           </h2>
-          <div className="flex space-x-3">
+          
+          {/* Search Row */}
+          <div className="flex space-x-3 mb-4">
             <Input
               type="text"
-              placeholder="Enter puzzle ID (e.g., 007bbfb7)"
+              placeholder="Enter puzzle ID (e.g., 494ef9d7)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -220,8 +225,37 @@ export default function OfficerTrackSimple() {
               {searching ? 'Searching...' : 'Find Puzzle'}
             </Button>
           </div>
-          <p className="text-slate-400 text-xs mt-2">
-            Search for specific puzzles by their ID (supports both arc and PlayFab formats)
+
+          {/* Limit Controls - copied from arc-explainer */}
+          <div className="border-t border-slate-600 pt-4">
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <label htmlFor="limit-select" className="text-sm font-medium text-amber-300">
+                  Show hardest:
+                </label>
+                <select
+                  id="limit-select"
+                  value={currentLimit}
+                  onChange={(e) => setLimit(parseInt(e.target.value))}
+                  className="px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-sm text-amber-100"
+                >
+                  <option value={25}>25 puzzles</option>
+                  <option value={50}>50 puzzles</option>
+                  <option value={75}>75 puzzles</option>
+                  <option value={100}>100 puzzles</option>
+                  <option value={150}>150 puzzles</option>
+                  <option value={200}>200 puzzles</option>
+                </select>
+              </div>
+              
+              <div className="text-slate-400 text-sm">
+                Showing {filteredPuzzles.length} of {total} total analyzed puzzles
+              </div>
+            </div>
+          </div>
+
+          <p className="text-slate-400 text-xs mt-3">
+            Search for specific puzzles by their ID or adjust the number of hardest puzzles to display
           </p>
         </div>
 

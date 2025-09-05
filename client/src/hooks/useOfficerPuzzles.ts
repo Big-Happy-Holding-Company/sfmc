@@ -20,6 +20,7 @@ export interface UseOfficerPuzzlesReturn {
   puzzles: OfficerPuzzle[];
   stats: DifficultyStats;
   filteredPuzzles: OfficerPuzzle[];
+  total: number; // Total puzzles in database
   
   // State
   loading: boolean;
@@ -28,10 +29,12 @@ export interface UseOfficerPuzzlesReturn {
   // Actions
   filterByDifficulty: (difficulty: 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging' | null) => void;
   searchById: (id: string) => Promise<OfficerPuzzle | null>;
-  refresh: () => Promise<void>;
+  refresh: (limit?: number) => Promise<void>;
+  setLimit: (limit: number) => void;
   
   // Current filter state
   currentFilter: string | null;
+  currentLimit: number;
 }
 
 export function useOfficerPuzzles(): UseOfficerPuzzlesReturn {
@@ -44,29 +47,42 @@ export function useOfficerPuzzles(): UseOfficerPuzzlesReturn {
     total: 0
   });
   const [filteredPuzzles, setFilteredPuzzles] = useState<OfficerPuzzle[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentFilter, setCurrentFilter] = useState<string | null>(null);
+  const [currentLimit, setCurrentLimit] = useState(50);
 
   // Load initial data
-  const loadData = async () => {
+  const loadData = async (limit: number = currentLimit) => {
     try {
       setLoading(true);
       setError(null);
       
-      console.log('🔄 Loading officer puzzles...');
+      console.log(`🔄 Loading officer puzzles (limit: ${limit})...`);
       
-      // Load puzzles and stats in parallel
-      const [puzzleData, statsData] = await Promise.all([
-        getOfficerPuzzles(),
-        getDifficultyStats()
-      ]);
+      // Load puzzles with limit
+      const puzzleResponse = await getOfficerPuzzles(limit);
       
-      setPuzzles(puzzleData);
+      // Calculate stats from loaded puzzles
+      const statsData: DifficultyStats = {
+        impossible: 0,
+        extremely_hard: 0,
+        very_hard: 0,
+        challenging: 0,
+        total: puzzleResponse.total // Use real total from API
+      };
+      
+      puzzleResponse.puzzles.forEach(puzzle => {
+        statsData[puzzle.difficulty]++;
+      });
+      
+      setPuzzles(puzzleResponse.puzzles);
+      setTotal(puzzleResponse.total);
       setStats(statsData);
-      setFilteredPuzzles(puzzleData); // Show all by default
+      setFilteredPuzzles(puzzleResponse.puzzles); // Show all by default
       
-      console.log(`✅ Loaded ${puzzleData.length} puzzles`);
+      console.log(`✅ Loaded ${puzzleResponse.puzzles.length} puzzles out of ${puzzleResponse.total} total analyzed`);
       console.log('📊 Stats:', statsData);
       
     } catch (err) {
@@ -111,17 +127,24 @@ export function useOfficerPuzzles(): UseOfficerPuzzlesReturn {
   };
 
   // Refresh data
-  const refresh = async () => {
-    await loadData();
+  const refresh = async (limit?: number) => {
+    const newLimit = limit || currentLimit;
+    await loadData(newLimit);
     // Reapply current filter if any
     if (currentFilter) {
       filterByDifficulty(currentFilter as any);
     }
   };
 
-  // Load data on mount
+  // Set new limit and reload data
+  const setLimit = (limit: number) => {
+    setCurrentLimit(limit);
+    loadData(limit);
+  };
+
+  // Load data on mount and when limit changes
   useEffect(() => {
-    loadData();
+    loadData(currentLimit);
   }, []);
 
   return {
@@ -129,6 +152,7 @@ export function useOfficerPuzzles(): UseOfficerPuzzlesReturn {
     puzzles,
     stats,
     filteredPuzzles,
+    total,
     
     // State
     loading,
@@ -138,8 +162,10 @@ export function useOfficerPuzzles(): UseOfficerPuzzlesReturn {
     filterByDifficulty,
     searchById,
     refresh,
+    setLimit,
     
-    // Current filter
-    currentFilter
+    // Current state
+    currentFilter,
+    currentLimit
   };
 }

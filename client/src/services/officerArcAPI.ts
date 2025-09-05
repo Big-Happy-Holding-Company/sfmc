@@ -22,6 +22,11 @@ export interface DifficultyStats {
   total: number;
 }
 
+export interface OfficerPuzzleResponse {
+  puzzles: OfficerPuzzle[];
+  total: number; // Total in database, not just loaded
+}
+
 // Simple cache - 5 minute TTL
 const cache = new Map<string, { data: any; timestamp: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -114,32 +119,40 @@ export function categorizeDifficulty(accuracy: number): 'impossible' | 'extremel
 }
 
 /**
- * Get worst performing puzzles (our primary data source)
+ * Get worst performing puzzles with total count (our primary data source)
  */
-export async function getOfficerPuzzles(): Promise<OfficerPuzzle[]> {
-  const cacheKey = 'officer-puzzles';
+export async function getOfficerPuzzles(limit: number = 50): Promise<OfficerPuzzleResponse> {
+  const cacheKey = `officer-puzzles-${limit}`;
   
   if (isCached(cacheKey)) {
-    return getFromCache<OfficerPuzzle[]>(cacheKey);
+    return getFromCache<OfficerPuzzleResponse>(cacheKey);
   }
 
   try {
-    console.log('🔄 Fetching puzzles from arc-explainer API...');
+    console.log(`🔄 Fetching ${limit} puzzles from arc-explainer API...`);
     
-    const data = await makeAPICall('/api/puzzle/worst-performing');
+    // Add limit parameter like arc-explainer does
+    const data = await makeAPICall(`/api/puzzle/worst-performing?limit=${limit}&sortBy=composite`);
     
-    // Handle different response formats (as noted in API guide)
+    // Extract puzzles and total following arc-explainer pattern
     let rawPuzzles: any[] = [];
+    let total = 0;
     
-    if (Array.isArray(data)) {
-      rawPuzzles = data;
-    } else if (data.success && data.data?.puzzles) {
+    if (data.success && data.data?.puzzles) {
+      // Arc-explainer format: { success: true, data: { puzzles: [...], total: number } }
       rawPuzzles = data.data.puzzles;
+      total = data.data.total || 0;
+    } else if (Array.isArray(data)) {
+      // Fallback: direct array
+      rawPuzzles = data;
+      total = data.length;
     } else if (data.data && Array.isArray(data.data)) {
+      // Fallback: data is array
       rawPuzzles = data.data;
+      total = data.data.length;
     } else {
       console.warn('Unexpected API response structure:', data);
-      return [];
+      return { puzzles: [], total: 0 };
     }
 
     // Transform to our simplified format
@@ -157,10 +170,11 @@ export async function getOfficerPuzzles(): Promise<OfficerPuzzle[]> {
       };
     }).filter(p => p.id); // Remove any without valid IDs
 
-    setCache(cacheKey, puzzles);
-    console.log(`✅ Loaded ${puzzles.length} officer puzzles`);
+    const result: OfficerPuzzleResponse = { puzzles, total };
+    setCache(cacheKey, result);
+    console.log(`✅ Loaded ${puzzles.length} puzzles out of ${total} total analyzed`);
     
-    return puzzles;
+    return result;
     
   } catch (error) {
     console.error('❌ Failed to fetch officer puzzles:', error);
@@ -172,17 +186,17 @@ export async function getOfficerPuzzles(): Promise<OfficerPuzzle[]> {
  * Get difficulty statistics
  */
 export async function getDifficultyStats(): Promise<DifficultyStats> {
-  const puzzles = await getOfficerPuzzles();
+  const response = await getOfficerPuzzles(200); // Get larger sample for better stats
   
   const stats: DifficultyStats = {
     impossible: 0,
     extremely_hard: 0,
     very_hard: 0,
     challenging: 0,
-    total: puzzles.length
+    total: response.total // Use real database total
   };
   
-  puzzles.forEach(puzzle => {
+  response.puzzles.forEach(puzzle => {
     stats[puzzle.difficulty]++;
   });
   
@@ -193,23 +207,75 @@ export async function getDifficultyStats(): Promise<DifficultyStats> {
  * Filter puzzles by difficulty
  */
 export async function getPuzzlesByDifficulty(difficulty: 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging'): Promise<OfficerPuzzle[]> {
-  const allPuzzles = await getOfficerPuzzles();
-  return allPuzzles.filter(p => p.difficulty === difficulty);
+  const response = await getOfficerPuzzles(200);
+  return response.puzzles.filter(p => p.difficulty === difficulty);
 }
 
 /**
- * Search for puzzle by ID (supports both arc and PlayFab formats)
+ * Search for specific puzzle by ID using arc-explainer task endpoint
+ * This searches the full database, not just loaded puzzles
  */
 export async function searchPuzzleById(searchId: string): Promise<OfficerPuzzle | null> {
-  const allPuzzles = await getOfficerPuzzles();
-  
+  try {
+    const cleanId = searchId.trim().toLowerCase().replace(/^arc-[a-z0-9]+-/, '');
+    console.log(`🔍 Searching for puzzle: ${searchId} (cleaned: ${cleanId})`);
+    
+    // Use arc-explainer's specific puzzle endpoint
+    const data = await makeAPICall(`/api/puzzle/task/${cleanId}`);
+    
+    if (data.success && data.data) {
+      // Get performance data for this specific puzzle
+      const taskData = data.data;
+      
+      // Try to get performance data from worst-performing (might not be there)
+      let performanceData = null;
+      try {
+        const perfResponse = await getOfficerPuzzles(200); // Get larger set to find performance data
+        const foundWithPerf = perfResponse.puzzles.find(p => p.id === cleanId);
+        if (foundWithPerf) {
+          performanceData = {
+            avgAccuracy: foundWithPerf.avgAccuracy,
+            totalExplanations: foundWithPerf.totalExplanations,
+            compositeScore: foundWithPerf.compositeScore
+          };
+        }
+      } catch (err) {
+        console.warn('Could not get performance data for puzzle:', cleanId);
+      }
+      
+      // Create puzzle object with available data
+      const puzzle: OfficerPuzzle = {
+        id: cleanId,
+        playFabId: arcIdToPlayFab(cleanId),
+        avgAccuracy: performanceData?.avgAccuracy || 0,
+        difficulty: categorizeDifficulty(performanceData?.avgAccuracy || 0),
+        totalExplanations: performanceData?.totalExplanations || 0,
+        compositeScore: performanceData?.compositeScore || 0
+      };
+      
+      console.log(`✅ Found puzzle ${cleanId} with performance data:`, performanceData);
+      return puzzle;
+    }
+    
+    return null;
+    
+  } catch (error) {
+    console.error(`❌ Failed to search for puzzle ${searchId}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Legacy search within loaded puzzles (for backward compatibility)
+ */
+export async function searchWithinLoadedPuzzles(searchId: string, puzzles: OfficerPuzzle[]): Promise<OfficerPuzzle | null> {
   // Try exact match first
-  let found = allPuzzles.find(p => p.id === searchId || p.playFabId === searchId);
+  let found = puzzles.find(p => p.id === searchId || p.playFabId === searchId);
   
   // If not found, try partial match
   if (!found) {
     const cleanSearch = searchId.toLowerCase().replace(/^arc-[a-z0-9]+-/, '');
-    found = allPuzzles.find(p => p.id.toLowerCase().includes(cleanSearch));
+    found = puzzles.find(p => p.id.toLowerCase().includes(cleanSearch));
   }
   
   return found || null;
