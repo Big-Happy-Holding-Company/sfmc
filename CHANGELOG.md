@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## Recent Commits (Latest First)
 
+**2025-09-05**: CORS Configuration Required for ARC Explainer API - Railway Service Fix Needed
+- **PROBLEM**: Production SFMC app (`https://sfmc.bhhc.us`) blocked by CORS when calling ARC explainer API
+- **ERROR**: "Access-Control-Allow-Origin header is present on the requested resource" from `https://arc-explainer-production.up.railway.app`  
+- **ROOT CAUSE**: ARC explainer server lacks CORS middleware to whitelist production domain
+- **SOLUTION REQUIRED**: Configure Express.js CORS middleware in ARC explainer project with origin whitelist
+- **DOMAINS TO WHITELIST**: `https://sfmc.bhhc.us`, `http://localhost:3000`, `http://localhost:5000`
+- **IMPLEMENTATION**: Add cors npm package with origin function checking allowedOrigins array
+- **ENVIRONMENT VARIABLE**: Use ALLOWED_ORIGINS env var for security: `ALLOWED_ORIGINS=http://localhost:3000,https://sfmc.bhhc.us`
+- **IMPACT**: Officer Track cannot load AI performance data for puzzle difficulty ratings until fixed
+- **HOW TO TEST**: After deployment, Officer Track should show AI accuracy percentages and difficulty stats
+- **NO FALLBACKS ALLOWED**: Must properly configure CORS, not disable or work around it
+
 **2025-09-04**: Officer Academy infinite loading and PlayFab data parsing fixes - Cascade
 - **INFINITE RECURSION FIX**: Fixed updateOfficerPlayerData() infinite loop causing GetUserData spam
 - **ROOT CAUSE**: createNewOfficerProfile() → updateOfficerPlayerData() → getOfficerPlayerData() → createNewOfficerProfile() recursion
