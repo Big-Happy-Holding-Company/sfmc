@@ -13,6 +13,20 @@
 import { useState, useEffect, useMemo } from 'react';
 import { SPACE_EMOJIS } from "@/constants/spaceEmojis";
 
+const TRAINER_IMAGES = [
+  '/Trainer1.PNG',
+  '/Trainer2.png',
+  '/Trainer3.png',
+  '/captain-divyapriya.PNG',
+  '/captain-iki.png',
+  '/col-kim.png',
+  '/ltcol-Luz.png',
+  '/master-chief-wyatt.png',
+  '/masterchief-yasemin.png',
+  '/Cadet-Yvonne.PNG',
+  '/Cadet-fatma.png'
+];
+
 interface LoadingSplashProps {
   onComplete: () => void;
   duration?: number; // Duration in ms (default 1000)
@@ -22,6 +36,7 @@ export function LoadingSplash({ onComplete, duration = 1000 }: LoadingSplashProp
   const [progress, setProgress] = useState(0);
   const [emojiRow, setEmojiRow] = useState<string[]>([]);
   const [isExiting, setIsExiting] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   // Memoize the combined emojis to prevent recreation on each render
   const combinedEmojis = useMemo(() => [
@@ -56,14 +71,17 @@ export function LoadingSplash({ onComplete, duration = 1000 }: LoadingSplashProp
       }
     }, intervalTime);
     
-    // Simple emoji rotation
+    // Faster emoji rotation and image cycling for 1-second total duration
     const emojiInterval = setInterval(() => {
       setEmojiRow(prev => {
         if (prev.length === 0) return prev;
         const [first, ...rest] = prev;
         return [...rest, first];
       });
-    }, 100);
+      
+      // Cycle to next image every 100ms to show all images within 1 second
+      setCurrentImageIndex(prev => (prev + 1) % TRAINER_IMAGES.length);
+    }, 100); // Change image every 100ms
 
     return () => {
       clearInterval(progressInterval);
@@ -78,9 +96,10 @@ export function LoadingSplash({ onComplete, duration = 1000 }: LoadingSplashProp
     >
       <div className="relative w-11/12 sm:w-4/5 max-w-md mx-auto mb-6 sm:mb-8">
         <img 
-          src="/master-chief-wyatt.png" 
-          alt="Master Chief Wyatt" 
-          className="w-full h-auto object-contain max-h-[40vh] sm:max-h-[50vh]"
+          src={TRAINER_IMAGES[currentImageIndex]} 
+          alt="Space Force Trainer" 
+          className="w-full h-auto object-contain max-h-[40vh] sm:max-h-[50vh] transition-opacity duration-75"
+          key={currentImageIndex}
         />
         <div className="absolute -bottom-3 sm:-bottom-4 left-0 right-0 text-center">
           <span className="bg-black px-3 py-1 rounded-full text-amber-400 font-mono text-xs sm:text-sm">
