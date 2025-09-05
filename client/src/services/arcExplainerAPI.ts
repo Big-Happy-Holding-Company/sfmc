@@ -48,10 +48,9 @@ export class ArcExplainerAPI {
   private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   private constructor() {
-    // TODO: Configure your arc-explainer server URL
     console.log('🔧 VITE_ARC_EXPLAINER_URL env var:', process.env.VITE_ARC_EXPLAINER_URL);
     console.log('🔧 All VITE env vars:', Object.keys(process.env).filter(k => k.startsWith('VITE_')));
-    this.baseURL = process.env.VITE_ARC_EXPLAINER_URL || 'http://localhost:3001';
+    this.baseURL = process.env.VITE_ARC_EXPLAINER_URL || 'https://arc-explainer-production.up.railway.app';
     console.log('🌐 ArcExplainerAPI baseURL set to:', this.baseURL);
   }
 
