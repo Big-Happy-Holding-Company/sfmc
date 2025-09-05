@@ -186,6 +186,25 @@ The Officer Track with AI-curated difficulty requires:
 - **arc-explainer API**: External service providing AI performance analytics
 - **Environment**: `VITE_ARC_EXPLAINER_URL` must point to your arc-explainer instance
 
+#### Arc-Explainer API Integration
+The Officer Track uses the arc-explainer API for AI difficulty analysis:
+
+**Key Endpoint**: `/api/puzzle/worst-performing`
+- **Parameters**: `limit` (max 50), `sortBy`, `minAccuracy`, `maxAccuracy`, `zeroAccuracyOnly`
+- **Response**: Puzzle performance data with `avgAccuracy`, `compositeScore`, etc.
+- **ID Format**: Uses raw puzzle IDs (e.g., `007bbfb7`) vs PlayFab format (`ARC-TR-007bbfb7`)
+
+**Data Flow**:
+1. PlayFab stores puzzle content (authoritative source)
+2. Arc-explainer provides AI performance metadata  
+3. ID conversion: `ARC-TR-007bbfb7` ↔ `007bbfb7`
+4. Merged data enables difficulty-based filtering
+
+**Available Filters**:
+- `zeroAccuracyOnly=true` - Puzzles with 0% AI success rate (impossible category)
+- `minAccuracy`/`maxAccuracy` - Accuracy range filtering
+- `sortBy=composite` - Sort by composite difficulty score
+
 ### Documentation
 
 📚 **See [docs/](./docs/)** for comprehensive documentation:

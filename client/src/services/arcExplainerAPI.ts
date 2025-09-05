@@ -196,10 +196,83 @@ export class ArcExplainerAPI {
    * Convert PlayFab puzzle ID format to ARC Explainer format
    * ARC-TR-007bbfb7 → 007bbfb7
    * ARC-EV-1ae2feb7 → 1ae2feb7
+   * ARC-TR2-123abc45 → 123abc45
+   * ARC-EV2-def67890 → def67890
    */
   public convertPlayFabIdToArcId(playFabId: string): string {
+    if (!playFabId || typeof playFabId !== 'string') {
+      console.warn('convertPlayFabIdToArcId: Invalid input:', playFabId);
+      return playFabId || '';
+    }
+    
     // Remove ARC-TR-, ARC-EV-, ARC-TR2-, ARC-EV2- prefixes
-    return playFabId.replace(/^ARC-[A-Z0-9]+-/, '');
+    const converted = playFabId.replace(/^ARC-[A-Z0-9]+-/, '');
+    
+    // Validation: ensure we got a reasonable result
+    if (converted === playFabId) {
+      console.debug('convertPlayFabIdToArcId: No prefix found, using ID as-is:', playFabId);
+    }
+    
+    return converted;
+  }
+
+  /**
+   * Convert ARC Explainer ID format to PlayFab format
+   * 007bbfb7 → ARC-TR-007bbfb7 (assumes training dataset by default)
+   * Note: Cannot definitively determine dataset without additional context
+   */
+  public convertArcIdToPlayFabId(arcId: string, dataset: 'training' | 'evaluation' | 'training2' | 'evaluation2' = 'training'): string {
+    if (!arcId || typeof arcId !== 'string') {
+      console.warn('convertArcIdToPlayFabId: Invalid input:', arcId);
+      return arcId || '';
+    }
+
+    // If already has ARC prefix, return as-is
+    if (arcId.startsWith('ARC-')) {
+      return arcId;
+    }
+
+    // Map dataset to prefix
+    const prefixMap = {
+      'training': 'ARC-TR-',
+      'evaluation': 'ARC-EV-', 
+      'training2': 'ARC-TR2-',
+      'evaluation2': 'ARC-EV2-'
+    };
+
+    return prefixMap[dataset] + arcId;
+  }
+
+  /**
+   * Validate puzzle ID format (both PlayFab and ARC formats)
+   */
+  public validatePuzzleId(puzzleId: string): { valid: boolean, format: 'playfab' | 'arc' | 'unknown', dataset?: string } {
+    if (!puzzleId || typeof puzzleId !== 'string') {
+      return { valid: false, format: 'unknown' };
+    }
+
+    // Check PlayFab format: ARC-XX-xxxxxxxx or ARC-XX2-xxxxxxxx
+    const playfabMatch = puzzleId.match(/^ARC-(TR|EV|TR2|EV2)-([a-f0-9]{8})$/);
+    if (playfabMatch) {
+      const datasetMap = {
+        'TR': 'training',
+        'EV': 'evaluation', 
+        'TR2': 'training2',
+        'EV2': 'evaluation2'
+      };
+      return { 
+        valid: true, 
+        format: 'playfab', 
+        dataset: datasetMap[playfabMatch[1] as keyof typeof datasetMap] 
+      };
+    }
+
+    // Check ARC format: xxxxxxxx (8 hex characters)
+    if (puzzleId.match(/^[a-f0-9]{8}$/)) {
+      return { valid: true, format: 'arc' };
+    }
+
+    return { valid: false, format: 'unknown' };
   }
 
   /**
