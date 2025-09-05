@@ -227,19 +227,27 @@ export async function searchPuzzleById(searchId: string): Promise<OfficerPuzzle 
     
     if (data.success && data.data) {
       console.log(`✅ Puzzle found in arc-explainer database: ${cleanId}`);
+      console.log(`📊 Full API response data:`, data.data);
       
-      // Create puzzle object - performance data will be 0 if not available
-      // This is better than failing the whole search
+      // Extract performance data from the arc-explainer response
+      const puzzleData = data.data;
+      const performanceData = puzzleData.performanceData || {};
+      
+      // Calculate accuracy and other metrics from the rich data
+      const avgAccuracy = performanceData.avgAccuracy || 0;
+      const totalExplanations = performanceData.totalExplanations || 0;
+      const compositeScore = performanceData.compositeScore || 0;
+      
       const puzzle: OfficerPuzzle = {
         id: cleanId,
         playFabId: arcIdToPlayFab(cleanId),
-        avgAccuracy: 0, // Will show as "impossible" difficulty
-        difficulty: 'impossible', // Safe default for puzzles without performance data
-        totalExplanations: 0,
-        compositeScore: 0
+        avgAccuracy,
+        difficulty: categorizeDifficulty(avgAccuracy),
+        totalExplanations,
+        compositeScore
       };
       
-      console.log(`✅ Created puzzle object for ${cleanId}:`, puzzle);
+      console.log(`✅ Created puzzle object with real data for ${cleanId}:`, puzzle);
       return puzzle;
     } else {
       console.warn(`❌ Puzzle not found or invalid response for ${cleanId}:`, data);
@@ -280,21 +288,21 @@ export async function loadPuzzleFromPlayFab(playFabId: string): Promise<any | nu
     // Import PlayFab core dynamically to avoid circular dependencies
     const { playFabCore } = await import('@/services/playfab/core');
     
-    // DEBUGGING: Search ALL datasets since we're not sure which one contains the puzzle
-    // This is inefficient but will help us find where the puzzle actually is
-    const allBatchKeys = [
-      // Training dataset - 4 batches
-      ...Array.from({length: 4}, (_, i) => `officer-tasks-training-batch${i + 1}.json`),
-      // Training2 dataset - 10 batches  
-      ...Array.from({length: 10}, (_, i) => `officer-tasks-training2-batch${i + 1}.json`),
+    // Determine which batches to search based on PlayFab ID prefix
+    let batchKeys: string[];
+    if (playFabId.startsWith('ARC-TR2-')) {
+      // Training2 dataset - 10 batches
+      batchKeys = Array.from({length: 10}, (_, i) => `officer-tasks-training2-batch${i + 1}.json`);
+    } else if (playFabId.startsWith('ARC-EV2-')) {
+      // Evaluation2 dataset - 2 batches  
+      batchKeys = Array.from({length: 2}, (_, i) => `officer-tasks-evaluation2-batch${i + 1}.json`);
+    } else if (playFabId.startsWith('ARC-EV-')) {
       // Evaluation dataset - 4 batches
-      ...Array.from({length: 4}, (_, i) => `officer-tasks-evaluation-batch${i + 1}.json`),
-      // Evaluation2 dataset - 2 batches
-      ...Array.from({length: 2}, (_, i) => `officer-tasks-evaluation2-batch${i + 1}.json`)
-    ];
-    
-    const batchKeys = allBatchKeys;
-    console.log(`🔍 DEBUG: Searching ALL ${batchKeys.length} batches for puzzle: ${playFabId}`);
+      batchKeys = Array.from({length: 4}, (_, i) => `officer-tasks-evaluation-batch${i + 1}.json`);
+    } else {
+      // Default to training dataset - 4 batches
+      batchKeys = Array.from({length: 4}, (_, i) => `officer-tasks-training-batch${i + 1}.json`);
+    }
     
     console.log(`🔍 Searching ${batchKeys.length} batches for puzzle: ${playFabId}`);
     

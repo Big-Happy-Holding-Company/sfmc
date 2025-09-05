@@ -63,8 +63,6 @@ export default function OfficerTrackSimple() {
         // Clear the search input after successful search
         setSearchQuery('');
         
-        console.log(`🔍 Current filteredPuzzles count after search: ${filteredPuzzles.length}`);
-        console.log(`🔍 Found puzzle data:`, puzzle);
         
         alert(`Found puzzle "${puzzle.id}"! Look for it at the top of the puzzle grid below.`);
       } else {
@@ -305,11 +303,6 @@ export default function OfficerTrackSimple() {
             loading={loading}
             onSelectPuzzle={handleSelectPuzzle}
           />
-          
-          {/* Debug info */}
-          <div className="mt-4 text-xs text-slate-600">
-            Debug: Displaying {filteredPuzzles.length} puzzles
-          </div>
         </div>
 
 
