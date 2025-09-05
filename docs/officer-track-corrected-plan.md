@@ -40,14 +40,17 @@
 
 ### Task 3.5: FIX UI DISPLAY
 - [ ] Fix `client/src/pages/OfficerTrack.tsx` to display data correctly, check for hardcoded mobile layout, placeholders and simulated data or UI.  
+- [ ] makes sure you are calling our other app at arc-explainer.railway.internal for all the API calls that arent PlayFab calls.
 - [x] It should be using real data from the API and from PlayFab.
 
 ### Task 3.5.1: FIX Layout!
-- [ ] Stop using mobile layout use full width instead
-- [ ] Fix puzzle grid display so they do not overlap!!!
-- [ ] Improve the Example 1, Example 2 etc display - make it easier to compare them side by side, without overlapping the puzzle grid.
-- [ ] Make sure the puzzle ID is stripped of the ARC-TR- or ARC-EV- prefix and correctly displaying a badge showing if it is a training or evaluation puzzle.  Like the arc-explainer project does.
-- [ ] Allow users to switch between emoji sets and number/color display for the puzzle grid. export const EMOJI_SET_INFO is what it is in the constants file spaceEmojis.ts.  Check the arc-explainer project for the implementation along with the alien meaning display if you need to.  
+- [x] Stop using mobile layout use full width instead
+- [x] Fix puzzle grid display so they do not overlap!!!
+- [x] Improve the Example 1, Example 2 etc display - make it easier to compare them side by side, without overlapping the puzzle grid.
+- [x] Make sure the puzzle ID is stripped of the ARC-TR- or ARC-EV- prefix and correctly displaying a badge showing if it is a training or evaluation puzzle.  Like the arc-explainer project does.
+- [x] Allow users to switch between emoji sets and number/color display for the puzzle grid. export const EMOJI_SET_INFO is what it is in the constants file spaceEmojis.ts.  Check the arc-explainer project for the implementation along with the alien meaning display if you need to.
+- [x] Add support for multiple test cases (1-3) with tabbed interface
+- [x] Implement dynamic grid sizing that adapts to puzzle dimensions (3x3=large, 30x30=tiny)  
 
 ### Task 3.6: Improve Puzzle Grid User Experience
 - [ ] Improve user input possibilities in the puzzle grid.
