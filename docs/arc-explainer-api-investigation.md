@@ -3,50 +3,83 @@
 **Date:** September 5, 2025  
 **Investigation of:** D:\1Projects\arc-explainer actual API endpoints and data structures
 
-## Actual API Endpoints Available
+## Complete Arc-Explainer API Endpoints
 
-### Puzzle Performance Endpoints
+### Core Puzzle Management
+- **`GET /api/puzzle/list`** - List all available puzzles
+- **`GET /api/puzzle/overview`** - Get puzzle overview
+- **`GET /api/puzzle/task/:taskId`** - Get specific puzzle by ID ✅ **USEFUL FOR DIRECT SEARCH**
+- **`POST /api/puzzle/analyze/:taskId/:model`** - Analyze a puzzle with a specific model
+- **`GET /api/puzzle/:puzzleId/has-explanation`** - Check if a puzzle has an explanation
+- **`POST /api/puzzle/reinitialize`** - Force reinitialize puzzle loader (debug)
 
-1. **`/api/puzzle/worst-performing`** ✅ **EXISTS AND WORKS**
-   - **Parameters:** `limit`, `sortBy`, `minAccuracy`, `maxAccuracy`, `zeroAccuracyOnly`
-   - **Default limit:** 20, **Max limit:** 50 (validated server-side)
-   - **Response structure:**
-     ```json
-     {
-       "success": true,
-       "data": {
-         "puzzles": [
-           {
-             "id": "puzzleId",
-             "performanceData": {
-               "wrongCount": number,
-               "avgAccuracy": number,
-               "avgConfidence": number,
-               "totalExplanations": number,
-               "negativeFeedback": number,
-               "totalFeedback": number,
-               "latestAnalysis": string,
-               "worstExplanationId": number,
-               "compositeScore": number
-             },
-             // ...puzzle metadata if available
-           }
-         ],
-         "total": number
-       }
-     }
-     ```
+### Statistics & Analytics
+- **`GET /api/puzzle/accuracy-stats`** - Get accuracy statistics (includes trustworthiness data)
+- **`GET /api/puzzle/general-stats`** - Get general model statistics
+- **`GET /api/puzzle/raw-stats`** - Get raw database statistics
+- **`GET /api/puzzle/performance-stats`** - Get trustworthiness statistics ✅ **BETTER FOR DIFFICULTY STATS**
+- **`GET /api/puzzle/confidence-stats`** - Get confidence analysis statistics
+- **`GET /api/puzzle/worst-performing`** - Get worst performing puzzles ✅ **CURRENTLY USED**
+  - **Parameters:** `limit`, `sortBy`, `minAccuracy`, `maxAccuracy`, `zeroAccuracyOnly`
+  - **Max limit:** 50 (server-validated)
 
-2. **`/api/puzzle/accuracy-stats`** - Mixed data (misleading name)
-3. **`/api/puzzle/general-stats`** - Mixed statistics  
-4. **`/api/puzzle/raw-stats`** - Infrastructure metrics
-5. **`/api/puzzle/performance-stats`** - Trustworthiness analysis
-6. **`/api/puzzle/confidence-stats`** - AI confidence patterns
+### Prompts
+- **`POST /api/prompt/preview/:provider/:taskId`** - Preview prompt for a specific provider
+- **`GET /api/prompts`** - Get all prompt templates
+- **`POST /api/prompt-preview`** - Generate a preview of a prompt
 
-### Other Relevant Endpoints
-- **`/api/puzzle/list`** - List all puzzles
-- **`/api/puzzle/overview`** - Overview data
-- **`/api/puzzle/task/:taskId`** - Get specific puzzle by ID
+### Explanations
+- **`GET /api/puzzle/:puzzleId/explanations`** - Get all explanations for a puzzle
+- **`GET /api/puzzle/:puzzleId/explanation`** - Get a specific explanation
+- **`POST /api/puzzle/save-explained/:puzzleId`** - Save a new explanation
+
+### Feedback & Solutions
+- **`POST /api/feedback`** - Submit feedback
+- **`GET /api/explanation/:explanationId/feedback`** - Get feedback for an explanation
+- **`GET /api/puzzle/:puzzleId/feedback`** - Get feedback for a puzzle
+- **`GET /api/feedback`** - Get all feedback
+- **`GET /api/feedback/stats`** - Get feedback statistics ✅ **POTENTIAL ENHANCEMENT**
+- **`GET /api/puzzles/:puzzleId/solutions`** - Get solutions for a puzzle
+- **`POST /api/puzzles/:puzzleId/solutions`** - Submit a new solution
+- **`POST /api/solutions/:solutionId/vote`** - Vote on a solution
+- **`GET /api/solutions/:solutionId/votes`** - Get votes for a solution
+
+### Saturn Analysis
+- **`POST /api/saturn/analyze/:taskId`** - Analyze a task using Saturn
+- **`POST /api/saturn/analyze-with-reasoning/:taskId`** - Analyze with detailed reasoning
+- **`GET /api/saturn/status/:sessionId`** - Get status of a Saturn analysis
+
+### Batch Processing
+- **`POST /api/model/batch-analyze`** - Start a batch analysis
+- **`GET /api/model/batch-status/:sessionId`** - Get status of a batch job
+- **`POST /api/model/batch-control/:sessionId`** - Control a batch job (pause/resume/stop)
+- **`GET /api/model/batch-results/:sessionId`** - Get results of a batch job
+- **`GET /api/model/batch-sessions`** - Get all batch sessions
+
+### Admin & Maintenance
+- **`GET /api/admin/recovery-stats`** - Get recovery statistics
+- **`POST /api/admin/recover-multiple-predictions`** - Recover multiple predictions data
+- **`GET /api/health/database`** - Check database health
+
+### Models
+- **`GET /api/models`** - Get available AI models
+- **`GET /api/models/:provider`** - Get models for a specific provider
+
+## Currently Used vs Available Opportunities
+
+### Currently Used:
+- `/api/puzzle/worst-performing` - For both statistics and filtering data
+
+### Optimization Opportunities:
+- `/api/puzzle/performance-stats` - Better source for difficulty statistics
+- `/api/puzzle/task/:taskId` - Direct puzzle lookup for search
+- `/api/puzzle/confidence-stats` - Could add confidence-based difficulty
+- `/api/feedback/stats` - Could incorporate user feedback into difficulty
+
+### Future Enhancements:
+- Batch analysis integration for Officer Track
+- Solution sharing and voting system
+- Saturn visual analysis for complex puzzles
 
 ## Key Findings vs My Assumptions
 

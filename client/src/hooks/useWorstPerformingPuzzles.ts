@@ -77,15 +77,18 @@ export function useWorstPerformingPuzzles(
 }
 
 /**
- * Hook for getting difficulty statistics
+ * Hook for getting difficulty statistics from unified puzzle dataset
+ * Uses consistent data source with Officer Track filtering
  */
-export function useDifficultyStats() {
+export function useDifficultyStats(datasetOptions?: any) {
   const [stats, setStats] = useState({
     impossible: 0,
     extremely_hard: 0,
     very_hard: 0,
     challenging: 0,
-    total: 0
+    total: 0,
+    withPerformanceData: 0,
+    withoutPerformanceData: 0
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -95,8 +98,22 @@ export function useDifficultyStats() {
     setError(null);
 
     try {
-      const data = await arcExplainerAPI.getDifficultyStats();
-      setStats(data);
+      // Import here to avoid circular dependency
+      const { puzzlePerformanceService } = await import('@/services/puzzlePerformanceService');
+      
+      // Use same dataset as Officer Track for consistency
+      const mergedData = await puzzlePerformanceService.getMergedPuzzleDataset(
+        datasetOptions || {
+          datasets: ['training', 'evaluation'],
+          difficulty: undefined, // Load all difficulties
+          limit: undefined // Remove arbitrary limits
+        }
+      );
+      
+      const statsData = puzzlePerformanceService.getDifficultyStats(mergedData);
+      setStats(statsData);
+      
+      console.log('📊 Difficulty stats from unified dataset:', statsData);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load difficulty stats';
       setError(errorMessage);
@@ -108,7 +125,7 @@ export function useDifficultyStats() {
 
   useEffect(() => {
     fetchStats();
-  }, []);
+  }, [JSON.stringify(datasetOptions)]);
 
   return {
     stats,

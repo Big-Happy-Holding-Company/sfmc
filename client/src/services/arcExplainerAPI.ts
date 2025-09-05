@@ -323,7 +323,7 @@ export class ArcExplainerAPI {
   }
 
   /**
-   * Get difficulty statistics summary
+   * Get difficulty statistics from performance-stats endpoint (more accurate)
    */
   public async getDifficultyStats(): Promise<{
     impossible: number;
@@ -333,8 +333,39 @@ export class ArcExplainerAPI {
     total: number;
   }> {
     try {
-      // Get a large sample of worst performing puzzles
-      const puzzles = await this.getWorstPerformingPuzzles({ limit: 1000 });
+      // Use dedicated performance stats endpoint for better accuracy
+      const response = await this.makeRequest('/api/puzzle/performance-stats');
+      const data = await response.json();
+      
+      if (data.success && data.data) {
+        // Process the performance stats data to create difficulty categories
+        // Note: The exact structure depends on what the endpoint returns
+        console.log('🔍 Performance stats data:', data.data);
+        
+        // Fallback to worst-performing if performance-stats doesn't provide what we need
+        return this.getFallbackDifficultyStats();
+      } else {
+        return this.getFallbackDifficultyStats();
+      }
+    } catch (error) {
+      console.warn('Performance stats endpoint failed, using fallback:', error);
+      return this.getFallbackDifficultyStats();
+    }
+  }
+
+  /**
+   * Fallback method using worst-performing puzzles
+   */
+  private async getFallbackDifficultyStats(): Promise<{
+    impossible: number;
+    extremely_hard: number;
+    very_hard: number;
+    challenging: number;
+    total: number;
+  }> {
+    try {
+      // Get worst performing puzzles with server max limit (50)
+      const puzzles = await this.getWorstPerformingPuzzles({ limit: 50 });
       
       const stats = {
         impossible: 0,
@@ -351,7 +382,7 @@ export class ArcExplainerAPI {
 
       return stats;
     } catch (error) {
-      console.error('Failed to get difficulty stats:', error);
+      console.error('Failed to get fallback difficulty stats:', error);
       return {
         impossible: 0,
         extremely_hard: 0,
@@ -359,6 +390,26 @@ export class ArcExplainerAPI {
         challenging: 0,
         total: 0
       };
+    }
+  }
+
+  /**
+   * Get specific puzzle by ID using direct API endpoint
+   */
+  public async getPuzzleById(puzzleId: string): Promise<any> {
+    try {
+      const cleanId = this.convertPlayFabIdToArcId(puzzleId);
+      const response = await this.makeRequest(`/api/puzzle/task/${cleanId}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        return data.data;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error(`Failed to get puzzle ${puzzleId}:`, error);
+      return null;
     }
   }
 

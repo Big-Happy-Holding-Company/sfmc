@@ -25,6 +25,7 @@ import { useState, useEffect } from "react";
 import { arcDataService } from "@/services/arcDataService";
 import { playFabService } from "@/services/playfab";
 import { arcExplainerAPI, type AIPuzzlePerformance } from "@/services/arcExplainerAPI";
+import { puzzlePerformanceService, type MergedPuzzleData } from "@/services/puzzlePerformanceService";
 import type { 
   OfficerTrackPuzzle, 
   OfficerTrackPlayer,
@@ -61,12 +62,11 @@ export default function OfficerTrack() {
   // Core state management
   const [currentPuzzle, setCurrentPuzzle] = useState<OfficerTrackPuzzle | null>(null);
   const [officerPlayer, setOfficerPlayer] = useState<OfficerTrackPlayer | null>(null);
-  const [availablePuzzles, setAvailablePuzzles] = useState<ARCPuzzleSearchResult | null>(null);
+  const [mergedPuzzles, setMergedPuzzles] = useState<MergedPuzzleData[]>([]);
   const [playerSolution, setPlayerSolution] = useState<number[][]>([]);
   const [validationResult, setValidationResult] = useState<ARCValidationResult | null>(null);
   
-  // AI Performance Integration
-  const [aiPerformanceMap, setAiPerformanceMap] = useState<Map<string, AIPuzzlePerformance>>(new Map());
+  // AI Performance Integration - using unified service
   const [selectedDifficultyFilter, setSelectedDifficultyFilter] = useState<'impossible' | 'extremely_hard' | 'very_hard' | 'challenging' | null>(null);
   
   // UI state
@@ -120,21 +120,14 @@ export default function OfficerTrack() {
         setOfficerPlayer(playerData);
         console.log(`👮 Officer loaded: ${playerData.officerRank} with ${playerData.officerPoints} points`);
         
-        // Load initial set of ARC puzzles based on officer rank
-        const puzzleData = await arcDataService.loadARCPuzzles({
+        // Load merged puzzle dataset (PlayFab + arc-explainer performance data)
+        const mergedData = await puzzlePerformanceService.getMergedPuzzleDataset({
           datasets: ['training', 'evaluation'],
-          limit: 50, // Increased limit for better AI filtering
-          offset: 0,
-          difficulty: getAccessibleDifficulties(playerData.officerRank)
+          difficulty: getAccessibleDifficulties(playerData.officerRank),
+          // Remove arbitrary limit - load what's available for the rank
         });
-        setAvailablePuzzles(puzzleData);
-        console.log(`🧩 Loaded ${puzzleData.puzzles.length} ARC puzzles for ${playerData.officerRank}`);
-        
-        // Load AI performance data for all puzzles
-        const puzzleIds = puzzleData.puzzles.map(p => p.id);
-        const performanceData = await arcExplainerAPI.getBatchPuzzlePerformance(puzzleIds);
-        setAiPerformanceMap(performanceData);
-        console.log(`🤖 Loaded AI performance data for ${performanceData.size} puzzles`);
+        setMergedPuzzles(mergedData);
+        console.log(`🧩 Loaded ${mergedData.length} merged puzzles for ${playerData.officerRank}`);
         
         console.log('✅ Officer Track initialization complete');
       } catch (err) {
@@ -167,32 +160,22 @@ export default function OfficerTrack() {
   };
 
   /**
-   * Get AI performance for a specific puzzle
+   * Get AI performance for a specific puzzle from merged data
    */
   const getAIPerformance = (puzzleId: string): AIPuzzlePerformance | null => {
-    return aiPerformanceMap.get(puzzleId) || null;
+    const puzzle = mergedPuzzles.find(p => p.id === puzzleId);
+    return puzzle?.aiPerformance || null;
   };
 
   /**
-   * Check if puzzle matches selected AI difficulty filter
+   * Get filtered puzzles based on AI difficulty selection using unified service
    */
-  const puzzleMatchesDifficultyFilter = (puzzle: OfficerTrackPuzzle): boolean => {
-    if (!selectedDifficultyFilter) return true;
+  const getFilteredPuzzles = (): MergedPuzzleData[] => {
+    if (!selectedDifficultyFilter) return mergedPuzzles;
     
-    const aiPerformance = getAIPerformance(puzzle.id);
-    if (!aiPerformance) return false;
-    
-    const category = arcExplainerAPI.getDifficultyCategory(aiPerformance.avgAccuracy);
-    return category === selectedDifficultyFilter;
-  };
-
-  /**
-   * Get filtered puzzles based on AI difficulty selection
-   */
-  const getFilteredPuzzles = (): OfficerTrackPuzzle[] => {
-    if (!availablePuzzles) return [];
-    
-    return availablePuzzles.puzzles.filter(puzzleMatchesDifficultyFilter);
+    return puzzlePerformanceService.filterByPerformance(mergedPuzzles, {
+      difficulty: selectedDifficultyFilter
+    });
   };
 
   /**
@@ -361,11 +344,42 @@ export default function OfficerTrack() {
     try {
       console.log(`🔍 Searching for puzzle: ${puzzleId}`);
       
-      // Search using arcDataService
+      // First try to find in current merged dataset
+      const foundInCurrent = await puzzlePerformanceService.findPuzzleById(
+        puzzleId, 
+        { datasets: ['training', 'evaluation'] }
+      );
+      
+      if (foundInCurrent) {
+        console.log(`✅ Found puzzle in current dataset: ${foundInCurrent.id}`);
+        handleSelectPuzzle(foundInCurrent);
+        return;
+      }
+      
+      // If not found, try direct API lookup for additional metadata
+      const directLookup = await arcExplainerAPI.getPuzzleById(puzzleId);
+      if (directLookup) {
+        console.log(`✅ Found puzzle via direct API lookup: ${puzzleId}`);
+        // Try to find corresponding PlayFab puzzle with expanded search
+        const expandedSearch = await puzzlePerformanceService.findPuzzleById(
+          puzzleId,
+          { 
+            datasets: ['training', 'evaluation', 'training2', 'evaluation2'],
+            difficulty: undefined // Search all difficulties
+          }
+        );
+        
+        if (expandedSearch) {
+          handleSelectPuzzle(expandedSearch);
+          return;
+        }
+      }
+      
+      // Fallback to original search method
       const puzzle = await arcDataService.searchPuzzleById(puzzleId);
       
       if (puzzle) {
-        console.log(`✅ Found puzzle: ${puzzle.id}`);
+        console.log(`✅ Found puzzle via fallback search: ${puzzle.id}`);
         handleSelectPuzzle(puzzle);
       } else {
         setError(`Puzzle "${puzzleId}" not found in any dataset. Try a different ID.`);
@@ -384,28 +398,24 @@ export default function OfficerTrack() {
    * Handle random puzzle selection with optional difficulty filter
    */
   const handleRandomPuzzle = async (difficulty?: string) => {
-    if (!availablePuzzles) return;
-    
     try {
       console.log(`🎲 Selecting random puzzle with difficulty: ${difficulty || 'any'}`);
       
-      // Filter puzzles based on difficulty
-      let candidatePuzzles = availablePuzzles.puzzles;
+      // Get filtered puzzles based on difficulty
+      let candidatePuzzles: MergedPuzzleData[];
       
       if (difficulty && difficulty !== 'all') {
-        // Filter by AI difficulty category
-        candidatePuzzles = availablePuzzles.puzzles.filter(puzzle => {
-          const aiPerformance = getAIPerformance(puzzle.id);
-          if (!aiPerformance) return false;
-          
-          const category = arcExplainerAPI.getDifficultyCategory(aiPerformance.avgAccuracy);
-          return category === difficulty;
+        // Filter by AI difficulty category using unified service
+        candidatePuzzles = puzzlePerformanceService.filterByPerformance(mergedPuzzles, {
+          difficulty: difficulty as 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging'
         });
         
         if (candidatePuzzles.length === 0) {
           setError(`No puzzles found with difficulty "${difficulty}". Try a different filter.`);
           return;
         }
+      } else {
+        candidatePuzzles = mergedPuzzles;
       }
       
       // Select random puzzle from candidates
@@ -427,16 +437,18 @@ export default function OfficerTrack() {
   const handleSearchFilterChange = async (filters: SearchFilters) => {
     console.log(`🔧 Search filters changed:`, filters);
     
+    // Handle zero accuracy filter (takes priority)
+    if (filters.zeroAccuracyOnly) {
+      setSelectedDifficultyFilter('impossible');
+      console.log('🚫 Applied zero accuracy filter - showing impossible puzzles only');
+      return;
+    }
+    
     // Update the AI difficulty filter to match search filters
     if (filters.difficulty && filters.difficulty !== 'all') {
       setSelectedDifficultyFilter(filters.difficulty);
     } else {
       setSelectedDifficultyFilter(null);
-    }
-    
-    // If zero accuracy filter is set, automatically select "impossible" difficulty
-    if (filters.zeroAccuracyOnly) {
-      setSelectedDifficultyFilter('impossible');
     }
   };
 
@@ -803,7 +815,7 @@ export default function OfficerTrack() {
                 <CardTitle className="text-amber-400 flex items-center">
                   🧩 Advanced Reasoning Challenges
                   <Badge className="ml-3 bg-amber-600 text-slate-900">
-                    {getFilteredPuzzles().length} of {availablePuzzles?.totalCount || 0} Available
+                    {getFilteredPuzzles().length} of {mergedPuzzles.length} Available
                   </Badge>
                   {selectedDifficultyFilter && (
                     <Badge className="ml-2 bg-blue-600 text-white">
@@ -845,7 +857,7 @@ export default function OfficerTrack() {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {getFilteredPuzzles().map((puzzle) => {
-                    const aiPerformance = getAIPerformance(puzzle.id);
+                    const aiPerformance = puzzle.aiPerformance;
                     return (
                     <Card 
                       key={puzzle.id}
@@ -868,7 +880,7 @@ export default function OfficerTrack() {
                         </div>
                         
                         {/* AI Performance Badge */}
-                        {aiPerformance && (
+                        {puzzle.hasPerformanceData && aiPerformance && (
                           <div className="mb-2">
                             <Badge className={`
                               text-xs
@@ -878,6 +890,22 @@ export default function OfficerTrack() {
                               ${aiPerformance.avgAccuracy > 0.50 ? 'bg-blue-600 text-white' : ''}
                             `}>
                               🤖 AI: {(aiPerformance.avgAccuracy * 100).toFixed(0)}% accuracy
+                              {aiPerformance.avgAccuracy === 0 && ' (IMPOSSIBLE)'}
+                            </Badge>
+                          </div>
+                        )}
+                        
+                        {/* Difficulty Category Badge */}
+                        {puzzle.difficultyCategory && (
+                          <div className="mb-2">
+                            <Badge className={`
+                              text-xs
+                              ${puzzle.difficultyCategory === 'impossible' ? 'bg-red-700 text-red-200' : ''}
+                              ${puzzle.difficultyCategory === 'extremely_hard' ? 'bg-orange-700 text-orange-200' : ''}
+                              ${puzzle.difficultyCategory === 'very_hard' ? 'bg-yellow-700 text-yellow-200' : ''}
+                              ${puzzle.difficultyCategory === 'challenging' ? 'bg-blue-700 text-blue-200' : ''}
+                            `}>
+                              {puzzle.difficultyCategory.replace('_', ' ').toUpperCase()}
                             </Badge>
                           </div>
                         )}
@@ -890,9 +918,9 @@ export default function OfficerTrack() {
                           <div>Training Examples: {puzzle.complexity.trainingExamples}</div>
                           <div>Colors Used: {puzzle.complexity.uniqueColors}</div>
                           <div>Complexity: {puzzle.complexity.transformationComplexity}</div>
-                          {aiPerformance && (
+                          {puzzle.hasPerformanceData && aiPerformance && (
                             <div className="text-blue-300">
-                              Explanations: {aiPerformance.totalExplanations} • Score: {aiPerformance.compositeScore.toFixed(1)}
+                              Explanations: {aiPerformance.totalExplanations} • Score: {aiPerformance.compositeScore?.toFixed(1) || 'N/A'}
                             </div>
                           )}
                         </div>
