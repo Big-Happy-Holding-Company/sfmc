@@ -29,6 +29,7 @@ export interface UseOfficerPuzzlesReturn {
   // Actions
   filterByDifficulty: (difficulty: 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging' | null) => void;
   searchById: (id: string) => Promise<OfficerPuzzle | null>;
+  addSearchResult: (puzzle: OfficerPuzzle) => void;
   refresh: (limit?: number) => Promise<void>;
   setLimit: (limit: number) => void;
   
@@ -126,6 +127,19 @@ export function useOfficerPuzzles(): UseOfficerPuzzlesReturn {
     }
   };
 
+  // Add search result to the displayed puzzles
+  const addSearchResult = (puzzle: OfficerPuzzle) => {
+    // Check if puzzle already exists in current filtered display
+    const isAlreadyDisplayed = filteredPuzzles.some(p => p.id === puzzle.id);
+    if (!isAlreadyDisplayed) {
+      // Add to the beginning of the filtered list for prominence
+      setFilteredPuzzles([puzzle, ...filteredPuzzles]);
+      console.log(`🎯 Added search result "${puzzle.id}" to display grid`);
+    } else {
+      console.log(`🔄 Puzzle "${puzzle.id}" already in display grid`);
+    }
+  };
+
   // Refresh data
   const refresh = async (limit?: number) => {
     const newLimit = limit || currentLimit;
@@ -161,6 +175,7 @@ export function useOfficerPuzzles(): UseOfficerPuzzlesReturn {
     // Actions
     filterByDifficulty,
     searchById,
+    addSearchResult,
     refresh,
     setLimit,
     

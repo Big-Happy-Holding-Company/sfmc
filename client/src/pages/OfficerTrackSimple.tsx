@@ -26,6 +26,7 @@ export default function OfficerTrackSimple() {
     error, 
     filterByDifficulty, 
     searchById,
+    addSearchResult,
     currentFilter,
     currentLimit,
     refresh,
@@ -46,7 +47,7 @@ export default function OfficerTrackSimple() {
     }
   };
 
-  // Handle puzzle search
+  // Handle puzzle search - add found puzzle to the card display
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
     
@@ -54,17 +55,18 @@ export default function OfficerTrackSimple() {
     try {
       const puzzle = await searchById(searchQuery.trim());
       if (puzzle) {
-        // Import the new PlayFab loading function
-        const { loadPuzzleFromPlayFab } = await import('@/services/officerArcAPI');
+        console.log('✅ Found puzzle:', puzzle.id);
         
-        // Load full puzzle data directly from PlayFab using PlayFab ID
-        const fullPuzzleData = await loadPuzzleFromPlayFab(puzzle.playFabId);
-        if (fullPuzzleData) {
-          setCurrentPuzzle(fullPuzzleData);
-          console.log('✅ Loaded puzzle for solving:', fullPuzzleData.id);
-        } else {
-          alert(`Failed to load puzzle data for "${puzzle.playFabId}". The puzzle may not be available in PlayFab.`);
-        }
+        // Add the found puzzle to the display grid using the hook
+        addSearchResult(puzzle);
+        
+        // Clear the search input after successful search
+        setSearchQuery('');
+        
+        console.log(`🔍 Current filteredPuzzles count after search: ${filteredPuzzles.length}`);
+        console.log(`🔍 Found puzzle data:`, puzzle);
+        
+        alert(`Found puzzle "${puzzle.id}"! Look for it at the top of the puzzle grid below.`);
       } else {
         alert(`Puzzle "${searchQuery}" not found. Try a different ID.`);
       }
@@ -303,6 +305,11 @@ export default function OfficerTrackSimple() {
             loading={loading}
             onSelectPuzzle={handleSelectPuzzle}
           />
+          
+          {/* Debug info */}
+          <div className="mt-4 text-xs text-slate-600">
+            Debug: Displaying {filteredPuzzles.length} puzzles
+          </div>
         </div>
 
 
