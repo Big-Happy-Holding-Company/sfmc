@@ -72,7 +72,7 @@
 - [x] ✅ `client/src/components/game/OfficerDifficultyCards.tsx` already existed from previous work
 - [x] Shows stats: Impossible (0%), Extremely Hard (0-25%), Very Hard (25-50%), Challenging (50-75%)
 - [x] Uses shadcn/ui Card components (existing pattern)  
-- [x] ✅ **FIXED**: Displays trustworthiness data from ARC Explainer API - corrected URL from railway.internal to public Railway URL
+- [x] ✅ **FIXED**: Displays trustworthiness data from ARC Explainer API - corrected URL to arc-explainer-production.up.railway.app:8080
 - [x] **INTEGRATED**: Now properly integrated into Officer Track with real filtering functionality
 
 ### Task 5: Enhanced Puzzle Search
