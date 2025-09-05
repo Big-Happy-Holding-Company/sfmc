@@ -7,22 +7,20 @@
  * ARCHITECTURE: Static-only SFMC app calls external API via HTTP
  */
 
-// Types matching arc-explainer API response structure
+// Simplified interface for just the performance data we need
 export interface AIPuzzlePerformance {
-  id: string;           // Puzzle ID 
-  puzzleId?: string;    // Alternative puzzle ID field
-  wrongCount: number;
-  avgAccuracy: number;
-  avgConfidence: number;
-  totalExplanations: number;
-  negativeFeedback: number;
-  totalFeedback: number;
+  id: string;                    // Puzzle ID 
+  puzzleId?: string;            // Alternative puzzle ID field
+  wrongCount?: number;
+  avgAccuracy: number;          // Main metric we care about
+  avgConfidence?: number;
+  totalExplanations?: number;
+  negativeFeedback?: number;
+  totalFeedback?: number;
   latestAnalysis?: string;
   worstExplanationId?: number;
-  compositeScore: number;
-  // Full puzzle data that the API also returns
-  train?: Array<{input: number[][], output: number[][]}>;
-  test?: Array<{input: number[][], output: number[][]}>;
+  compositeScore?: number;
+  // We don't need the full puzzle data - just performance metrics
 }
 
 export interface WorstPerformingPuzzlesResponse {
@@ -115,24 +113,40 @@ export class ArcExplainerAPI {
       });
 
       // Handle different possible response structures
-      let puzzles: AIPuzzlePerformance[] = [];
+      let rawPuzzles: any[] = [];
 
       if (Array.isArray(data)) {
         // Response is directly an array of puzzles
-        puzzles = data;
-        console.log('📋 Direct array response:', puzzles.length, 'puzzles');
+        rawPuzzles = data;
+        console.log('📋 Direct array response:', rawPuzzles.length, 'puzzles');
       } else if (data.success && data.data?.puzzles) {
         // Wrapped response with success flag
-        puzzles = data.data.puzzles;
-        console.log('📋 Wrapped response:', puzzles.length, 'puzzles');
+        rawPuzzles = data.data.puzzles;
+        console.log('📋 Wrapped response:', rawPuzzles.length, 'puzzles');
       } else if (data.data && Array.isArray(data.data)) {
         // Response has data property that is an array
-        puzzles = data.data;
-        console.log('📋 Data array response:', puzzles.length, 'puzzles');
+        rawPuzzles = data.data;
+        console.log('📋 Data array response:', rawPuzzles.length, 'puzzles');
       } else {
         console.warn('🚫 Unexpected response structure:', data);
         return [];
       }
+
+      // Extract only the performance metrics we need, not full puzzle data
+      const puzzles: AIPuzzlePerformance[] = rawPuzzles.map(p => ({
+        id: p.id || p.puzzleId || '',
+        puzzleId: p.puzzleId || p.id,
+        avgAccuracy: p.avgAccuracy || 0,
+        wrongCount: p.wrongCount,
+        avgConfidence: p.avgConfidence,
+        totalExplanations: p.totalExplanations,
+        negativeFeedback: p.negativeFeedback,
+        totalFeedback: p.totalFeedback,
+        latestAnalysis: p.latestAnalysis,
+        worstExplanationId: p.worstExplanationId,
+        compositeScore: p.compositeScore || 0
+        // Deliberately omitting train/test data - we don't need full puzzle content
+      })).filter(p => p.id); // Remove any entries without valid IDs
 
       if (puzzles.length > 0) {
         this.setCache(cacheKey, puzzles);
