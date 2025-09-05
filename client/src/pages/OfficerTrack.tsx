@@ -41,7 +41,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { SPACE_EMOJIS, EMOJI_SET_INFO } from "@/constants/spaceEmojis";
+import { SPACE_EMOJIS, EMOJI_SET_INFO, getARCColorCSS } from "@/constants/spaceEmojis";
 import type { EmojiSet } from "@/constants/spaceEmojis";
 import { OfficerDifficultyCards } from "@/components/game/OfficerDifficultyCards";
 import { OfficerPuzzleSearch, type SearchFilters } from "@/components/game/OfficerPuzzleSearch";
@@ -577,14 +577,25 @@ export default function OfficerTrack() {
           style={{ gridTemplateColumns: `repeat(${grid[0]?.length || 1}, 1fr)` }}
         >
           {emojiGrid.map((row, rowIndex) =>
-            row.map((cell, colIndex) => (
-              <div
-                key={`${rowIndex}-${colIndex}`}
-                className={`${size} flex items-center justify-center bg-slate-700 rounded ${textSize} border border-amber-800`}
-              >
-                {cell}
-              </div>
-            ))
+            row.map((cell, colIndex) => {
+              const originalValue = grid[rowIndex][colIndex];
+              const cellStyle = showNumbers ? {
+                backgroundColor: getARCColorCSS(originalValue),
+                color: originalValue === 4 ? '#000000' : '#ffffff' // Black text for yellow (4), white for others
+              } : {};
+              
+              return (
+                <div
+                  key={`${rowIndex}-${colIndex}`}
+                  className={`${size} flex items-center justify-center rounded ${textSize} border ${
+                    showNumbers ? 'border-gray-400' : 'bg-slate-700 border-amber-800'
+                  }`}
+                  style={cellStyle}
+                >
+                  {cell}
+                </div>
+              );
+            })
           )}
         </div>
         <div className="text-xs text-amber-600 mt-1">
@@ -617,17 +628,32 @@ export default function OfficerTrack() {
             row.map((cell, colIndex) => {
               const cellKey = getCellKey(rowIndex, colIndex);
               const isSelected = selectedCells.has(cellKey);
+              const originalValue = playerSolution[rowIndex][colIndex];
+              
+              // Calculate styles based on display mode and selection state
+              let cellStyle = {};
+              let className = `${size} flex items-center justify-center rounded ${textSize} border transition-colors`;
+              
+              if (showNumbers && !isSelected) {
+                // Apply ARC colors in numeric mode when not selected
+                cellStyle = {
+                  backgroundColor: getARCColorCSS(originalValue),
+                  color: originalValue === 4 ? '#000000' : '#ffffff' // Black text for yellow (4), white for others
+                };
+                className += ' border-gray-400 hover:scale-105 active:scale-95';
+              } else if (isSelected) {
+                // Selected state overrides color styling
+                className += ' bg-amber-600 border-amber-400 text-slate-900';
+              } else {
+                // Default emoji mode styling
+                className += ' bg-slate-700 hover:bg-slate-600 border-amber-700 hover:scale-105 active:scale-95';
+              }
               
               return (
                 <button
                   key={`${rowIndex}-${colIndex}`}
-                  className={`
-                    ${size} flex items-center justify-center rounded ${textSize} border transition-colors
-                    ${isSelected 
-                      ? 'bg-amber-600 border-amber-400 text-slate-900' 
-                      : 'bg-slate-700 hover:bg-slate-600 border-amber-700 hover:scale-105 active:scale-95'
-                    }
-                  `}
+                  className={className}
+                  style={cellStyle}
                   onMouseDown={(e) => handleCellMouseDown(rowIndex, colIndex, e)}
                   onMouseEnter={() => handleCellMouseEnter(rowIndex, colIndex)}
                   onContextMenu={(e) => e.preventDefault()}
@@ -1149,16 +1175,35 @@ export default function OfficerTrack() {
                             <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
                               {getUsedValues().map(value => {
                                 const emoji = showNumbers ? value.toString() : transformGridForDisplay([[value]])[0][0];
+                                
+                                // Calculate styles based on display mode and selection state
+                                let buttonStyle = {};
+                                let buttonClassName = `h-10 w-10 flex items-center justify-center rounded border transition-colors text-sm`;
+                                
+                                if (showNumbers) {
+                                  if (selectedValue === value) {
+                                    // Selected state: use purple selection styling
+                                    buttonClassName += ' bg-purple-600 border-purple-400 text-white';
+                                  } else {
+                                    // Not selected: use ARC colors with gray border
+                                    buttonStyle = {
+                                      backgroundColor: getARCColorCSS(value),
+                                      color: value === 4 ? '#000000' : '#ffffff' // Black text for yellow (4), white for others
+                                    };
+                                    buttonClassName += ' border-gray-400 hover:border-purple-400';
+                                  }
+                                } else {
+                                  // Emoji mode: use original purple styling
+                                  buttonClassName += selectedValue === value 
+                                    ? ' bg-purple-600 border-purple-400 text-white' 
+                                    : ' bg-slate-700 border-purple-700 text-purple-200 hover:bg-purple-800';
+                                }
+                                
                                 return (
                                   <button
                                     key={value}
-                                    className={`
-                                      h-10 w-10 flex items-center justify-center rounded border transition-colors text-sm
-                                      ${selectedValue === value 
-                                        ? 'bg-purple-600 border-purple-400 text-white' 
-                                        : 'bg-slate-700 border-purple-700 text-purple-200 hover:bg-purple-800'
-                                      }
-                                    `}
+                                    className={buttonClassName}
+                                    style={buttonStyle}
                                     onClick={() => setSelectedValue(value)}
                                   >
                                     {emoji}
