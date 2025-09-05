@@ -13,9 +13,10 @@ import type {
   ARCGrid
 } from '@/types/arcTypes';
 import { OfficerRank, ARC_CONSTANTS } from '@/types/arcTypes';
-import type { PlayFabServiceResult } from '@/types/playfab';
+import type { PlayFabServiceResult, CloudScriptValidationRequest, TaskValidationResult } from '@/types/playfab';
 import { playFabCore } from './core';
 import { playFabAuth } from './auth';
+import { playFabValidation } from './validation';
 import { PLAYFAB_CONSTANTS } from '@/types/playfab';
 
 // PlayFab request/response interfaces for Officer Track
@@ -236,6 +237,56 @@ export class PlayFabOfficerTrack {
    */
   private isCacheValid(): boolean {
     return this.officerPlayerCache !== null; // Simple cache for now
+  }
+
+  // =============================================================================
+  // ARC SOLUTION VALIDATION
+  // =============================================================================
+
+  /**
+   * Validate ARC puzzle solution via PlayFab CloudScript
+   * Transforms ARC format to CloudScript validation request
+   */
+  public async validateARCSolution(attempt: ARCSolutionAttempt): Promise<ARCValidationResult> {
+    await playFabAuth.ensureAuthenticated();
+
+    // Transform ARC format to CloudScript format
+    const cloudScriptRequest: CloudScriptValidationRequest = {
+      taskId: attempt.puzzleId,
+      solution: attempt.solution.map(row => row.map(cell => cell.toString())), // Convert number[][] to string[][]
+      timeElapsed: attempt.timeElapsed,
+      hintsUsed: attempt.hintsUsed,
+      sessionId: attempt.sessionId,
+      attemptId: attempt.attemptNumber
+    };
+
+    playFabCore.logOperation('ARC Solution Validation', `Puzzle: ${attempt.puzzleId}`);
+
+    try {
+      // Use existing validation infrastructure
+      const result = await playFabValidation.validateSolution(cloudScriptRequest);
+      
+      // Transform result back to ARC format
+      const arcResult: ARCValidationResult = {
+        success: result.success,
+        correct: result.correct,
+        pointsEarned: result.pointsEarned,
+        timeBonus: result.timeBonus || 0,
+        hintPenalty: result.hintPenalty || 0,
+        message: result.message || (result.correct ? 'Puzzle solved!' : 'Incorrect solution'),
+        totalScore: result.totalScore || result.pointsEarned
+      };
+
+      playFabCore.logOperation('ARC Validation Complete', {
+        correct: arcResult.correct,
+        points: arcResult.pointsEarned
+      });
+
+      return arcResult;
+    } catch (error) {
+      playFabCore.logOperation('ARC Validation Failed', error);
+      throw error;
+    }
   }
 
   /**

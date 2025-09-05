@@ -77,6 +77,23 @@ export default function OfficerTrack() {
   const [selectedEmojiSet, setSelectedEmojiSet] = useState<EmojiSet>('tech_set1');
   const [selectedTestCase, setSelectedTestCase] = useState(0);
   const [showNumbers, setShowNumbers] = useState(false);
+  
+  // Enhanced Grid UX state
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartCell, setDragStartCell] = useState<{row: number, col: number} | null>(null);
+  const [selectedCells, setSelectedCells] = useState<Set<string>>(new Set());
+  const [selectedValue, setSelectedValue] = useState<number>(1); // For emoji palette selection
+  const [showEmojiPalette, setShowEmojiPalette] = useState(false);
+
+  // Handle global mouse events for drag selection
+  useEffect(() => {
+    const handleGlobalMouseUp = () => {
+      handleCellMouseUp();
+    };
+    
+    document.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => document.removeEventListener('mouseup', handleGlobalMouseUp);
+  }, [isDragging, selectedCells, showEmojiPalette, selectedValue, playerSolution]);
 
   // Initialize Officer Track data
   useEffect(() => {
@@ -185,6 +202,124 @@ export default function OfficerTrack() {
   };
 
   /**
+   * Enhanced Grid UX Utilities
+   */
+  
+  // Get cell key for tracking selections
+  const getCellKey = (row: number, col: number) => `${row}-${col}`;
+  
+  // Copy input grid to solution grid
+  const copyInputToSolution = () => {
+    if (!currentPuzzle) return;
+    const testCase = currentPuzzle.test[selectedTestCase];
+    if (!testCase) return;
+    
+    const copiedGrid = testCase.input.map(row => [...row]);
+    setPlayerSolution(copiedGrid);
+  };
+  
+  // Handle mouse down for drag selection
+  const handleCellMouseDown = (row: number, col: number, event: React.MouseEvent) => {
+    if (event.button === 2) {
+      // Right click - clear cell
+      event.preventDefault();
+      const newGrid = [...playerSolution];
+      newGrid[row][col] = 0;
+      setPlayerSolution(newGrid);
+      return;
+    }
+    
+    if (event.button === 0) {
+      // Left click - start drag selection or set value
+      setIsDragging(true);
+      setDragStartCell({row, col});
+      
+      if (showEmojiPalette) {
+        // Use selected value from palette
+        const newGrid = [...playerSolution];
+        newGrid[row][col] = selectedValue;
+        setPlayerSolution(newGrid);
+      } else {
+        // Cycle through values (original behavior)
+        const newGrid = [...playerSolution];
+        newGrid[row][col] = (playerSolution[row][col] + 1) % 10;
+        setPlayerSolution(newGrid);
+      }
+      
+      // Update selected cells
+      const cellKey = getCellKey(row, col);
+      setSelectedCells(new Set([cellKey]));
+    }
+  };
+  
+  // Handle mouse enter during drag
+  const handleCellMouseEnter = (row: number, col: number) => {
+    if (!isDragging || !dragStartCell) return;
+    
+    // Calculate rectangular selection from drag start to current cell
+    const minRow = Math.min(dragStartCell.row, row);
+    const maxRow = Math.max(dragStartCell.row, row);
+    const minCol = Math.min(dragStartCell.col, col);
+    const maxCol = Math.max(dragStartCell.col, col);
+    
+    const newSelectedCells = new Set<string>();
+    for (let r = minRow; r <= maxRow; r++) {
+      for (let c = minCol; c <= maxCol; c++) {
+        newSelectedCells.add(getCellKey(r, c));
+      }
+    }
+    setSelectedCells(newSelectedCells);
+  };
+  
+  // Handle mouse up - apply value to selected cells
+  const handleCellMouseUp = () => {
+    if (!isDragging || selectedCells.size === 0) {
+      setIsDragging(false);
+      setDragStartCell(null);
+      setSelectedCells(new Set());
+      return;
+    }
+    
+    // Apply selected value to all selected cells
+    const newGrid = [...playerSolution];
+    selectedCells.forEach(cellKey => {
+      const [rowStr, colStr] = cellKey.split('-');
+      const row = parseInt(rowStr);
+      const col = parseInt(colStr);
+      if (showEmojiPalette) {
+        newGrid[row][col] = selectedValue;
+      }
+    });
+    
+    if (showEmojiPalette && selectedCells.size > 1) {
+      setPlayerSolution(newGrid);
+    }
+    
+    setIsDragging(false);
+    setDragStartCell(null);
+    setSelectedCells(new Set());
+  };
+  
+  // Get unique values used in current puzzle for emoji palette
+  const getUsedValues = (): number[] => {
+    if (!currentPuzzle) return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    
+    const allGrids = [
+      ...currentPuzzle.train.flatMap(ex => [ex.input, ex.output]),
+      ...currentPuzzle.test.map(t => t.input)
+    ];
+    
+    const usedValues = new Set<number>();
+    allGrids.forEach(grid => {
+      grid.forEach(row => {
+        row.forEach(cell => usedValues.add(cell));
+      });
+    });
+    
+    return Array.from(usedValues).sort((a, b) => a - b);
+  };
+
+  /**
    * Handle puzzle selection
    */
   const handleSelectPuzzle = (puzzle: OfficerTrackPuzzle) => {
@@ -194,6 +329,14 @@ export default function OfficerTrack() {
     setStartTime(Date.now());
     setValidationResult(null);
     setShowResult(false);
+    
+    // Reset enhanced UX state
+    setIsDragging(false);
+    setDragStartCell(null);
+    setSelectedCells(new Set());
+    setShowEmojiPalette(false);
+    setSelectedValue(1);
+    setSelectedTestCase(0);
     
     // Initialize empty solution grid based on test case
     const testCase = puzzle.test[0];
@@ -360,7 +503,7 @@ export default function OfficerTrack() {
   };
 
   /**
-   * Render interactive solution grid
+   * Render interactive solution grid with enhanced UX
    */
   const renderSolutionGrid = (): JSX.Element => {
     if (!currentPuzzle) return <div></div>;
@@ -375,30 +518,43 @@ export default function OfficerTrack() {
       <div className="text-center">
         <div className="text-xs text-amber-300 mb-2 font-semibold">YOUR SOLUTION</div>
         <div 
-          className="grid gap-1 bg-slate-800 p-2 rounded border-2 border-amber-400"
+          className="grid gap-1 bg-slate-800 p-2 rounded border-2 border-amber-400 select-none"
           style={{ gridTemplateColumns: `repeat(${playerSolution[0]?.length || 1}, 1fr)` }}
         >
           {solutionDisplay.map((row, rowIndex) =>
-            row.map((cell, colIndex) => (
-              <button
-                key={`${rowIndex}-${colIndex}`}
-                className={`${size} flex items-center justify-center bg-slate-700 hover:bg-slate-600 rounded ${textSize} border border-amber-700 transition-colors hover:scale-105 active:scale-95`}
-                onClick={() => {
-                  // Cycle through available integers 0-9
-                  const newGrid = [...playerSolution];
-                  newGrid[rowIndex][colIndex] = (cell + 1) % 10;
-                  setPlayerSolution(newGrid);
-                }}
-                disabled={validating}
-                title={`Cell (${rowIndex}, ${colIndex}): ${playerSolution[rowIndex][colIndex]}`}
-              >
-                {cell}
-              </button>
-            ))
+            row.map((cell, colIndex) => {
+              const cellKey = getCellKey(rowIndex, colIndex);
+              const isSelected = selectedCells.has(cellKey);
+              
+              return (
+                <button
+                  key={`${rowIndex}-${colIndex}`}
+                  className={`
+                    ${size} flex items-center justify-center rounded ${textSize} border transition-colors
+                    ${isSelected 
+                      ? 'bg-amber-600 border-amber-400 text-slate-900' 
+                      : 'bg-slate-700 hover:bg-slate-600 border-amber-700 hover:scale-105 active:scale-95'
+                    }
+                  `}
+                  onMouseDown={(e) => handleCellMouseDown(rowIndex, colIndex, e)}
+                  onMouseEnter={() => handleCellMouseEnter(rowIndex, colIndex)}
+                  onContextMenu={(e) => e.preventDefault()}
+                  disabled={validating}
+                  title={`Cell (${rowIndex}, ${colIndex}): ${playerSolution[rowIndex][colIndex]} | Left: ${showEmojiPalette ? 'set selected value' : 'cycle'} | Right: clear | Drag: select area`}
+                >
+                  {cell}
+                </button>
+              );
+            })
           )}
         </div>
         <div className="text-xs text-amber-600 mt-2 space-y-1">
-          <div>Click cells to cycle through values (0-9)</div>
+          <div>
+            {showEmojiPalette 
+              ? `Click: set selected value (${selectedValue}) | Drag: select area | Right-click: clear`
+              : 'Click: cycle values (0-9) | Drag: select area | Right-click: clear'
+            }
+          </div>
           <div>{playerSolution.length}×{playerSolution[0]?.length || 0}</div>
         </div>
       </div>
@@ -834,6 +990,86 @@ export default function OfficerTrack() {
                   
                   <Card className="bg-slate-700 border-amber-400">
                     <CardContent className="p-6">
+                      {/* Enhanced Grid Controls */}
+                      <div className="bg-slate-900 border border-amber-800 rounded-lg p-4 mb-6">
+                        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+                          <div className="flex items-center space-x-3">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={copyInputToSolution}
+                              className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
+                              title="Copy the test input grid to your solution grid as a starting point"
+                            >
+                              📥 Copy Input
+                            </Button>
+                            
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                // Clear all cells to 0
+                                const testCase = currentPuzzle.test[selectedTestCase];
+                                if (testCase) {
+                                  const emptyGrid = testCase.input.map(row => row.map(() => 0));
+                                  setPlayerSolution(emptyGrid);
+                                }
+                              }}
+                              className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
+                              title="Clear all cells to empty (0)"
+                            >
+                              🗑️ Clear All
+                            </Button>
+                            
+                            <Button
+                              variant={showEmojiPalette ? "default" : "outline"}
+                              size="sm"
+                              onClick={() => setShowEmojiPalette(!showEmojiPalette)}
+                              className={showEmojiPalette 
+                                ? "bg-purple-600 hover:bg-purple-700 text-white" 
+                                : "border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white"
+                              }
+                              title="Show/hide emoji palette for fast value selection"
+                            >
+                              🎨 Palette
+                            </Button>
+                          </div>
+                          
+                          <div className="text-xs text-amber-500 max-w-md">
+                            💡 <strong>New:</strong> Copy input, drag-select multiple cells, right-click to clear, use palette for fast selection
+                          </div>
+                        </div>
+
+                        {/* Emoji Palette */}
+                        {showEmojiPalette && (
+                          <div className="bg-slate-800 border border-purple-600 rounded-lg p-3">
+                            <div className="text-purple-400 text-sm font-medium mb-2">
+                              🎨 Value Palette - Click to select, then click/drag on grid
+                            </div>
+                            <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
+                              {getUsedValues().map(value => {
+                                const emoji = showNumbers ? value.toString() : transformGridForDisplay([[value]])[0][0];
+                                return (
+                                  <button
+                                    key={value}
+                                    className={`
+                                      h-10 w-10 flex items-center justify-center rounded border transition-colors text-sm
+                                      ${selectedValue === value 
+                                        ? 'bg-purple-600 border-purple-400 text-white' 
+                                        : 'bg-slate-700 border-purple-700 text-purple-200 hover:bg-purple-800'
+                                      }
+                                    `}
+                                    onClick={() => setSelectedValue(value)}
+                                  >
+                                    {emoji}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
                       <div className="flex flex-col lg:flex-row items-center justify-center gap-6 mb-6">
                         <div className="flex items-center space-x-6">
                           {renderDisplayGrid(currentPuzzle.test[selectedTestCase].input, "TEST INPUT")}
@@ -849,21 +1085,6 @@ export default function OfficerTrack() {
                           className="bg-amber-600 hover:bg-amber-700 text-slate-900 font-semibold px-8"
                         >
                           {validating ? 'Validating...' : '🚀 Submit Solution'}
-                        </Button>
-                        
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            // Reset solution to empty using current test case
-                            const testCase = currentPuzzle.test[selectedTestCase];
-                            if (testCase) {
-                              const emptyGrid = testCase.input.map(row => row.map(() => 0));
-                              setPlayerSolution(emptyGrid);
-                            }
-                          }}
-                          className="border-amber-600 text-amber-400 hover:bg-amber-600 hover:text-slate-900"
-                        >
-                          🔄 Reset Grid
                         </Button>
                       </div>
                     </CardContent>
