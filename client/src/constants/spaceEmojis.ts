@@ -3,6 +3,18 @@
 // Every list is exactly length-10, enabling a direct mapping of
 // emoji index → ARC colour digit (0-9).  This avoids null cells
 // in our grids: colour-0 (black or 'empty') is explicitly the first emoji.
+// 
+// Official ARC Color Mapping (RGB values):
+// 0: (0, 0, 0)        - Black (background)
+// 1: (0, 116, 217)    - Blue  
+// 2: (255, 65, 54)    - Red
+// 3: (46, 204, 64)    - Green
+// 4: (255, 220, 0)    - Yellow
+// 5: (128, 128, 128)  - Grey
+// 6: (240, 18, 190)   - Magenta/Pink
+// 7: (255, 133, 27)   - Orange
+// 8: (127, 219, 255)  - Light Blue/Cyan
+// 9: (128, 0, 0)      - Maroon
 // -------------------------------------------------------------
 export const SPACE_EMOJIS = {
 
@@ -101,3 +113,32 @@ export const EMOJI_SET_INFO = {
 
 export type EmojiSet = keyof typeof SPACE_EMOJIS;
 export type SpaceEmoji = typeof SPACE_EMOJIS[EmojiSet][number];
+
+// Official ARC Color Constants (for when users switch to color display mode)
+export const ARC_COLORS = {
+  0: [0, 0, 0],        // Black (background)
+  1: [0, 116, 217],    // Blue
+  2: [255, 65, 54],    // Red
+  3: [46, 204, 64],    // Green
+  4: [255, 220, 0],    // Yellow
+  5: [128, 128, 128],  // Grey
+  6: [240, 18, 190],   // Magenta/Pink
+  7: [255, 133, 27],   // Orange
+  8: [127, 219, 255],  // Light Blue/Cyan
+  9: [128, 0, 0],      // Maroon
+} as const;
+
+// Helper function to convert ARC color index to CSS RGB string
+export const getARCColorCSS = (colorIndex: number): string => {
+  const color = ARC_COLORS[colorIndex as keyof typeof ARC_COLORS];
+  if (!color) return 'rgb(0, 0, 0)'; // Default to black
+  return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+};
+
+// Helper function to get ARC color as hex string
+export const getARCColorHex = (colorIndex: number): string => {
+  const color = ARC_COLORS[colorIndex as keyof typeof ARC_COLORS];
+  if (!color) return '#000000'; // Default to black
+  const [r, g, b] = color;
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+};
