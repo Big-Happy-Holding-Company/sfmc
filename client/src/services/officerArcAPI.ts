@@ -280,21 +280,21 @@ export async function loadPuzzleFromPlayFab(playFabId: string): Promise<any | nu
     // Import PlayFab core dynamically to avoid circular dependencies
     const { playFabCore } = await import('@/services/playfab/core');
     
-    // Determine which batches to search based on PlayFab ID prefix
-    let batchKeys: string[];
-    if (playFabId.startsWith('ARC-TR2-')) {
-      // Training2 dataset - 10 batches
-      batchKeys = Array.from({length: 10}, (_, i) => `officer-tasks-training2-batch${i + 1}.json`);
-    } else if (playFabId.startsWith('ARC-EV2-')) {
-      // Evaluation2 dataset - 2 batches  
-      batchKeys = Array.from({length: 2}, (_, i) => `officer-tasks-evaluation2-batch${i + 1}.json`);
-    } else if (playFabId.startsWith('ARC-EV-')) {
+    // DEBUGGING: Search ALL datasets since we're not sure which one contains the puzzle
+    // This is inefficient but will help us find where the puzzle actually is
+    const allBatchKeys = [
+      // Training dataset - 4 batches
+      ...Array.from({length: 4}, (_, i) => `officer-tasks-training-batch${i + 1}.json`),
+      // Training2 dataset - 10 batches  
+      ...Array.from({length: 10}, (_, i) => `officer-tasks-training2-batch${i + 1}.json`),
       // Evaluation dataset - 4 batches
-      batchKeys = Array.from({length: 4}, (_, i) => `officer-tasks-evaluation-batch${i + 1}.json`);
-    } else {
-      // Default to training dataset - 4 batches
-      batchKeys = Array.from({length: 4}, (_, i) => `officer-tasks-training-batch${i + 1}.json`);
-    }
+      ...Array.from({length: 4}, (_, i) => `officer-tasks-evaluation-batch${i + 1}.json`),
+      // Evaluation2 dataset - 2 batches
+      ...Array.from({length: 2}, (_, i) => `officer-tasks-evaluation2-batch${i + 1}.json`)
+    ];
+    
+    const batchKeys = allBatchKeys;
+    console.log(`🔍 DEBUG: Searching ALL ${batchKeys.length} batches for puzzle: ${playFabId}`);
     
     console.log(`🔍 Searching ${batchKeys.length} batches for puzzle: ${playFabId}`);
     
