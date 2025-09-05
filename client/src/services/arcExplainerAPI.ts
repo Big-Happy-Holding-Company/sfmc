@@ -235,21 +235,31 @@ export class ArcExplainerAPI {
   private async makeRequest(endpoint: string): Promise<Response> {
     const url = `${this.baseURL}${endpoint}`;
     
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        // Add CORS headers if needed
-      },
-      // Add credentials if your arc-explainer server requires auth
-      // credentials: 'include',
-    });
+    console.log(`🌐 Making API request to: ${url}`);
+    
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // Add credentials if your arc-explainer server requires auth
+        // credentials: 'include',
+      });
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      console.log(`📡 API response: ${response.status} ${response.statusText}`);
+
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => 'Unknown error');
+        console.error(`❌ API Error ${response.status}: ${response.statusText}`, errorText);
+        throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+      }
+
+      return response;
+    } catch (error) {
+      console.error(`🚫 Network error calling ${url}:`, error);
+      throw error;
     }
-
-    return response;
   }
 
   /**

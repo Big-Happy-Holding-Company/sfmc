@@ -599,6 +599,49 @@ export class ARCDataService {
   }
 
   /**
+   * Search for a specific puzzle by ID across all datasets
+   */
+  public async searchPuzzleById(puzzleId: string): Promise<OfficerTrackPuzzle | null> {
+    const cleanId = puzzleId.trim();
+    
+    // First check if we already have it in cache
+    for (const cache of this.puzzleCache.values()) {
+      for (const puzzle of cache.values()) {
+        if (puzzle.filename === cleanId || puzzle.id.includes(cleanId)) {
+          return puzzle;
+        }
+      }
+    }
+
+    // If not in cache, try to load it directly from file
+    const datasets: ARCDatasetType[] = ['training', 'evaluation', 'training2', 'evaluation2'];
+    
+    for (const dataset of datasets) {
+      try {
+        const filePath = `/data/${dataset}/${cleanId}.json`;
+        const rawPuzzle = await this.loadPuzzleFile(filePath);
+        
+        if (rawPuzzle) {
+          const enhancedPuzzle = await this.enhancePuzzle(rawPuzzle, filePath, dataset);
+          
+          // Add to cache
+          if (!this.puzzleCache.has(dataset)) {
+            this.puzzleCache.set(dataset, new Map());
+          }
+          this.puzzleCache.get(dataset)!.set(enhancedPuzzle.id, enhancedPuzzle);
+          
+          return enhancedPuzzle;
+        }
+      } catch (error) {
+        // Continue trying other datasets
+        console.debug(`Puzzle ${cleanId} not found in ${dataset} dataset`);
+      }
+    }
+
+    return null;
+  }
+
+  /**
    * Clear all caches
    */
   public clearCache(): void {
