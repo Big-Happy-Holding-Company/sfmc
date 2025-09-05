@@ -122,9 +122,9 @@ export default function OfficerTrack() {
         
         // Load merged puzzle dataset (PlayFab + arc-explainer performance data)
         const mergedData = await puzzlePerformanceService.getMergedPuzzleDataset({
-          datasets: ['training', 'evaluation'],
+          datasets: ['training', 'evaluation', 'training2', 'evaluation2'],
           difficulty: getAccessibleDifficulties(playerData.officerRank),
-          // Remove arbitrary limit - load what's available for the rank
+          // Load all 1,920 puzzles from all datasets - no limits
         });
         setMergedPuzzles(mergedData);
         console.log(`🧩 Loaded ${mergedData.length} merged puzzles for ${playerData.officerRank}`);

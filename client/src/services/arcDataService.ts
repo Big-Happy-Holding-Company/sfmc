@@ -65,7 +65,8 @@ export class ARCDataService {
    * Load ARC puzzles from specified datasets with pagination
    */
   public async loadARCPuzzles(options: ARCLoadOptions): Promise<ARCPuzzleSearchResult> {
-    const { datasets, limit = 50, offset = 0, difficulty, forceRefresh = false } = options;
+    const { datasets, offset = 0, difficulty, forceRefresh = false } = options;
+    const limit = options.limit || Number.MAX_SAFE_INTEGER; // No artificial limits
     
     console.log(`🎯 Loading ARC puzzles:`, { datasets, limit, offset, difficulty });
 
@@ -542,7 +543,7 @@ export class ARCDataService {
     const options: ARCLoadOptions = {
       datasets,
       difficulty: filters.difficulty,
-      limit: 50, // Will be handled by the search logic
+      // No artificial limits - load all available puzzles
       offset: 0
     };
 
@@ -711,7 +712,7 @@ export function useARCData() {
     try {
       const puzzles = await arcDataService.loadARCPuzzles({
         datasets: [dataset],
-        limit: 1000 // Load many puzzles for the selector
+        // Load all available puzzles - no artificial limits
       });
       
       // Convert to file format expected by components

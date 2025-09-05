@@ -216,3 +216,4 @@ PLAYFAB_SECRET_KEY=<admin-secret-key> # Required for upload scripts only
 - **Upload Scripts**: Check what data is actually uploaded before building complex loading systems  
 - **PlayFab Investigation**: Use API calls to verify what Title Data keys exist and contain
 
+- PlayFab is used for most backend stuff...  we do call the API of our other app, the arc-explainer though for the puzzle filtering on the officer track

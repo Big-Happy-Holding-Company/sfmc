@@ -32,7 +32,7 @@ export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
               <h3 className="text-green-400 font-semibold mb-2">Welcome, Cadet! I'm your trainer. I'll be here if you need hints!</h3>
               <div className="text-slate-200 text-base leading-relaxed space-y-3">
                 <p>
-                  You are now part of the <span className="text-cyan-400 font-bold">Space Force Operations Center</span> — where we test the kind of thinking that <em className="text-red-300">AI 🤖 still can't do</em>.
+                  You are now part of the <span className="text-cyan-400 font-bold">Space Force Operations Center</span> — where we need the kind of thinking that <em className="text-red-300">AI 🤖 still can't do</em>.
                 </p>
                 <p>
                   Sure, they can chat like a human and even pass hard exams — like the ones to become a lawyer or a doctor. But that's because those tests follow patterns, and <strong className="text-yellow-300">AI 🤖 are pattern masters</strong>.

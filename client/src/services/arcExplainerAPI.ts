@@ -174,8 +174,8 @@ export class ArcExplainerAPI {
       // Convert PlayFab puzzle ID format to ARC Explainer format
       const cleanPuzzleId = this.convertPlayFabIdToArcId(puzzleId);
       
-      // First try to get from worst performing list (cached)
-      const worstPuzzles = await this.getWorstPerformingPuzzles({ limit: 1000 });
+      // First try to get from worst performing list (cached) - no artificial limits
+      const worstPuzzles = await this.getWorstPerformingPuzzles({});
       const found = worstPuzzles.find(p => (p.id || p.puzzleId) === cleanPuzzleId);
       
       if (found) {
@@ -282,8 +282,8 @@ export class ArcExplainerAPI {
     try {
       const performanceMap = new Map<string, AIPuzzlePerformance>();
       
-      // Get all worst performing puzzles (with larger limit for better coverage)
-      const worstPuzzles = await this.getWorstPerformingPuzzles({ limit: 1000 });
+      // Get all worst performing puzzles - no artificial limits for better coverage
+      const worstPuzzles = await this.getWorstPerformingPuzzles({});
       
       // Create lookup map for faster searching - handle both id and puzzleId fields
       const arcPerformanceMap = new Map<string, AIPuzzlePerformance>();
@@ -364,8 +364,8 @@ export class ArcExplainerAPI {
     total: number;
   }> {
     try {
-      // Get worst performing puzzles with server max limit (50)
-      const puzzles = await this.getWorstPerformingPuzzles({ limit: 50 });
+      // Get worst performing puzzles - no artificial limits
+      const puzzles = await this.getWorstPerformingPuzzles({});
       
       const stats = {
         impossible: 0,
