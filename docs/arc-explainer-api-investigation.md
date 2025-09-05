@@ -70,17 +70,6 @@
 ### Currently Used:
 - `/api/puzzle/worst-performing` - For both statistics and filtering data
 
-### Optimization Opportunities:
-- `/api/puzzle/performance-stats` - Better source for difficulty statistics
-- `/api/puzzle/task/:taskId` - Direct puzzle lookup for search
-- `/api/puzzle/confidence-stats` - Could add confidence-based difficulty
-- `/api/feedback/stats` - Could incorporate user feedback into difficulty
-
-### Future Enhancements:
-- Batch analysis integration for Officer Track
-- Solution sharing and voting system
-- Saturn visual analysis for complex puzzles
-
 ## Key Findings vs My Assumptions
 
 ### ✅ What I Got Right

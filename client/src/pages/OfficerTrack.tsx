@@ -1,31 +1,36 @@
 /**
- * Officer Track Page - Advanced ARC Puzzle Interface
+ * Officer Track Page - ARC Puzzle Interface
  * ========================================================
- * Author: Space Force Mission Control Team
+ * Author: Claude 4 Code with major hallucinations and incompetence.  Sloppy code, imaginary endpoints
+ * and broken logic.  Do not trust this code.
  * 
  * Purpose:
- * Advanced puzzle interface for ARC-AGI challenges with military academy theming.
+ * Advanced puzzle interface for ARC-AGI challenges with NASA military academy theming.
  * Completely separate from main game with dedicated officer ranking system.
  * 
  * Key Features:
  * - ARC puzzle loading and transformation from integer grids to emoji presentation
- * - Officer rank progression system (Lieutenant → General)
- * - Separate PlayFab leaderboards and achievements
- * - Gold/silver military academy visual theme
- * - Advanced difficulty indicators and complex puzzle handling
+ * - Officer rank progression system (Lieutenant → General) HALLUCINATED!  Remove if found.
+ * - Separate PlayFab leaderboards and achievements (Unknown if implemented, not required at this time)
+ * - Gold/silver military academy visual theme (Poorly executed, needs a makeover and a NASA-inspired space theme that
+ * isn't cheesy and looks somewhat scientific while still being fun)
+ * - Advanced difficulty indicators and complex puzzle handling (Totally overengineered and needs 
+ * to be simplified based on D:\1Projects\arc-explainer\client\src\pages\PuzzleDiscussion.tsx and what it is using
+ * since we are using the same API!!)
  * 
- * Data Flow:
- * - Loads ARC puzzles via arcDataService (1,920+ puzzles)
- * - Manages officer player data via playFabOfficerTrack
- * - Validates solutions via dedicated CloudScript function
- * - Maintains complete separation from base game
+ * Data Flow:   ///  Needs major overhaul.  We know where to get the puzzles, we know where to get the metadata, we know how to call PlayFab, it needs to be hooked up correctly.
+ * - Loads ARC puzzles via arcDataService (1,920+ puzzles)  // Not sure if this is the best way???
+ * - Matches puzzles to the PlayFab puzzle IDs (Not working?  Maybe working?)
+ * - Manages officer player data via playFabOfficerTrack //  Not even sure if it does that??  Far too complex for this stage.
+ * - Validates solutions via dedicated CloudScript function (Bare minimum, works!)
+ * - No interaction with base game code at this time.
  */
 
 import { useState, useEffect } from "react";
 import { arcDataService } from "@/services/arcDataService";
 import { playFabService } from "@/services/playfab";
 import { arcExplainerAPI, type AIPuzzlePerformance } from "@/services/arcExplainerAPI";
-import { puzzlePerformanceService, type MergedPuzzleData } from "@/services/puzzlePerformanceService";
+// Removed puzzlePerformanceService - using direct arc-explainer API
 import type { 
   OfficerTrackPuzzle, 
   OfficerTrackPlayer,
@@ -367,42 +372,38 @@ export default function OfficerTrack() {
     try {
       console.log(`🔍 Searching for puzzle: ${puzzleId}`);
       
-      // First try to find in current merged dataset
-      const foundInCurrent = await puzzlePerformanceService.findPuzzleById(
-        puzzleId, 
-        { datasets: ['training', 'evaluation'] }
+      // First try to find in current filtered dataset
+      const foundInFiltered = filteredPuzzles.find(p => 
+        p.id === puzzleId || p.id.includes(puzzleId)
       );
       
-      if (foundInCurrent) {
-        console.log(`✅ Found puzzle in current dataset: ${foundInCurrent.id}`);
-        handleSelectPuzzle(foundInCurrent);
-        return;
-      }
-      
-      // If not found, try direct API lookup for additional metadata
-      const directLookup = await arcExplainerAPI.getPuzzleById(puzzleId);
-      if (directLookup) {
-        console.log(`✅ Found puzzle via direct API lookup: ${puzzleId}`);
-        // Try to find corresponding PlayFab puzzle with expanded search
-        const expandedSearch = await puzzlePerformanceService.findPuzzleById(
-          puzzleId,
-          { 
-            datasets: ['training', 'evaluation', 'training2', 'evaluation2'],
-            difficulty: undefined // Search all difficulties
-          }
-        );
-        
-        if (expandedSearch) {
-          handleSelectPuzzle(expandedSearch);
+      if (foundInFiltered) {
+        console.log(`✅ Found puzzle in filtered dataset: ${foundInFiltered.id}`);
+        // Convert AIPuzzlePerformance to OfficerTrackPuzzle for selection
+        const puzzleData = await arcDataService.searchPuzzleById(foundInFiltered.id);
+        if (puzzleData) {
+          handleSelectPuzzle(puzzleData);
           return;
         }
       }
       
-      // Fallback to original search method
+      // Try direct API lookup from arc-explainer
+      const directLookup = await arcExplainerAPI.getPuzzleById(puzzleId);
+      if (directLookup) {
+        console.log(`✅ Found puzzle via arc-explainer API: ${puzzleId}`);
+        // Get full puzzle data from arcDataService
+        const puzzleData = await arcDataService.searchPuzzleById(puzzleId);
+        if (puzzleData) {
+          handleSelectPuzzle(puzzleData);
+          return;
+        }
+      }
+      
+      // Fallback to direct arcDataService search
       const puzzle = await arcDataService.searchPuzzleById(puzzleId);
       
       if (puzzle) {
-        console.log(`✅ Found puzzle via fallback search: ${puzzle.id}`);
+        console.log(`✅ Found puzzle via direct search: ${puzzle.id}`);
         handleSelectPuzzle(puzzle);
       } else {
         setError(`Puzzle "${puzzleId}" not found in any dataset. Try a different ID.`);
@@ -424,29 +425,44 @@ export default function OfficerTrack() {
     try {
       console.log(`🎲 Selecting random puzzle with difficulty: ${difficulty || 'any'}`);
       
-      // Get filtered puzzles based on difficulty
-      let candidatePuzzles: MergedPuzzleData[];
+      // Use filtered puzzles from arc-explainer API
+      let candidatePuzzles = filteredPuzzles;
       
       if (difficulty && difficulty !== 'all') {
-        // Filter by AI difficulty category using unified service
-        candidatePuzzles = puzzlePerformanceService.filterByPerformance(mergedPuzzles, {
-          difficulty: difficulty as 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging'
-        });
+        // Filter current puzzles by requested difficulty
+        const difficultyMap: Record<string, 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging'> = {
+          'impossible': 'impossible',
+          'extremely_hard': 'extremely_hard', 
+          'very_hard': 'very_hard',
+          'challenging': 'challenging'
+        };
+        
+        const targetDifficulty = difficultyMap[difficulty];
+        if (targetDifficulty) {
+          candidatePuzzles = filteredPuzzles.filter(p => 
+            arcExplainerAPI.getDifficultyCategory(p.avgAccuracy) === targetDifficulty
+          );
+        }
         
         if (candidatePuzzles.length === 0) {
           setError(`No puzzles found with difficulty "${difficulty}". Try a different filter.`);
           return;
         }
-      } else {
-        candidatePuzzles = mergedPuzzles;
       }
       
       // Select random puzzle from candidates
       const randomIndex = Math.floor(Math.random() * candidatePuzzles.length);
-      const randomPuzzle = candidatePuzzles[randomIndex];
+      const randomAIPuzzle = candidatePuzzles[randomIndex];
       
-      console.log(`✅ Selected random puzzle: ${randomPuzzle.id} (${candidatePuzzles.length} candidates)`);
-      handleSelectPuzzle(randomPuzzle);
+      console.log(`✅ Selected random AI puzzle: ${randomAIPuzzle.id} (${candidatePuzzles.length} candidates)`);
+      
+      // Get full puzzle data from arcDataService
+      const puzzleData = await arcDataService.searchPuzzleById(randomAIPuzzle.id);
+      if (puzzleData) {
+        handleSelectPuzzle(puzzleData);
+      } else {
+        setError('Failed to load selected puzzle data');
+      }
       
     } catch (err) {
       console.error('❌ Random puzzle selection failed:', err);
@@ -471,7 +487,7 @@ export default function OfficerTrack() {
     if (filters.difficulty && filters.difficulty !== 'all') {
       setSelectedDifficultyFilter(filters.difficulty);
     } else {
-      setSelectedDifficultyFilter(null);
+      setSelectedDifficultyFilter(undefined);
     }
   };
 
@@ -844,7 +860,6 @@ export default function OfficerTrack() {
                     <Badge className="ml-2 bg-blue-600 text-white">
                       Filtered: {selectedDifficultyFilter.replace('_', ' ').toUpperCase()}
                     </Badge>
-{{ ... }}
                   )}
                 </CardTitle>
               </CardHeader>
@@ -864,13 +879,13 @@ export default function OfficerTrack() {
                         </div>
                         <div className="text-blue-300 text-xs">
                           Showing only puzzles categorized as "{selectedDifficultyFilter.replace('_', ' ')}" based on AI performance data.
-                          {getFilteredPuzzles().length === 0 && " No puzzles match this criteria in the current set."}
+                          {filteredPuzzles.length === 0 && " No puzzles match this criteria in the current set."}
                         </div>
                       </div>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setSelectedDifficultyFilter(null)}
+                        onClick={() => setSelectedDifficultyFilter(undefined)}
                         className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
                       >
                         Clear Filter
@@ -880,73 +895,70 @@ export default function OfficerTrack() {
                 )}
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {getFilteredPuzzles().map((puzzle) => {
-                    const aiPerformance = puzzle.aiPerformance;
+                  {filteredPuzzles.map((aiPuzzle) => {
+                    const difficultyCategory = arcExplainerAPI.getDifficultyCategory(aiPuzzle.avgAccuracy);
                     return (
                     <Card 
-                      key={puzzle.id}
+                      key={aiPuzzle.id}
                       className="bg-slate-700 border-amber-600 hover:border-amber-400 cursor-pointer transition-colors"
-                      onClick={() => handleSelectPuzzle(puzzle)}
+                      onClick={async () => {
+                        // Load full puzzle data from arcDataService when selected
+                        const puzzleData = await arcDataService.searchPuzzleById(aiPuzzle.id);
+                        if (puzzleData) {
+                          handleSelectPuzzle(puzzleData);
+                        } else {
+                          setError(`Failed to load puzzle data for ${aiPuzzle.id}`);
+                        }
+                      }}
                     >
                       <CardContent className="p-4">
                         <div className="flex justify-between items-start mb-2">
-                          <Badge className={`
-                            ${puzzle.difficulty === 'LIEUTENANT' ? 'bg-green-600' : ''}
-                            ${puzzle.difficulty === 'CAPTAIN' ? 'bg-blue-600' : ''}
-                            ${puzzle.difficulty === 'MAJOR' ? 'bg-purple-600' : ''}
-                            ${puzzle.difficulty === 'COLONEL' ? 'bg-red-600' : ''}
-                          `}>
-                            {puzzle.difficulty}
+                          <Badge className="bg-amber-600 text-slate-900">
+                            ARC PUZZLE
                           </Badge>
                           <div className="text-xs text-amber-400">
-                            {puzzle.dataset.toUpperCase()}
+                            ANALYSIS DATA
                           </div>
                         </div>
                         
                         {/* AI Performance Badge */}
-                        {puzzle.hasPerformanceData && aiPerformance && (
-                          <div className="mb-2">
-                            <Badge className={`
-                              text-xs
-                              ${aiPerformance.avgAccuracy === 0 ? 'bg-red-600 text-white' : ''}
-                              ${aiPerformance.avgAccuracy <= 0.25 && aiPerformance.avgAccuracy > 0 ? 'bg-orange-600 text-white' : ''}
-                              ${aiPerformance.avgAccuracy <= 0.50 && aiPerformance.avgAccuracy > 0.25 ? 'bg-yellow-600 text-black' : ''}
-                              ${aiPerformance.avgAccuracy > 0.50 ? 'bg-blue-600 text-white' : ''}
-                            `}>
-                              🤖 AI: {(aiPerformance.avgAccuracy * 100).toFixed(0)}% accuracy
-                              {aiPerformance.avgAccuracy === 0 && ' (IMPOSSIBLE)'}
-                            </Badge>
-                          </div>
-                        )}
+                        <div className="mb-2">
+                          <Badge className={`
+                            text-xs
+                            ${aiPuzzle.avgAccuracy === 0 ? 'bg-red-600 text-white' : ''}
+                            ${aiPuzzle.avgAccuracy <= 0.25 && aiPuzzle.avgAccuracy > 0 ? 'bg-orange-600 text-white' : ''}
+                            ${aiPuzzle.avgAccuracy <= 0.50 && aiPuzzle.avgAccuracy > 0.25 ? 'bg-yellow-600 text-black' : ''}
+                            ${aiPuzzle.avgAccuracy > 0.50 ? 'bg-blue-600 text-white' : ''}
+                          `}>
+                            🤖 AI: {(aiPuzzle.avgAccuracy * 100).toFixed(0)}% accuracy
+                            {aiPuzzle.avgAccuracy === 0 && ' (IMPOSSIBLE)'}
+                          </Badge>
+                        </div>
                         
                         {/* Difficulty Category Badge */}
-                        {puzzle.difficultyCategory && (
-                          <div className="mb-2">
-                            <Badge className={`
-                              text-xs
-                              ${puzzle.difficultyCategory === 'impossible' ? 'bg-red-700 text-red-200' : ''}
-                              ${puzzle.difficultyCategory === 'extremely_hard' ? 'bg-orange-700 text-orange-200' : ''}
-                              ${puzzle.difficultyCategory === 'very_hard' ? 'bg-yellow-700 text-yellow-200' : ''}
-                              ${puzzle.difficultyCategory === 'challenging' ? 'bg-blue-700 text-blue-200' : ''}
-                            `}>
-                              {puzzle.difficultyCategory.replace('_', ' ').toUpperCase()}
-                            </Badge>
-                          </div>
-                        )}
+                        <div className="mb-2">
+                          <Badge className={`
+                            text-xs
+                            ${difficultyCategory === 'impossible' ? 'bg-red-700 text-red-200' : ''}
+                            ${difficultyCategory === 'extremely_hard' ? 'bg-orange-700 text-orange-200' : ''}
+                            ${difficultyCategory === 'very_hard' ? 'bg-yellow-700 text-yellow-200' : ''}
+                            ${difficultyCategory === 'challenging' ? 'bg-blue-700 text-blue-200' : ''}
+                          `}>
+                            {difficultyCategory.replace('_', ' ').toUpperCase()}
+                          </Badge>
+                        </div>
                         
                         <div className="text-sm font-semibold text-amber-200 mb-1">
-                          {getCleanPuzzleId(puzzle.id)}
+                          {getCleanPuzzleId(aiPuzzle.id)}
                         </div>
                         
                         <div className="text-xs text-slate-300 space-y-1">
-                          <div>Training Examples: {puzzle.complexity.trainingExamples}</div>
-                          <div>Colors Used: {puzzle.complexity.uniqueColors}</div>
-                          <div>Complexity: {puzzle.complexity.transformationComplexity}</div>
-                          {puzzle.hasPerformanceData && aiPerformance && (
-                            <div className="text-blue-300">
-                              Explanations: {aiPerformance.totalExplanations} • Score: {aiPerformance.compositeScore?.toFixed(1) || 'N/A'}
-                            </div>
-                          )}
+                          <div className="text-blue-300">
+                            Explanations: {aiPuzzle.totalExplanations} • Score: {aiPuzzle.compositeScore?.toFixed(1) || 'N/A'}
+                          </div>
+                          <div className="text-amber-300">
+                            Click to load full puzzle data and solve
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
