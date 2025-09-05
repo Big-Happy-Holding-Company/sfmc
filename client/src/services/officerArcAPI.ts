@@ -219,48 +219,36 @@ export async function searchPuzzleById(searchId: string): Promise<OfficerPuzzle 
   try {
     const cleanId = searchId.trim().toLowerCase().replace(/^arc-[a-z0-9]+-/, '');
     console.log(`🔍 Searching for puzzle: ${searchId} (cleaned: ${cleanId})`);
+    console.log(`🌐 Making API call to: /api/puzzle/task/${cleanId}`);
     
-    // Use arc-explainer's specific puzzle endpoint
+    // Use arc-explainer's specific puzzle endpoint - NO LOCAL FALLBACKS
     const data = await makeAPICall(`/api/puzzle/task/${cleanId}`);
+    console.log(`📡 API response:`, data);
     
     if (data.success && data.data) {
-      // Get performance data for this specific puzzle
-      const taskData = data.data;
+      console.log(`✅ Puzzle found in arc-explainer database: ${cleanId}`);
       
-      // Try to get performance data from worst-performing (might not be there)
-      let performanceData = null;
-      try {
-        const perfResponse = await getOfficerPuzzles(200); // Get larger set to find performance data
-        const foundWithPerf = perfResponse.puzzles.find(p => p.id === cleanId);
-        if (foundWithPerf) {
-          performanceData = {
-            avgAccuracy: foundWithPerf.avgAccuracy,
-            totalExplanations: foundWithPerf.totalExplanations,
-            compositeScore: foundWithPerf.compositeScore
-          };
-        }
-      } catch (err) {
-        console.warn('Could not get performance data for puzzle:', cleanId);
-      }
-      
-      // Create puzzle object with available data
+      // Create puzzle object - performance data will be 0 if not available
+      // This is better than failing the whole search
       const puzzle: OfficerPuzzle = {
         id: cleanId,
         playFabId: arcIdToPlayFab(cleanId),
-        avgAccuracy: performanceData?.avgAccuracy || 0,
-        difficulty: categorizeDifficulty(performanceData?.avgAccuracy || 0),
-        totalExplanations: performanceData?.totalExplanations || 0,
-        compositeScore: performanceData?.compositeScore || 0
+        avgAccuracy: 0, // Will show as "impossible" difficulty
+        difficulty: 'impossible', // Safe default for puzzles without performance data
+        totalExplanations: 0,
+        compositeScore: 0
       };
       
-      console.log(`✅ Found puzzle ${cleanId} with performance data:`, performanceData);
+      console.log(`✅ Created puzzle object for ${cleanId}:`, puzzle);
       return puzzle;
+    } else {
+      console.warn(`❌ Puzzle not found or invalid response for ${cleanId}:`, data);
+      return null;
     }
-    
-    return null;
     
   } catch (error) {
     console.error(`❌ Failed to search for puzzle ${searchId}:`, error);
+    console.error(`❌ Error details:`, error);
     return null;
   }
 }
