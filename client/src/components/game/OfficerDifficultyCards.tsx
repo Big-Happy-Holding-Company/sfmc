@@ -7,11 +7,10 @@
  * Uses existing SFMC component patterns and shadcn/ui
  */
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Brain, Zap, AlertTriangle, Target } from "lucide-react";
-import { useDifficultyStats } from "@/hooks/useWorstPerformingPuzzles";
+import { useOfficerPuzzles } from "@/hooks/useOfficerPuzzles";
 
 interface OfficerDifficultyCardsProps {
   onCategorySelect: (category: 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging') => void;
@@ -23,7 +22,7 @@ export function OfficerDifficultyCards({
   selectedCategory 
 }: OfficerDifficultyCardsProps) {
   
-  const { stats, isLoading, error, refetch } = useDifficultyStats();
+  const { stats, loading: isLoading, error, refresh: refetch } = useOfficerPuzzles();
 
   if (error) {
     return (
@@ -33,8 +32,7 @@ export function OfficerDifficultyCards({
           <h3 className="text-red-400 font-semibold mb-2">Failed to Load AI Difficulty Data</h3>
           <p className="text-slate-400 text-sm mb-4">{error}</p>
           <Button onClick={refetch} variant="outline" size="sm">
-            <i className="fas fa-redo mr-2"></i>
-            Retry
+            🔄 Retry
           </Button>
         </div>
       </div>
