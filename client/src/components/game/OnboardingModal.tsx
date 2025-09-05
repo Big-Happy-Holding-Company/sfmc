@@ -30,9 +30,26 @@ export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
           <div className="space-y-4 px-2">
             <div className="bg-slate-900 border border-slate-600 rounded p-3 sm:p-4">
               <h3 className="text-green-400 font-semibold mb-2">Welcome, Cadet! I'm your trainer. I'll be here if you need hints!</h3>
-              <p className="text-slate-300 text-sm leading-relaxed">
-                You are now part of the <span className="text-cyan-400 font-semibold">Space Force Operations Center</span> where we test the kinds of abstract reasoning and thinking that LLMs aren't capable of. Even though they can talk pretty and pass the bar exam or medical boards, they aren't actually smart - they're just predictive parrots repeating memorized patterns. When it comes to novel problems they've never seen before, they can't do it. In officer training, you'll learn more about how to spot these dangerously wrong answers. For now, let's get you started on some basic tasks to judge your <span className="text-amber-400 font-semibold">Fluid Intelligence Quotient</span>. Don't worry if it's low to start - FIQ can be built, like muscles in a gym.
-              </p>
+              <div className="text-slate-200 text-base leading-relaxed space-y-3">
+                <p>
+                  You are now part of the <span className="text-cyan-400 font-bold">Space Force Operations Center</span> — where we test the kind of thinking that <em className="text-red-300">LLMs still can't do</em>.
+                </p>
+                <p>
+                  Sure, they can chat like a human and even pass hard exams — like the ones to become a lawyer or a doctor. But that's because those tests follow patterns, and <strong className="text-yellow-300">LLMs are pattern masters</strong>.
+                </p>
+                <p>
+                  What they're <em>not</em>? <strong className="text-red-400">Real problem-solvers</strong>. Give them something brand new — something they've never seen, with no clear answer in their memory — and they freeze. Or worse: <em className="text-red-300">they make up confident-sounding nonsense</em>.
+                </p>
+                <p>
+                  In officer training, you'll learn how to spot those <strong className="text-red-400">fake-smart answers</strong> before they cause real damage.
+                </p>
+                <p>
+                  For now? We're testing your <span className="text-amber-400 font-bold text-lg">Fluid Intelligence Quotient</span> — your ability to <strong>think on your feet, adapt, and solve what's never been solved before</strong>.
+                </p>
+                <p className="text-green-300">
+                  Don't worry if you're rusty. Like muscles, your FIQ gets <em>stronger</em> the more you use it.
+                </p>
+              </div>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
