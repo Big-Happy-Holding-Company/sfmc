@@ -44,6 +44,7 @@ import { Label } from "@/components/ui/label";
 import { SPACE_EMOJIS, EMOJI_SET_INFO } from "@/constants/spaceEmojis";
 import type { EmojiSet } from "@/constants/spaceEmojis";
 import { OfficerDifficultyCards } from "@/components/game/OfficerDifficultyCards";
+import { OfficerPuzzleSearch, type SearchFilters } from "@/components/game/OfficerPuzzleSearch";
 
 // Officer Track specific styling constants
 const OFFICER_COLORS = {
