@@ -34,6 +34,7 @@ import { ResultModal } from "@/components/game/ResultModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SPACE_EMOJIS } from "@/constants/spaceEmojis";
+import { getTrainerForTask } from "@/constants/trainers";
 import type { MissionExample } from "@/types/game";
 import type { EmojiSet } from "@/constants/spaceEmojis";
 
@@ -52,6 +53,9 @@ export default function MissionControl() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [validating, setValidating] = useState(false);
+
+  // Get trainer for current task
+  const trainer = currentTask ? getTrainerForTask(currentTask.id) : null;
 
   // Initialize PlayFab data on mount
   useEffect(() => {
@@ -303,7 +307,7 @@ export default function MissionControl() {
                   <div className="bg-slate-800 border border-yellow-500 rounded p-4 mb-4">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-yellow-400 font-semibold flex items-center">
-                        <img src="/wyatt-space-force.jpg" alt="Sgt Wyatt" className="w-10 h-10 rounded-full border-2 border-cyan-400 mr-2" />
+                        <img src={trainer?.image || "/wyatt-space-force.jpg"} alt={trainer ? `${trainer.rank} ${trainer.name}` : "Trainer"} className="w-10 h-10 rounded-full border-2 border-cyan-400 mr-2" />
                         <i className="fas fa-lightbulb mr-2"></i>
                         MISSION HINTS ({hintsUsed}/{currentTask.hints.length})
                       </h3>
@@ -325,7 +329,7 @@ export default function MissionControl() {
                           <div key={index} className="bg-slate-700 p-3 rounded border-l-4 border-yellow-400">
                             <div className="text-xs text-yellow-400 mb-1">HINT {index + 1}</div>
                             <div className="flex items-start space-x-2">
-                              <img src="/wyatt-space-force.jpg" alt="Sgt Wyatt" className="w-8 h-8 rounded-full border-2 border-cyan-400" />
+                              <img src={trainer?.image || "/wyatt-space-force.jpg"} alt={trainer ? `${trainer.rank} ${trainer.name}` : "Trainer"} className="w-8 h-8 rounded-full border-2 border-cyan-400" />
                               <span className="text-slate-200 text-sm">{hint}</span>
                             </div>
                           </div>
@@ -335,8 +339,8 @@ export default function MissionControl() {
                     
                     {currentHintIndex === -1 && (
                       <div className="flex items-center text-slate-400 text-sm italic">
-                        <img src="/wyatt-space-force.jpg" alt="Sgt Wyatt" className="w-8 h-8 rounded-full border-2 border-cyan-400 mr-2" />
-                        Click 'GET HINT' and Sergeant Wyatt will guide you through the mission.
+                        <img src={trainer?.image || "/wyatt-space-force.jpg"} alt={trainer ? `${trainer.rank} ${trainer.name}` : "Trainer"} className="w-8 h-8 rounded-full border-2 border-cyan-400 mr-2" />
+                        Click 'GET HINT' and {trainer ? `${trainer.rank} ${trainer.name}` : "your trainer"} will guide you through the mission.
                       </div>
                     )}
                   </div>

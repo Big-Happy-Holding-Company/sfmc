@@ -14,6 +14,7 @@
 
 import { useEffect, useState } from 'react';
 import { X, CheckCircle, AlertCircle, Star, Award, TrendingUp, Target, ArrowRight } from 'lucide-react';
+import { getRandomOfficer } from '@/constants/trainers';
 import type { ARCGrid, OfficerRank, OfficerPlayerData, ARCPuzzleFile } from '@/types/arcTypes';
 import { OfficerDisplayGrid } from './OfficerGrid';
 import { OfficerRankBadge } from './OfficerRankBadge';
@@ -67,6 +68,7 @@ export function OfficerResultModal({
 }: OfficerResultModalProps) {
   const [showAnimation, setShowAnimation] = useState(false);
   const [showRankUp, setShowRankUp] = useState(false);
+  const [officer] = useState(() => getRandomOfficer()); // Fixed officer for this modal instance
 
   const rankUp = previousRank !== currentRank;
 
@@ -132,19 +134,26 @@ export function OfficerResultModal({
           }
         `}>
           <div className="flex items-center gap-4">
-            {success ? (
-              <CheckCircle className="w-8 h-8 text-green-400" />
-            ) : (
-              <AlertCircle className="w-8 h-8 text-red-400" />
-            )}
+            <div className="flex items-center gap-3">
+              <img 
+                src={officer.image} 
+                alt={`${officer.rank} ${officer.name}`}
+                className="w-16 h-16 rounded-full border-3 border-amber-400 object-cover"
+              />
+              {success ? (
+                <CheckCircle className="w-8 h-8 text-green-400" />
+              ) : (
+                <AlertCircle className="w-8 h-8 text-red-400" />
+              )}
+            </div>
             <div>
               <h2 className="text-2xl font-bold text-white">
                 {success ? 'Mission Accomplished!' : 'Mission Failed'}
               </h2>
               <p className="text-amber-300">
                 {success 
-                  ? 'Outstanding work, Officer! Mission parameters achieved.'
-                  : 'Mission incomplete. Regroup and analyze tactical approach.'
+                  ? `Outstanding work, Officer! ${officer.rank} ${officer.name} commends your tactical analysis.`
+                  : `Mission incomplete. ${officer.rank} ${officer.name} recommends regrouping and analyzing tactical approach.`
                 }
               </p>
             </div>
