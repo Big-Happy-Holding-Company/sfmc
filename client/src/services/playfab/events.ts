@@ -214,7 +214,7 @@ export class PlayFabEvents {
       position.y,
       { action },
       deltaMs,
-      "Mission Control 2045",
+      "Mission Control 2050",
       "start", // actions are ongoing
       "player_interaction",
       "player_action",
@@ -243,7 +243,7 @@ export class PlayFabEvents {
       0, 0, // position not relevant for hints
       { hintIndex },
       deltaMs,
-      "Mission Control 2045",
+      "Mission Control 2050",
       "start",
       "hint_system",
       "hint_used",
@@ -266,7 +266,7 @@ export class PlayFabEvents {
         0, 0,
         { event: 'game_start' },
         0,
-        "Mission Control 2045",
+        "Mission Control 2050",
         "start",
         "game_flow",
         "game_start",
@@ -302,7 +302,7 @@ export class PlayFabEvents {
           final_status: status
         },
         duration,
-        "Mission Control 2045",
+        "Mission Control 2050",
         status,
         "game_flow",
         "game_completion",

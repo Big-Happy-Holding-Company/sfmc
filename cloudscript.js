@@ -1,6 +1,6 @@
 /**
  * PlayFab CloudScript Functions
- * Server-side functions for Mission Control 2045 React application
+ * Server-side functions for Mission Control 2050 React application
  * 
  * SECURITY CRITICAL: These functions run on PlayFab servers and cannot be hacked by clients
  */
