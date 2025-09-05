@@ -83,18 +83,15 @@ export default function OfficerTrackSimple() {
     try {
       console.log('🎯 Loading puzzle for solving:', puzzle.id);
       
-      // Import the new PlayFab loading function
-      const { loadPuzzleFromPlayFab } = await import('@/services/officerArcAPI');
-      
-      // Load full puzzle data directly from PlayFab using PlayFab ID
-      const fullPuzzleData = await loadPuzzleFromPlayFab(puzzle.playFabId);
+      // Load full puzzle data from arcDataService using the arc ID (this was working before)
+      const fullPuzzleData = await arcDataService.searchPuzzleById(puzzle.id);
       
       if (fullPuzzleData) {
         setCurrentPuzzle(fullPuzzleData);
         console.log('✅ Puzzle loaded and ready to solve:', fullPuzzleData.id);
       } else {
-        alert(`Failed to load puzzle data for "${puzzle.playFabId}". The puzzle may not be available in PlayFab.`);
-        console.error('❌ No full puzzle data found for:', puzzle.playFabId);
+        alert(`Failed to load puzzle data for "${puzzle.id}"`);
+        console.error('❌ No full puzzle data found for:', puzzle.id);
       }
       
     } catch (err) {
