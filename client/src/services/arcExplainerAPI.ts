@@ -132,21 +132,24 @@ export class ArcExplainerAPI {
         return [];
       }
 
-      // Extract only the performance metrics we need, not full puzzle data
-      const puzzles: AIPuzzlePerformance[] = rawPuzzles.map(p => ({
-        id: p.id || p.puzzleId || '',
-        puzzleId: p.puzzleId || p.id,
-        avgAccuracy: p.avgAccuracy || 0,
-        wrongCount: p.wrongCount,
-        avgConfidence: p.avgConfidence,
-        totalExplanations: p.totalExplanations,
-        negativeFeedback: p.negativeFeedback,
-        totalFeedback: p.totalFeedback,
-        latestAnalysis: p.latestAnalysis,
-        worstExplanationId: p.worstExplanationId,
-        compositeScore: p.compositeScore || 0
-        // Deliberately omitting train/test data - we don't need full puzzle content
-      })).filter(p => p.id); // Remove any entries without valid IDs
+      // Extract only the performance metrics we need from performanceData, not full puzzle data
+      const puzzles: AIPuzzlePerformance[] = rawPuzzles.map(p => {
+        const perf = p.performanceData || {};
+        return {
+          id: p.id || p.puzzleId || '',
+          puzzleId: p.puzzleId || p.id,
+          avgAccuracy: perf.avgAccuracy || 0,
+          wrongCount: perf.wrongCount,
+          avgConfidence: perf.avgConfidence,
+          totalExplanations: perf.totalExplanations,
+          negativeFeedback: perf.negativeFeedback,
+          totalFeedback: perf.totalFeedback,
+          latestAnalysis: perf.latestAnalysis,
+          worstExplanationId: perf.worstExplanationId,
+          compositeScore: perf.compositeScore || 0
+          // Deliberately omitting train/test data - we don't need full puzzle content
+        };
+      }).filter(p => p.id); // Remove any entries without valid IDs
 
       if (puzzles.length > 0) {
         this.setCache(cacheKey, puzzles);
