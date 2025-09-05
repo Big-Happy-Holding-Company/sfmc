@@ -9,16 +9,20 @@
 
 // Types matching arc-explainer API response structure
 export interface AIPuzzlePerformance {
-  puzzleId: string;
+  id: string;           // Puzzle ID 
+  puzzleId?: string;    // Alternative puzzle ID field
   wrongCount: number;
   avgAccuracy: number;
   avgConfidence: number;
   totalExplanations: number;
   negativeFeedback: number;
   totalFeedback: number;
-  latestAnalysis: string;
-  worstExplanationId: number;
+  latestAnalysis?: string;
+  worstExplanationId?: number;
   compositeScore: number;
+  // Full puzzle data that the API also returns
+  train?: Array<{input: number[][], output: number[][]}>;
+  test?: Array<{input: number[][], output: number[][]}>;
 }
 
 export interface WorstPerformingPuzzlesResponse {
@@ -48,9 +52,11 @@ export class ArcExplainerAPI {
   private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   private constructor() {
-    console.log('🔧 VITE_ARC_EXPLAINER_URL env var:', process.env.VITE_ARC_EXPLAINER_URL);
-    console.log('🔧 All VITE env vars:', Object.keys(process.env).filter(k => k.startsWith('VITE_')));
-    this.baseURL = process.env.VITE_ARC_EXPLAINER_URL || 'https://arc-explainer-production.up.railway.app';
+    // For Vite, use import.meta.env instead of process.env
+    const envUrl = import.meta.env.VITE_ARC_EXPLAINER_URL || process.env.VITE_ARC_EXPLAINER_URL;
+    console.log('🔧 VITE_ARC_EXPLAINER_URL env var:', envUrl);
+    console.log('🔧 All VITE env vars:', Object.keys(import.meta.env).filter(k => k.startsWith('VITE_')));
+    this.baseURL = envUrl || 'https://arc-explainer-production.up.railway.app';
     console.log('🌐 ArcExplainerAPI baseURL set to:', this.baseURL);
   }
 
@@ -97,17 +103,47 @@ export class ArcExplainerAPI {
 
     try {
       const response = await this.makeRequest(url);
-      const data: WorstPerformingPuzzlesResponse = await response.json();
+      const data = await response.json();
 
-      if (data.success && data.data?.puzzles) {
-        this.setCache(cacheKey, data.data.puzzles);
-        return data.data.puzzles;
+      console.log('🔍 Raw API response:', data);
+      console.log('🔍 Response structure:', {
+        hasSuccess: 'success' in data,
+        hasData: 'data' in data,
+        dataType: typeof data.data,
+        isArray: Array.isArray(data),
+        keys: Object.keys(data)
+      });
+
+      // Handle different possible response structures
+      let puzzles: AIPuzzlePerformance[] = [];
+
+      if (Array.isArray(data)) {
+        // Response is directly an array of puzzles
+        puzzles = data;
+        console.log('📋 Direct array response:', puzzles.length, 'puzzles');
+      } else if (data.success && data.data?.puzzles) {
+        // Wrapped response with success flag
+        puzzles = data.data.puzzles;
+        console.log('📋 Wrapped response:', puzzles.length, 'puzzles');
+      } else if (data.data && Array.isArray(data.data)) {
+        // Response has data property that is an array
+        puzzles = data.data;
+        console.log('📋 Data array response:', puzzles.length, 'puzzles');
       } else {
-        console.warn('arc-explainer API returned unsuccessful response:', data);
+        console.warn('🚫 Unexpected response structure:', data);
+        return [];
+      }
+
+      if (puzzles.length > 0) {
+        this.setCache(cacheKey, puzzles);
+        console.log('✅ Successfully loaded', puzzles.length, 'worst performing puzzles');
+        return puzzles;
+      } else {
+        console.warn('⚠️  No puzzles in API response');
         return [];
       }
     } catch (error) {
-      console.error('Failed to fetch worst performing puzzles:', error);
+      console.error('❌ Failed to fetch worst performing puzzles:', error);
       throw error;
     }
   }
@@ -123,7 +159,7 @@ export class ArcExplainerAPI {
       
       // First try to get from worst performing list (cached)
       const worstPuzzles = await this.getWorstPerformingPuzzles({ limit: 1000 });
-      const found = worstPuzzles.find(p => p.puzzleId === cleanPuzzleId);
+      const found = worstPuzzles.find(p => (p.id || p.puzzleId) === cleanPuzzleId);
       
       if (found) {
         return found;
@@ -159,9 +195,14 @@ export class ArcExplainerAPI {
       // Get all worst performing puzzles (with larger limit for better coverage)
       const worstPuzzles = await this.getWorstPerformingPuzzles({ limit: 1000 });
       
-      // Create lookup map for faster searching
+      // Create lookup map for faster searching - handle both id and puzzleId fields
       const arcPerformanceMap = new Map<string, AIPuzzlePerformance>();
-      worstPuzzles.forEach(p => arcPerformanceMap.set(p.puzzleId, p));
+      worstPuzzles.forEach(p => {
+        const puzzleId = p.id || p.puzzleId || '';
+        if (puzzleId) {
+          arcPerformanceMap.set(puzzleId, p);
+        }
+      });
       
       // Match PlayFab IDs to ARC performance data
       puzzleIds.forEach(playFabId => {
