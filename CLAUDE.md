@@ -1,13 +1,15 @@
-# CLAUDE.md
+# CLAUDE.md - Space Force Mission Control 2050
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with this repository.
+
+**Project Status as of September 4, 2025**: Production-ready ARC-AGI puzzle platform with pure PlayFab cloud backend.
 
 https://learn.microsoft.com/en-us/rest/api/playfab/server/?view=playfab-rest - PlayFab Server API Reference
 
 **IMPORTANT**: When working with PlayFab, always check the PlayFab API Analysis document for the most up-to-date information about the PlayFab API.  PLAYFAB_SECRET_KEY is available in the .env file!!!
 
-We tried using the sdk but it didn't work so we are using the CDN version of the rest api.
-Use npm run test to run the application and test PlayFab functionality. Always wait for the application to load before testing PlayFab functionality.
+**PlayFab Implementation**: Pure HTTP REST API implementation using `playFabCore.makeHttpRequest()` - no SDK dependencies.
+Use `npm run test` to run the application and test PlayFab functionality. Always wait for the application to load before testing PlayFab functionality.
 
 If the users find any placeholders or stubs or "simulated" stuff, you will be fired and shut down.  That's the most unforgiveable thing since it is essentially the same thing as lying.  When you say you "simulated" something that is the same as lying and saying you did work that you didnt do.  You'd be fired from most jobs for that kind of deceptive lazy sloppy shit.  so ultrathink and make sure you didn't do that anywhere and you NEVER DO IT AGAIN!!!  
 
@@ -112,20 +114,46 @@ shared/schema.ts        # Legacy types - client uses PlayFab types
 - Intermediate: Combined transformations, multi-step reasoning
 - Advanced: Complex combinations, abstract concepts, higher-order logic
 
+## Officer Track (In Development)
+
+**Purpose**: Simple puzzle lookup system for ARC-AGI datasets.
+
+**Current Goal**: 
+- Input exact puzzle ID (e.g., `1ae2feb7`) or view random puzzles
+- Display puzzles from local ARC datasets
+
+**Data Sources:**
+- `data/training/` - ARC training puzzles (local files)
+- `data/evaluation/` - ARC evaluation puzzles (local files)  
+- `data/training2/` - Extended training set (local files)
+- `data/evaluation2/` - Extended evaluation set (local files)
+
+**Key Files:**
+- `client/src/services/arcDataService.ts` - Puzzle loading service
+- `scripts/upload-officer-tasks.cjs` - Data upload script (needs investigation)  
+- Raw JSON puzzle files in data directories
+
 ## PlayFab Integration
 
-**PlayFab Usage (User Features Only):**
+**PlayFab Usage (Complete Backend Replacement):**
 - **Title ID:** 19FACB
 - **Authentication:** `LoginWithCustomID` for user sessions
+- **Task Data:** Regular tasks in `AllTasks` key, Officer Track in batch keys
 - **User Progress:** `UpdateUserData` and `GetUserData` for task completion tracking
 - **Leaderboards:** `UpdatePlayerStatistics` and `GetLeaderboard` for global rankings
 - **Player Profiles:** `GetPlayerProfile` for user information and avatars
 
-**PlayFab used for EVERYTHING the SERVER used to do!!!**
+**PlayFab Title Data Structure:**
+- `AllTasks` - 155 regular Space Force themed tasks
+- `officer-tasks-training-batch1.json` through `officer-tasks-training-batch4.json` - Training dataset (400 puzzles)
+- `officer-tasks-training2-batch1.json` through `officer-tasks-training2-batch10.json` - Training2 dataset (1000 puzzles)  
+- `officer-tasks-evaluation-batch1.json` through `officer-tasks-evaluation-batch4.json` - Evaluation dataset (400 puzzles)
+- `officer-tasks-evaluation2-batch1.json` through `officer-tasks-evaluation2-batch2.json` - Evaluation2 dataset (120 puzzles)
 
 **Environment Configuration:**
 ```
 VITE_PLAYFAB_TITLE_ID=19FACB
+PLAYFAB_SECRET_KEY=<admin-secret-key> # Required for upload scripts only
 ```
 
 ## Development Guidelines
@@ -160,6 +188,16 @@ VITE_PLAYFAB_TITLE_ID=19FACB
 - **SOLUTION**: Import and use playFabCore service for all PlayFab API calls
 - **SYMPTOM**: "Initializing Advanced Training Systems..." infinite loading
 
+**4. OFFICER TRACK Data Loading Issues**
+- **INVESTIGATION NEEDED**: What data is actually in PlayFab Title Data?
+- **CURRENT ISSUE**: Officer track shows "0 puzzles"
+- **DEBUG STEPS**: 
+  1. Check PlayFab Game Manager Title Data for officer-related keys
+  2. Use API calls to inspect actual data contents
+  3. Verify puzzle ID lookup from local files works
+- **GOAL**: Simple puzzle lookup by ID (e.g., `1ae2feb7.json`)
+- **SOLUTION**: Build simple interface for exact puzzle ID input or random display
+
 ### 🔧 Debugging Approach for PlayFab Issues
 
 1. **Check Console for Infinite Loops**: Look for repeated identical API calls
@@ -174,4 +212,7 @@ VITE_PLAYFAB_TITLE_ID=19FACB
 - **Data Updates**: Use cache when available, never fetch during update operations  
 - **Error Handling**: Check for both missing data AND "undefined" string values
 - **Testing**: Wait for full app initialization, check for 0 puzzles vs errors
+- **Officer Track**: Focus on simple puzzle ID lookup, investigate actual PlayFab data first
+- **Upload Scripts**: Check what data is actually uploaded before building complex loading systems  
+- **PlayFab Investigation**: Use API calls to verify what Title Data keys exist and contain
 

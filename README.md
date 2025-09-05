@@ -1,22 +1,36 @@
-# Mission Control 2050
+# Space Force Mission Control 2050
 
-A Space Force-themed puzzle game where players complete operational tasks to advance through enlisted ranks. Tasks are based on the Abstract Reasoning Corpus (ARC) puzzles, transformed to fit the Space Force theme while maintaining accessibility for all players, including those with color vision deficiencies.
+A Space Force-themed puzzle platform featuring two distinct training systems: **Enlisted Track** with 155 curated operational tasks, and **Officer Track** with 1,920+ ARC-AGI puzzles for advanced training. Built on the Abstract Reasoning Corpus (ARC) framework while maintaining accessibility for all players.
 
 ## About
 
-- **Purpose**: Provide an engaging way to develop and test human reasoning skills through space operations-themed puzzles
-- **Inspiration**: Based on the ARC-AGI benchmark for measuring intelligence
-- **Platform**: Web-based, responsive design works on any device with a modern browser
+- **Purpose**: Develop human reasoning skills through space operations-themed puzzles
+- **Dual Track System**: Enlisted (themed tasks) + Officer (raw ARC-AGI datasets)  
+- **Inspiration**: Based on the ARC-AGI benchmark for measuring AI and human intelligence
+- **Platform**: Static web application with PlayFab cloud backend
+- **Accessibility**: Colorblind-friendly emoji sets and clear visual feedback
 
 https://learn.microsoft.com/en-us/rest/api/playfab/server/?view=playfab-rest - PlayFab Server API Reference
 
-**Note**: This is a static site that connects directly to PlayFab. No server setup required!
+**Architecture**: Pure static site deployment with PlayFab-only backend. No server infrastructure required!
 
 ## Key Features
 
-- **Task Categories**: Various space operations themes (Oxygen Systems, Navigation, Power, etc.)
-- **Rank Progression**: Advance through Space Force enlisted ranks by solving puzzles
-- **Accessibility**: Designed with colorblind-friendly emoji sets and clear visual feedback
+### Enlisted Track (155 Tasks)
+- **Themed Categories**: O₂ Systems, Navigation, Power, Communications, Fuel Systems, Pre-Launch, Security
+- **Rank Progression**: Advance through Space Force enlisted ranks (E1-E9)
+- **Curated Content**: Space Force themed transformations with storylines
+
+### Officer Track (1,920+ Puzzles)  
+- **ARC-AGI Datasets**: Raw training, training2, evaluation, evaluation2 datasets
+- **Advanced Training**: Complex abstract reasoning for officer development
+- **Batch Architecture**: Efficient loading of large puzzle collections
+- **Officer Ranks**: LIEUTENANT → CAPTAIN → MAJOR → COLONEL progression
+
+### Accessibility & Design
+- **Colorblind Friendly**: Multiple emoji sets with clear visual distinctions
+- **Responsive UI**: Works on desktop, tablet, and mobile devices
+- **Real-time Feedback**: Immediate validation and hints system
 
 ## Technical Stack
 
@@ -29,28 +43,36 @@ https://learn.microsoft.com/en-us/rest/api/playfab/server/?view=playfab-rest - P
 
 ### Architecture Overview
 
-This is a **static web application** that runs entirely in the browser, with all backend functionality handled by PlayFab cloud services.
+This is a **pure static web application** with all backend functionality handled by PlayFab cloud services.
 
 ```
-PlayFab Cloud (Single Source of Truth)
-├── Title Data: Task definitions (155 tasks)
-├── User Data: Player progress & stats
-├── Statistics: Leaderboards & rankings
+PlayFab Cloud Backend (Single Source of Truth)
+├── Title Data: 
+│   ├── AllTasks (155 enlisted tasks)
+│   ├── officer-tasks-training-batch1-4.json (400 puzzles)
+│   ├── officer-tasks-training2-batch1-10.json (1000 puzzles)  
+│   ├── officer-tasks-evaluation-batch1-4.json (400 puzzles)
+│   └── officer-tasks-evaluation2-batch1-2.json (120 puzzles)
+├── User Data: Player progress & officer track stats
+├── Statistics: Global leaderboards & rankings
 └── Events: Game analytics & logging
     ↓
 Static React App (client/)
-├── components/    # UI components
-├── constants/     # Game constants and emoji sets  
-├── services/      # PlayFab integration
+├── components/    # Game UI components + shadcn/ui
+├── constants/     # Emoji sets and game constants  
+├── services/      # Pure HTTP PlayFab integration
+│   ├── playfab/   # Core PlayFab services
+│   └── arcDataService.ts  # Officer track batch loading
 └── pages/         # Route components
 
 ### Data Flow
-1. **Tasks**: Loaded from PlayFab Title Data on app start
-2. **Authentication**: Anonymous PlayFab login with device ID
-3. **Progress**: Stored in PlayFab User Data  
-4. **Validation**: Client-side with PlayFab progress updates
-5. **Leaderboards**: PlayFab Statistics API
-6. **Deployment**: Static files served from CDN (Railway)
+1. **Enlisted Tasks**: Loaded from `AllTasks` PlayFab Title Data key
+2. **Officer Tasks**: Batch-loaded from multiple Title Data keys per dataset  
+3. **Authentication**: Anonymous PlayFab login with persistent device ID
+4. **Progress**: Stored separately for enlisted vs officer tracks in User Data
+5. **Validation**: Client-side logic with PlayFab progress updates
+6. **Leaderboards**: Separate leaderboards for enlisted and officer tracks
+7. **Deployment**: Static files served from CDN (Railway)
 
 
 
@@ -82,6 +104,25 @@ Tasks are defined in JSON format with the following structure:
 ### Emoji Sets
 
 Tasks use emoji sets to represent different game elements. The mapping from numbers to emojis is handled automatically by the frontend.
+
+## Officer Track (In Development)
+
+### Current Goal
+Simple puzzle lookup system where users can:
+- Input exact puzzle ID (e.g., `1ae2feb7` from `data/evaluation2/1ae2feb7.json`)
+- View random puzzles by their IDs
+
+### Data Sources
+Raw ARC-AGI datasets in local directories:
+- `data/training/` - ARC training puzzles  
+- `data/evaluation/` - ARC evaluation puzzles
+- `data/training2/` - Extended training set
+- `data/evaluation2/` - Extended evaluation set
+
+### Next Steps
+1. Investigate what data is actually in PlayFab Title Data
+2. Build simple puzzle ID input/lookup interface
+3. Display puzzles by their unique IDs
 
 ## Development
 
