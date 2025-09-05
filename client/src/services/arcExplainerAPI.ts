@@ -112,12 +112,16 @@ export class ArcExplainerAPI {
 
   /**
    * Get performance data for a specific puzzle
+   * Handles PlayFab puzzle ID format conversion (ARC-TR-007bbfb7 → 007bbfb7)
    */
   public async getPuzzlePerformance(puzzleId: string): Promise<AIPuzzlePerformance | null> {
     try {
+      // Convert PlayFab puzzle ID format to ARC Explainer format
+      const cleanPuzzleId = this.convertPlayFabIdToArcId(puzzleId);
+      
       // First try to get from worst performing list (cached)
-      const worstPuzzles = await this.getWorstPerformingPuzzles({ limit: 100 });
-      const found = worstPuzzles.find(p => p.puzzleId === puzzleId);
+      const worstPuzzles = await this.getWorstPerformingPuzzles({ limit: 1000 });
+      const found = worstPuzzles.find(p => p.puzzleId === cleanPuzzleId);
       
       if (found) {
         return found;
@@ -130,6 +134,48 @@ export class ArcExplainerAPI {
     } catch (error) {
       console.error(`Failed to get performance data for puzzle ${puzzleId}:`, error);
       return null;
+    }
+  }
+
+  /**
+   * Convert PlayFab puzzle ID format to ARC Explainer format
+   * ARC-TR-007bbfb7 → 007bbfb7
+   * ARC-EV-1ae2feb7 → 1ae2feb7
+   */
+  public convertPlayFabIdToArcId(playFabId: string): string {
+    // Remove ARC-TR-, ARC-EV-, ARC-TR2-, ARC-EV2- prefixes
+    return playFabId.replace(/^ARC-[A-Z0-9]+-/, '');
+  }
+
+  /**
+   * Get performance data for multiple puzzles (batch operation)
+   */
+  public async getBatchPuzzlePerformance(puzzleIds: string[]): Promise<Map<string, AIPuzzlePerformance>> {
+    try {
+      const performanceMap = new Map<string, AIPuzzlePerformance>();
+      
+      // Get all worst performing puzzles (with larger limit for better coverage)
+      const worstPuzzles = await this.getWorstPerformingPuzzles({ limit: 1000 });
+      
+      // Create lookup map for faster searching
+      const arcPerformanceMap = new Map<string, AIPuzzlePerformance>();
+      worstPuzzles.forEach(p => arcPerformanceMap.set(p.puzzleId, p));
+      
+      // Match PlayFab IDs to ARC performance data
+      puzzleIds.forEach(playFabId => {
+        const arcId = this.convertPlayFabIdToArcId(playFabId);
+        const performance = arcPerformanceMap.get(arcId);
+        if (performance) {
+          performanceMap.set(playFabId, performance);
+        }
+      });
+      
+      console.log(`Found AI performance data for ${performanceMap.size}/${puzzleIds.length} puzzles`);
+      return performanceMap;
+      
+    } catch (error) {
+      console.error('Failed to get batch puzzle performance:', error);
+      return new Map();
     }
   }
 

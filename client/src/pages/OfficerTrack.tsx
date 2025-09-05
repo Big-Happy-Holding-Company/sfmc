@@ -24,6 +24,7 @@
 import { useState, useEffect } from "react";
 import { arcDataService } from "@/services/arcDataService";
 import { playFabService } from "@/services/playfab";
+import { arcExplainerAPI, type AIPuzzlePerformance } from "@/services/arcExplainerAPI";
 import type { 
   OfficerTrackPuzzle, 
   OfficerTrackPlayer,
@@ -42,6 +43,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { SPACE_EMOJIS, EMOJI_SET_INFO } from "@/constants/spaceEmojis";
 import type { EmojiSet } from "@/constants/spaceEmojis";
+import { OfficerDifficultyCards } from "@/components/game/OfficerDifficultyCards";
 
 // Officer Track specific styling constants
 const OFFICER_COLORS = {
@@ -61,6 +63,10 @@ export default function OfficerTrack() {
   const [availablePuzzles, setAvailablePuzzles] = useState<ARCPuzzleSearchResult | null>(null);
   const [playerSolution, setPlayerSolution] = useState<number[][]>([]);
   const [validationResult, setValidationResult] = useState<ARCValidationResult | null>(null);
+  
+  // AI Performance Integration
+  const [aiPerformanceMap, setAiPerformanceMap] = useState<Map<string, AIPuzzlePerformance>>(new Map());
+  const [selectedDifficultyFilter, setSelectedDifficultyFilter] = useState<'impossible' | 'extremely_hard' | 'very_hard' | 'challenging' | null>(null);
   
   // UI state
   const [loading, setLoading] = useState(true);
@@ -99,12 +105,18 @@ export default function OfficerTrack() {
         // Load initial set of ARC puzzles based on officer rank
         const puzzleData = await arcDataService.loadARCPuzzles({
           datasets: ['training', 'evaluation'],
-          limit: 20,
+          limit: 50, // Increased limit for better AI filtering
           offset: 0,
           difficulty: getAccessibleDifficulties(playerData.officerRank)
         });
         setAvailablePuzzles(puzzleData);
         console.log(`🧩 Loaded ${puzzleData.puzzles.length} ARC puzzles for ${playerData.officerRank}`);
+        
+        // Load AI performance data for all puzzles
+        const puzzleIds = puzzleData.puzzles.map(p => p.id);
+        const performanceData = await arcExplainerAPI.getBatchPuzzlePerformance(puzzleIds);
+        setAiPerformanceMap(performanceData);
+        console.log(`🤖 Loaded AI performance data for ${performanceData.size} puzzles`);
         
         console.log('✅ Officer Track initialization complete');
       } catch (err) {
@@ -134,6 +146,42 @@ export default function OfficerTrack() {
       difficulties.push('COLONEL');
     }
     return difficulties;
+  };
+
+  /**
+   * Get AI performance for a specific puzzle
+   */
+  const getAIPerformance = (puzzleId: string): AIPuzzlePerformance | null => {
+    return aiPerformanceMap.get(puzzleId) || null;
+  };
+
+  /**
+   * Check if puzzle matches selected AI difficulty filter
+   */
+  const puzzleMatchesDifficultyFilter = (puzzle: OfficerTrackPuzzle): boolean => {
+    if (!selectedDifficultyFilter) return true;
+    
+    const aiPerformance = getAIPerformance(puzzle.id);
+    if (!aiPerformance) return false;
+    
+    const category = arcExplainerAPI.getDifficultyCategory(aiPerformance.avgAccuracy);
+    return category === selectedDifficultyFilter;
+  };
+
+  /**
+   * Get filtered puzzles based on AI difficulty selection
+   */
+  const getFilteredPuzzles = (): OfficerTrackPuzzle[] => {
+    if (!availablePuzzles) return [];
+    
+    return availablePuzzles.puzzles.filter(puzzleMatchesDifficultyFilter);
+  };
+
+  /**
+   * Handle AI difficulty category selection
+   */
+  const handleDifficultyFilterSelect = (category: 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging') => {
+    setSelectedDifficultyFilter(category === selectedDifficultyFilter ? null : category);
   };
 
   /**
@@ -462,13 +510,24 @@ export default function OfficerTrack() {
         {!currentPuzzle ? (
           /* Puzzle Selection Interface */
           <div className="space-y-6">
+            {/* AI Difficulty Filter Cards */}
+            <OfficerDifficultyCards 
+              onCategorySelect={handleDifficultyFilterSelect}
+              selectedCategory={selectedDifficultyFilter}
+            />
+            
             <Card className="bg-slate-800 border-amber-400">
               <CardHeader>
                 <CardTitle className="text-amber-400 flex items-center">
                   🧩 Advanced Reasoning Challenges
                   <Badge className="ml-3 bg-amber-600 text-slate-900">
-                    {availablePuzzles?.totalCount || 0} Available
+                    {getFilteredPuzzles().length} of {availablePuzzles?.totalCount || 0} Available
                   </Badge>
+                  {selectedDifficultyFilter && (
+                    <Badge className="ml-2 bg-blue-600 text-white">
+                      Filtered: {selectedDifficultyFilter.replace('_', ' ').toUpperCase()}
+                    </Badge>
+                  )}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -478,8 +537,34 @@ export default function OfficerTrack() {
                   understanding complex transformations that go far beyond standard operations.
                 </p>
                 
+                {selectedDifficultyFilter && (
+                  <div className="bg-slate-900 border border-blue-600 rounded-lg p-3 mb-4">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="text-blue-400 text-sm font-medium mb-1">
+                          🤖 AI Difficulty Filter Active
+                        </div>
+                        <div className="text-blue-300 text-xs">
+                          Showing only puzzles categorized as "{selectedDifficultyFilter.replace('_', ' ')}" based on AI performance data.
+                          {getFilteredPuzzles().length === 0 && " No puzzles match this criteria in the current set."}
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedDifficultyFilter(null)}
+                        className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
+                      >
+                        Clear Filter
+                      </Button>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {availablePuzzles?.puzzles.map((puzzle) => (
+                  {getFilteredPuzzles().map((puzzle) => {
+                    const aiPerformance = getAIPerformance(puzzle.id);
+                    return (
                     <Card 
                       key={puzzle.id}
                       className="bg-slate-700 border-amber-600 hover:border-amber-400 cursor-pointer transition-colors"
@@ -500,18 +585,39 @@ export default function OfficerTrack() {
                           </div>
                         </div>
                         
+                        {/* AI Performance Badge */}
+                        {aiPerformance && (
+                          <div className="mb-2">
+                            <Badge className={`
+                              text-xs
+                              ${aiPerformance.avgAccuracy === 0 ? 'bg-red-600 text-white' : ''}
+                              ${aiPerformance.avgAccuracy <= 0.25 && aiPerformance.avgAccuracy > 0 ? 'bg-orange-600 text-white' : ''}
+                              ${aiPerformance.avgAccuracy <= 0.50 && aiPerformance.avgAccuracy > 0.25 ? 'bg-yellow-600 text-black' : ''}
+                              ${aiPerformance.avgAccuracy > 0.50 ? 'bg-blue-600 text-white' : ''}
+                            `}>
+                              🤖 AI: {(aiPerformance.avgAccuracy * 100).toFixed(0)}% accuracy
+                            </Badge>
+                          </div>
+                        )}
+                        
                         <div className="text-sm font-semibold text-amber-200 mb-1">
-                          {puzzle.id}
+                          {getCleanPuzzleId(puzzle.id)}
                         </div>
                         
                         <div className="text-xs text-slate-300 space-y-1">
                           <div>Training Examples: {puzzle.complexity.trainingExamples}</div>
                           <div>Colors Used: {puzzle.complexity.uniqueColors}</div>
                           <div>Complexity: {puzzle.complexity.transformationComplexity}</div>
+                          {aiPerformance && (
+                            <div className="text-blue-300">
+                              Explanations: {aiPerformance.totalExplanations} • Score: {aiPerformance.compositeScore.toFixed(1)}
+                            </div>
+                          )}
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
@@ -541,6 +647,14 @@ export default function OfficerTrack() {
                       Dataset: {currentPuzzle.dataset.toUpperCase()} • 
                       Complexity: {currentPuzzle.complexity.transformationComplexity} • 
                       Colors: {currentPuzzle.complexity.uniqueColors}
+                      {getAIPerformance(currentPuzzle.id) && (
+                        <>
+                          {" • "}
+                          <span className="text-blue-300">
+                            🤖 AI Accuracy: {(getAIPerformance(currentPuzzle.id)!.avgAccuracy * 100).toFixed(0)}%
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
                   
@@ -555,6 +669,57 @@ export default function OfficerTrack() {
               </CardHeader>
               
               <CardContent className="space-y-6">
+                {/* AI Performance Context */}
+                {getAIPerformance(currentPuzzle.id) && (
+                  <div className="bg-slate-900 border border-blue-600 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-blue-400 font-semibold flex items-center">
+                        🤖 AI PERFORMANCE ANALYSIS
+                      </h4>
+                      <Badge className={`
+                        ${getAIPerformance(currentPuzzle.id)!.avgAccuracy === 0 ? 'bg-red-600 text-white' : ''}
+                        ${getAIPerformance(currentPuzzle.id)!.avgAccuracy <= 0.25 && getAIPerformance(currentPuzzle.id)!.avgAccuracy > 0 ? 'bg-orange-600 text-white' : ''}
+                        ${getAIPerformance(currentPuzzle.id)!.avgAccuracy <= 0.50 && getAIPerformance(currentPuzzle.id)!.avgAccuracy > 0.25 ? 'bg-yellow-600 text-black' : ''}
+                        ${getAIPerformance(currentPuzzle.id)!.avgAccuracy > 0.50 ? 'bg-blue-600 text-white' : ''}
+                      `}>
+                        {arcExplainerAPI.getDifficultyCategory(getAIPerformance(currentPuzzle.id)!.avgAccuracy).replace('_', ' ').toUpperCase()}
+                      </Badge>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      <div className="text-center">
+                        <div className="text-blue-300 font-medium">Accuracy Rate</div>
+                        <div className="text-2xl font-bold text-blue-100">
+                          {(getAIPerformance(currentPuzzle.id)!.avgAccuracy * 100).toFixed(0)}%
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-blue-300 font-medium">Explanations</div>
+                        <div className="text-2xl font-bold text-blue-100">
+                          {getAIPerformance(currentPuzzle.id)!.totalExplanations}
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-blue-300 font-medium">Composite Score</div>
+                        <div className="text-2xl font-bold text-blue-100">
+                          {getAIPerformance(currentPuzzle.id)!.compositeScore.toFixed(1)}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {getAIPerformance(currentPuzzle.id)!.avgAccuracy === 0 && (
+                      <div className="mt-3 text-center">
+                        <div className="text-red-300 text-sm font-medium">
+                          ⚠️ This puzzle has NEVER been solved correctly by AI systems
+                        </div>
+                        <div className="text-red-400 text-xs mt-1">
+                          You're attempting a challenge that represents the frontier of human reasoning
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
                 {/* Emoji Set and Display Controls */}
                 <div className="bg-slate-900 border border-amber-800 rounded-lg p-4">
                   <div className="flex flex-wrap items-center gap-4">
