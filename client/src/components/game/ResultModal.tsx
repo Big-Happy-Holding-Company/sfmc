@@ -17,6 +17,7 @@
  */
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { getRandomTrainer, getRandomOfficer } from "@/constants/trainers";
 import type { TaskValidationResult } from "@/services/playfab";
 
 interface ResultModalProps {
@@ -35,6 +36,7 @@ export function ResultModal({ open, onClose, result, onRetry }: ResultModalProps
   if (!result?.success) return null;
 
   const isSuccess = result.correct;
+  const personnel = isSuccess ? getRandomOfficer() : getRandomTrainer();
   
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -42,8 +44,8 @@ export function ResultModal({ open, onClose, result, onRetry }: ResultModalProps
         <div className="text-center space-y-4">
           <div className="flex justify-center mb-2">
             <img 
-              src={isSuccess ? "/master-chief-wyatt.png" : "/wyatt-space-force.jpg"} 
-              alt={isSuccess ? "Master Chief Wyatt" : "Sgt Wyatt"} 
+              src={personnel.image} 
+              alt={`${personnel.rank} ${personnel.name}`} 
               className={`w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 ${isSuccess ? 'border-green-400' : 'border-amber-400'} object-cover`} 
             />
           </div>

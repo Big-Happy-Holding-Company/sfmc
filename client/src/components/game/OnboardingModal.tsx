@@ -1,5 +1,6 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { getRandomTrainer } from "@/constants/trainers";
 
 interface OnboardingModalProps {
   open: boolean;
@@ -7,6 +8,7 @@ interface OnboardingModalProps {
 }
 
 export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
+  const trainer = getRandomTrainer();
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -16,20 +18,20 @@ export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
           <div>
             <div className="flex justify-center mb-4">
               <img 
-                src="/wyatt-space-force.jpg" 
-                alt="Sgt Wyatt" 
+                src={trainer.image} 
+                alt={`${trainer.rank} ${trainer.name}`} 
                 className="w-48 h-48 sm:w-64 sm:h-64 rounded-full border-4 border-cyan-400 object-cover transition-transform duration-300 hover:scale-105" 
               />
             </div>
             <h1 className="text-3xl font-bold text-cyan-400 mb-2">Mission Control 2050</h1>
-            <p className="text-amber-400 font-mono text-sm">US SPACE FORCE OPERATIONS CENTER</p>
+            <p className="text-amber-400 font-mono text-sm">SPACE FORCE OPERATIONS CENTER</p>
           </div>
           
           <div className="space-y-4 px-2">
             <div className="bg-slate-900 border border-slate-600 rounded p-3 sm:p-4">
-              <h3 className="text-green-400 font-semibold mb-2">Welcome, Cadet! I'm your trainer, Sergeant Wyatt. I'll be here if you need hints!</h3>
+              <h3 className="text-green-400 font-semibold mb-2">Welcome, Cadet! I'm your trainer. I'll be here if you need hints!</h3>
               <p className="text-slate-300 text-sm leading-relaxed">
-                You are now part of the <span className="text-cyan-400 font-semibold">US Space Force Operations Center</span> where computers do math, but we need humans to perceive the bigger picture. Let's start you with some basic tasks to make you a useful member of the team. This training will take you all the way to the highest enlisted rank: <span className="text-amber-400 font-semibold">Chief Master Sergeant of the Space Force!</span>
+                You are now part of the <span className="text-cyan-400 font-semibold">Space Force Operations Center</span> where we test the kinds of abstract reasoning and thinking that LLMs aren't capable of. Even though they can talk pretty and pass the bar exam or medical boards, they aren't actually smart - they're just predictive parrots repeating memorized patterns. When it comes to novel problems they've never seen before, they can't do it. In officer training, you'll learn more about how to spot these dangerously wrong answers. For now, let's get you started on some basic tasks to judge your <span className="text-amber-400 font-semibold">Fluid Intelligence Quotient</span>. Don't worry if it's low to start - FIQ can be built, like muscles in a gym.
               </p>
             </div>
             
