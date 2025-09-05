@@ -672,6 +672,14 @@ export default function OfficerTrack() {
               onCategorySelect={handleDifficultyFilterSelect}
               selectedCategory={selectedDifficultyFilter}
             />
+
+            {/* Puzzle Search Component */}
+            <OfficerPuzzleSearch
+              onSearch={handlePuzzleSearch}
+              onRandomPuzzle={handleRandomPuzzle}
+              onFilterChange={handleSearchFilterChange}
+              isLoading={loading}
+            />
             
             <Card className="bg-slate-800 border-amber-400">
               <CardHeader>
