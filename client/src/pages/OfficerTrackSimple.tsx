@@ -54,13 +54,16 @@ export default function OfficerTrackSimple() {
     try {
       const puzzle = await searchById(searchQuery.trim());
       if (puzzle) {
-        // Load full puzzle data from arcDataService
-        const fullPuzzleData = await arcDataService.searchPuzzleById(puzzle.id);
+        // Import the new PlayFab loading function
+        const { loadPuzzleFromPlayFab } = await import('@/services/officerArcAPI');
+        
+        // Load full puzzle data directly from PlayFab using PlayFab ID
+        const fullPuzzleData = await loadPuzzleFromPlayFab(puzzle.playFabId);
         if (fullPuzzleData) {
           setCurrentPuzzle(fullPuzzleData);
           console.log('✅ Loaded puzzle for solving:', fullPuzzleData.id);
         } else {
-          alert(`Failed to load puzzle data for "${puzzle.id}"`);
+          alert(`Failed to load puzzle data for "${puzzle.playFabId}". The puzzle may not be available in PlayFab.`);
         }
       } else {
         alert(`Puzzle "${searchQuery}" not found. Try a different ID.`);
@@ -78,15 +81,18 @@ export default function OfficerTrackSimple() {
     try {
       console.log('🎯 Loading puzzle for solving:', puzzle.id);
       
-      // Load full puzzle data from arcDataService using the arc ID
-      const fullPuzzleData = await arcDataService.searchPuzzleById(puzzle.id);
+      // Import the new PlayFab loading function
+      const { loadPuzzleFromPlayFab } = await import('@/services/officerArcAPI');
+      
+      // Load full puzzle data directly from PlayFab using PlayFab ID
+      const fullPuzzleData = await loadPuzzleFromPlayFab(puzzle.playFabId);
       
       if (fullPuzzleData) {
         setCurrentPuzzle(fullPuzzleData);
         console.log('✅ Puzzle loaded and ready to solve:', fullPuzzleData.id);
       } else {
-        alert(`Failed to load puzzle data for "${puzzle.id}"`);
-        console.error('❌ No full puzzle data found for:', puzzle.id);
+        alert(`Failed to load puzzle data for "${puzzle.playFabId}". The puzzle may not be available in PlayFab.`);
+        console.error('❌ No full puzzle data found for:', puzzle.playFabId);
       }
       
     } catch (err) {
