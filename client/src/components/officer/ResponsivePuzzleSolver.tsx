@@ -205,12 +205,12 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
             </div>
           </div>
 
-          {/* Desktop/Tablet Layout: Optimized for better space utilization */}
+          {/* Desktop Layout: Optimized for better space utilization */}
           <div className="hidden lg:block">
-            <div className="flex items-start justify-center gap-8 max-w-6xl mx-auto">
+            <div className="flex items-start justify-center gap-12 max-w-7xl mx-auto px-4">
               {/* Test Input */}
-              <div className="flex-1 max-w-md text-center">
-                <h3 className="text-amber-300 text-sm font-semibold mb-4">TEST INPUT</h3>
+              <div className="flex-1 max-w-sm text-center">
+                <h3 className="text-amber-300 text-sm font-semibold mb-6">TEST INPUT</h3>
                 <ResponsiveOfficerDisplayGrid
                   grid={testInput}
                   containerType="solver"
@@ -219,15 +219,15 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
               </div>
 
               {/* Transformation Indicator */}
-              <div className="flex items-center justify-center py-8">
-                <div className="text-cyan-400 text-3xl font-bold px-4">
+              <div className="flex items-center justify-center py-12 min-w-0">
+                <div className="text-cyan-400 text-4xl font-bold px-6">
                   →
                 </div>
               </div>
 
               {/* User Solution */}
-              <div className="flex-1 max-w-md text-center">
-                <h3 className="text-amber-300 text-sm font-semibold mb-4">YOUR SOLUTION</h3>
+              <div className="flex-1 max-w-sm text-center">
+                <h3 className="text-amber-300 text-sm font-semibold mb-6">YOUR SOLUTION</h3>
                 <ResponsiveOfficerGrid
                   initialGrid={currentSolution}
                   containerType="solver"
@@ -260,11 +260,11 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
 
           {/* Tablet Layout: Semi-compact side-by-side */}
           <div className="hidden md:block lg:hidden">
-            <div className="flex flex-col items-center space-y-6 max-w-4xl mx-auto">
-              <div className="flex items-center justify-center gap-6 w-full">
+            <div className="flex flex-col items-center space-y-8 max-w-5xl mx-auto px-4">
+              <div className="flex items-center justify-center gap-8 w-full">
                 {/* Test Input */}
-                <div className="flex-1 text-center">
-                  <h3 className="text-amber-300 text-sm font-semibold mb-4">TEST INPUT</h3>
+                <div className="flex-1 text-center max-w-xs">
+                  <h3 className="text-amber-300 text-sm font-semibold mb-5">TEST INPUT</h3>
                   <ResponsiveOfficerDisplayGrid
                     grid={testInput}
                     containerType="solver"
@@ -273,13 +273,13 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                 </div>
 
                 {/* Transformation Indicator */}
-                <div className="text-cyan-400 text-2xl font-bold px-2">
+                <div className="text-cyan-400 text-3xl font-bold px-4 min-w-0">
                   →
                 </div>
 
                 {/* User Solution */}
-                <div className="flex-1 text-center">
-                  <h3 className="text-amber-300 text-sm font-semibold mb-4">YOUR SOLUTION</h3>
+                <div className="flex-1 text-center max-w-xs">
+                  <h3 className="text-amber-300 text-sm font-semibold mb-5">YOUR SOLUTION</h3>
                   <ResponsiveOfficerGrid
                     initialGrid={currentSolution}
                     containerType="solver"
@@ -311,11 +311,11 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
             </div>
           </div>
 
-          {/* Mobile Layout: Stacked */}
-          <div className="md:hidden space-y-6">
+          {/* Mobile Layout: Stack vertically with proper spacing */}
+          <div className="md:hidden space-y-8 px-2">
             {/* Test Input */}
             <div className="text-center">
-              <h3 className="text-amber-300 text-sm font-semibold mb-4">TEST INPUT</h3>
+              <h3 className="text-amber-300 text-sm font-semibold mb-6">TEST INPUT</h3>
               <ResponsiveOfficerDisplayGrid
                 grid={testInput}
                 containerType="solver"
@@ -324,15 +324,15 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
             </div>
 
             {/* Arrow */}
-            <div className="text-center">
-              <div className="text-cyan-400 text-xl font-bold">
+            <div className="text-center py-4">
+              <div className="text-cyan-400 text-2xl font-bold">
                 ↓ APPLY PATTERN ↓
               </div>
             </div>
 
             {/* User Solution */}
             <div className="text-center">
-              <h3 className="text-amber-300 text-sm font-semibold mb-4">YOUR SOLUTION</h3>
+              <h3 className="text-amber-300 text-sm font-semibold mb-6">YOUR SOLUTION</h3>
               <ResponsiveOfficerGrid
                 initialGrid={currentSolution}
                 containerType="solver"
@@ -340,7 +340,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                 onChange={updateCurrentSolution}
               />
               
-              <div className="flex justify-center space-x-2 mt-4">
+              <div className="flex justify-center space-x-2 mt-6">
                 <Button
                   size="sm"
                   variant="outline"
@@ -359,7 +359,6 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                 </Button>
               </div>
             </div>
-
           </div>
 
           {/* Submit Button */}
