@@ -254,31 +254,26 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
           />
         )}
 
-        {/* Test Case Navigation */}
-        {totalTests > 1 && (
-          <TestCaseNavigation
-            totalTests={totalTests}
-            currentTestIndex={currentTestIndex}
-            completedTests={completedTests}
-            onTestSelect={handleTestSelect}
-          />
-        )}
 
-        {/* Grid Size Controls + Display Controls + Emoji Palette */}
-        <GridSizeSelector
-          width={currentDimensions.width}
-          height={currentDimensions.height}
-          onSizeChange={handleSizeChange}
-          hasExistingData={hasExistingData}
-          suggestedSizes={getSuggestedSizes()}
-          displayMode={displayState.displayMode}
-          emojiSet={displayState.emojiSet}
-          selectedValue={displayState.selectedValue}
-          onDisplayModeChange={handleDisplayModeChange}
-          onEmojiSetChange={handleEmojiSetChange}
-          onValueSelect={handleValueSelect}
-          usedValues={getUsedValues()}
-        />
+        {/* Test Case Navigation - SILVER THEME */}
+        {totalTests > 1 && (
+          <div className="bg-gradient-to-r from-slate-200 via-gray-100 to-slate-200 border-2 border-slate-400 rounded-lg p-4 shadow-lg">
+            <div className="mb-3">
+              <h3 className="text-slate-800 text-lg font-bold flex items-center gap-2 mb-1">
+                🎯 MULTI-TEST PUZZLE - ALL {totalTests} TESTS REQUIRED
+              </h3>
+              <p className="text-slate-700 text-sm">
+                ⚠️ You must solve ALL {totalTests} test cases to complete this puzzle. Switch between tests using the buttons below.
+              </p>
+            </div>
+            <TestCaseNavigation
+              totalTests={totalTests}
+              currentTestIndex={currentTestIndex}
+              completedTests={completedTests}
+              onTestSelect={handleTestSelect}
+            />
+          </div>
+        )}
 
         {/* Solving Interface - Full Screen Width */}
         <div className="w-full">
@@ -306,14 +301,75 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
               />
             </div>
 
-            {/* Emoji Palette Divider - Interactive Value Selection */}
-            <div className="flex items-center justify-center px-2">
+            {/* Combined Controls Panel - Grid Size + Display + Emoji Palette */}
+            <div className="flex flex-col items-center justify-center px-2 space-y-3">
+              
+              {/* Grid Size Controls - Compact */}
+              <div className="bg-slate-800 border border-slate-600 rounded-lg p-2 w-full">
+                <h4 className="text-amber-300 text-xs font-semibold mb-2 text-center">OUTPUT SIZE</h4>
+                <div className="flex items-center justify-center gap-2 text-xs">
+                  <select
+                    value={currentDimensions.width}
+                    onChange={(e) => handleSizeChange(parseInt(e.target.value), currentDimensions.height)}
+                    className="bg-slate-700 border border-slate-500 rounded px-2 py-1 text-amber-100 text-xs"
+                  >
+                    {Array.from({ length: 30 }, (_, i) => i + 1).map(size => (
+                      <option key={size} value={size}>W: {size}</option>
+                    ))}
+                  </select>
+                  <span className="text-slate-400">×</span>
+                  <select
+                    value={currentDimensions.height}
+                    onChange={(e) => handleSizeChange(currentDimensions.width, parseInt(e.target.value))}
+                    className="bg-slate-700 border border-slate-500 rounded px-2 py-1 text-amber-100 text-xs"
+                  >
+                    {Array.from({ length: 30 }, (_, i) => i + 1).map(size => (
+                      <option key={size} value={size}>H: {size}</option>
+                    ))}
+                  </select>
+                </div>
+                
+                {/* Quick Size Suggestions */}
+                {getSuggestedSizes().length > 0 && (
+                  <div className="flex flex-wrap justify-center gap-1 mt-2">
+                    {getSuggestedSizes().slice(0, 3).map((size, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSizeChange(size.width, size.height)}
+                        className="bg-amber-700 hover:bg-amber-600 text-white text-xs px-2 py-1 rounded"
+                      >
+                        {size.width}×{size.height}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Display Mode Toggle - Compact */}
+              <div className="bg-slate-800 border border-slate-600 rounded-lg p-2 w-full">
+                <div className="flex justify-center gap-1">
+                  <button
+                    onClick={() => handleDisplayModeChange('arc-colors')}
+                    className={`px-2 py-1 text-xs rounded ${displayState.displayMode === 'arc-colors' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
+                  >
+                    123
+                  </button>
+                  <button
+                    onClick={() => handleDisplayModeChange('emoji')}
+                    className={`px-2 py-1 text-xs rounded ${displayState.displayMode === 'emoji' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
+                  >
+                    🎨
+                  </button>
+                </div>
+              </div>
+
+              {/* Emoji Palette - Main Selection */}
               <EmojiPaletteDivider
                 emojiSet={displayState.emojiSet}
                 selectedValue={displayState.selectedValue}
                 onValueSelect={handleValueSelect}
                 usedValues={getUsedValues()}
-                className="bg-slate-800 border border-slate-600 rounded-lg p-3"
+                className="bg-slate-800 border border-slate-600 rounded-lg p-3 w-full"
               />
             </div>
 
