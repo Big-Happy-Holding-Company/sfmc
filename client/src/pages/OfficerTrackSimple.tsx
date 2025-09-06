@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -13,14 +14,12 @@ import { AlertTriangle } from 'lucide-react';
 import { useOfficerPuzzles } from '@/hooks/useOfficerPuzzles';
 import { OfficerDifficultyCards } from '@/components/game/OfficerDifficultyCards';
 import { PuzzleGrid } from '@/components/officer/PuzzleGrid';
-import { arcDataService } from '@/services/arcDataService';
 import { playFabService } from '@/services/playfab';
 import type { OfficerPuzzle } from '@/services/officerArcAPI';
-import type { OfficerTrackPuzzle } from '@/types/arcTypes';
-import { validateIDConversions, validateDataFlow } from '@/utils/idValidation';
-import { ResponsivePuzzleSolver } from '@/components/officer/ResponsivePuzzleSolver';
 
 export default function OfficerTrackSimple() {
+  const [location, setLocation] = useLocation();
+  
   const { 
     filteredPuzzles, 
     stats, 
@@ -36,7 +35,6 @@ export default function OfficerTrackSimple() {
     setLimit 
   } = useOfficerPuzzles();
   
-  const [currentPuzzle, setCurrentPuzzle] = useState<OfficerTrackPuzzle | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searching, setSearching] = useState(false);
   const [playFabReady, setPlayFabReady] = useState(false);
@@ -121,62 +119,17 @@ export default function OfficerTrackSimple() {
     }
   };
 
-  // Handle puzzle selection from grid  
-  const handleSelectPuzzle = async (puzzle: OfficerPuzzle) => {
-    // Prevent puzzle loading while PlayFab is still initializing
+  // Handle puzzle selection from grid - navigate to dedicated solver page
+  const handleSelectPuzzle = (puzzle: OfficerPuzzle) => {
+    // Prevent navigation while PlayFab is still initializing
     if (playFabInitializing) {
       alert('Please wait for the system to initialize before loading puzzles...');
       return;
     }
     
-    try {
-      console.log('🎯 Loading full puzzle data for solving:', puzzle.id);
-      
-      // Import the loadPuzzleFromPlayFab function directly for efficient loading
-      const { loadPuzzleFromPlayFab } = await import('@/services/officerArcAPI');
-      const fullPuzzleData = await loadPuzzleFromPlayFab(puzzle.id);
-      
-      if (fullPuzzleData) {
-        setCurrentPuzzle(fullPuzzleData);
-        console.log('✅ Puzzle loaded from PlayFab:', fullPuzzleData.id);
-      } else {
-        console.error('❌ Puzzle not found in PlayFab:', puzzle.id);
-        if (playFabReady) {
-          alert(`Puzzle "${puzzle.id}" not found in PlayFab.\n\nThis could mean:\n• The puzzle data hasn't been uploaded yet\n• The puzzle ID format is incorrect\n• There was an issue with the data upload\n\nTry selecting a different puzzle from the grid.`);
-        } else {
-          alert(`Puzzle "${puzzle.id}" not found.\n\n⚠️ PlayFab connection failed - full puzzle data is not available.\n\nPlease:\n• Refresh the page to retry PlayFab connection\n• Check your internet connection\n• Try again in a few moments`);
-        }
-      }
-      
-    } catch (err) {
-      console.error('❌ Failed to load puzzle:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      
-      let userMessage = `Failed to load puzzle "${puzzle.id}": ${errorMessage}\n\n`;
-      
-      if (errorMessage.includes('PlayFab not initialized')) {
-        userMessage += 'The system is still initializing. Please wait and try again.';
-      } else if (errorMessage.includes('Network')) {
-        userMessage += 'Network connection issue. Please check your internet and try again.';
-      } else if (errorMessage.includes('JSON')) {
-        userMessage += 'The puzzle data appears to be corrupted. Please try a different puzzle.';
-      } else {
-        userMessage += 'Please try:\n• Refreshing the page\n• Selecting a different puzzle\n• Checking your internet connection';
-      }
-      
-      alert(userMessage);
-    }
+    console.log('🎯 Navigating to puzzle solver:', puzzle.id);
+    setLocation(`/officer-track/solve/${puzzle.id}`);
   };
-
-  // If puzzle selected, show puzzle solver
-  if (currentPuzzle) {
-    return (
-      <ResponsivePuzzleSolver 
-        puzzle={currentPuzzle}
-        onBack={() => setCurrentPuzzle(null)}
-      />
-    );
-  }
 
   return (
     <div className="min-h-screen bg-slate-900 text-amber-50">
