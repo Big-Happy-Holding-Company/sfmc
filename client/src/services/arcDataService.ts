@@ -180,27 +180,36 @@ export class ARCDataService {
   }
 
   /**
-   * Load data from PlayFab Title Data using authenticated core service
+   * Load data from PlayFab Title Data using Admin API
    */
   private async loadPlayFabTitleData(key: string): Promise<OfficerTrackPuzzle[] | null> {
     try {
-      // Import PlayFab core service for authenticated requests
+      // Import PlayFab core service for Admin API requests
       const { playFabCore } = await import('./playfab/core');
       
-      // Make authenticated request to PlayFab Title Data
-      const result = await playFabCore.makeHttpRequest<{ Keys: string[] }, { Data?: Record<string, string> }>(
-        '/Client/GetTitleData',
+      // Ensure PlayFab is initialized
+      if (!playFabCore.isReady()) {
+        console.warn('PlayFab not initialized, attempting initialization...');
+        const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
+        const secretKey = import.meta.env.VITE_PLAYFAB_SECRET_KEY;
+        await playFabCore.initialize({ titleId, secretKey });
+      }
+      
+      // Use Admin API to get Title Data (no user authentication required, uses secret key)
+      const result = await playFabCore.makeHttpRequest<{ Keys: string[] }, { Data?: Record<string, { Value: string }> }>(
+        '/Admin/GetTitleData',
         { Keys: [key] },
-        true // requiresAuth = true
+        false // requiresAuth = false (Admin API uses secret key instead)
       );
 
-      if (!result?.Data?.[key] || result.Data[key] === "undefined") {
+      // Admin API response structure: result.Data[key].Value
+      if (!result?.Data?.[key]?.Value || result.Data[key].Value === "undefined") {
         console.warn(`No title data found for key: ${key}`);
         return null;
       }
 
-      // Parse the JSON data
-      const puzzleData = JSON.parse(result.Data[key]);
+      // Parse the JSON data from the Value field
+      const puzzleData = JSON.parse(result.Data[key].Value);
       return Array.isArray(puzzleData) ? puzzleData : null;
 
     } catch (error) {

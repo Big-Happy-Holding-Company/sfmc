@@ -205,8 +205,8 @@ export class ArcExplainerAPI {
       return playFabId || '';
     }
     
-    // Remove ARC-TR-, ARC-EV-, ARC-TR2-, ARC-EV2- prefixes
-    const converted = playFabId.replace(/^ARC-[A-Z0-9]+-/, '');
+    // Remove ARC-TR-, ARC-EV-, ARC-T2-, ARC-E2- prefixes (matches upload script format)
+    const converted = playFabId.replace(/^ARC-(TR|T2|EV|E2)-/, '');
     
     // Validation: ensure we got a reasonable result
     if (converted === playFabId) {
@@ -232,12 +232,12 @@ export class ArcExplainerAPI {
       return arcId;
     }
 
-    // Map dataset to prefix
+    // Map dataset to prefix (matches upload script format)
     const prefixMap = {
       'training': 'ARC-TR-',
       'evaluation': 'ARC-EV-', 
-      'training2': 'ARC-TR2-',
-      'evaluation2': 'ARC-EV2-'
+      'training2': 'ARC-T2-',    // Fixed: matches upload script
+      'evaluation2': 'ARC-E2-'   // Fixed: matches upload script
     };
 
     return prefixMap[dataset] + arcId;
@@ -251,14 +251,14 @@ export class ArcExplainerAPI {
       return { valid: false, format: 'unknown' };
     }
 
-    // Check PlayFab format: ARC-XX-xxxxxxxx or ARC-XX2-xxxxxxxx
-    const playfabMatch = puzzleId.match(/^ARC-(TR|EV|TR2|EV2)-([a-f0-9]{8})$/);
+    // Check PlayFab format: ARC-XX-xxxxxxxx (matches upload script format)
+    const playfabMatch = puzzleId.match(/^ARC-(TR|EV|T2|E2)-([a-f0-9]{8})$/);
     if (playfabMatch) {
       const datasetMap = {
         'TR': 'training',
         'EV': 'evaluation', 
-        'TR2': 'training2',
-        'EV2': 'evaluation2'
+        'T2': 'training2',    // Fixed: matches upload script
+        'E2': 'evaluation2'   // Fixed: matches upload script
       };
       return { 
         valid: true, 

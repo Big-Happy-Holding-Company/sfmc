@@ -38,12 +38,14 @@ export default function OfficerTrackSimple() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searching, setSearching] = useState(false);
   const [playFabReady, setPlayFabReady] = useState(false);
+  const [playFabInitializing, setPlayFabInitializing] = useState(true);
 
   // Initialize PlayFab on mount
   useEffect(() => {
     const initializePlayFab = async () => {
       try {
         console.log('🎖️ Initializing PlayFab for Officer Track...');
+        setPlayFabInitializing(true);
         
         if (!playFabService.core.isReady()) {
           await playFabService.initialize();
@@ -58,7 +60,10 @@ export default function OfficerTrackSimple() {
       } catch (err) {
         console.error('❌ PlayFab initialization failed:', err);
         // Continue anyway - arc-explainer API doesn't require PlayFab
-        setPlayFabReady(true);
+        // But warn user that puzzle loading might be limited
+        setPlayFabReady(false);
+      } finally {
+        setPlayFabInitializing(false);
       }
     };
 
@@ -79,14 +84,14 @@ export default function OfficerTrackSimple() {
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
     
+    // Prevent search while PlayFab is still initializing
+    if (playFabInitializing) {
+      alert('Please wait for the system to initialize...');
+      return;
+    }
+    
     setSearching(true);
     try {
-      // Wait for PlayFab to be ready  
-      if (!playFabReady) {
-        console.log('⏳ Waiting for PlayFab initialization...');
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-      
       const puzzle = await searchById(searchQuery.trim());
       if (puzzle) {
         console.log('✅ Found puzzle:', puzzle.id);
@@ -97,10 +102,13 @@ export default function OfficerTrackSimple() {
         // Clear the search input after successful search
         setSearchQuery('');
         
-        
         alert(`Found puzzle "${puzzle.id}"! Look for it at the top of the puzzle grid below.`);
       } else {
-        alert(`Puzzle "${searchQuery}" not found. Try a different ID.`);
+        if (playFabReady) {
+          alert(`Puzzle "${searchQuery}" not found. Try a different ID.`);
+        } else {
+          alert(`Puzzle "${searchQuery}" not found. Note: PlayFab connection failed, so only some puzzles may be available.`);
+        }
       }
     } catch (err) {
       console.error('Search failed:', err);
@@ -112,24 +120,29 @@ export default function OfficerTrackSimple() {
 
   // Handle puzzle selection from grid  
   const handleSelectPuzzle = async (puzzle: OfficerPuzzle) => {
+    // Prevent puzzle loading while PlayFab is still initializing
+    if (playFabInitializing) {
+      alert('Please wait for the system to initialize before loading puzzles...');
+      return;
+    }
+    
     try {
-      console.log('🎯 Loading puzzle for solving:', puzzle.id);
+      console.log('🎯 Loading full puzzle data for solving:', puzzle.id);
       
-      // Wait for PlayFab to be ready
-      if (!playFabReady) {
-        console.log('⏳ Waiting for PlayFab initialization...');
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-      
-      // Use arcDataService to get full puzzle from PlayFab  
-      const fullPuzzleData = await arcDataService.searchPuzzleById(puzzle.id);
+      // Import the loadPuzzleFromPlayFab function directly for efficient loading
+      const { loadPuzzleFromPlayFab } = await import('@/services/officerArcAPI');
+      const fullPuzzleData = await loadPuzzleFromPlayFab(puzzle.id);
       
       if (fullPuzzleData) {
         setCurrentPuzzle(fullPuzzleData);
         console.log('✅ Puzzle loaded from PlayFab:', fullPuzzleData.id);
       } else {
         console.error('❌ Puzzle not found in PlayFab:', puzzle.id);
-        alert(`Puzzle "${puzzle.id}" not found. Try a different puzzle ID.`);
+        if (playFabReady) {
+          alert(`Puzzle "${puzzle.id}" not found in PlayFab. Try a different puzzle ID.`);
+        } else {
+          alert(`Puzzle "${puzzle.id}" not found. PlayFab connection failed - puzzle data may not be available.`);
+        }
       }
       
     } catch (err) {
@@ -250,6 +263,24 @@ export default function OfficerTrackSimple() {
             🔍 PUZZLE SEARCH & FILTERS
           </h2>
           
+          {/* System Status Indicator */}
+          {playFabInitializing && (
+            <div className="bg-blue-900 border border-blue-600 rounded-lg p-3 mb-4">
+              <div className="flex items-center">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400 mr-3"></div>
+                <span className="text-blue-300 text-sm">Initializing PlayFab connection for puzzle data access...</span>
+              </div>
+            </div>
+          )}
+          
+          {!playFabInitializing && !playFabReady && (
+            <div className="bg-orange-900 border border-orange-600 rounded-lg p-3 mb-4">
+              <div className="text-orange-300 text-sm">
+                ⚠️ PlayFab connection failed - puzzle loading may be limited to arc-explainer data only
+              </div>
+            </div>
+          )}
+
           {/* Search Row */}
           <div className="flex space-x-3 mb-4">
             <Input
@@ -259,13 +290,14 @@ export default function OfficerTrackSimple() {
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
               className="bg-slate-700 border-slate-600 text-amber-100 flex-1"
+              disabled={playFabInitializing}
             />
             <Button 
               onClick={handleSearch}
-              disabled={searching || !searchQuery.trim()}
-              className="bg-amber-600 hover:bg-amber-700 text-slate-900"
+              disabled={playFabInitializing || searching || !searchQuery.trim()}
+              className="bg-amber-600 hover:bg-amber-700 text-slate-900 disabled:bg-amber-800 disabled:opacity-50"
             >
-              {searching ? 'Searching...' : 'Find Puzzle'}
+              {playFabInitializing ? 'Initializing...' : searching ? 'Searching...' : 'Find Puzzle'}
             </Button>
           </div>
 
