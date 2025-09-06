@@ -18,7 +18,7 @@ import { playFabService } from '@/services/playfab';
 import type { OfficerPuzzle } from '@/services/officerArcAPI';
 import type { OfficerTrackPuzzle } from '@/types/arcTypes';
 import { validateIDConversions, validateDataFlow } from '@/utils/idValidation';
-import { SimplePuzzleSolver } from '@/components/officer/SimplePuzzleSolver';
+import { ResponsivePuzzleSolver } from '@/components/officer/ResponsivePuzzleSolver';
 
 export default function OfficerTrackSimple() {
   const { 
@@ -171,7 +171,7 @@ export default function OfficerTrackSimple() {
   // If puzzle selected, show puzzle solver
   if (currentPuzzle) {
     return (
-      <SimplePuzzleSolver 
+      <ResponsivePuzzleSolver 
         puzzle={currentPuzzle}
         onBack={() => setCurrentPuzzle(null)}
       />
