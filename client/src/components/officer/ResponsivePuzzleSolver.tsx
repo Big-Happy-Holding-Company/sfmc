@@ -13,8 +13,6 @@ import { TrainingExamplesSection } from '@/components/officer/TrainingExamplesSe
 import { GridSizeSelector } from '@/components/officer/GridSizeSelector';
 import { TestCaseNavigation } from '@/components/officer/TestCaseNavigation';
 import { EmojiPaletteDivider } from '@/components/officer/EmojiPaletteDivider';
-import { PuzzleDisplayControls } from '@/components/officer/PuzzleDisplayControls';
-import { ValuePalette } from '@/components/officer/ValuePalette';
 import type { OfficerTrackPuzzle, ARCGrid } from '@/types/arcTypes';
 import type { DisplayMode, PuzzleDisplayState } from '@/types/puzzleDisplayTypes';
 import type { EmojiSet } from '@/constants/spaceEmojis';

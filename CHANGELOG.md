@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 ## Recent Commits (Latest First)
 
+**2025-09-06**: 🔧 PRODUCTION PUZZLE LOADING FIX - Admin API to Client API Migration
+- **CRITICAL PRODUCTION ISSUE RESOLVED**: Fixed officer track puzzle loading failures in production environment
+- **PROBLEM**: URLs like `https://sfmc.bhhc.us/officer-track/solve/182e5d0f` showing "failed to load puzzle errors" 
+- **ROOT CAUSE**: `loadPuzzleFromPlayFab()` was using Admin API (`/Admin/GetTitleData`) requiring secret keys
+- **LOCAL VS PRODUCTION**: Worked locally due to `VITE_PLAYFAB_SECRET_KEY` in .env, failed in production (correctly) without secret keys
+- **ARCHITECTURE FIX**: 
+  - Changed from `/Admin/GetTitleData` to `/Client/GetTitleData` (client-appropriate API)
+  - Updated authentication from `requiresAuth: false` (secret key) to `requiresAuth: true` (user session token)
+  - Removed secret key dependency from client-side puzzle loading logic
+- **SECURITY IMPROVEMENT**: Client applications no longer attempt to use admin credentials
+- **DEPLOYMENT READY**: Production puzzle loading now works without requiring secret keys in client builds
+- **FILES MODIFIED**: `client/src/services/officerArcAPI.ts` (lines ~385-425)
+- **TESTING REQUIRED**: User should verify puzzle loading works at production URL after deployment
+- **HOW TO TEST**: Visit `https://sfmc.bhhc.us/officer-track/solve/182e5d0f` - should load puzzle instead of showing error
+
 **2025-09-06**: 🎯 OFFICER TRACK MAJOR OVERHAUL - Dynamic Arc-Explainer Integration & PlayFab Data Parsing Fix
 - **FIXED HARDCODED PUZZLE LOADING**: Removed static 50-task limit, now dynamically loads worst-performing puzzles from arc-explainer API
 - **DYNAMIC SORTING STRATEGIES**: Added 5 sorting options (composite, accuracy, explanations, difficulty, recent) for intelligent puzzle selection

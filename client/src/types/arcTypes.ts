@@ -145,8 +145,10 @@ export interface OfficerLeaderboardEntry {
 export interface ARCSolutionAttempt {
   /** Puzzle ID being attempted */
   puzzleId: string;
-  /** Player's solution grid */
+  /** Player's solution grid (single test case) */
   solution: ARCGrid;
+  /** Player's solution grids (multi test case support) */
+  solutions?: ARCGrid[];
   /** Time taken to solve (in seconds) */
   timeElapsed: number;
   /** Number of hints used (if any) */
@@ -163,24 +165,28 @@ export interface ARCValidationResult {
   success: boolean;
   /** Whether the solution is correct */
   correct: boolean;
-  /** Base points for this puzzle */
-  basePoints: number;
+  /** Base points for this puzzle (Officer Track uses 0) */
+  pointsEarned: number;
   /** Time bonus points */
   timeBonus: number;
   /** Penalty for hints (if any) */
   hintPenalty: number;
-  /** Total points earned */
-  pointsEarned: number;
-  /** New total officer points */
-  newTotalPoints: number;
-  /** Whether player ranked up */
-  rankUp: boolean;
-  /** New rank (if ranked up) */
-  newRank?: OfficerRank;
+  /** Total score (for compatibility) */
+  totalScore?: number;
+  /** Time elapsed during solve */
+  timeElapsed?: number;
+  /** When validation completed */
+  completedAt?: string;
   /** Validation message */
   message: string;
-  /** Detailed scoring breakdown */
-  scoring: {
+  /** Optional: New total officer points (complex scoring) */
+  newTotalPoints?: number;
+  /** Optional: Whether player ranked up (complex scoring) */
+  rankUp?: boolean;
+  /** Optional: New rank (if ranked up) */
+  newRank?: OfficerRank;
+  /** Optional: Detailed scoring breakdown (complex scoring) */
+  scoring?: {
     difficultyMultiplier: number;
     speedBonus: number;
     streakBonus: number;
