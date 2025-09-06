@@ -18,6 +18,7 @@ import { playFabService } from '@/services/playfab';
 import type { OfficerPuzzle } from '@/services/officerArcAPI';
 import type { OfficerTrackPuzzle } from '@/types/arcTypes';
 import { validateIDConversions, validateDataFlow } from '@/utils/idValidation';
+import { SimplePuzzleSolver } from '@/components/officer/SimplePuzzleSolver';
 
 export default function OfficerTrackSimple() {
   const { 
@@ -167,60 +168,13 @@ export default function OfficerTrackSimple() {
     }
   };
 
-  // If puzzle selected, show puzzle solver (simple version for now)
+  // If puzzle selected, show puzzle solver
   if (currentPuzzle) {
     return (
-      <div className="min-h-screen bg-slate-900 text-amber-50">
-        {/* Header */}
-        <header className="bg-slate-800 border-b-2 border-amber-400 shadow-lg">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-4">
-                <h1 className="text-2xl font-bold text-amber-400">
-                  🎯 MISSION: {currentPuzzle.filename || currentPuzzle.id}
-                </h1>
-                <Badge className="bg-amber-600 text-slate-900 font-bold">
-                  {currentPuzzle.difficulty} LEVEL
-                </Badge>
-              </div>
-              
-              <Button 
-                variant="outline" 
-                className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900"
-                onClick={() => setCurrentPuzzle(null)}
-              >
-                ← Back to Puzzle Selection
-              </Button>
-            </div>
-          </div>
-        </header>
-
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-green-900 border border-green-600 rounded-lg p-8 text-center">
-            <h2 className="text-green-400 text-2xl font-bold mb-4">
-              ✅ Puzzle Solver Connected!
-            </h2>
-            <div className="text-green-200 space-y-2 mb-6">
-              <div><strong>Puzzle ID:</strong> {currentPuzzle.id}</div>
-              <div><strong>Filename:</strong> {currentPuzzle.filename}</div>
-              <div><strong>Difficulty:</strong> {currentPuzzle.difficulty}</div>
-              <div><strong>Dataset:</strong> {currentPuzzle.dataset}</div>
-              <div><strong>Training Examples:</strong> {currentPuzzle.train?.length || 0}</div>
-              <div><strong>Test Cases:</strong> {currentPuzzle.test?.length || 0}</div>
-            </div>
-            <div className="text-green-300 text-sm">
-              <p className="mb-2">
-                🎉 <strong>Success!</strong> The puzzle has been loaded from the arc-explainer API 
-                and successfully translated to the full PlayFab puzzle format.
-              </p>
-              <p>
-                The existing puzzle solver UI can now be integrated here to complete the flow.
-                For now, this demonstrates the end-to-end connection working perfectly!
-              </p>
-            </div>
-          </div>
-        </main>
-      </div>
+      <SimplePuzzleSolver 
+        puzzle={currentPuzzle}
+        onBack={() => setCurrentPuzzle(null)}
+      />
     );
   }
 
