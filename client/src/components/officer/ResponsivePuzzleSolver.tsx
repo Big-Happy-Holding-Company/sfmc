@@ -155,8 +155,61 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
             </div>
           </div>
 
-          {/* Mobile/Tablet Layout: Stacked */}
-          <div className="lg:hidden space-y-8">
+          {/* Tablet Layout: Semi-compact side-by-side */}
+          <div className="hidden md:block lg:hidden">
+            <div className="flex flex-col items-center space-y-6 max-w-4xl mx-auto">
+              <div className="flex items-center justify-center gap-6 w-full">
+                {/* Test Input */}
+                <div className="flex-1 text-center">
+                  <h3 className="text-amber-300 text-sm font-semibold mb-4">TEST INPUT</h3>
+                  <ResponsiveOfficerDisplayGrid
+                    grid={testInput}
+                    containerType="solver"
+                    className="mx-auto"
+                  />
+                </div>
+
+                {/* Transformation Indicator */}
+                <div className="text-cyan-400 text-2xl font-bold px-2">
+                  →
+                </div>
+
+                {/* User Solution */}
+                <div className="flex-1 text-center">
+                  <h3 className="text-amber-300 text-sm font-semibold mb-4">YOUR SOLUTION</h3>
+                  <ResponsiveOfficerGrid
+                    initialGrid={userSolution}
+                    containerType="solver"
+                    className="mx-auto"
+                    onChange={setUserSolution}
+                  />
+                </div>
+              </div>
+              
+              {/* Controls below on tablet */}
+              <div className="flex justify-center space-x-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
+                  onClick={copyInput}
+                >
+                  Copy Input
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
+                  onClick={resetSolution}
+                >
+                  Reset
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile Layout: Stacked */}
+          <div className="md:hidden space-y-6">
             {/* Test Input */}
             <div className="text-center">
               <h3 className="text-amber-300 text-sm font-semibold mb-4">TEST INPUT</h3>
@@ -169,7 +222,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
 
             {/* Arrow */}
             <div className="text-center">
-              <div className="text-cyan-400 text-2xl font-bold">
+              <div className="text-cyan-400 text-xl font-bold">
                 ↓ APPLY PATTERN ↓
               </div>
             </div>
