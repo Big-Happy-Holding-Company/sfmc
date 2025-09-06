@@ -9,6 +9,7 @@
 
 import { arcDataService } from '@/services/arcDataService';
 import { arcExplainerAPI, type AIPuzzlePerformance } from '@/services/arcExplainerAPI';
+import { categorizeDifficulty } from '@/services/officerArcAPI';
 import type { OfficerTrackPuzzle } from '@/types/arcTypes';
 
 export interface MergedPuzzleData extends OfficerTrackPuzzle {
@@ -69,7 +70,6 @@ class PuzzlePerformanceService {
       console.log(`🤖 Got performance data for ${performanceMap.size}/${puzzleIds.length} puzzles`);
       
       // Step 3: Merge data
-      const { categorizeDifficulty } = await import('@/services/officerArcAPI');
       const mergedData: MergedPuzzleData[] = puzzleData.puzzles.map(puzzle => {
         const performance = performanceMap.get(puzzle.id);
         const hasPerformanceData = !!performance;

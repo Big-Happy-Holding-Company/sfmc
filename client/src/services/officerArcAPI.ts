@@ -5,6 +5,9 @@
  * No overengineering - just the basics needed for the new Officer Track
  */
 
+import { arcDataService } from '@/services/arcDataService';
+import { playFabCore } from '@/services/playfab/core';
+
 export interface OfficerPuzzle {
   id: string;                    // ARC ID (e.g., "007bbfb7")
   playFabId: string;            // PlayFab format (e.g., "ARC-TR-007bbfb7")
@@ -230,7 +233,6 @@ export async function getPuzzlesByDifficulty(difficulty: 'impossible' | 'extreme
  */
 export async function searchPuzzleById(searchId: string): Promise<OfficerPuzzle | null> {
   try {
-    const { arcDataService } = await import('@/services/arcDataService');
     const cleanId = searchId.trim().toLowerCase().replace(/^arc-[a-z0-9]+-/, '');
     
     console.log(`🔍 Getting puzzle from PlayFab: ${cleanId}`);
@@ -300,7 +302,6 @@ export async function searchWithinLoadedPuzzles(searchId: string, puzzles: Offic
  */
 export async function loadPuzzleFromPlayFab(puzzleId: string): Promise<any | null> {
   try {
-    const { playFabCore } = await import('@/services/playfab/core');
     
     // Extract ARC ID (remove any existing prefix)
     const arcId = puzzleId.startsWith('ARC-') ? playFabToArcId(puzzleId) : puzzleId;

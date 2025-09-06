@@ -8,6 +8,7 @@
  * - Integer-to-emoji transformation for UI presentation
  * - Difficulty estimation and complexity analysis
  * - Intelligent caching for performance
+ * - Importing arcDataService, arcExplainerAPI, and loadPuzzleFromPlayFab
  */
 
 import type { 
@@ -23,6 +24,7 @@ import type {
   ARCDisplayGrid
 } from '@/types/arcTypes';
 import { SPACE_EMOJIS } from '@/constants/spaceEmojis';
+import { loadPuzzleFromPlayFab } from '@/services/officerArcAPI';
 
 /**
  * ARC Data Service - Singleton for managing ARC puzzle data
@@ -618,7 +620,6 @@ export class ARCDataService {
     console.log(`🔍 Loading puzzle ${cleanId} from PlayFab...`);
     
     try {
-      const { loadPuzzleFromPlayFab } = await import('@/services/officerArcAPI');
       const puzzleData = await loadPuzzleFromPlayFab(cleanId);
       
       if (puzzleData) {
