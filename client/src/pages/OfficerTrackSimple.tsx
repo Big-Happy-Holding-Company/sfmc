@@ -81,6 +81,12 @@ export default function OfficerTrackSimple() {
     
     setSearching(true);
     try {
+      // Wait for PlayFab to be ready  
+      if (!playFabReady) {
+        console.log('⏳ Waiting for PlayFab initialization...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      
       const puzzle = await searchById(searchQuery.trim());
       if (puzzle) {
         console.log('✅ Found puzzle:', puzzle.id);
@@ -109,31 +115,21 @@ export default function OfficerTrackSimple() {
     try {
       console.log('🎯 Loading puzzle for solving:', puzzle.id);
       
-      // Use working arcDataService approach (loads from local /data/ files)
+      // Wait for PlayFab to be ready
+      if (!playFabReady) {
+        console.log('⏳ Waiting for PlayFab initialization...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      
+      // Use arcDataService to get full puzzle from PlayFab  
       const fullPuzzleData = await arcDataService.searchPuzzleById(puzzle.id);
       
       if (fullPuzzleData) {
         setCurrentPuzzle(fullPuzzleData);
-        console.log('✅ Puzzle loaded and ready to solve:', fullPuzzleData.id);
-        
-        // TODO: Investigate PlayFab loading separately
-        // Debug: Try loading from PlayFab in background for comparison
-        console.log('🔍 DEBUG: Also trying PlayFab loading for comparison...');
-        try {
-          const { loadPuzzleFromPlayFab } = await import('@/services/officerArcAPI');
-          const playFabData = await loadPuzzleFromPlayFab(puzzle.id);
-          if (playFabData) {
-            console.log('✅ DEBUG: PlayFab also found puzzle:', playFabData.id);
-          } else {
-            console.log('❌ DEBUG: PlayFab could not find puzzle:', puzzle.id);
-          }
-        } catch (pfError) {
-          console.log('❌ DEBUG: PlayFab loading error:', pfError);
-        }
-        
+        console.log('✅ Puzzle loaded from PlayFab:', fullPuzzleData.id);
       } else {
-        console.error('❌ arcDataService returned null for:', puzzle.id);
-        alert(`Failed to load puzzle data for "${puzzle.id}". The puzzle may not exist in local data.`);
+        console.error('❌ Puzzle not found in PlayFab:', puzzle.id);
+        alert(`Puzzle "${puzzle.id}" not found. Try a different puzzle ID.`);
       }
       
     } catch (err) {

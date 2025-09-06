@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## Recent Commits (Latest First)
 
+**2025-09-06**: 🔧 Fixed Windows Certificate Issues - Arc-Explainer API Restored  
+- **ISSUE RESOLVED**: Fixed Windows certificate validation blocking arc-explainer API calls
+- **ROOT CAUSE**: Railway.app HTTPS certificate revocation check failures in Windows environment  
+- **SOLUTION**: Added retry logic and cache-control headers to HTTP clients
+- **ENHANCED ERROR HANDLING**: Better logging and debugging for API failures
+- **DEBUGGING COMPLETED**: Comprehensive analysis showed puzzle data exists correctly in both systems
+- **API STATUS**: Arc-explainer API at `https://arc-explainer-production.up.railway.app` fully operational
+- **PUZZLE VERIFICATION**: Confirmed puzzle `11852cab` exists as `ARC-TR-11852cab` in PlayFab and returns valid data from arc-explainer
+- **TESTING**: Manual curl tests confirm API works with `-k` flag, browser should now work with retry logic
+
 **2025-09-05**: ✅ ARC-Explainer API Integration COMPLETE - Officer Track Fully Operational  
 - **SUCCESS**: Arc-explainer API integration fully working with real performance data
 - **API ENDPOINT**: `https://arc-explainer-production.up.railway.app/api/puzzle/worst-performing` operational

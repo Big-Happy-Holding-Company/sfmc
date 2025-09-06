@@ -70,10 +70,8 @@ async function makeAPICall(endpoint: string): Promise<any> {
     return fetch(url, {
       method: 'GET',
       headers: { 
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache'
-      },
-      cache: 'no-cache'
+        'Content-Type': 'application/json'
+      }
     });
   };
 
@@ -145,77 +143,30 @@ export function categorizeDifficulty(accuracy: number, hasData: boolean = true):
 }
 
 /**
- * Get worst performing puzzles with total count (our primary data source)
+ * Get puzzles from arc-explainer (metadata only) - simple pattern
  */
 export async function getOfficerPuzzles(limit: number = 50): Promise<OfficerPuzzleResponse> {
-  const cacheKey = `officer-puzzles-${limit}`;
-  
-  if (isCached(cacheKey)) {
-    return getFromCache<OfficerPuzzleResponse>(cacheKey);
-  }
-
   try {
-    console.log(`🔄 Fetching ${limit} puzzles from arc-explainer API...`);
+    console.log(`🔄 Getting ${limit} puzzles from arc-explainer...`);
     
     // Add limit parameter like arc-explainer does
     const data = await makeAPICall(`/api/puzzle/worst-performing?limit=${limit}&sortBy=composite`);
     
-    // Extract puzzles and total following arc-explainer pattern
-    let rawPuzzles: any[] = [];
-    let total = 0;
+    // Simple: get puzzles from arc-explainer response
+    const rawPuzzles = data.data?.puzzles || [];
+    const total = data.data?.total || rawPuzzles.length;
     
-    if (data.success && data.data?.puzzles) {
-      // Arc-explainer format: { success: true, data: { puzzles: [...], total: number } }
-      rawPuzzles = data.data.puzzles;
-      total = data.data.total || 0;
-    } else if (Array.isArray(data)) {
-      // Fallback: direct array
-      rawPuzzles = data;
-      total = data.length;
-    } else if (data.data && Array.isArray(data.data)) {
-      // Fallback: data is array
-      rawPuzzles = data.data;
-      total = data.data.length;
-    } else {
-      console.warn('Unexpected API response structure:', data);
-      return { puzzles: [], total: 0 };
-    }
-
-    // Transform to our simplified format
-    const puzzles: OfficerPuzzle[] = rawPuzzles.map((p, index) => {
-      const perf = p.performanceData || {};
-      const accuracy = perf.avgAccuracy || 0;
-      const hasData = !!p.performanceData;
+    // Convert to our format
+    const puzzles: OfficerPuzzle[] = rawPuzzles.map(p => ({
+      id: p.id,
+      playFabId: p.id,
+      avgAccuracy: p.avgAccuracy || 0,
+      difficulty: categorizeDifficulty(p.avgAccuracy || 0, p.totalExplanations > 0),
+      totalExplanations: p.totalExplanations || 0,
+      compositeScore: p.compositeScore || 0
+    }));
       
-      const arcId = p.id || p.puzzleId || '';
-      const puzzle = {
-        id: arcId,
-        playFabId: arcId,
-        avgAccuracy: accuracy,
-        difficulty: categorizeDifficulty(accuracy, hasData),
-        totalExplanations: perf.totalExplanations || 0,
-        compositeScore: perf.compositeScore || 0
-      };
-      
-      // Log first 5 puzzles for debugging
-      if (index < 5) {
-        console.log(`Puzzle ${index + 1}:`, {
-          id: puzzle.id,
-          hasData,
-          accuracy,
-          difficulty: puzzle.difficulty,
-          totalExplanations: puzzle.totalExplanations
-        });
-      }
-      
-      return puzzle;
-    }).filter(p => p.id); // Remove any without valid IDs
-
-    const result: OfficerPuzzleResponse = { puzzles, total };
-    setCache(cacheKey, result);
-    console.log(`✅ Loaded ${puzzles.length} puzzles out of ${total} total analyzed`);
-    
-    return result;
+    return { puzzles, total };
     
   } catch (error) {
     console.error('❌ Failed to fetch officer puzzles:', error);
@@ -274,44 +225,53 @@ export async function getPuzzlesByDifficulty(difficulty: 'impossible' | 'extreme
 }
 
 /**
- * Search for specific puzzle by ID using arc-explainer task endpoint
- * This searches the full database, not just loaded puzzles
+ * Search for puzzle by ID - uses PlayFab data via arcDataService
+ * Simple pattern: get full puzzle from PlayFab, add AI data if available
  */
 export async function searchPuzzleById(searchId: string): Promise<OfficerPuzzle | null> {
   try {
+    const { arcDataService } = await import('@/services/arcDataService');
     const cleanId = searchId.trim().toLowerCase().replace(/^arc-[a-z0-9]+-/, '');
-    console.log(`🔍 Searching for puzzle: ${searchId} (cleaned: ${cleanId})`);
     
-    // Use arc-explainer's specific puzzle endpoint
-    const data = await makeAPICall(`/api/puzzle/task/${cleanId}`);
+    console.log(`🔍 Getting puzzle from PlayFab: ${cleanId}`);
     
-    if (data.success && data.data) {
-      console.log(`✅ Puzzle found in arc-explainer database: ${cleanId}`);
-      
-      // Extract performance data from the arc-explainer response
-      const puzzleData = data.data;
-      const performanceData = puzzleData.performanceData || {};
-      
-      // Calculate accuracy and other metrics from the rich data
-      const avgAccuracy = performanceData.avgAccuracy || 0;
-      const totalExplanations = performanceData.totalExplanations || 0;
-      const compositeScore = performanceData.compositeScore || 0;
-      
-      const puzzle: OfficerPuzzle = {
-        id: cleanId,
-        playFabId: cleanId, // Raw ARC ID - let loader figure out the dataset
-        avgAccuracy,
-        difficulty: categorizeDifficulty(avgAccuracy, !!performanceData),
-        totalExplanations,
-        compositeScore
-      };
-      
-      console.log(`✅ Created puzzle object with real data for ${cleanId}:`, puzzle);
-      return puzzle;
-    } else {
-      console.warn(`❌ Puzzle not found or invalid response for ${cleanId}:`, data);
+    // Get full puzzle data from PlayFab
+    const puzzleData = await arcDataService.searchPuzzleById(cleanId);
+    
+    if (!puzzleData) {
+      console.log(`❌ Puzzle not found in PlayFab: ${cleanId}`);
       return null;
     }
+    
+    // Try to get AI performance data (optional)
+    let avgAccuracy = 0;
+    let totalExplanations = 0;
+    let compositeScore = 0;
+    
+    try {
+      const aiData = await makeAPICall(`/api/puzzle/task/${cleanId}`);
+      if (aiData.success && aiData.data) {
+        const performanceData = aiData.data.performanceData || {};
+        avgAccuracy = performanceData.avgAccuracy || 0;
+        totalExplanations = performanceData.totalExplanations || 0;
+        compositeScore = performanceData.compositeScore || 0;
+      }
+    } catch {
+      // AI data is optional - continue without it
+    }
+    
+    // Return the PlayFab puzzle data with optional AI metadata  
+    const puzzle: OfficerPuzzle = {
+      id: cleanId,
+      playFabId: cleanId,
+      avgAccuracy,
+      difficulty: categorizeDifficulty(avgAccuracy, totalExplanations > 0),
+      totalExplanations,
+      compositeScore
+    };
+    
+    console.log(`✅ Found puzzle in PlayFab with AI data: ${cleanId}`);
+    return puzzle;
     
   } catch (error) {
     console.error(`❌ Failed to search for puzzle ${searchId}:`, error);
