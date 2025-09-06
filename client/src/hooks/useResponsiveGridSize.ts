@@ -79,15 +79,15 @@ function calculateGridSize(
   if (viewportWidth < breakpoints.mobile) {
     // Mobile: Use most of screen width, smaller cells
     availableWidth = Math.min(viewportWidth - 32, 350);
-    targetCellSize = containerType === 'example' ? 24 : 32;
+    targetCellSize = containerType === 'example' ? 28 : 36;
   } else if (viewportWidth < breakpoints.tablet) {
-    // Tablet: More space available
-    availableWidth = Math.min(viewportWidth * 0.8, 500);
-    targetCellSize = containerType === 'example' ? 32 : 40;
+    // Tablet: More space available, better utilization
+    availableWidth = Math.min(viewportWidth * 0.85, 600);
+    targetCellSize = containerType === 'example' ? 36 : 44;
   } else {
-    // Desktop: Full space available
-    availableWidth = containerType === 'example' ? 300 : 500;
-    targetCellSize = containerType === 'example' ? 32 : 48;
+    // Desktop: Better space utilization for larger screens
+    availableWidth = containerType === 'example' ? 350 : 600;
+    targetCellSize = containerType === 'example' ? 36 : 52;
   }
 
   // Adjust for solver vs example containers

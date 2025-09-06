@@ -102,11 +102,11 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
             </div>
           </div>
 
-          {/* Desktop/Tablet Layout: Side by side */}
+          {/* Desktop/Tablet Layout: Optimized for better space utilization */}
           <div className="hidden lg:block">
-            <div className="grid grid-cols-2 gap-8">
+            <div className="flex items-start justify-center gap-8 max-w-6xl mx-auto">
               {/* Test Input */}
-              <div className="text-center">
+              <div className="flex-1 max-w-md text-center">
                 <h3 className="text-amber-300 text-sm font-semibold mb-4">TEST INPUT</h3>
                 <ResponsiveOfficerDisplayGrid
                   grid={testInput}
@@ -115,8 +115,15 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                 />
               </div>
 
+              {/* Transformation Indicator */}
+              <div className="flex items-center justify-center py-8">
+                <div className="text-cyan-400 text-3xl font-bold px-4">
+                  →
+                </div>
+              </div>
+
               {/* User Solution */}
-              <div className="text-center">
+              <div className="flex-1 max-w-md text-center">
                 <h3 className="text-amber-300 text-sm font-semibold mb-4">YOUR SOLUTION</h3>
                 <ResponsiveOfficerGrid
                   initialGrid={userSolution}
