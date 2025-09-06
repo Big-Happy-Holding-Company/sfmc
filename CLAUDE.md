@@ -3,7 +3,7 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with this repository.
 
 **Project Status as of September 4, 2025**: Production-ready ARC-AGI puzzle platform with pure PlayFab cloud backend.
-
+We also communicate with VITE_ARC_EXPLAINER_URL=https://arc-explainer-production.up.railway.app  
 https://learn.microsoft.com/en-us/rest/api/playfab/server/?view=playfab-rest - PlayFab Server API Reference
 
 **IMPORTANT**: When working with PlayFab, always check the PlayFab API Analysis document for the most up-to-date information about the PlayFab API.  PLAYFAB_SECRET_KEY is available in the .env file!!!
