@@ -17,6 +17,7 @@ import { arcDataService } from '@/services/arcDataService';
 import { playFabService } from '@/services/playfab';
 import type { OfficerPuzzle } from '@/services/officerArcAPI';
 import type { OfficerTrackPuzzle } from '@/types/arcTypes';
+import { validateIDConversions, validateDataFlow } from '@/utils/idValidation';
 
 export default function OfficerTrackSimple() {
   const { 
@@ -105,14 +106,15 @@ export default function OfficerTrackSimple() {
         alert(`Found puzzle "${puzzle.id}"! Look for it at the top of the puzzle grid below.`);
       } else {
         if (playFabReady) {
-          alert(`Puzzle "${searchQuery}" not found. Try a different ID.`);
+          alert(`Puzzle "${searchQuery}" not found.\n\nTips:\n• Try a different puzzle ID (e.g., "007bbfb7")\n• Make sure the ID is exactly 8 characters\n• Check that the puzzle exists in the ARC dataset`);
         } else {
-          alert(`Puzzle "${searchQuery}" not found. Note: PlayFab connection failed, so only some puzzles may be available.`);
+          alert(`Puzzle "${searchQuery}" not found.\n\n⚠️ PlayFab connection failed, so only puzzles with AI analysis data are available.\n\nTry:\n• A different puzzle ID\n• Refreshing the page\n• Checking your internet connection`);
         }
       }
     } catch (err) {
       console.error('Search failed:', err);
-      alert('Search failed. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      alert(`Search failed: ${errorMessage}\n\nPlease try:\n• Refreshing the page\n• Checking your internet connection\n• Trying a different puzzle ID`);
     } finally {
       setSearching(false);
     }
@@ -139,15 +141,29 @@ export default function OfficerTrackSimple() {
       } else {
         console.error('❌ Puzzle not found in PlayFab:', puzzle.id);
         if (playFabReady) {
-          alert(`Puzzle "${puzzle.id}" not found in PlayFab. Try a different puzzle ID.`);
+          alert(`Puzzle "${puzzle.id}" not found in PlayFab.\n\nThis could mean:\n• The puzzle data hasn't been uploaded yet\n• The puzzle ID format is incorrect\n• There was an issue with the data upload\n\nTry selecting a different puzzle from the grid.`);
         } else {
-          alert(`Puzzle "${puzzle.id}" not found. PlayFab connection failed - puzzle data may not be available.`);
+          alert(`Puzzle "${puzzle.id}" not found.\n\n⚠️ PlayFab connection failed - full puzzle data is not available.\n\nPlease:\n• Refresh the page to retry PlayFab connection\n• Check your internet connection\n• Try again in a few moments`);
         }
       }
       
     } catch (err) {
       console.error('❌ Failed to load puzzle:', err);
-      alert('Failed to load puzzle. Please try another one.');
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      
+      let userMessage = `Failed to load puzzle "${puzzle.id}": ${errorMessage}\n\n`;
+      
+      if (errorMessage.includes('PlayFab not initialized')) {
+        userMessage += 'The system is still initializing. Please wait and try again.';
+      } else if (errorMessage.includes('Network')) {
+        userMessage += 'Network connection issue. Please check your internet and try again.';
+      } else if (errorMessage.includes('JSON')) {
+        userMessage += 'The puzzle data appears to be corrupted. Please try a different puzzle.';
+      } else {
+        userMessage += 'Please try:\n• Refreshing the page\n• Selecting a different puzzle\n• Checking your internet connection';
+      }
+      
+      alert(userMessage);
     }
   };
 
@@ -332,6 +348,43 @@ export default function OfficerTrackSimple() {
           <p className="text-slate-400 text-xs mt-3">
             Search for specific puzzles by their ID or adjust the number of hardest puzzles to display
           </p>
+
+          {/* Debug Section - only show in development */}
+          {import.meta.env.DEV && (
+            <div className="border-t border-slate-600 pt-4 mt-4">
+              <h3 className="text-amber-400 text-sm font-semibold mb-2">🧪 DEBUG TOOLS</h3>
+              <div className="flex gap-2 flex-wrap">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white text-xs"
+                  onClick={async () => {
+                    console.log('🧪 Running ID conversion tests...');
+                    const result = validateIDConversions();
+                    alert(`ID Conversion Tests: ${result.success ? 'PASSED' : 'FAILED'}\n\nCheck console for details.`);
+                  }}
+                >
+                  Test ID Conversions
+                </Button>
+                
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white text-xs"
+                  onClick={async () => {
+                    console.log('🧪 Running full data flow test...');
+                    const result = await validateDataFlow();
+                    alert(`Data Flow Test: ${result.success ? 'PASSED' : 'FAILED'}\n\nCheck console for details.`);
+                  }}
+                >
+                  Test Data Flow
+                </Button>
+              </div>
+              <p className="text-purple-300 text-xs mt-2">
+                These debug tools validate the PlayFab integration and ID conversion functions.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Difficulty Cards */}

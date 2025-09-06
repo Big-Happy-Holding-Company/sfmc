@@ -322,6 +322,18 @@ export async function searchPuzzleById(searchId: string): Promise<OfficerPuzzle 
     
   } catch (error) {
     console.error(`❌ Failed to search for puzzle ${searchId}:`, error);
+    
+    // Provide helpful context based on error type
+    if (error instanceof Error) {
+      if (error.message.includes('fetch')) {
+        console.error('💡 Arc-explainer API connection failed - puzzle may still be available in PlayFab');
+      } else if (error.message.includes('JSON.parse')) {
+        console.error('💡 Invalid response from arc-explainer API - server may be experiencing issues');
+      } else if (error.message.includes('PlayFab')) {
+        console.error('💡 PlayFab connection failed - check credentials and network');
+      }
+    }
+    
     return null;
   }
 }
@@ -434,6 +446,18 @@ export async function loadPuzzleFromPlayFab(puzzleId: string): Promise<any | nul
     
   } catch (error) {
     console.error(`❌ Failed to load puzzle ${puzzleId}:`, error);
+    
+    // Provide specific error context for debugging
+    if (error instanceof Error) {
+      if (error.message.includes('PlayFab not initialized')) {
+        console.error('💡 Suggestion: Ensure PlayFab is initialized with proper credentials before calling loadPuzzleFromPlayFab');
+      } else if (error.message.includes('PLAYFAB_SECRET_KEY')) {
+        console.error('💡 Suggestion: Check that VITE_PLAYFAB_SECRET_KEY is set in environment variables');
+      } else if (error.message.includes('HTTP')) {
+        console.error('💡 Suggestion: Check network connection and PlayFab service status');
+      }
+    }
+    
     return null;
   }
 }

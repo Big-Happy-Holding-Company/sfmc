@@ -214,6 +214,20 @@ export class ARCDataService {
 
     } catch (error) {
       console.error(`Failed to load PlayFab title data for ${key}:`, error);
+      
+      // Provide specific guidance based on error type
+      if (error instanceof Error) {
+        if (error.message.includes('PlayFab not initialized')) {
+          console.error(`💡 PlayFab initialization failed. Ensure VITE_PLAYFAB_TITLE_ID and VITE_PLAYFAB_SECRET_KEY are set.`);
+        } else if (error.message.includes('HTTP 401') || error.message.includes('Unauthorized')) {
+          console.error(`💡 PlayFab authentication failed. Check VITE_PLAYFAB_SECRET_KEY in environment.`);
+        } else if (error.message.includes('HTTP 404')) {
+          console.error(`💡 PlayFab title data key "${key}" not found. Ensure data was uploaded correctly.`);
+        } else if (error.message.includes('JSON.parse')) {
+          console.error(`💡 Invalid JSON in PlayFab title data. The data may be corrupted or contain "undefined" strings.`);
+        }
+      }
+      
       throw error;
     }
   }
