@@ -345,9 +345,12 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                 )}
               </div>
 
-              {/* Display Mode Toggle - Compact */}
+              {/* Display Mode & Emoji Set Controls - Compact */}
               <div className="bg-slate-800 border border-slate-600 rounded-lg p-2 w-full">
-                <div className="flex justify-center gap-1">
+                <h4 className="text-amber-300 text-xs font-semibold mb-2 text-center">DISPLAY</h4>
+                
+                {/* Display Mode Toggle */}
+                <div className="flex justify-center gap-1 mb-2">
                   <button
                     onClick={() => handleDisplayModeChange('arc-colors')}
                     className={`px-2 py-1 text-xs rounded ${displayState.displayMode === 'arc-colors' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
@@ -360,7 +363,28 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                   >
                     🎨
                   </button>
+                  <button
+                    onClick={() => handleDisplayModeChange('hybrid')}
+                    className={`px-2 py-1 text-xs rounded ${displayState.displayMode === 'hybrid' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
+                  >
+                    MIX
+                  </button>
                 </div>
+                
+                {/* Emoji Set Dropdown - Only show when emoji or hybrid mode */}
+                {(displayState.displayMode === 'emoji' || displayState.displayMode === 'hybrid') && (
+                  <select
+                    value={displayState.emojiSet}
+                    onChange={(e) => handleEmojiSetChange(e.target.value as any)}
+                    className="w-full bg-slate-700 border border-slate-500 rounded px-2 py-1 text-amber-100 text-xs"
+                  >
+                    <option value="tech_set1">Tech Set 1</option>
+                    <option value="tech_set2">Tech Set 2</option>
+                    <option value="nature_set1">Nature Set 1</option>
+                    <option value="space_set1">Space Set 1</option>
+                    <option value="geometric_set1">Geometric Set 1</option>
+                  </select>
+                )}
               </div>
 
               {/* Emoji Palette - Main Selection */}
@@ -369,6 +393,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                 selectedValue={displayState.selectedValue}
                 onValueSelect={handleValueSelect}
                 usedValues={getUsedValues()}
+                displayMode={displayState.displayMode}
                 className="bg-slate-800 border border-slate-600 rounded-lg p-3 w-full"
               />
             </div>

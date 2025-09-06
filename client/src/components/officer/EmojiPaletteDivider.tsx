@@ -8,6 +8,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { SPACE_EMOJIS, type EmojiSet } from '@/constants/spaceEmojis';
+import type { DisplayMode } from '@/types/puzzleDisplayTypes';
 
 interface EmojiPaletteDividerProps {
   emojiSet: EmojiSet;
@@ -15,6 +16,7 @@ interface EmojiPaletteDividerProps {
   onValueSelect: (value: number) => void;
   usedValues?: number[];
   className?: string;
+  displayMode?: DisplayMode;
 }
 
 export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
@@ -22,7 +24,8 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
   selectedValue,
   onValueSelect,
   usedValues = [],
-  className = ''
+  className = '',
+  displayMode = 'emoji'
 }) => {
   const getAllEmojis = () => {
     const emojis = SPACE_EMOJIS[emojiSet];
@@ -31,13 +34,23 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
 
   const emojis = getAllEmojis();
   
-  // Split into 2 rows of 5 emojis each
+  // Split into 2 rows of 5 values each
   const topRow = emojis.slice(0, 5);
   const bottomRow = emojis.slice(5, 10);
 
-  const renderEmojiButton = ({ emoji, value }: { emoji: string; value: number }) => {
+  const renderValueButton = ({ emoji, value }: { emoji: string; value: number }) => {
     const isSelected = value === selectedValue;
     const isUsed = usedValues.includes(value);
+    
+    // Determine what to display based on mode
+    let displayContent: string;
+    if (displayMode === 'arc-colors') {
+      displayContent = value.toString();
+    } else if (displayMode === 'hybrid') {
+      displayContent = `${value}${emoji}`;
+    } else {
+      displayContent = emoji;
+    }
     
     return (
       <Button
@@ -56,7 +69,7 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
         `}
         title={`Value ${value}: ${emoji} ${isUsed ? '(used in puzzle)' : ''}`}
       >
-        {emoji}
+        {displayContent}
       </Button>
     );
   };
@@ -65,12 +78,12 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
     <div className={`flex flex-col items-center justify-center gap-1 ${className}`}>
       {/* Top row (0-4) */}
       <div className="flex gap-1">
-        {topRow.map(renderEmojiButton)}
+        {topRow.map(renderValueButton)}
       </div>
       
       {/* Bottom row (5-9) */}
       <div className="flex gap-1">
-        {bottomRow.map(renderEmojiButton)}
+        {bottomRow.map(renderValueButton)}
       </div>
       
       {/* Selected value indicator */}

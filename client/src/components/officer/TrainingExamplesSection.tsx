@@ -162,8 +162,8 @@ export function TrainingExamplesSection({
             const maxOutputDim = Math.max(example.output.length, example.output[0]?.length || 1);
             const maxDim = Math.max(maxInputDim, maxOutputDim);
             
-            // Use better sized fixed sizes for training examples
-            const cellSize = maxDim > 20 ? 16 : maxDim > 15 ? 20 : maxDim > 10 ? 24 : 28;
+            // Use bigger cell sizes for training examples - much more visible
+            const cellSize = maxDim > 20 ? 24 : maxDim > 15 ? 32 : maxDim > 10 ? 40 : 48;
             
             return (
               <div key={index} className="flex-shrink-0 bg-slate-700 rounded border border-slate-600 p-3">

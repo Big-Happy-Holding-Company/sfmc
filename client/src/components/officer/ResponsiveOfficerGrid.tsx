@@ -362,15 +362,6 @@ export function ResponsiveOfficerGrid({
         </div>
       )}
 
-      {/* Grid info and responsive debug - improved styling to prevent overlap */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="text-xs text-slate-400 mt-3 p-2 bg-slate-800 rounded border border-slate-600 space-y-1">
-          <div className="font-mono">{gridHeight}×{gridWidth} • {emojiSet} • {displayMode}</div>
-          <div className="font-mono">Cell: {cellSize}px • Type: {containerType} • Enhanced: {useEnhancedDisplay ? 'Yes' : 'No'}</div>
-          <div className="font-mono">Total: {responsiveSize.totalWidth}×{responsiveSize.totalHeight}px</div>
-          {enableDragToPaint && <div className="font-mono">Drag-to-paint: Enabled</div>}
-        </div>
-      )}
     </div>
   );
 }
