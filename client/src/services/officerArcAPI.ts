@@ -61,22 +61,44 @@ function getBaseURL(): string {
 }
 
 /**
- * Make API call to arc-explainer
+ * Make API call to arc-explainer with retry logic for Windows/certificate issues
  */
 async function makeAPICall(endpoint: string): Promise<any> {
   const url = `${getBaseURL()}${endpoint}`;
   
-  try {
-    const response = await fetch(url, {
+  const makeRequest = async (): Promise<Response> => {
+    return fetch(url, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+      },
+      cache: 'no-cache'
     });
+  };
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+  try {
+    console.log(`🌐 Calling arc-explainer API: ${url}`);
+    
+    // First attempt
+    let response = await makeRequest();
+    
+    // Retry once if network error (common with Windows certificate issues)
+    if (!response.ok && (response.status >= 500 || response.status === 0)) {
+      console.log(`⚠️ First attempt failed (${response.status}), retrying...`);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+      response = await makeRequest();
     }
 
-    return await response.json();
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Unknown error');
+      console.error(`❌ Arc-explainer API error: ${response.status} ${response.statusText}`, errorText);
+      throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log(`✅ Arc-explainer API success: ${endpoint}`);
+    return data;
   } catch (error) {
     console.error(`API call failed: ${url}`, error);
     throw error;
@@ -115,6 +137,7 @@ export function playFabToArcId(playFabId: string): string {
  * Categorize puzzle difficulty based on AI accuracy
  */
 export function categorizeDifficulty(accuracy: number, hasData: boolean = true): 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging' {
+  // If no data or accuracy is exactly 0, consider it impossible
   if (!hasData || accuracy === 0) return 'impossible';
   if (accuracy <= 0.25) return 'extremely_hard';
   if (accuracy <= 0.50) return 'very_hard';
@@ -159,20 +182,33 @@ export async function getOfficerPuzzles(limit: number = 50): Promise<OfficerPuzz
     }
 
     // Transform to our simplified format
-    const puzzles: OfficerPuzzle[] = rawPuzzles.map(p => {
+    const puzzles: OfficerPuzzle[] = rawPuzzles.map((p, index) => {
       const perf = p.performanceData || {};
       const accuracy = perf.avgAccuracy || 0;
       const hasData = !!p.performanceData;
       
       const arcId = p.id || p.puzzleId || '';
-      return {
+      const puzzle = {
         id: arcId,
-        playFabId: arcId, // Don't assume dataset - let loadPuzzleFromPlayFab figure it out
+        playFabId: arcId,
         avgAccuracy: accuracy,
         difficulty: categorizeDifficulty(accuracy, hasData),
         totalExplanations: perf.totalExplanations || 0,
         compositeScore: perf.compositeScore || 0
       };
+      
+      // Log first 5 puzzles for debugging
+      if (index < 5) {
+        console.log(`Puzzle ${index + 1}:`, {
+          id: puzzle.id,
+          hasData,
+          accuracy,
+          difficulty: puzzle.difficulty,
+          totalExplanations: puzzle.totalExplanations
+        });
+      }
+      
+      return puzzle;
     }).filter(p => p.id); // Remove any without valid IDs
 
     const result: OfficerPuzzleResponse = { puzzles, total };
@@ -191,6 +227,7 @@ export async function getOfficerPuzzles(limit: number = 50): Promise<OfficerPuzz
  * Get difficulty statistics
  */
 export async function getDifficultyStats(): Promise<DifficultyStats> {
+  console.log('🔍 Calculating difficulty statistics...');
   const response = await getOfficerPuzzles(200); // Get larger sample for better stats
   
   const stats: DifficultyStats = {
@@ -201,9 +238,29 @@ export async function getDifficultyStats(): Promise<DifficultyStats> {
     total: response.total // Use real database total
   };
   
+  // Track some examples of each difficulty
+  const examples: Record<string, any> = {
+    impossible: [],
+    extremely_hard: [],
+    very_hard: [],
+    challenging: []
+  };
+  
   response.puzzles.forEach(puzzle => {
     stats[puzzle.difficulty]++;
+    
+    // Keep up to 3 examples of each difficulty
+    if (examples[puzzle.difficulty].length < 3) {
+      examples[puzzle.difficulty].push({
+        id: puzzle.id,
+        accuracy: puzzle.avgAccuracy,
+        explanations: puzzle.totalExplanations
+      });
+    }
   });
+  
+  console.log('📊 Difficulty distribution:', stats);
+  console.log('🔍 Examples by difficulty:', JSON.stringify(examples, null, 2));
   
   return stats;
 }
