@@ -58,6 +58,16 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
     }
   }, [puzzle.test]);
 
+  // Determine if grids are large (need special layout)
+  const isLargeGrid = (grid: ARCGrid) => {
+    const height = grid.length;
+    const width = grid[0]?.length || 0;
+    return height > 10 || width > 10;
+  };
+
+  const hasLargeGrids = testInput.length > 10 || (testInput[0]?.length || 0) > 10 || 
+                        trainingExamples.some(ex => isLargeGrid(ex.input) || isLargeGrid(ex.output));
+
   // Get suggested sizes from training examples
   const getSuggestedSizes = () => {
     const suggestions: Array<{ width: number; height: number; label: string }> = [];
@@ -164,7 +174,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <main className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
         {/* Training Examples Section */}
         {trainingExamples.length > 0 && (
@@ -172,6 +182,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
             examples={trainingExamples}
             emojiSet="tech_set1"
             title="📚 TRAINING EXAMPLES - Apply what you learn from them to solve the puzzle"
+            hasLargeGrids={hasLargeGrids}
           />
         )}
 
@@ -205,37 +216,42 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
             </div>
           </div>
 
-          {/* Desktop Layout: Optimized for better space utilization */}
-          <div className="hidden lg:block">
-            <div className="flex items-start justify-center gap-12 max-w-7xl mx-auto px-4">
-              {/* Test Input */}
-              <div className="flex-1 max-w-sm text-center">
+          {/* Full Width Layout - No scrollbars, use all available space */}
+          {hasLargeGrids ? (
+            /* Large Grids: Vertical stacking, full width */
+            <div className="space-y-8 w-full">
+              {/* Test Input - Full width, no scrollbars */}
+              <div className="text-center w-full">
                 <h3 className="text-amber-300 text-sm font-semibold mb-6">TEST INPUT</h3>
-                <ResponsiveOfficerDisplayGrid
-                  grid={testInput}
-                  containerType="solver"
-                  className="mx-auto"
-                />
-              </div>
-
-              {/* Transformation Indicator */}
-              <div className="flex items-center justify-center py-12 min-w-0">
-                <div className="text-cyan-400 text-4xl font-bold px-6">
-                  →
+                <div className="w-full flex justify-center">
+                  <ResponsiveOfficerDisplayGrid
+                    grid={testInput}
+                    containerType="solver"
+                    className="w-full max-w-none"
+                  />
                 </div>
               </div>
 
-              {/* User Solution */}
-              <div className="flex-1 max-w-sm text-center">
+              {/* Arrow Indicator */}
+              <div className="text-center">
+                <div className="text-cyan-400 text-3xl font-bold py-4">
+                  ↓ APPLY PATTERN ↓
+                </div>
+              </div>
+
+              {/* User Solution - Full width, no scrollbars */}
+              <div className="text-center w-full">
                 <h3 className="text-amber-300 text-sm font-semibold mb-6">YOUR SOLUTION</h3>
-                <ResponsiveOfficerGrid
-                  initialGrid={currentSolution}
-                  containerType="solver"
-                  className="mx-auto"
-                  onChange={updateCurrentSolution}
-                />
+                <div className="w-full flex justify-center">
+                  <ResponsiveOfficerGrid
+                    initialGrid={currentSolution}
+                    containerType="solver"
+                    className="w-full max-w-none"
+                    onChange={updateCurrentSolution}
+                  />
+                </div>
                 
-                <div className="flex justify-center space-x-2 mt-4">
+                <div className="flex justify-center space-x-2 mt-6">
                   <Button
                     size="sm"
                     variant="outline"
@@ -254,112 +270,62 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                   </Button>
                 </div>
               </div>
-
             </div>
-          </div>
-
-          {/* Tablet Layout: Semi-compact side-by-side */}
-          <div className="hidden md:block lg:hidden">
-            <div className="flex flex-col items-center space-y-8 max-w-5xl mx-auto px-4">
-              <div className="flex items-center justify-center gap-8 w-full">
-                {/* Test Input */}
-                <div className="flex-1 text-center max-w-xs">
-                  <h3 className="text-amber-300 text-sm font-semibold mb-5">TEST INPUT</h3>
+          ) : (
+            /* Small Grids: Side-by-side, full width */
+            <div className="flex items-start justify-center gap-8 w-full">
+              {/* Test Input */}
+              <div className="flex-1 text-center">
+                <h3 className="text-amber-300 text-sm font-semibold mb-6">TEST INPUT</h3>
+                <div className="w-full flex justify-center">
                   <ResponsiveOfficerDisplayGrid
                     grid={testInput}
                     containerType="solver"
-                    className="mx-auto"
+                    className="w-full"
                   />
                 </div>
+              </div>
 
-                {/* Transformation Indicator */}
-                <div className="text-cyan-400 text-3xl font-bold px-4 min-w-0">
+              {/* Transformation Indicator */}
+              <div className="flex items-center justify-center py-12 px-4">
+                <div className="text-cyan-400 text-4xl font-bold">
                   →
                 </div>
+              </div>
 
-                {/* User Solution */}
-                <div className="flex-1 text-center max-w-xs">
-                  <h3 className="text-amber-300 text-sm font-semibold mb-5">YOUR SOLUTION</h3>
+              {/* User Solution */}
+              <div className="flex-1 text-center">
+                <h3 className="text-amber-300 text-sm font-semibold mb-6">YOUR SOLUTION</h3>
+                <div className="w-full flex justify-center">
                   <ResponsiveOfficerGrid
                     initialGrid={currentSolution}
                     containerType="solver"
-                    className="mx-auto"
+                    className="w-full"
                     onChange={updateCurrentSolution}
                   />
                 </div>
-              </div>
-              
-              {/* Controls below on tablet */}
-              <div className="flex justify-center space-x-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
-                  onClick={copyInput}
-                >
-                  Copy Input
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
-                  onClick={resetSolution}
-                >
-                  Reset
-                </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile Layout: Stack vertically with proper spacing */}
-          <div className="md:hidden space-y-8 px-2">
-            {/* Test Input */}
-            <div className="text-center">
-              <h3 className="text-amber-300 text-sm font-semibold mb-6">TEST INPUT</h3>
-              <ResponsiveOfficerDisplayGrid
-                grid={testInput}
-                containerType="solver"
-                className="mx-auto"
-              />
-            </div>
-
-            {/* Arrow */}
-            <div className="text-center py-4">
-              <div className="text-cyan-400 text-2xl font-bold">
-                ↓ APPLY PATTERN ↓
+                
+                <div className="flex justify-center space-x-2 mt-6">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
+                    onClick={copyInput}
+                  >
+                    Copy Input
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
+                    onClick={resetSolution}
+                  >
+                    Reset
+                  </Button>
+                </div>
               </div>
             </div>
-
-            {/* User Solution */}
-            <div className="text-center">
-              <h3 className="text-amber-300 text-sm font-semibold mb-6">YOUR SOLUTION</h3>
-              <ResponsiveOfficerGrid
-                initialGrid={currentSolution}
-                containerType="solver"
-                className="mx-auto"
-                onChange={updateCurrentSolution}
-              />
-              
-              <div className="flex justify-center space-x-2 mt-6">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
-                  onClick={copyInput}
-                >
-                  Copy Input
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
-                  onClick={resetSolution}
-                >
-                  Reset
-                </Button>
-              </div>
-            </div>
-          </div>
+          )}
 
           {/* Submit Button */}
           <div className="flex justify-center mt-8 pt-6 border-t border-slate-600">
