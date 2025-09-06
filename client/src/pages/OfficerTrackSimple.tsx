@@ -5,7 +5,7 @@
  * No overengineering - just the essentials
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,7 @@ import { useOfficerPuzzles } from '@/hooks/useOfficerPuzzles';
 import { OfficerDifficultyCards } from '@/components/game/OfficerDifficultyCards';
 import { PuzzleGrid } from '@/components/officer/PuzzleGrid';
 import { arcDataService } from '@/services/arcDataService';
+import { playFabService } from '@/services/playfab';
 import type { OfficerPuzzle } from '@/services/officerArcAPI';
 import type { OfficerTrackPuzzle } from '@/types/arcTypes';
 
@@ -36,6 +37,33 @@ export default function OfficerTrackSimple() {
   const [currentPuzzle, setCurrentPuzzle] = useState<OfficerTrackPuzzle | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searching, setSearching] = useState(false);
+  const [playFabReady, setPlayFabReady] = useState(false);
+
+  // Initialize PlayFab on mount
+  useEffect(() => {
+    const initializePlayFab = async () => {
+      try {
+        console.log('🎖️ Initializing PlayFab for Officer Track...');
+        
+        if (!playFabService.core.isReady()) {
+          await playFabService.initialize();
+        }
+        
+        if (!playFabService.isAuthenticated()) {
+          await playFabService.loginAnonymously();
+        }
+        
+        setPlayFabReady(true);
+        console.log('✅ PlayFab ready for Officer Track');
+      } catch (err) {
+        console.error('❌ PlayFab initialization failed:', err);
+        // Continue anyway - arc-explainer API doesn't require PlayFab
+        setPlayFabReady(true);
+      }
+    };
+
+    initializePlayFab();
+  }, []);
 
   // Handle difficulty filter from cards
   const handleDifficultySelect = (difficulty: 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging') => {
