@@ -24,6 +24,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import MissionControl from "@/pages/MissionControl";
 import FIQTest from "@/pages/FIQTest";
 import OfficerTrackSimple from "@/pages/OfficerTrackSimple";
+import { GridSizeTest } from "@/components/officer/GridSizeTest";
 import NotFound from "@/pages/not-found";
 import { LoadingSplash } from "@/components/game/LoadingSplash";
 import { OnboardingModal } from "@/components/game/OnboardingModal";
@@ -34,6 +35,7 @@ function Router() {
       <Route path="/" component={MissionControl} />
       <Route path="/fiq-test" component={FIQTest} />
       <Route path="/officer-track" component={OfficerTrackSimple} />
+      <Route path="/grid-test" component={GridSizeTest} />
       <Route component={NotFound} />
     </Switch>
   );
