@@ -92,9 +92,9 @@ function ExampleCard({ example, index, emojiSet }: ExampleCardProps) {
         </div>
       </div>
       
-      {/* Size Info (development only) */}
+      {/* Size Info (development only) - improved styling to prevent overlap */}
       {process.env.NODE_ENV === 'development' && (
-        <div className="text-xs text-slate-500 mt-3 text-center">
+        <div className="text-xs text-slate-400 mt-3 p-2 bg-slate-800 rounded border border-slate-600 text-center font-mono">
           Input: {example.input.length}×{example.input[0]?.length || 0} → 
           Output: {example.output.length}×{example.output[0]?.length || 0}
         </div>

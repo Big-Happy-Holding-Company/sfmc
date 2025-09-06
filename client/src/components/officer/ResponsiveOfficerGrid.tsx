@@ -176,12 +176,12 @@ export function ResponsiveOfficerGrid({
         </div>
       )}
 
-      {/* Grid info and responsive debug */}
+      {/* Grid info and responsive debug - improved styling to prevent overlap */}
       {process.env.NODE_ENV === 'development' && (
-        <div className="text-xs text-slate-500 mt-1 space-y-1">
-          <div>{gridHeight}×{gridWidth} • {emojiSet}</div>
-          <div>Cell: {cellSize}px • Type: {containerType}</div>
-          <div>Total: {responsiveSize.totalWidth}×{responsiveSize.totalHeight}px</div>
+        <div className="text-xs text-slate-400 mt-3 p-2 bg-slate-800 rounded border border-slate-600 space-y-1">
+          <div className="font-mono">{gridHeight}×{gridWidth} • {emojiSet}</div>
+          <div className="font-mono">Cell: {cellSize}px • Type: {containerType}</div>
+          <div className="font-mono">Total: {responsiveSize.totalWidth}×{responsiveSize.totalHeight}px</div>
         </div>
       )}
     </div>
