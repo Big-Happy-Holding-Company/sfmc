@@ -614,29 +614,21 @@ export class ARCDataService {
       }
     }
 
-    // If not in cache, try to load it directly from file
-    const datasets: ARCDatasetType[] = ['training', 'evaluation', 'training2', 'evaluation2'];
+    // If not in cache, load from PlayFab
+    console.log(`🔍 Loading puzzle ${cleanId} from PlayFab...`);
     
-    for (const dataset of datasets) {
-      try {
-        const filePath = `/data/${dataset}/${cleanId}.json`;
-        const rawPuzzle = await this.loadPuzzleFile(filePath);
-        
-        if (rawPuzzle) {
-          const enhancedPuzzle = await this.enhancePuzzle(rawPuzzle, filePath, dataset);
-          
-          // Add to cache
-          if (!this.puzzleCache.has(dataset)) {
-            this.puzzleCache.set(dataset, new Map());
-          }
-          this.puzzleCache.get(dataset)!.set(enhancedPuzzle.id, enhancedPuzzle);
-          
-          return enhancedPuzzle;
-        }
-      } catch (error) {
-        // Continue trying other datasets
-        console.debug(`Puzzle ${cleanId} not found in ${dataset} dataset`);
+    try {
+      const { loadPuzzleFromPlayFab } = await import('@/services/officerArcAPI');
+      const puzzleData = await loadPuzzleFromPlayFab(cleanId);
+      
+      if (puzzleData) {
+        console.log(`✅ Found puzzle ${cleanId} in PlayFab`);
+        return puzzleData;
+      } else {
+        console.log(`❌ Puzzle ${cleanId} not found in PlayFab`);
       }
+    } catch (error) {
+      console.error(`❌ Failed to load puzzle ${cleanId} from PlayFab:`, error);
     }
 
     return null;
