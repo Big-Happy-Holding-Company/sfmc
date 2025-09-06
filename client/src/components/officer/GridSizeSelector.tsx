@@ -96,134 +96,126 @@ export function GridSizeSelector({
   };
 
   return (
-    <div className={`bg-slate-700 rounded-lg p-4 border border-slate-600 ${className}`}>
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-amber-300 text-base font-semibold">
-          ⚙️ INPUT CONTROLS
-        </h3>
-        <div className="flex gap-2">
-          <Badge variant="outline" className="text-slate-300 border-slate-500">
-            Size: {width}×{height}
-          </Badge>
+    <div className={`bg-slate-700 rounded-lg p-6 border border-slate-600 ${className}`}>
+      {/* Centered Header with Grid Size */}
+      <div className="text-center mb-6">
+        <h3 className="text-amber-300 text-4xl font-bold mb-4">⚙️ INPUT CONTROLS</h3>
+        
+        {/* Ultra Compact Grid Size */}
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <span className="text-slate-300 text-2xl font-medium">Grid Size:</span>
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              value={width}
+              min="1"
+              max="30"
+              onChange={(e) => handleSizeChange(parseInt(e.target.value) || 1, height)}
+              className="w-16 h-12 px-2 bg-slate-600 border border-slate-500 rounded text-amber-100 text-center text-2xl font-bold"
+            />
+            <span className="text-slate-400 text-3xl font-bold">×</span>
+            <input
+              type="number"
+              value={height}
+              min="1"
+              max="30"
+              onChange={(e) => handleSizeChange(width, parseInt(e.target.value) || 1)}
+              className="w-16 h-12 px-2 bg-slate-600 border border-slate-500 rounded text-amber-100 text-center text-2xl font-bold"
+            />
+          </div>
+          
           {onValueSelect && (
-            <Badge variant="outline" className="text-slate-300 border-slate-500">
+            <Badge variant="outline" className="text-slate-300 border-slate-500 text-2xl px-4 py-2 ml-4">
               Selected: {selectedValue}
             </Badge>
           )}
         </div>
       </div>
-      
-      {/* Size Controls */}
-      <div className="flex items-center gap-4 mb-3">
-        <div className="flex items-center gap-2">
-          <label className="text-slate-300 text-base">Width:</label>
-          <select
-            value={width}
-            onChange={(e) => handleSizeChange(parseInt(e.target.value), height)}
-            className="px-2 py-1 bg-slate-600 border border-slate-500 rounded text-amber-100 text-sm"
-          >
-            {Array.from({ length: 30 }, (_, i) => i + 1).map(size => (
-              <option key={size} value={size}>{size}</option>
-            ))}
-          </select>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <label className="text-slate-300 text-base">Height:</label>
-          <select
-            value={height}
-            onChange={(e) => handleSizeChange(width, parseInt(e.target.value))}
-            className="px-2 py-1 bg-slate-600 border border-slate-500 rounded text-amber-100 text-sm"
-          >
-            {Array.from({ length: 30 }, (_, i) => i + 1).map(size => (
-              <option key={size} value={size}>{size}</option>
-            ))}
-          </select>
-        </div>
-      </div>
 
-      {/* Suggested Sizes */}
+      {/* Suggested Sizes - Centered */}
       {suggestedSizes.length > 0 && (
-        <div className="space-y-2">
-          <div className="text-slate-400 text-sm">Suggested sizes from training examples:</div>
-          <div className="flex flex-wrap gap-2">
+        <div className="text-center mb-6">
+          <div className="text-slate-400 text-2xl font-semibold mb-4">Quick Sizes from Examples:</div>
+          <div className="flex flex-wrap justify-center gap-3">
             {suggestedSizes.map((suggestion, index) => (
               <Button
                 key={index}
-                size="sm"
+                size="lg"
                 variant="outline"
-                className="h-6 px-2 text-xs border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
+                className="h-12 px-6 text-xl font-bold border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
                 onClick={() => handleSizeChange(suggestion.width, suggestion.height)}
               >
-                {suggestion.width}×{suggestion.height} {suggestion.label}
+                {suggestion.width}×{suggestion.height}
               </Button>
             ))}
           </div>
         </div>
       )}
       
-      {/* Display Controls */}
+      {/* Display Controls - Centered */}
       {(onDisplayModeChange || onEmojiSetChange) && (
-        <div className="mt-4 pt-4 border-t border-slate-600">
-          <div className="space-y-3">
-            {/* Display Mode Toggle */}
+        <div className="border-t border-slate-600 pt-6 mt-6">
+          <div className="space-y-6">
+            {/* Display Mode Toggle - Centered */}
             {onDisplayModeChange && (
-              <div className="flex items-center justify-between">
-                <label className="text-slate-300 text-base font-medium">Display Mode:</label>
+              <div className="text-center">
+                <label className="text-slate-300 text-2xl font-bold block mb-4">Display Mode:</label>
                 <Button
                   variant="outline"
-                  size="sm"
+                  size="lg"
                   onClick={handleDisplayModeToggle}
-                  className="border-cyan-600 text-cyan-400 hover:bg-cyan-600 hover:text-white"
+                  className="border-cyan-600 text-cyan-400 hover:bg-cyan-600 hover:text-white text-2xl px-8 py-4 font-bold"
                 >
                   {getDisplayModeLabel(displayMode)}
                 </Button>
               </div>
             )}
             
-            {/* Emoji Set Selector */}
+            {/* Emoji Set Selector - Centered */}
             {onEmojiSetChange && (displayMode === 'emoji' || displayMode === 'hybrid') && (
-              <div>
-                <label className="text-slate-300 text-base font-medium mb-2 block">Emoji Set:</label>
-                <Select value={emojiSet} onValueChange={(value: EmojiSet) => onEmojiSetChange(value)}>
-                  <SelectTrigger className="bg-slate-600 border-slate-500 text-amber-100">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-700 border-slate-600">
-                    {Object.entries(EMOJI_SET_INFO).map(([key, info]) => (
-                      <SelectItem 
-                        key={key} 
-                        value={key}
-                        className="text-amber-100 focus:bg-slate-600 focus:text-amber-200"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="text-base">{SPACE_EMOJIS[key as EmojiSet][1]}</span>
-                          <div>
-                            <div className="font-medium">{info.name}</div>
-                            <div className="text-xs text-slate-400">{info.description}</div>
+              <div className="text-center">
+                <label className="text-slate-300 text-2xl font-bold mb-4 block">Emoji Set:</label>
+                <div className="max-w-md mx-auto">
+                  <Select value={emojiSet} onValueChange={(value: EmojiSet) => onEmojiSetChange(value)}>
+                    <SelectTrigger className="bg-slate-600 border-slate-500 text-amber-100 h-14 text-xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-700 border-slate-600">
+                      {Object.entries(EMOJI_SET_INFO).map(([key, info]) => (
+                        <SelectItem 
+                          key={key} 
+                          value={key}
+                          className="text-amber-100 focus:bg-slate-600 focus:text-amber-200 py-4"
+                        >
+                          <div className="flex items-center gap-4">
+                            <span className="text-2xl">{SPACE_EMOJIS[key as EmojiSet][1]}</span>
+                            <div>
+                              <div className="font-bold text-xl">{info.name}</div>
+                              <div className="text-lg text-slate-400">{info.description}</div>
+                            </div>
                           </div>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             )}
           </div>
         </div>
       )}
 
-      {/* FULL EMOJI PALETTE - Show ALL emojis in selected set */}
+      {/* EMOJI PALETTE - Centered */}
       {onValueSelect && (
-        <div className="mt-4 pt-4 border-t border-slate-600">
-          <div className="flex items-center justify-between mb-3">
-            <label className="text-slate-300 text-base font-medium">Emoji Palette (Click to select):</label>
-            <div className="text-slate-400 text-xs">
+        <div className="border-t border-slate-600 pt-6 mt-6">
+          <div className="text-center mb-6">
+            <label className="text-slate-300 text-2xl font-bold block mb-2">Emoji Palette</label>
+            <div className="text-slate-400 text-xl">
               {usedValues.length > 0 && `🔵 = Used in puzzle`}
             </div>
           </div>
           
-          <div className="flex flex-wrap gap-0.5">
+          <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
             {getAllEmojis().map(({ emoji, value }) => {
               const isSelected = value === selectedValue;
               const isUsed = usedValues.includes(value);
@@ -232,14 +224,14 @@ export function GridSizeSelector({
                 <Button
                   key={value}
                   variant={isSelected ? "default" : "outline"}
-                  size="sm"
+                  size="lg"
                   onClick={() => onValueSelect(value)}
                   className={`
-                    h-8 w-8 p-0 text-sm font-bold flex-shrink-0
+                    h-16 w-16 p-0 text-2xl font-bold flex-shrink-0
                     ${isSelected 
-                      ? 'bg-amber-600 text-slate-900 hover:bg-amber-700' 
+                      ? 'bg-amber-600 text-slate-900 hover:bg-amber-700 ring-4 ring-amber-400' 
                       : isUsed
-                        ? 'border-cyan-400 text-cyan-300 hover:bg-cyan-600 hover:text-white'
+                        ? 'border-cyan-400 text-cyan-300 hover:bg-cyan-600 hover:text-white border-2'
                         : 'border-slate-500 text-slate-300 hover:bg-slate-600'
                     }
                   `}
@@ -251,16 +243,18 @@ export function GridSizeSelector({
             })}
           </div>
           
-          <div className="text-sm text-slate-400 mt-2">
+          <div className="text-center text-xl text-slate-400 mt-6 max-w-3xl mx-auto">
             💡 Click emoji to select • Click grid cells to cycle through values • Drag to flood-fill
           </div>
         </div>
       )}
 
-      {/* Warning for existing data */}
+      {/* Warning for existing data - Centered */}
       {hasExistingData && (
-        <div className="mt-3 text-xs text-orange-400 bg-orange-900/20 border border-orange-800 rounded p-2">
-          ⚠️ You have existing solution data. Changing size will reset your progress.
+        <div className="mt-6 text-center">
+          <div className="inline-block text-2xl text-orange-400 bg-orange-900/20 border border-orange-800 rounded-lg p-4 font-bold">
+            ⚠️ You have existing solution data. Changing size will reset your progress.
+          </div>
         </div>
       )}
     </div>

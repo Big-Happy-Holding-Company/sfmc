@@ -284,10 +284,10 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
         {/* Solving Interface - Full Screen Width */}
         <div className="w-full">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-amber-400 font-semibold text-lg">
+            <h2 className="text-amber-400 font-semibold text-3xl">
               🧩 SOLVE TEST CASE {currentTestIndex + 1}
             </h2>
-            <div className="text-slate-400 text-base">
+            <div className="text-slate-400 text-xl">
               {completedTests[currentTestIndex] ? '✅ Solved!' : 'Apply the pattern to solve'}
             </div>
           </div>
