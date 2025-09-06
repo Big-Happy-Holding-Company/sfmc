@@ -83,8 +83,8 @@ export function ValuePalette({
         ${isSelected 
           ? 'border-amber-400 ring-2 ring-amber-400 ring-offset-2 ring-offset-slate-700 bg-slate-500' 
           : isUsed
-            ? 'border-cyan-400 bg-slate-550'
-            : 'border-slate-500 hover:border-slate-400 hover:bg-slate-550'
+            ? 'border-cyan-400 bg-slate-500'
+            : 'border-slate-500 hover:border-slate-400 hover:bg-slate-500'
         }
       `.trim();
     }
