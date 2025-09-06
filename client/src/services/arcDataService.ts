@@ -8,6 +8,7 @@
  * - Integer-to-emoji transformation for UI presentation
  * - Difficulty estimation and complexity analysis
  * - Intelligent caching for performance
+ * - Importing arcDataService, arcExplainerAPI, and loadPuzzleFromPlayFab
  */
 
 import type { 
@@ -23,6 +24,7 @@ import type {
   ARCDisplayGrid
 } from '@/types/arcTypes';
 import { SPACE_EMOJIS } from '@/constants/spaceEmojis';
+import { loadPuzzleFromPlayFab } from '@/services/officerArcAPI';
 
 /**
  * ARC Data Service - Singleton for managing ARC puzzle data
@@ -65,7 +67,8 @@ export class ARCDataService {
    * Load ARC puzzles from specified datasets with pagination
    */
   public async loadARCPuzzles(options: ARCLoadOptions): Promise<ARCPuzzleSearchResult> {
-    const { datasets, limit = 50, offset = 0, difficulty, forceRefresh = false } = options;
+    const { datasets, offset = 0, difficulty, forceRefresh = false } = options;
+    const limit = options.limit || Number.MAX_SAFE_INTEGER; // No artificial limits
     
     console.log(`🎯 Loading ARC puzzles:`, { datasets, limit, offset, difficulty });
 
@@ -177,31 +180,54 @@ export class ARCDataService {
   }
 
   /**
-   * Load data from PlayFab Title Data using authenticated core service
+   * Load data from PlayFab Title Data using Admin API
    */
   private async loadPlayFabTitleData(key: string): Promise<OfficerTrackPuzzle[] | null> {
     try {
-      // Import PlayFab core service for authenticated requests
+      // Import PlayFab core service for Admin API requests
       const { playFabCore } = await import('./playfab/core');
       
-      // Make authenticated request to PlayFab Title Data
-      const result = await playFabCore.makeHttpRequest<{ Keys: string[] }, { Data?: Record<string, string> }>(
-        '/Client/GetTitleData',
+      // Ensure PlayFab is initialized
+      if (!playFabCore.isReady()) {
+        console.warn('PlayFab not initialized, attempting initialization...');
+        const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
+        const secretKey = import.meta.env.VITE_PLAYFAB_SECRET_KEY;
+        await playFabCore.initialize({ titleId, secretKey });
+      }
+      
+      // Use Admin API to get Title Data (no user authentication required, uses secret key)
+      const result = await playFabCore.makeHttpRequest<{ Keys: string[] }, { Data?: Record<string, { Value: string }> }>(
+        '/Admin/GetTitleData',
         { Keys: [key] },
-        true // requiresAuth = true
+        false // requiresAuth = false (Admin API uses secret key instead)
       );
 
-      if (!result?.Data?.[key] || result.Data[key] === "undefined") {
+      // Admin API response structure: result.Data[key].Value
+      if (!result?.Data?.[key]?.Value || result.Data[key].Value === "undefined") {
         console.warn(`No title data found for key: ${key}`);
         return null;
       }
 
-      // Parse the JSON data
-      const puzzleData = JSON.parse(result.Data[key]);
+      // Parse the JSON data from the Value field
+      const puzzleData = JSON.parse(result.Data[key].Value);
       return Array.isArray(puzzleData) ? puzzleData : null;
 
     } catch (error) {
       console.error(`Failed to load PlayFab title data for ${key}:`, error);
+      
+      // Provide specific guidance based on error type
+      if (error instanceof Error) {
+        if (error.message.includes('PlayFab not initialized')) {
+          console.error(`💡 PlayFab initialization failed. Ensure VITE_PLAYFAB_TITLE_ID and VITE_PLAYFAB_SECRET_KEY are set.`);
+        } else if (error.message.includes('HTTP 401') || error.message.includes('Unauthorized')) {
+          console.error(`💡 PlayFab authentication failed. Check VITE_PLAYFAB_SECRET_KEY in environment.`);
+        } else if (error.message.includes('HTTP 404')) {
+          console.error(`💡 PlayFab title data key "${key}" not found. Ensure data was uploaded correctly.`);
+        } else if (error.message.includes('JSON.parse')) {
+          console.error(`💡 Invalid JSON in PlayFab title data. The data may be corrupted or contain "undefined" strings.`);
+        }
+      }
+      
       throw error;
     }
   }
@@ -542,7 +568,7 @@ export class ARCDataService {
     const options: ARCLoadOptions = {
       datasets,
       difficulty: filters.difficulty,
-      limit: 50, // Will be handled by the search logic
+      // No artificial limits - load all available puzzles
       offset: 0
     };
 
@@ -613,29 +639,20 @@ export class ARCDataService {
       }
     }
 
-    // If not in cache, try to load it directly from file
-    const datasets: ARCDatasetType[] = ['training', 'evaluation', 'training2', 'evaluation2'];
+    // If not in cache, load from PlayFab
+    console.log(`🔍 Loading puzzle ${cleanId} from PlayFab...`);
     
-    for (const dataset of datasets) {
-      try {
-        const filePath = `/data/${dataset}/${cleanId}.json`;
-        const rawPuzzle = await this.loadPuzzleFile(filePath);
-        
-        if (rawPuzzle) {
-          const enhancedPuzzle = await this.enhancePuzzle(rawPuzzle, filePath, dataset);
-          
-          // Add to cache
-          if (!this.puzzleCache.has(dataset)) {
-            this.puzzleCache.set(dataset, new Map());
-          }
-          this.puzzleCache.get(dataset)!.set(enhancedPuzzle.id, enhancedPuzzle);
-          
-          return enhancedPuzzle;
-        }
-      } catch (error) {
-        // Continue trying other datasets
-        console.debug(`Puzzle ${cleanId} not found in ${dataset} dataset`);
+    try {
+      const puzzleData = await loadPuzzleFromPlayFab(cleanId);
+      
+      if (puzzleData) {
+        console.log(`✅ Found puzzle ${cleanId} in PlayFab`);
+        return puzzleData;
+      } else {
+        console.log(`❌ Puzzle ${cleanId} not found in PlayFab`);
       }
+    } catch (error) {
+      console.error(`❌ Failed to load puzzle ${cleanId} from PlayFab:`, error);
     }
 
     return null;
@@ -711,7 +728,7 @@ export function useARCData() {
     try {
       const puzzles = await arcDataService.loadARCPuzzles({
         datasets: [dataset],
-        limit: 1000 // Load many puzzles for the selector
+        // Load all available puzzles - no artificial limits
       });
       
       // Convert to file format expected by components

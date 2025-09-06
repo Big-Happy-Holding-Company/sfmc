@@ -3,7 +3,7 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with this repository.
 
 **Project Status as of September 4, 2025**: Production-ready ARC-AGI puzzle platform with pure PlayFab cloud backend.
-
+We also communicate with VITE_ARC_EXPLAINER_URL=https://arc-explainer-production.up.railway.app  
 https://learn.microsoft.com/en-us/rest/api/playfab/server/?view=playfab-rest - PlayFab Server API Reference
 
 **IMPORTANT**: When working with PlayFab, always check the PlayFab API Analysis document for the most up-to-date information about the PlayFab API.  PLAYFAB_SECRET_KEY is available in the .env file!!!
@@ -216,3 +216,44 @@ PLAYFAB_SECRET_KEY=<admin-secret-key> # Required for upload scripts only
 - **Upload Scripts**: Check what data is actually uploaded before building complex loading systems  
 - **PlayFab Investigation**: Use API calls to verify what Title Data keys exist and contain
 
+- PlayFab is used for most backend stuff...  we do call the API of our other app, the arc-explainer though for the puzzle filtering on the officer track:
+
+That API exposes these endpoints:
+Core API Endpoints
+Puzzle Management
+GET /api/puzzle/list - List all available puzzles
+GET /api/puzzle/overview - Get puzzle overview
+GET /api/puzzle/task/:taskId - Get specific puzzle by ID
+POST /api/puzzle/analyze/:taskId/:model - Analyze a puzzle with a specific model
+GET /api/puzzle/:puzzleId/has-explanation - Check if a puzzle has an explanation
+POST /api/puzzle/reinitialize - Force reinitialize puzzle loader (debug)
+Statistics & Analytics  // USEFUL FOR METADATA!
+GET /api/puzzle/accuracy-stats - Get accuracy statistics (includes trustworthiness data) // Be careful with this one, it's not very clear what it returns
+GET /api/puzzle/general-stats - Get general model statistics  // Not sure how this works
+GET /api/puzzle/raw-stats - Get raw database statistics // Be careful with this one, it's not very clear what it returns
+GET /api/puzzle/performance-stats - Get trustworthiness statistics // Name may be misleading, but might have data we want...  we want puzzles with LOW trustworthiness (bad explanations and bad solutions)
+GET /api/puzzle/confidence-stats - Get confidence analysis statistics // AI are always overconfident, the purpose of arc-explainer is to expose this so we can highlight puzzles they got a wrong answer to (high confidence wrong answer) We want to highlight these types of puzzles!
+GET /api/puzzle/worst-performing - Get worst performing puzzles for analysis // The purpose of this SHOULD be to highlight puzzles that the AI got wrong and said they were very confident they were right.  These are the puzzles we want to focus on.
+Explanations
+GET /api/puzzle/:puzzleId/explanations - Get all explanations for a puzzle // Might be useful later!
+GET /api/puzzle/:puzzleId/explanation - Get a specific explanation // Might be useful later!
+POST /api/puzzle/save-explained/:puzzleId - Save a new explanation // Will not be used
+Feedback & Solutions
+POST /api/feedback - Submit feedback 
+GET /api/explanation/:explanationId/feedback - Get feedback for an explanation // These are the helpful and not helpful for explanations and we also want to highlight these puzzles in the officer track.
+GET /api/puzzle/:puzzleId/feedback - Get feedback for a puzzle  // Needs investigation, might be useful
+GET /api/feedback - Get all feedback // Needs investigation, might be useful
+GET /api/feedback/stats - Get feedback statistics // Needs investigation, possibly VERY useful!!!
+GET /api/puzzles/:puzzleId/solutions - Get solutions for a puzzle // Needs investigation, this is for human submissions of solutions
+POST /api/puzzles/:puzzleId/solutions - Submit a new solution  // Needs investigation, this is for human submissions of solutions
+POST /api/solutions/:solutionId/vote - Vote on a solution  // Might be useful metadata 
+GET /api/solutions/:solutionId/votes - Get votes for a solution
+
+Admin & Maintenance
+GET /api/health/database - Check database health
+
+Key Features Exposed
+Analysis: 
+Feedback System: Collect and analyze user feedback on explanations
+Solution Sharing: Allow users to submit and vote on puzzle solutions and model explanations
+Comprehensive Statistics: Detailed analytics on model performance and accuracy (maybe...)

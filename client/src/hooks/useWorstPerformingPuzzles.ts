@@ -77,7 +77,8 @@ export function useWorstPerformingPuzzles(
 }
 
 /**
- * Hook for getting difficulty statistics
+ * Hook for getting difficulty statistics directly from arc-explainer API
+ * Simple, direct approach - no PlayFab dependency
  */
 export function useDifficultyStats() {
   const [stats, setStats] = useState({
@@ -95,12 +96,23 @@ export function useDifficultyStats() {
     setError(null);
 
     try {
-      const data = await arcExplainerAPI.getDifficultyStats();
-      setStats(data);
+      console.log('🔄 Fetching difficulty stats directly from arc-explainer API...');
+      const statsData = await arcExplainerAPI.getPerformanceStats();
+      setStats(statsData);
+      console.log('✅ Got difficulty stats:', statsData);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load difficulty stats';
       setError(errorMessage);
-      console.error('useDifficultyStats error:', err);
+      console.error('❌ useDifficultyStats error:', err);
+      
+      // Set empty stats on error
+      setStats({
+        impossible: 0,
+        extremely_hard: 0,
+        very_hard: 0,
+        challenging: 0,
+        total: 0
+      });
     } finally {
       setIsLoading(false);
     }

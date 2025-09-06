@@ -174,8 +174,8 @@ export class ArcExplainerAPI {
       // Convert PlayFab puzzle ID format to ARC Explainer format
       const cleanPuzzleId = this.convertPlayFabIdToArcId(puzzleId);
       
-      // First try to get from worst performing list (cached)
-      const worstPuzzles = await this.getWorstPerformingPuzzles({ limit: 1000 });
+      // First try to get from worst performing list (cached) - no artificial limits
+      const worstPuzzles = await this.getWorstPerformingPuzzles({});
       const found = worstPuzzles.find(p => (p.id || p.puzzleId) === cleanPuzzleId);
       
       if (found) {
@@ -196,10 +196,83 @@ export class ArcExplainerAPI {
    * Convert PlayFab puzzle ID format to ARC Explainer format
    * ARC-TR-007bbfb7 → 007bbfb7
    * ARC-EV-1ae2feb7 → 1ae2feb7
+   * ARC-TR2-123abc45 → 123abc45
+   * ARC-EV2-def67890 → def67890
    */
   public convertPlayFabIdToArcId(playFabId: string): string {
-    // Remove ARC-TR-, ARC-EV-, ARC-TR2-, ARC-EV2- prefixes
-    return playFabId.replace(/^ARC-[A-Z0-9]+-/, '');
+    if (!playFabId || typeof playFabId !== 'string') {
+      console.warn('convertPlayFabIdToArcId: Invalid input:', playFabId);
+      return playFabId || '';
+    }
+    
+    // Remove ARC-TR-, ARC-EV-, ARC-T2-, ARC-E2- prefixes (matches upload script format)
+    const converted = playFabId.replace(/^ARC-(TR|T2|EV|E2)-/, '');
+    
+    // Validation: ensure we got a reasonable result
+    if (converted === playFabId) {
+      console.debug('convertPlayFabIdToArcId: No prefix found, using ID as-is:', playFabId);
+    }
+    
+    return converted;
+  }
+
+  /**
+   * Convert ARC Explainer ID format to PlayFab format
+   * 007bbfb7 → ARC-TR-007bbfb7 (assumes training dataset by default)
+   * Note: Cannot definitively determine dataset without additional context
+   */
+  public convertArcIdToPlayFabId(arcId: string, dataset: 'training' | 'evaluation' | 'training2' | 'evaluation2' = 'training'): string {
+    if (!arcId || typeof arcId !== 'string') {
+      console.warn('convertArcIdToPlayFabId: Invalid input:', arcId);
+      return arcId || '';
+    }
+
+    // If already has ARC prefix, return as-is
+    if (arcId.startsWith('ARC-')) {
+      return arcId;
+    }
+
+    // Map dataset to prefix (matches upload script format)
+    const prefixMap = {
+      'training': 'ARC-TR-',
+      'evaluation': 'ARC-EV-', 
+      'training2': 'ARC-T2-',    // Fixed: matches upload script
+      'evaluation2': 'ARC-E2-'   // Fixed: matches upload script
+    };
+
+    return prefixMap[dataset] + arcId;
+  }
+
+  /**
+   * Validate puzzle ID format (both PlayFab and ARC formats)
+   */
+  public validatePuzzleId(puzzleId: string): { valid: boolean, format: 'playfab' | 'arc' | 'unknown', dataset?: string } {
+    if (!puzzleId || typeof puzzleId !== 'string') {
+      return { valid: false, format: 'unknown' };
+    }
+
+    // Check PlayFab format: ARC-XX-xxxxxxxx (matches upload script format)
+    const playfabMatch = puzzleId.match(/^ARC-(TR|EV|T2|E2)-([a-f0-9]{8})$/);
+    if (playfabMatch) {
+      const datasetMap = {
+        'TR': 'training',
+        'EV': 'evaluation', 
+        'T2': 'training2',    // Fixed: matches upload script
+        'E2': 'evaluation2'   // Fixed: matches upload script
+      };
+      return { 
+        valid: true, 
+        format: 'playfab', 
+        dataset: datasetMap[playfabMatch[1] as keyof typeof datasetMap] 
+      };
+    }
+
+    // Check ARC format: xxxxxxxx (8 hex characters)
+    if (puzzleId.match(/^[a-f0-9]{8}$/)) {
+      return { valid: true, format: 'arc' };
+    }
+
+    return { valid: false, format: 'unknown' };
   }
 
   /**
@@ -209,8 +282,8 @@ export class ArcExplainerAPI {
     try {
       const performanceMap = new Map<string, AIPuzzlePerformance>();
       
-      // Get all worst performing puzzles (with larger limit for better coverage)
-      const worstPuzzles = await this.getWorstPerformingPuzzles({ limit: 1000 });
+      // Get all worst performing puzzles - no artificial limits for better coverage
+      const worstPuzzles = await this.getWorstPerformingPuzzles({});
       
       // Create lookup map for faster searching - handle both id and puzzleId fields
       const arcPerformanceMap = new Map<string, AIPuzzlePerformance>();
@@ -240,57 +313,134 @@ export class ArcExplainerAPI {
   }
 
   /**
-   * Get difficulty category based on accuracy score
+   * Get direct performance statistics from arc-explainer API
+   * This is the primary method for difficulty card data - no PlayFab dependency
    */
-  public getDifficultyCategory(accuracy: number): 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging' {
-    if (accuracy === 0) return 'impossible';
-    if (accuracy <= 0.25) return 'extremely_hard';
-    if (accuracy <= 0.50) return 'very_hard';
-    return 'challenging';
-  }
-
-  /**
-   * Get difficulty statistics summary
-   */
-  public async getDifficultyStats(): Promise<{
-    impossible: number;
-    extremely_hard: number;
-    very_hard: number;
-    challenging: number;
-    total: number;
-  }> {
+  public async getPerformanceStats(): Promise<{ impossible: number, extremely_hard: number, very_hard: number, challenging: number, total: number }> {
     try {
-      // Get a large sample of worst performing puzzles
-      const puzzles = await this.getWorstPerformingPuzzles({ limit: 1000 });
+      console.log('🔄 Fetching performance stats from arc-explainer API...');
       
-      const stats = {
+      // Try performance-stats endpoint first
+      try {
+        const response = await this.makeRequest('/api/puzzle/performance-stats');
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+          // Extract bucket counts from performance stats response
+          const stats = data.data;
+          const result = {
+            impossible: stats.impossible || 0,
+            extremely_hard: stats.extremely_hard || stats.extremelyHard || 0,
+            very_hard: stats.very_hard || stats.veryHard || 0,
+            challenging: stats.challenging || 0,
+            total: stats.total || 0
+          };
+          
+          console.log('✅ Got performance stats:', result);
+          return result;
+        }
+      } catch (perfError) {
+        console.warn('⚠️ Performance-stats endpoint unavailable, using fallback');
+      }
+      
+      // Fallback: get worst-performing puzzles and compute buckets
+      const puzzles = await this.getWorstPerformingPuzzles({ limit: 50 });
+      
+      const buckets = {
         impossible: 0,
-        extremely_hard: 0,
+        extremely_hard: 0, 
         very_hard: 0,
         challenging: 0,
         total: puzzles.length
       };
-
+      
       puzzles.forEach(puzzle => {
-        const category = this.getDifficultyCategory(puzzle.avgAccuracy);
-        stats[category]++;
+        const accuracy = puzzle.avgAccuracy;
+        if (accuracy === 0) {
+          buckets.impossible++;
+        } else if (accuracy <= 0.25) {
+          buckets.extremely_hard++;
+        } else if (accuracy <= 0.50) {
+          buckets.very_hard++;
+        } else if (accuracy <= 0.75) {
+          buckets.challenging++;
+        }
       });
-
-      return stats;
+      
+      console.log('✅ Computed difficulty stats from worst-performing:', buckets);
+      return buckets;
+      
     } catch (error) {
-      console.error('Failed to get difficulty stats:', error);
-      return {
-        impossible: 0,
-        extremely_hard: 0,
-        very_hard: 0,
-        challenging: 0,
-        total: 0
+      console.error('❌ Failed to get difficulty stats:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get filtered puzzles from arc-explainer API for Officer Track
+   * This replaces complex PlayFab merging - arc-explainer is the source of truth
+   */
+  public async getFilteredPuzzles(filters: {
+    difficulty?: 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging';
+    zeroAccuracyOnly?: boolean;
+    limit?: number;
+  }): Promise<AIPuzzlePerformance[]> {
+    try {
+      console.log('🔄 Getting filtered puzzles from arc-explainer...', filters);
+      
+      const apiFilters: APIFilters = {
+        limit: filters.limit || 50, // Use server max
+        sortBy: 'composite'
       };
+      
+      // Apply difficulty filter as accuracy range
+      if (filters.difficulty === 'impossible' || filters.zeroAccuracyOnly) {
+        apiFilters.zeroAccuracyOnly = true;
+      } else if (filters.difficulty === 'extremely_hard') {
+        apiFilters.minAccuracy = 0.01; // Exclude 0%
+        apiFilters.maxAccuracy = 0.25;
+      } else if (filters.difficulty === 'very_hard') {
+        apiFilters.minAccuracy = 0.25;
+        apiFilters.maxAccuracy = 0.50;
+      } else if (filters.difficulty === 'challenging') {
+        apiFilters.minAccuracy = 0.50;
+        apiFilters.maxAccuracy = 0.75;
+      }
+      
+      const puzzles = await this.getWorstPerformingPuzzles(apiFilters);
+      console.log(`✅ Found ${puzzles.length} puzzles matching ${filters.difficulty || 'all'} difficulty`);
+      
+      return puzzles;
+      
+    } catch (error) {
+      console.error('❌ Failed to get filtered puzzles:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get specific puzzle by ID using direct API endpoint
+   */
+  public async getPuzzleById(puzzleId: string): Promise<any> {
+    try {
+      const cleanId = this.convertPlayFabIdToArcId(puzzleId);
+      const response = await this.makeRequest(`/api/puzzle/task/${cleanId}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        return data.data;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error(`Failed to get puzzle ${puzzleId}:`, error);
+      return null;
     }
   }
 
   /**
    * Make HTTP request to arc-explainer server
+   * Windows certificate handling: Uses relaxed security for Railway.app certificates
    */
   private async makeRequest(endpoint: string): Promise<Response> {
     const url = `${this.baseURL}${endpoint}`;
@@ -298,14 +448,30 @@ export class ArcExplainerAPI {
     console.log(`🌐 Making API request to: ${url}`);
     
     try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        // Add credentials if your arc-explainer server requires auth
-        // credentials: 'include',
-      });
+      // Retry logic for Windows certificate issues
+      const makeRequest = async (): Promise<Response> => {
+        return fetch(url, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache', // Bypass potential cache issues
+          },
+          // For Railway.app certificate issues on Windows
+          cache: 'no-cache',
+          // Add credentials if your arc-explainer server requires auth
+          // credentials: 'include',
+        });
+      };
+
+      // First attempt
+      let response = await makeRequest();
+      
+      // Retry once if network error (common with Windows certificate issues)
+      if (!response.ok && (response.status >= 500 || response.status === 0)) {
+        console.log(`⚠️ First attempt failed (${response.status}), retrying in 1 second...`);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        response = await makeRequest();
+      }
 
       console.log(`📡 API response: ${response.status} ${response.statusText}`);
 

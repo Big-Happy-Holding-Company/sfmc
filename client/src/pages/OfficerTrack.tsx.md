@@ -1,30 +1,36 @@
 /**
- * Officer Track Page - Advanced ARC Puzzle Interface
+ * Officer Track Page - ARC Puzzle Interface
  * ========================================================
- * Author: Space Force Mission Control Team
+ * Author: Claude 4 Code with major hallucinations and incompetence.  Sloppy code, imaginary endpoints
+ * and broken logic.  Do not trust this code.
  * 
  * Purpose:
- * Advanced puzzle interface for ARC-AGI challenges with military academy theming.
+ * Advanced puzzle interface for ARC-AGI challenges with NASA military academy theming.
  * Completely separate from main game with dedicated officer ranking system.
  * 
  * Key Features:
  * - ARC puzzle loading and transformation from integer grids to emoji presentation
- * - Officer rank progression system (Lieutenant → General)
- * - Separate PlayFab leaderboards and achievements
- * - Gold/silver military academy visual theme
- * - Advanced difficulty indicators and complex puzzle handling
+ * - Officer rank progression system (Lieutenant → General) HALLUCINATED!  Remove if found.
+ * - Separate PlayFab leaderboards and achievements (Unknown if implemented, not required at this time)
+ * - Gold/silver military academy visual theme (Poorly executed, needs a makeover and a NASA-inspired space theme that
+ * isn't cheesy and looks somewhat scientific while still being fun)
+ * - Advanced difficulty indicators and complex puzzle handling (Totally overengineered and needs 
+ * to be simplified based on D:\1Projects\arc-explainer\client\src\pages\PuzzleDiscussion.tsx and what it is using
+ * since we are using the same API!!)
  * 
- * Data Flow:
- * - Loads ARC puzzles via arcDataService (1,920+ puzzles)
- * - Manages officer player data via playFabOfficerTrack
- * - Validates solutions via dedicated CloudScript function
- * - Maintains complete separation from base game
+ * Data Flow:   ///  Needs major overhaul.  We know where to get the puzzles, we know where to get the metadata, we know how to call PlayFab, it needs to be hooked up correctly.
+ * - Loads ARC puzzles via arcDataService (1,920+ puzzles)  // Not sure if this is the best way???
+ * - Matches puzzles to the PlayFab puzzle IDs (Not working?  Maybe working?)
+ * - Manages officer player data via playFabOfficerTrack //  Not even sure if it does that??  Far too complex for this stage.
+ * - Validates solutions via dedicated CloudScript function (Bare minimum, works!)
+ * - No interaction with base game code at this time.
  */
 
 import { useState, useEffect } from "react";
 import { arcDataService } from "@/services/arcDataService";
 import { playFabService } from "@/services/playfab";
 import { arcExplainerAPI, type AIPuzzlePerformance } from "@/services/arcExplainerAPI";
+// Removed puzzlePerformanceService - using direct arc-explainer API
 import type { 
   OfficerTrackPuzzle, 
   OfficerTrackPlayer,
@@ -41,7 +47,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { SPACE_EMOJIS, EMOJI_SET_INFO } from "@/constants/spaceEmojis";
+import { SPACE_EMOJIS, EMOJI_SET_INFO, getARCColorCSS } from "@/constants/spaceEmojis";
 import type { EmojiSet } from "@/constants/spaceEmojis";
 import { OfficerDifficultyCards } from "@/components/game/OfficerDifficultyCards";
 import { OfficerPuzzleSearch, type SearchFilters } from "@/components/game/OfficerPuzzleSearch";
@@ -61,13 +67,12 @@ export default function OfficerTrack() {
   // Core state management
   const [currentPuzzle, setCurrentPuzzle] = useState<OfficerTrackPuzzle | null>(null);
   const [officerPlayer, setOfficerPlayer] = useState<OfficerTrackPlayer | null>(null);
-  const [availablePuzzles, setAvailablePuzzles] = useState<ARCPuzzleSearchResult | null>(null);
+  const [filteredPuzzles, setFilteredPuzzles] = useState<AIPuzzlePerformance[]>([]);
   const [playerSolution, setPlayerSolution] = useState<number[][]>([]);
   const [validationResult, setValidationResult] = useState<ARCValidationResult | null>(null);
   
-  // AI Performance Integration
-  const [aiPerformanceMap, setAiPerformanceMap] = useState<Map<string, AIPuzzlePerformance>>(new Map());
-  const [selectedDifficultyFilter, setSelectedDifficultyFilter] = useState<'impossible' | 'extremely_hard' | 'very_hard' | 'challenging' | null>(null);
+  // AI Performance Integration - direct from arc-explainer
+  const [selectedDifficultyFilter, setSelectedDifficultyFilter] = useState<'impossible' | 'extremely_hard' | 'very_hard' | 'challenging' | undefined>(undefined);
   
   // UI state
   const [loading, setLoading] = useState(true);
@@ -120,21 +125,8 @@ export default function OfficerTrack() {
         setOfficerPlayer(playerData);
         console.log(`👮 Officer loaded: ${playerData.officerRank} with ${playerData.officerPoints} points`);
         
-        // Load initial set of ARC puzzles based on officer rank
-        const puzzleData = await arcDataService.loadARCPuzzles({
-          datasets: ['training', 'evaluation'],
-          limit: 50, // Increased limit for better AI filtering
-          offset: 0,
-          difficulty: getAccessibleDifficulties(playerData.officerRank)
-        });
-        setAvailablePuzzles(puzzleData);
-        console.log(`🧩 Loaded ${puzzleData.puzzles.length} ARC puzzles for ${playerData.officerRank}`);
-        
-        // Load AI performance data for all puzzles
-        const puzzleIds = puzzleData.puzzles.map(p => p.id);
-        const performanceData = await arcExplainerAPI.getBatchPuzzlePerformance(puzzleIds);
-        setAiPerformanceMap(performanceData);
-        console.log(`🤖 Loaded AI performance data for ${performanceData.size} puzzles`);
+        // Load initial filtered puzzles from arc-explainer API
+        await loadFilteredPuzzles();
         
         console.log('✅ Officer Track initialization complete');
       } catch (err) {
@@ -167,40 +159,59 @@ export default function OfficerTrack() {
   };
 
   /**
-   * Get AI performance for a specific puzzle
+   * Get AI performance for a specific puzzle from filtered data
    */
   const getAIPerformance = (puzzleId: string): AIPuzzlePerformance | null => {
-    return aiPerformanceMap.get(puzzleId) || null;
+    const puzzle = filteredPuzzles.find((p: AIPuzzlePerformance) => p.id === puzzleId);
+    return puzzle || null;
   };
 
   /**
-   * Check if puzzle matches selected AI difficulty filter
+   * Load filtered puzzles from arc-explainer API
    */
-  const puzzleMatchesDifficultyFilter = (puzzle: OfficerTrackPuzzle): boolean => {
-    if (!selectedDifficultyFilter) return true;
-    
-    const aiPerformance = getAIPerformance(puzzle.id);
-    if (!aiPerformance) return false;
-    
-    const category = arcExplainerAPI.getDifficultyCategory(aiPerformance.avgAccuracy);
-    return category === selectedDifficultyFilter;
+  const loadFilteredPuzzles = async () => {
+    try {
+      setLoading(true);
+      console.log('🔄 Loading puzzles from arc-explainer API...', { selectedDifficultyFilter });
+      
+      let puzzles: AIPuzzlePerformance[];
+      
+      if (!selectedDifficultyFilter) {
+        // No filter - get default worst performing puzzles
+        puzzles = await arcExplainerAPI.getWorstPerformingPuzzles({ limit: 50 });
+      } else {
+        // Use direct arc-explainer filtering
+        puzzles = await arcExplainerAPI.getFilteredPuzzles({
+          difficulty: selectedDifficultyFilter,
+          limit: 50
+        });
+      }
+      
+      setFilteredPuzzles(puzzles);
+      console.log(`✅ Loaded ${puzzles.length} puzzles from arc-explainer`);
+    } catch (error) {
+      console.error('❌ Failed to load filtered puzzles:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load puzzles');
+      setFilteredPuzzles([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   /**
-   * Get filtered puzzles based on AI difficulty selection
-   */
-  const getFilteredPuzzles = (): OfficerTrackPuzzle[] => {
-    if (!availablePuzzles) return [];
-    
-    return availablePuzzles.puzzles.filter(puzzleMatchesDifficultyFilter);
-  };
-
-  /**
-   * Handle AI difficulty category selection
+   * Handle AI difficulty category selection and reload puzzles
    */
   const handleDifficultyFilterSelect = (category: 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging') => {
-    setSelectedDifficultyFilter(category === selectedDifficultyFilter ? null : category);
+    const newFilter = category === selectedDifficultyFilter ? undefined : category;
+    setSelectedDifficultyFilter(newFilter);
   };
+
+  // Reload puzzles when difficulty filter changes
+  useEffect(() => {
+    if (officerPlayer) {
+      loadFilteredPuzzles();
+    }
+  }, [selectedDifficultyFilter]);
 
   /**
    * Enhanced Grid UX Utilities
@@ -361,11 +372,38 @@ export default function OfficerTrack() {
     try {
       console.log(`🔍 Searching for puzzle: ${puzzleId}`);
       
-      // Search using arcDataService
+      // First try to find in current filtered dataset
+      const foundInFiltered = filteredPuzzles.find(p => 
+        p.id === puzzleId || p.id.includes(puzzleId)
+      );
+      
+      if (foundInFiltered) {
+        console.log(`✅ Found puzzle in filtered dataset: ${foundInFiltered.id}`);
+        // Convert AIPuzzlePerformance to OfficerTrackPuzzle for selection
+        const puzzleData = await arcDataService.searchPuzzleById(foundInFiltered.id);
+        if (puzzleData) {
+          handleSelectPuzzle(puzzleData);
+          return;
+        }
+      }
+      
+      // Try direct API lookup from arc-explainer
+      const directLookup = await arcExplainerAPI.getPuzzleById(puzzleId);
+      if (directLookup) {
+        console.log(`✅ Found puzzle via arc-explainer API: ${puzzleId}`);
+        // Get full puzzle data from arcDataService
+        const puzzleData = await arcDataService.searchPuzzleById(puzzleId);
+        if (puzzleData) {
+          handleSelectPuzzle(puzzleData);
+          return;
+        }
+      }
+      
+      // Fallback to direct arcDataService search
       const puzzle = await arcDataService.searchPuzzleById(puzzleId);
       
       if (puzzle) {
-        console.log(`✅ Found puzzle: ${puzzle.id}`);
+        console.log(`✅ Found puzzle via direct search: ${puzzle.id}`);
         handleSelectPuzzle(puzzle);
       } else {
         setError(`Puzzle "${puzzleId}" not found in any dataset. Try a different ID.`);
@@ -384,23 +422,27 @@ export default function OfficerTrack() {
    * Handle random puzzle selection with optional difficulty filter
    */
   const handleRandomPuzzle = async (difficulty?: string) => {
-    if (!availablePuzzles) return;
-    
     try {
       console.log(`🎲 Selecting random puzzle with difficulty: ${difficulty || 'any'}`);
       
-      // Filter puzzles based on difficulty
-      let candidatePuzzles = availablePuzzles.puzzles;
+      // Use filtered puzzles from arc-explainer API
+      let candidatePuzzles = filteredPuzzles;
       
       if (difficulty && difficulty !== 'all') {
-        // Filter by AI difficulty category
-        candidatePuzzles = availablePuzzles.puzzles.filter(puzzle => {
-          const aiPerformance = getAIPerformance(puzzle.id);
-          if (!aiPerformance) return false;
-          
-          const category = arcExplainerAPI.getDifficultyCategory(aiPerformance.avgAccuracy);
-          return category === difficulty;
-        });
+        // Filter current puzzles by requested difficulty
+        const difficultyMap: Record<string, 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging'> = {
+          'impossible': 'impossible',
+          'extremely_hard': 'extremely_hard', 
+          'very_hard': 'very_hard',
+          'challenging': 'challenging'
+        };
+        
+        const targetDifficulty = difficultyMap[difficulty];
+        if (targetDifficulty) {
+          candidatePuzzles = filteredPuzzles.filter(p => 
+            arcExplainerAPI.getDifficultyCategory(p.avgAccuracy) === targetDifficulty
+          );
+        }
         
         if (candidatePuzzles.length === 0) {
           setError(`No puzzles found with difficulty "${difficulty}". Try a different filter.`);
@@ -410,10 +452,17 @@ export default function OfficerTrack() {
       
       // Select random puzzle from candidates
       const randomIndex = Math.floor(Math.random() * candidatePuzzles.length);
-      const randomPuzzle = candidatePuzzles[randomIndex];
+      const randomAIPuzzle = candidatePuzzles[randomIndex];
       
-      console.log(`✅ Selected random puzzle: ${randomPuzzle.id} (${candidatePuzzles.length} candidates)`);
-      handleSelectPuzzle(randomPuzzle);
+      console.log(`✅ Selected random AI puzzle: ${randomAIPuzzle.id} (${candidatePuzzles.length} candidates)`);
+      
+      // Get full puzzle data from arcDataService
+      const puzzleData = await arcDataService.searchPuzzleById(randomAIPuzzle.id);
+      if (puzzleData) {
+        handleSelectPuzzle(puzzleData);
+      } else {
+        setError('Failed to load selected puzzle data');
+      }
       
     } catch (err) {
       console.error('❌ Random puzzle selection failed:', err);
@@ -427,16 +476,18 @@ export default function OfficerTrack() {
   const handleSearchFilterChange = async (filters: SearchFilters) => {
     console.log(`🔧 Search filters changed:`, filters);
     
+    // Handle zero accuracy filter (takes priority)
+    if (filters.zeroAccuracyOnly) {
+      setSelectedDifficultyFilter('impossible');
+      console.log('🚫 Applied zero accuracy filter - showing impossible puzzles only');
+      return;
+    }
+    
     // Update the AI difficulty filter to match search filters
     if (filters.difficulty && filters.difficulty !== 'all') {
       setSelectedDifficultyFilter(filters.difficulty);
     } else {
-      setSelectedDifficultyFilter(null);
-    }
-    
-    // If zero accuracy filter is set, automatically select "impossible" difficulty
-    if (filters.zeroAccuracyOnly) {
-      setSelectedDifficultyFilter('impossible');
+      setSelectedDifficultyFilter(undefined);
     }
   };
 
@@ -577,14 +628,25 @@ export default function OfficerTrack() {
           style={{ gridTemplateColumns: `repeat(${grid[0]?.length || 1}, 1fr)` }}
         >
           {emojiGrid.map((row, rowIndex) =>
-            row.map((cell, colIndex) => (
-              <div
-                key={`${rowIndex}-${colIndex}`}
-                className={`${size} flex items-center justify-center bg-slate-700 rounded ${textSize} border border-amber-800`}
-              >
-                {cell}
-              </div>
-            ))
+            row.map((cell, colIndex) => {
+              const originalValue = grid[rowIndex][colIndex];
+              const cellStyle = showNumbers ? {
+                backgroundColor: getARCColorCSS(originalValue),
+                color: originalValue === 4 ? '#000000' : '#ffffff' // Black text for yellow (4), white for others
+              } : {};
+              
+              return (
+                <div
+                  key={`${rowIndex}-${colIndex}`}
+                  className={`${size} flex items-center justify-center rounded ${textSize} border ${
+                    showNumbers ? 'border-gray-400' : 'bg-slate-700 border-amber-800'
+                  }`}
+                  style={cellStyle}
+                >
+                  {cell}
+                </div>
+              );
+            })
           )}
         </div>
         <div className="text-xs text-amber-600 mt-1">
@@ -617,17 +679,32 @@ export default function OfficerTrack() {
             row.map((cell, colIndex) => {
               const cellKey = getCellKey(rowIndex, colIndex);
               const isSelected = selectedCells.has(cellKey);
+              const originalValue = playerSolution[rowIndex][colIndex];
+              
+              // Calculate styles based on display mode and selection state
+              let cellStyle = {};
+              let className = `${size} flex items-center justify-center rounded ${textSize} border transition-colors`;
+              
+              if (showNumbers && !isSelected) {
+                // Apply ARC colors in numeric mode when not selected
+                cellStyle = {
+                  backgroundColor: getARCColorCSS(originalValue),
+                  color: originalValue === 4 ? '#000000' : '#ffffff' // Black text for yellow (4), white for others
+                };
+                className += ' border-gray-400 hover:scale-105 active:scale-95';
+              } else if (isSelected) {
+                // Selected state overrides color styling
+                className += ' bg-amber-600 border-amber-400 text-slate-900';
+              } else {
+                // Default emoji mode styling
+                className += ' bg-slate-700 hover:bg-slate-600 border-amber-700 hover:scale-105 active:scale-95';
+              }
               
               return (
                 <button
                   key={`${rowIndex}-${colIndex}`}
-                  className={`
-                    ${size} flex items-center justify-center rounded ${textSize} border transition-colors
-                    ${isSelected 
-                      ? 'bg-amber-600 border-amber-400 text-slate-900' 
-                      : 'bg-slate-700 hover:bg-slate-600 border-amber-700 hover:scale-105 active:scale-95'
-                    }
-                  `}
+                  className={className}
+                  style={cellStyle}
                   onMouseDown={(e) => handleCellMouseDown(rowIndex, colIndex, e)}
                   onMouseEnter={() => handleCellMouseEnter(rowIndex, colIndex)}
                   onContextMenu={(e) => e.preventDefault()}
@@ -777,7 +854,7 @@ export default function OfficerTrack() {
                 <CardTitle className="text-amber-400 flex items-center">
                   🧩 Advanced Reasoning Challenges
                   <Badge className="ml-3 bg-amber-600 text-slate-900">
-                    {getFilteredPuzzles().length} of {availablePuzzles?.totalCount || 0} Available
+                    {filteredPuzzles.length} Available
                   </Badge>
                   {selectedDifficultyFilter && (
                     <Badge className="ml-2 bg-blue-600 text-white">
@@ -802,13 +879,13 @@ export default function OfficerTrack() {
                         </div>
                         <div className="text-blue-300 text-xs">
                           Showing only puzzles categorized as "{selectedDifficultyFilter.replace('_', ' ')}" based on AI performance data.
-                          {getFilteredPuzzles().length === 0 && " No puzzles match this criteria in the current set."}
+                          {filteredPuzzles.length === 0 && " No puzzles match this criteria in the current set."}
                         </div>
                       </div>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setSelectedDifficultyFilter(null)}
+                        onClick={() => setSelectedDifficultyFilter(undefined)}
                         className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
                       >
                         Clear Filter
@@ -818,57 +895,70 @@ export default function OfficerTrack() {
                 )}
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {getFilteredPuzzles().map((puzzle) => {
-                    const aiPerformance = getAIPerformance(puzzle.id);
+                  {filteredPuzzles.map((aiPuzzle) => {
+                    const difficultyCategory = arcExplainerAPI.getDifficultyCategory(aiPuzzle.avgAccuracy);
                     return (
                     <Card 
-                      key={puzzle.id}
+                      key={aiPuzzle.id}
                       className="bg-slate-700 border-amber-600 hover:border-amber-400 cursor-pointer transition-colors"
-                      onClick={() => handleSelectPuzzle(puzzle)}
+                      onClick={async () => {
+                        // Load full puzzle data from arcDataService when selected
+                        const puzzleData = await arcDataService.searchPuzzleById(aiPuzzle.id);
+                        if (puzzleData) {
+                          handleSelectPuzzle(puzzleData);
+                        } else {
+                          setError(`Failed to load puzzle data for ${aiPuzzle.id}`);
+                        }
+                      }}
                     >
                       <CardContent className="p-4">
                         <div className="flex justify-between items-start mb-2">
-                          <Badge className={`
-                            ${puzzle.difficulty === 'LIEUTENANT' ? 'bg-green-600' : ''}
-                            ${puzzle.difficulty === 'CAPTAIN' ? 'bg-blue-600' : ''}
-                            ${puzzle.difficulty === 'MAJOR' ? 'bg-purple-600' : ''}
-                            ${puzzle.difficulty === 'COLONEL' ? 'bg-red-600' : ''}
-                          `}>
-                            {puzzle.difficulty}
+                          <Badge className="bg-amber-600 text-slate-900">
+                            ARC PUZZLE
                           </Badge>
                           <div className="text-xs text-amber-400">
-                            {puzzle.dataset.toUpperCase()}
+                            ANALYSIS DATA
                           </div>
                         </div>
                         
                         {/* AI Performance Badge */}
-                        {aiPerformance && (
-                          <div className="mb-2">
-                            <Badge className={`
-                              text-xs
-                              ${aiPerformance.avgAccuracy === 0 ? 'bg-red-600 text-white' : ''}
-                              ${aiPerformance.avgAccuracy <= 0.25 && aiPerformance.avgAccuracy > 0 ? 'bg-orange-600 text-white' : ''}
-                              ${aiPerformance.avgAccuracy <= 0.50 && aiPerformance.avgAccuracy > 0.25 ? 'bg-yellow-600 text-black' : ''}
-                              ${aiPerformance.avgAccuracy > 0.50 ? 'bg-blue-600 text-white' : ''}
-                            `}>
-                              🤖 AI: {(aiPerformance.avgAccuracy * 100).toFixed(0)}% accuracy
-                            </Badge>
-                          </div>
-                        )}
+                        <div className="mb-2">
+                          <Badge className={`
+                            text-xs
+                            ${aiPuzzle.avgAccuracy === 0 ? 'bg-red-600 text-white' : ''}
+                            ${aiPuzzle.avgAccuracy <= 0.25 && aiPuzzle.avgAccuracy > 0 ? 'bg-orange-600 text-white' : ''}
+                            ${aiPuzzle.avgAccuracy <= 0.50 && aiPuzzle.avgAccuracy > 0.25 ? 'bg-yellow-600 text-black' : ''}
+                            ${aiPuzzle.avgAccuracy > 0.50 ? 'bg-blue-600 text-white' : ''}
+                          `}>
+                            🤖 AI: {(aiPuzzle.avgAccuracy * 100).toFixed(0)}% accuracy
+                            {aiPuzzle.avgAccuracy === 0 && ' (IMPOSSIBLE)'}
+                          </Badge>
+                        </div>
+                        
+                        {/* Difficulty Category Badge */}
+                        <div className="mb-2">
+                          <Badge className={`
+                            text-xs
+                            ${difficultyCategory === 'impossible' ? 'bg-red-700 text-red-200' : ''}
+                            ${difficultyCategory === 'extremely_hard' ? 'bg-orange-700 text-orange-200' : ''}
+                            ${difficultyCategory === 'very_hard' ? 'bg-yellow-700 text-yellow-200' : ''}
+                            ${difficultyCategory === 'challenging' ? 'bg-blue-700 text-blue-200' : ''}
+                          `}>
+                            {difficultyCategory.replace('_', ' ').toUpperCase()}
+                          </Badge>
+                        </div>
                         
                         <div className="text-sm font-semibold text-amber-200 mb-1">
-                          {getCleanPuzzleId(puzzle.id)}
+                          {getCleanPuzzleId(aiPuzzle.id)}
                         </div>
                         
                         <div className="text-xs text-slate-300 space-y-1">
-                          <div>Training Examples: {puzzle.complexity.trainingExamples}</div>
-                          <div>Colors Used: {puzzle.complexity.uniqueColors}</div>
-                          <div>Complexity: {puzzle.complexity.transformationComplexity}</div>
-                          {aiPerformance && (
-                            <div className="text-blue-300">
-                              Explanations: {aiPerformance.totalExplanations} • Score: {aiPerformance.compositeScore.toFixed(1)}
-                            </div>
-                          )}
+                          <div className="text-blue-300">
+                            Explanations: {aiPuzzle.totalExplanations} • Score: {aiPuzzle.compositeScore?.toFixed(1) || 'N/A'}
+                          </div>
+                          <div className="text-amber-300">
+                            Click to load full puzzle data and solve
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -1149,16 +1239,35 @@ export default function OfficerTrack() {
                             <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
                               {getUsedValues().map(value => {
                                 const emoji = showNumbers ? value.toString() : transformGridForDisplay([[value]])[0][0];
+                                
+                                // Calculate styles based on display mode and selection state
+                                let buttonStyle = {};
+                                let buttonClassName = `h-10 w-10 flex items-center justify-center rounded border transition-colors text-sm`;
+                                
+                                if (showNumbers) {
+                                  if (selectedValue === value) {
+                                    // Selected state: use purple selection styling
+                                    buttonClassName += ' bg-purple-600 border-purple-400 text-white';
+                                  } else {
+                                    // Not selected: use ARC colors with gray border
+                                    buttonStyle = {
+                                      backgroundColor: getARCColorCSS(value),
+                                      color: value === 4 ? '#000000' : '#ffffff' // Black text for yellow (4), white for others
+                                    };
+                                    buttonClassName += ' border-gray-400 hover:border-purple-400';
+                                  }
+                                } else {
+                                  // Emoji mode: use original purple styling
+                                  buttonClassName += selectedValue === value 
+                                    ? ' bg-purple-600 border-purple-400 text-white' 
+                                    : ' bg-slate-700 border-purple-700 text-purple-200 hover:bg-purple-800';
+                                }
+                                
                                 return (
                                   <button
                                     key={value}
-                                    className={`
-                                      h-10 w-10 flex items-center justify-center rounded border transition-colors text-sm
-                                      ${selectedValue === value 
-                                        ? 'bg-purple-600 border-purple-400 text-white' 
-                                        : 'bg-slate-700 border-purple-700 text-purple-200 hover:bg-purple-800'
-                                      }
-                                    `}
+                                    className={buttonClassName}
+                                    style={buttonStyle}
                                     onClick={() => setSelectedValue(value)}
                                   >
                                     {emoji}
