@@ -54,7 +54,13 @@ class PuzzlePerformanceService {
       console.log('🔄 Loading merged puzzle dataset...', datasetOptions);
       
       // Step 1: Load PlayFab puzzles (authoritative source)
-      const puzzleData = await arcDataService.loadARCPuzzles(datasetOptions);
+      const arcLoadOptions = {
+        datasets: datasetOptions.datasets || ['training', 'evaluation', 'training2', 'evaluation2'],
+        limit: datasetOptions.limit,
+        offset: datasetOptions.offset
+        // Remove difficulty field as it has incompatible types
+      };
+      const puzzleData = await arcDataService.loadARCPuzzles(arcLoadOptions);
       console.log(`📋 Loaded ${puzzleData.puzzles.length} PlayFab puzzles`);
       
       // Step 2: Get performance data from arc-explainer API
@@ -63,13 +69,14 @@ class PuzzlePerformanceService {
       console.log(`🤖 Got performance data for ${performanceMap.size}/${puzzleIds.length} puzzles`);
       
       // Step 3: Merge data
+      const { categorizeDifficulty } = await import('@/services/officerArcAPI');
       const mergedData: MergedPuzzleData[] = puzzleData.puzzles.map(puzzle => {
         const performance = performanceMap.get(puzzle.id);
         const hasPerformanceData = !!performance;
         
         let difficultyCategory: MergedPuzzleData['difficultyCategory'] = undefined;
         if (performance) {
-          difficultyCategory = arcExplainerAPI.getDifficultyCategory(performance.avgAccuracy);
+          difficultyCategory = categorizeDifficulty(performance.avgAccuracy, true);
         }
         
         return {

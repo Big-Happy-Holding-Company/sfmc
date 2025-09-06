@@ -157,7 +157,7 @@ export async function getOfficerPuzzles(limit: number = 50): Promise<OfficerPuzz
     const total = data.data?.total || rawPuzzles.length;
     
     // Convert to our format
-    const puzzles: OfficerPuzzle[] = rawPuzzles.map(p => ({
+    const puzzles: OfficerPuzzle[] = rawPuzzles.map((p: any) => ({
       id: p.id,
       playFabId: p.id,
       avgAccuracy: p.avgAccuracy || 0,
