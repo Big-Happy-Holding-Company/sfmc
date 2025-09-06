@@ -403,8 +403,8 @@ export async function loadPuzzleFromPlayFab(puzzleId: string): Promise<any | nul
               false // Admin API uses secret key, not user authentication
             );
             
-            if (result.success && result.data?.Data?.[batchKey]?.Value) {
-              const puzzleDataStr = result.data.Data[batchKey].Value;
+            if (result?.Data?.[batchKey]?.Value) {
+              const puzzleDataStr = result.Data[batchKey].Value;
               
               if (puzzleDataStr && puzzleDataStr !== "undefined") {
                 puzzleArray = JSON.parse(puzzleDataStr);
@@ -415,7 +415,7 @@ export async function loadPuzzleFromPlayFab(puzzleId: string): Promise<any | nul
                 continue; // Skip to next batch
               }
             } else {
-              console.log(`❌ Failed to get data for ${batchKey}`);
+              console.log(`❌ Failed to get data for ${batchKey} - no data in response`);
               continue; // Skip to next batch
             }
           }
