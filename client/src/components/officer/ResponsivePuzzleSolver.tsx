@@ -5,11 +5,13 @@
  * Replaces SimplePuzzleSolver with full responsive design implementation
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ResponsiveOfficerGrid, ResponsiveOfficerDisplayGrid } from '@/components/officer/ResponsiveOfficerGrid';
 import { TrainingExamplesSection } from '@/components/officer/TrainingExamplesSection';
+import { GridSizeSelector } from '@/components/officer/GridSizeSelector';
+import { TestCaseNavigation } from '@/components/officer/TestCaseNavigation';
 import type { OfficerTrackPuzzle, ARCGrid } from '@/types/arcTypes';
 
 interface ResponsivePuzzleSolverProps {
@@ -18,41 +20,123 @@ interface ResponsivePuzzleSolverProps {
 }
 
 export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolverProps) {
-  const [userSolution, setUserSolution] = useState<ARCGrid>([]);
+  // Multi-test case state
+  const [currentTestIndex, setCurrentTestIndex] = useState(0);
+  const [solutions, setSolutions] = useState<ARCGrid[]>([]);
+  const [outputDimensions, setOutputDimensions] = useState<Array<{width: number; height: number}>>([]);
+  const [completedTests, setCompletedTests] = useState<boolean[]>([]);
 
-  // Initialize empty solution grid
-  const initializeSolution = () => {
-    if (puzzle.test && puzzle.test.length > 0 && puzzle.test[0].input) {
-      const inputGrid = puzzle.test[0].input;
-      const emptyGrid = inputGrid.map(row => row.map(() => 0));
-      setUserSolution(emptyGrid);
-    }
-  };
-
-  // Copy test input to solution
-  const copyInput = () => {
-    if (puzzle.test && puzzle.test.length > 0 && puzzle.test[0].input) {
-      setUserSolution(puzzle.test[0].input.map(row => [...row]));
-    }
-  };
-
-  // Reset solution
-  const resetSolution = () => {
-    if (puzzle.test && puzzle.test.length > 0 && puzzle.test[0].input) {
-      const inputGrid = puzzle.test[0].input;
-      const emptyGrid = inputGrid.map(row => row.map(() => 0));
-      setUserSolution(emptyGrid);
-    }
-  };
-
-  // Initialize on first render
-  if (userSolution.length === 0 && puzzle.test && puzzle.test.length > 0) {
-    initializeSolution();
-  }
-
-  const testInput = puzzle.test?.[0]?.input || [];
-  const expectedOutput = puzzle.test?.[0]?.output || [];
+  const totalTests = puzzle.test?.length || 0;
+  const currentTest = puzzle.test?.[currentTestIndex];
+  const testInput = currentTest?.input || [];
+  const expectedOutput = currentTest?.output || [];
   const trainingExamples = puzzle.train || [];
+
+  // Initialize state for all test cases
+  useEffect(() => {
+    if (puzzle.test && puzzle.test.length > 0) {
+      const newSolutions: ARCGrid[] = [];
+      const newDimensions: Array<{width: number; height: number}> = [];
+      const newCompleted: boolean[] = [];
+
+      puzzle.test.forEach((test, index) => {
+        // Default to input dimensions, but allow user override
+        const inputHeight = test.input?.length || 3;
+        const inputWidth = test.input?.[0]?.length || 3;
+        
+        // Create empty solution grid matching input size initially
+        const emptyGrid = Array(inputHeight).fill(null).map(() => Array(inputWidth).fill(0));
+        
+        newSolutions.push(emptyGrid);
+        newDimensions.push({ width: inputWidth, height: inputHeight });
+        newCompleted.push(false);
+      });
+
+      setSolutions(newSolutions);
+      setOutputDimensions(newDimensions);
+      setCompletedTests(newCompleted);
+    }
+  }, [puzzle.test]);
+
+  // Get suggested sizes from training examples
+  const getSuggestedSizes = () => {
+    const suggestions: Array<{ width: number; height: number; label: string }> = [];
+    const seenSizes = new Set<string>();
+
+    trainingExamples.forEach((example, index) => {
+      const outputHeight = example.output?.length || 0;
+      const outputWidth = example.output?.[0]?.length || 0;
+      const sizeKey = `${outputWidth}x${outputHeight}`;
+      
+      if (!seenSizes.has(sizeKey) && outputWidth > 0 && outputHeight > 0) {
+        seenSizes.add(sizeKey);
+        suggestions.push({
+          width: outputWidth,
+          height: outputHeight,
+          label: `(Ex ${index + 1})`
+        });
+      }
+    });
+
+    return suggestions.slice(0, 4); // Limit to 4 suggestions
+  };
+
+  // Handle output size change for current test
+  const handleSizeChange = (newWidth: number, newHeight: number) => {
+    const newDimensions = [...outputDimensions];
+    newDimensions[currentTestIndex] = { width: newWidth, height: newHeight };
+    setOutputDimensions(newDimensions);
+
+    // Create new empty grid with new dimensions
+    const newGrid = Array(newHeight).fill(null).map(() => Array(newWidth).fill(0));
+    const newSolutions = [...solutions];
+    newSolutions[currentTestIndex] = newGrid;
+    setSolutions(newSolutions);
+
+    // Mark as incomplete since we reset the solution
+    const newCompleted = [...completedTests];
+    newCompleted[currentTestIndex] = false;
+    setCompletedTests(newCompleted);
+  };
+
+  // Handle test case selection
+  const handleTestSelect = (testIndex: number) => {
+    setCurrentTestIndex(testIndex);
+  };
+
+  // Get current solution for active test
+  const currentSolution = solutions[currentTestIndex] || [];
+  const currentDimensions = outputDimensions[currentTestIndex] || { width: 3, height: 3 };
+  const hasExistingData = currentSolution.some(row => row.some(cell => cell !== 0));
+
+  // Update current solution
+  const updateCurrentSolution = (newGrid: ARCGrid) => {
+    const newSolutions = [...solutions];
+    newSolutions[currentTestIndex] = newGrid;
+    setSolutions(newSolutions);
+
+    // Check if solution matches expected output
+    if (expectedOutput.length > 0) {
+      const matches = JSON.stringify(newGrid) === JSON.stringify(expectedOutput);
+      const newCompleted = [...completedTests];
+      newCompleted[currentTestIndex] = matches;
+      setCompletedTests(newCompleted);
+    }
+  };
+
+  // Copy input to solution
+  const copyInput = () => {
+    if (testInput.length > 0) {
+      updateCurrentSolution(testInput.map(row => [...row]));
+    }
+  };
+
+  // Reset solution to empty
+  const resetSolution = () => {
+    const { width, height } = currentDimensions;
+    const emptyGrid = Array(height).fill(null).map(() => Array(width).fill(0));
+    updateCurrentSolution(emptyGrid);
+  };
 
   return (
     <div className="min-h-screen bg-slate-900 text-amber-50">
@@ -80,25 +164,44 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
         {/* Training Examples Section */}
         {trainingExamples.length > 0 && (
           <TrainingExamplesSection
             examples={trainingExamples}
             emojiSet="tech_set1"
-            title="📚 TRAINING EXAMPLES - Study the Pattern"
+            title="📚 TRAINING EXAMPLES - Apply what you learn from them to solve the puzzle"
           />
         )}
+
+        {/* Test Case Navigation */}
+        {totalTests > 1 && (
+          <TestCaseNavigation
+            totalTests={totalTests}
+            currentTestIndex={currentTestIndex}
+            completedTests={completedTests}
+            onTestSelect={handleTestSelect}
+          />
+        )}
+
+        {/* Grid Size Controls */}
+        <GridSizeSelector
+          width={currentDimensions.width}
+          height={currentDimensions.height}
+          onSizeChange={handleSizeChange}
+          hasExistingData={hasExistingData}
+          suggestedSizes={getSuggestedSizes()}
+        />
 
         {/* Solving Interface */}
         <div className="bg-slate-800 border border-slate-600 rounded-lg p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-amber-400 font-semibold flex items-center">
-              🧩 SOLVE THE PUZZLE
+              🧩 SOLVE TEST CASE {currentTestIndex + 1}
             </h2>
             <div className="text-slate-400 text-sm">
-              Apply the pattern to solve
+              {completedTests[currentTestIndex] ? '✅ Solved!' : 'Apply the pattern to solve'}
             </div>
           </div>
 
@@ -126,10 +229,10 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
               <div className="flex-1 max-w-md text-center">
                 <h3 className="text-amber-300 text-sm font-semibold mb-4">YOUR SOLUTION</h3>
                 <ResponsiveOfficerGrid
-                  initialGrid={userSolution}
+                  initialGrid={currentSolution}
                   containerType="solver"
                   className="mx-auto"
-                  onChange={setUserSolution}
+                  onChange={updateCurrentSolution}
                 />
                 
                 <div className="flex justify-center space-x-2 mt-4">
@@ -178,10 +281,10 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                 <div className="flex-1 text-center">
                   <h3 className="text-amber-300 text-sm font-semibold mb-4">YOUR SOLUTION</h3>
                   <ResponsiveOfficerGrid
-                    initialGrid={userSolution}
+                    initialGrid={currentSolution}
                     containerType="solver"
                     className="mx-auto"
-                    onChange={setUserSolution}
+                    onChange={updateCurrentSolution}
                   />
                 </div>
               </div>
@@ -231,10 +334,10 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
             <div className="text-center">
               <h3 className="text-amber-300 text-sm font-semibold mb-4">YOUR SOLUTION</h3>
               <ResponsiveOfficerGrid
-                initialGrid={userSolution}
+                initialGrid={currentSolution}
                 containerType="solver"
                 className="mx-auto"
-                onChange={setUserSolution}
+                onChange={updateCurrentSolution}
               />
               
               <div className="flex justify-center space-x-2 mt-4">
@@ -267,12 +370,12 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
               onClick={() => {
                 // TODO: Add solution validation
                 alert('Solution validation not implemented yet - check console for your solution');
-                console.log('User solution:', userSolution);
+                console.log('User solution:', currentSolution);
                 console.log('Expected output:', expectedOutput);
                 
                 // Compare solutions for debugging
                 if (expectedOutput.length > 0) {
-                  const matches = JSON.stringify(userSolution) === JSON.stringify(expectedOutput);
+                  const matches = JSON.stringify(currentSolution) === JSON.stringify(expectedOutput);
                   console.log('Solution matches expected:', matches);
                 }
               }}
