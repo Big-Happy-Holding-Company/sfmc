@@ -90,11 +90,12 @@ async function makeAPICall(endpoint: string): Promise<any> {
 export function arcIdToPlayFab(arcId: string, dataset: 'training' | 'evaluation' | 'training2' | 'evaluation2' = 'training'): string {
   if (arcId.startsWith('ARC-')) return arcId; // Already in PlayFab format
   
+  // FIXED: Use actual prefixes from upload script
   const prefixMap = {
     'training': 'ARC-TR-',
-    'evaluation': 'ARC-EV-',
-    'training2': 'ARC-TR2-',
-    'evaluation2': 'ARC-EV2-'
+    'evaluation': 'ARC-EV-', 
+    'training2': 'ARC-T2-',    // Was ARC-TR2-, now matches upload script
+    'evaluation2': 'ARC-E2-'   // Was ARC-EV2-, now matches upload script
   };
   
   return prefixMap[dataset] + arcId;
@@ -103,16 +104,18 @@ export function arcIdToPlayFab(arcId: string, dataset: 'training' | 'evaluation'
 /**
  * Convert PlayFab ID to arc-ID
  * ARC-TR-007bbfb7 -> 007bbfb7
+ * ARC-T2-11852cab -> 11852cab
  */
 export function playFabToArcId(playFabId: string): string {
-  return playFabId.replace(/^ARC-[A-Z0-9]+-/, '');
+  // FIXED: Handle all actual uploaded prefixes: ARC-TR-, ARC-T2-, ARC-EV-, ARC-E2-
+  return playFabId.replace(/^ARC-(TR|T2|EV|E2)-/, '');
 }
 
 /**
  * Categorize puzzle difficulty based on AI accuracy
  */
-export function categorizeDifficulty(accuracy: number): 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging' {
-  if (accuracy === 0) return 'impossible';
+export function categorizeDifficulty(accuracy: number, hasData: boolean = true): 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging' {
+  if (!hasData || accuracy === 0) return 'impossible';
   if (accuracy <= 0.25) return 'extremely_hard';
   if (accuracy <= 0.50) return 'very_hard';
   return 'challenging';
@@ -159,12 +162,14 @@ export async function getOfficerPuzzles(limit: number = 50): Promise<OfficerPuzz
     const puzzles: OfficerPuzzle[] = rawPuzzles.map(p => {
       const perf = p.performanceData || {};
       const accuracy = perf.avgAccuracy || 0;
+      const hasData = !!p.performanceData;
       
+      const arcId = p.id || p.puzzleId || '';
       return {
-        id: p.id || p.puzzleId || '',
-        playFabId: arcIdToPlayFab(p.id || p.puzzleId || ''),
+        id: arcId,
+        playFabId: arcId, // Don't assume dataset - let loadPuzzleFromPlayFab figure it out
         avgAccuracy: accuracy,
-        difficulty: categorizeDifficulty(accuracy),
+        difficulty: categorizeDifficulty(accuracy, hasData),
         totalExplanations: perf.totalExplanations || 0,
         compositeScore: perf.compositeScore || 0
       };
@@ -219,15 +224,12 @@ export async function searchPuzzleById(searchId: string): Promise<OfficerPuzzle 
   try {
     const cleanId = searchId.trim().toLowerCase().replace(/^arc-[a-z0-9]+-/, '');
     console.log(`🔍 Searching for puzzle: ${searchId} (cleaned: ${cleanId})`);
-    console.log(`🌐 Making API call to: /api/puzzle/task/${cleanId}`);
     
-    // Use arc-explainer's specific puzzle endpoint - NO LOCAL FALLBACKS
+    // Use arc-explainer's specific puzzle endpoint
     const data = await makeAPICall(`/api/puzzle/task/${cleanId}`);
-    console.log(`📡 API response:`, data);
     
     if (data.success && data.data) {
       console.log(`✅ Puzzle found in arc-explainer database: ${cleanId}`);
-      console.log(`📊 Full API response data:`, data.data);
       
       // Extract performance data from the arc-explainer response
       const puzzleData = data.data;
@@ -240,9 +242,9 @@ export async function searchPuzzleById(searchId: string): Promise<OfficerPuzzle 
       
       const puzzle: OfficerPuzzle = {
         id: cleanId,
-        playFabId: arcIdToPlayFab(cleanId),
+        playFabId: cleanId, // Raw ARC ID - let loader figure out the dataset
         avgAccuracy,
-        difficulty: categorizeDifficulty(avgAccuracy),
+        difficulty: categorizeDifficulty(avgAccuracy, !!performanceData),
         totalExplanations,
         compositeScore
       };
@@ -256,7 +258,6 @@ export async function searchPuzzleById(searchId: string): Promise<OfficerPuzzle 
     
   } catch (error) {
     console.error(`❌ Failed to search for puzzle ${searchId}:`, error);
-    console.error(`❌ Error details:`, error);
     return null;
   }
 }
@@ -277,10 +278,15 @@ export async function searchWithinLoadedPuzzles(searchId: string, puzzles: Offic
   return found || null;
 }
 
-export async function loadPuzzleFromPlayFab(playFabId: string): Promise<any | null> {
+/**
+ * Load full puzzle data from PlayFab by searching all datasets for ARC ID
+ */
+export async function loadPuzzleFromPlayFab(puzzleId: string): Promise<any | null> {
   try {
     const { playFabCore } = await import('@/services/playfab/core');
-    const arcId = playFabToArcId(playFabId);
+    
+    // Extract ARC ID (remove any existing prefix)
+    const arcId = puzzleId.startsWith('ARC-') ? playFabToArcId(puzzleId) : puzzleId;
     
     // All datasets to search
     const datasets = [
@@ -308,10 +314,12 @@ export async function loadPuzzleFromPlayFab(playFabId: string): Promise<any | nu
             if (puzzleDataStr && puzzleDataStr !== "undefined") {
               const puzzleArray = JSON.parse(puzzleDataStr);
               
-              // Search by both PlayFab ID and ARC ID
-              const puzzle = puzzleArray.find((p: any) => 
-                p.id === playFabId || playFabToArcId(p.id) === arcId
-              );
+              // Find puzzle by ARC ID (regardless of prefix)
+              const puzzle = puzzleArray.find((p: any) => {
+                if (!p.id) return false;
+                const pArcId = playFabToArcId(p.id);
+                return pArcId === arcId;
+              });
               
               if (puzzle) {
                 console.log(`Found puzzle ${puzzle.id} in ${dataset.name} batch ${i}`);
@@ -325,11 +333,11 @@ export async function loadPuzzleFromPlayFab(playFabId: string): Promise<any | nu
       }
     }
     
-    console.log(`Puzzle ${playFabId} not found in any dataset`);
+    console.log(`Puzzle with ARC ID ${arcId} not found in any dataset`);
     return null;
     
   } catch (error) {
-    console.error(`Failed to load puzzle ${playFabId}:`, error);
+    console.error(`Failed to load puzzle ${puzzleId}:`, error);
     return null;
   }
 }
