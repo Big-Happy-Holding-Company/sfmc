@@ -277,142 +277,61 @@ export async function searchWithinLoadedPuzzles(searchId: string, puzzles: Offic
   return found || null;
 }
 
-/**
- * Load full puzzle data from PlayFab using PlayFab ID
- * This bridges the gap between arc-explainer search and actual puzzle solving
- */
 export async function loadPuzzleFromPlayFab(playFabId: string): Promise<any | null> {
   try {
-    console.log(`🎯 Loading full puzzle data from PlayFab: ${playFabId}`);
-    
-    // Import PlayFab core dynamically to avoid circular dependencies
     const { playFabCore } = await import('@/services/playfab/core');
-    
-    // Extract the arc ID from the PlayFab ID
     const arcId = playFabToArcId(playFabId);
-    console.log(`🔍 Extracted ARC ID: ${arcId} from PlayFab ID: ${playFabId}`);
     
-    // Define all possible datasets and their batch counts
-    const allDatasets = [
-      { prefix: 'ARC-TR-', name: 'training', batches: 4 },
-      { prefix: 'ARC-EV-', name: 'evaluation', batches: 4 },
-      { prefix: 'ARC-TR2-', name: 'training2', batches: 10 },
-      { prefix: 'ARC-EV2-', name: 'evaluation2', batches: 2 }
+    // All datasets to search
+    const datasets = [
+      { name: 'training', batches: 4 },
+      { name: 'evaluation', batches: 4 },
+      { name: 'training2', batches: 10 },
+      { name: 'evaluation2', batches: 2 }
     ];
     
-    // Try the assumed dataset first (based on PlayFab ID prefix)
-    let batchKeys: string[];
-    let datasetName: string;
-    
-    if (playFabId.startsWith('ARC-TR2-')) {
-      batchKeys = Array.from({length: 10}, (_, i) => `officer-tasks-training2-batch${i + 1}.json`);
-      datasetName = 'training2';
-    } else if (playFabId.startsWith('ARC-EV2-')) {
-      batchKeys = Array.from({length: 2}, (_, i) => `officer-tasks-evaluation2-batch${i + 1}.json`);
-      datasetName = 'evaluation2';
-    } else if (playFabId.startsWith('ARC-EV-')) {
-      batchKeys = Array.from({length: 4}, (_, i) => `officer-tasks-evaluation-batch${i + 1}.json`);
-      datasetName = 'evaluation';
-    } else {
-      batchKeys = Array.from({length: 4}, (_, i) => `officer-tasks-training-batch${i + 1}.json`);
-      datasetName = 'training';
-    }
-    
-    console.log(`🔍 First trying ${datasetName} dataset (${batchKeys.length} batches) for puzzle: ${playFabId}`);
-    
-    // First, search through the assumed dataset
-    const result = await searchDatasetBatches(playFabCore, batchKeys, playFabId, arcId, datasetName);
-    if (result) {
-      return result;
-    }
-    
-    // If not found in assumed dataset, search ALL other datasets
-    console.log(`❌ Puzzle ${playFabId} not found in ${datasetName} dataset. Searching ALL datasets...`);
-    
-    for (const dataset of allDatasets) {
-      if (dataset.name === datasetName) continue; // Skip the one we already tried
-      
-      const otherBatchKeys = Array.from({length: dataset.batches}, (_, i) => 
-        `officer-tasks-${dataset.name}-batch${i + 1}.json`
-      );
-      
-      console.log(`🔍 Trying ${dataset.name} dataset (${otherBatchKeys.length} batches)...`);
-      const otherResult = await searchDatasetBatches(playFabCore, otherBatchKeys, playFabId, arcId, dataset.name);
-      if (otherResult) {
-        return otherResult;
+    // Search all datasets
+    for (const dataset of datasets) {
+      for (let i = 1; i <= dataset.batches; i++) {
+        try {
+          const batchKey = `officer-tasks-${dataset.name}-batch${i}.json`;
+          
+          const result = await playFabCore.makeHttpRequest(
+            '/Client/GetTitleData',
+            { Keys: [batchKey] },
+            true
+          );
+          
+          if (result.success && result.data?.Data?.[batchKey]) {
+            const puzzleDataStr = result.data.Data[batchKey];
+            
+            if (puzzleDataStr && puzzleDataStr !== "undefined") {
+              const puzzleArray = JSON.parse(puzzleDataStr);
+              
+              // Search by both PlayFab ID and ARC ID
+              const puzzle = puzzleArray.find((p: any) => 
+                p.id === playFabId || playFabToArcId(p.id) === arcId
+              );
+              
+              if (puzzle) {
+                console.log(`Found puzzle ${puzzle.id} in ${dataset.name} batch ${i}`);
+                return puzzle;
+              }
+            }
+          }
+        } catch (error) {
+          // Continue to next batch
+        }
       }
     }
     
-    console.log(`❌ Puzzle ${playFabId} (ARC ID: ${arcId}) not found in ANY dataset`);
+    console.log(`Puzzle ${playFabId} not found in any dataset`);
     return null;
     
   } catch (error) {
-    console.error(`❌ Failed to load puzzle from PlayFab: ${playFabId}`, error);
+    console.error(`Failed to load puzzle ${playFabId}:`, error);
     return null;
   }
-}
-
-/**
- * Search through a set of dataset batches for a puzzle
- */
-async function searchDatasetBatches(
-  playFabCore: any, 
-  batchKeys: string[], 
-  playFabId: string, 
-  arcId: string, 
-  datasetName: string
-): Promise<any | null> {
-  for (const datasetKey of batchKeys) {
-    try {
-      console.log(`🔍 Checking batch: ${datasetKey}`);
-      
-      const result = await playFabCore.makeHttpRequest<
-        { Keys: string[] }, 
-        { Data?: Record<string, string> }
-      >(
-        '/Client/GetTitleData',
-        { Keys: [datasetKey] },
-        true // requiresAuth = true
-      );
-      
-      if (result.success && result.data?.Data?.[datasetKey]) {
-        const puzzleDataStr = result.data.Data[datasetKey];
-        
-        if (puzzleDataStr && puzzleDataStr !== "undefined") {
-          const puzzleArray = JSON.parse(puzzleDataStr);
-          console.log(`🔍 Checking batch ${datasetKey} with ${puzzleArray.length} puzzles`);
-          
-          // Search by both PlayFab ID AND ARC ID (in case the prefix is wrong)
-          let puzzle = puzzleArray.find((p: any) => p.id === playFabId);
-          
-          if (!puzzle) {
-            // Also try searching by just the ARC ID part
-            puzzle = puzzleArray.find((p: any) => {
-              const pArcId = playFabToArcId(p.id);
-              return pArcId === arcId;
-            });
-          }
-          
-          if (puzzle) {
-            console.log(`✅ Found puzzle in ${datasetName} batch ${datasetKey}: ${puzzle.id}`);
-            return puzzle;
-          } else {
-            // Show sample IDs for debugging
-            if (puzzleArray.length > 0) {
-              const sampleIds = puzzleArray.slice(0, 3).map((p: any) => p.id);
-              console.log(`❌ Not in batch ${datasetKey}. Sample IDs:`, sampleIds);
-            }
-          }
-        }
-      }
-      
-    } catch (batchError) {
-      console.warn(`⚠️ Failed to check batch ${datasetKey}:`, batchError);
-      // Continue to next batch
-    }
-  }
-  
-  return null; // Not found in this dataset
 }
 
 /**
