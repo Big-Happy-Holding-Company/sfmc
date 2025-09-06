@@ -172,20 +172,26 @@ export function categorizeDifficulty(accuracy: number, hasData: boolean = true):
 }
 
 /**
- * Get puzzles from arc-explainer (metadata only) - simple pattern
+ * Get puzzles from arc-explainer with dynamic sorting strategies
+ * Now supports multiple sorting approaches to get truly worst-performing puzzles
  */
-export async function getOfficerPuzzles(limit: number = 50): Promise<OfficerPuzzleResponse> {
+export async function getOfficerPuzzles(
+  limit: number = 50, 
+  sortBy: string = 'composite'
+): Promise<OfficerPuzzleResponse> {
   try {
-    console.log(`🔄 Getting ${limit} puzzles from arc-explainer...`);
+    console.log(`🔄 Getting ${limit} puzzles from arc-explainer (sortBy: ${sortBy})...`);
     
-    // Add limit parameter like arc-explainer does
-    const data = await makeAPICall(`/api/puzzle/worst-performing?limit=${limit}&sortBy=composite`);
+    // Use dynamic sortBy parameter instead of hardcoded 'composite'
+    const data = await makeAPICall(`/api/puzzle/worst-performing?limit=${limit}&sortBy=${sortBy}`);
     
     // Simple: get puzzles from arc-explainer response
     const rawPuzzles = data.data?.puzzles || [];
     const total = data.data?.total || rawPuzzles.length;
     
-    // Convert to our format
+    console.log(`📊 Arc-explainer returned ${rawPuzzles.length} puzzles with ${sortBy} sorting`);
+    
+    // Convert to our format with rich metadata preservation
     const puzzles: OfficerPuzzle[] = rawPuzzles.map((p: any) => ({
       id: p.id,
       playFabId: p.id,
@@ -194,6 +200,22 @@ export async function getOfficerPuzzles(limit: number = 50): Promise<OfficerPuzz
       totalExplanations: p.totalExplanations || 0,
       compositeScore: p.compositeScore || 0
     }));
+    
+    // Log insights about the worst-performing puzzles we got
+    if (puzzles.length > 0) {
+      const avgAccuracy = puzzles.reduce((sum, p) => sum + p.avgAccuracy, 0) / puzzles.length;
+      const worstAccuracy = Math.min(...puzzles.map(p => p.avgAccuracy));
+      const difficultyBreakdown = puzzles.reduce((acc, p) => {
+        acc[p.difficulty] = (acc[p.difficulty] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      
+      console.log(`🎯 Worst-performing puzzle set (${sortBy}):`, {
+        avgAccuracy: avgAccuracy.toFixed(3),
+        worstAccuracy: worstAccuracy.toFixed(3),
+        difficultyBreakdown
+      });
+    }
       
     return { puzzles, total };
     
