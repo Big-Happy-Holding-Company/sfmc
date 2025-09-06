@@ -50,20 +50,20 @@ export function TestCaseNavigation({
   const progressPercentage = Math.round((completedCount / totalTests) * 100);
 
   return (
-    <div className={`bg-slate-700 rounded-lg p-4 border border-slate-600 ${className}`}>
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-amber-300 text-sm font-semibold flex items-center">
+    <div className={`bg-slate-100/90 rounded-lg p-3 border border-slate-400 ${className}`}>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-slate-700 text-sm font-semibold flex items-center">
           🎯 TEST CASES
         </h3>
         <div className="flex items-center gap-2">
           <Badge 
             variant="outline" 
-            className={`${completedCount === totalTests ? 'text-green-400 border-green-600' : 'text-slate-300 border-slate-500'}`}
+            className={`${completedCount === totalTests ? 'text-green-700 border-green-600 bg-green-100' : 'text-slate-600 border-slate-400 bg-white'}`}
           >
             {completedCount}/{totalTests} Complete
           </Badge>
           {completedCount === totalTests && (
-            <Badge className="bg-green-600 text-white">
+            <Badge className="bg-green-600 text-white shadow-md">
               ✅ ALL SOLVED!
             </Badge>
           )}
@@ -71,20 +71,20 @@ export function TestCaseNavigation({
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-4">
-        <div className="flex justify-between text-xs text-slate-400 mb-1">
+      <div className="mb-3">
+        <div className="flex justify-between text-xs text-slate-600 mb-1">
           <span>Progress</span>
           <span>{progressPercentage}%</span>
         </div>
-        <div className="w-full bg-slate-800 rounded-full h-2">
+        <div className="w-full bg-slate-300 rounded-full h-2">
           <div 
-            className="bg-amber-500 h-2 rounded-full transition-all duration-300"
+            className="bg-slate-600 h-2 rounded-full transition-all duration-300 shadow-sm"
             style={{ width: `${progressPercentage}%` }}
           />
         </div>
       </div>
 
-      {/* Test Case Buttons */}
+      {/* Test Case Buttons - Silver Theme */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
         {Array.from({ length: totalTests }, (_, index) => {
           const isActive = index === currentTestIndex;
@@ -98,20 +98,21 @@ export function TestCaseNavigation({
               className={`
                 relative h-10 flex items-center justify-center gap-2
                 ${isActive 
-                  ? 'bg-amber-600 text-slate-900 border-amber-600' 
+                  ? 'bg-slate-600 hover:bg-slate-700 text-white border-slate-500 shadow-md' 
                   : isCompleted
-                    ? 'border-green-600 text-green-400 hover:bg-green-600 hover:text-white'
-                    : 'border-slate-600 text-slate-300 hover:border-amber-600 hover:text-amber-400'
+                    ? 'bg-green-600 hover:bg-green-700 text-white border-green-500 shadow-sm'
+                    : 'border-slate-400 text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-500'
                 }
+                transition-all duration-200
               `}
               onClick={() => onTestSelect(index)}
             >
               {isCompleted ? (
-                <CheckCircle className="h-3 w-3" />
+                <CheckCircle className="w-4 h-4" />
               ) : (
-                <Circle className="h-3 w-3" />
+                <Circle className="w-4 h-4" />
               )}
-              <span className="text-xs font-semibold">
+              <span className="font-semibold">
                 Test {index + 1}
               </span>
             </Button>

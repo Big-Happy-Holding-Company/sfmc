@@ -381,12 +381,11 @@ export async function searchWithinLoadedPuzzles(searchId: string, puzzles: Offic
  */
 export async function loadPuzzleFromPlayFab(puzzleId: string): Promise<any | null> {
   try {
-    // Ensure PlayFab is initialized with admin credentials
+    // Ensure PlayFab is initialized for client access
     if (!playFabCore.isReady()) {
-      console.warn('PlayFab not initialized for admin access, initializing...');
+      console.warn('PlayFab not initialized for client access, initializing...');
       const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
-      const secretKey = import.meta.env.VITE_PLAYFAB_SECRET_KEY;
-      await playFabCore.initialize({ titleId, secretKey });
+      await playFabCore.initialize({ titleId });
     }
     
     // Extract ARC ID (remove any existing prefix)
@@ -420,9 +419,9 @@ export async function loadPuzzleFromPlayFab(puzzleId: string): Promise<any | nul
           } else {
             // Load from PlayFab and cache
             const result = await playFabCore.makeHttpRequest(
-              '/Admin/GetTitleData',
+              '/Client/GetTitleData',
               { Keys: [batchKey] },
-              false // Admin API uses secret key, not user authentication
+              true // Client API uses user authentication
             );
             
             if (result?.Data?.[batchKey]) {
@@ -472,9 +471,9 @@ export async function loadPuzzleFromPlayFab(puzzleId: string): Promise<any | nul
     // Provide specific error context for debugging
     if (error instanceof Error) {
       if (error.message.includes('PlayFab not initialized')) {
-        console.error('💡 Suggestion: Ensure PlayFab is initialized with proper credentials before calling loadPuzzleFromPlayFab');
-      } else if (error.message.includes('PLAYFAB_SECRET_KEY')) {
-        console.error('💡 Suggestion: Check that VITE_PLAYFAB_SECRET_KEY is set in environment variables');
+        console.error('💡 Suggestion: Ensure PlayFab is initialized and user is authenticated before calling loadPuzzleFromPlayFab');
+      } else if (error.message.includes('anonymous callers')) {
+        console.error('💡 Suggestion: User authentication required - ensure PlayFab login is completed');
       } else if (error.message.includes('HTTP')) {
         console.error('💡 Suggestion: Check network connection and PlayFab service status');
       }

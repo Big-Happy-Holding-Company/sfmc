@@ -48,6 +48,17 @@ interface UpdateOfficerUserDataRequest {
   Data: Record<string, string>;
 }
 
+interface ExecuteCloudScriptRequest {
+  FunctionName: string;
+  FunctionParameter: any;
+}
+
+interface ExecuteCloudScriptResponse {
+  FunctionResult: any;
+  Logs?: any[];
+  ExecutionTimeMilliseconds?: number;
+}
+
 interface GetOfficerUserDataRequest {
   Keys?: string[];
 }
@@ -244,42 +255,63 @@ export class PlayFabOfficerTrack {
   // =============================================================================
 
   /**
-   * Validate ARC puzzle solution via PlayFab CloudScript
-   * Transforms ARC format to CloudScript validation request
+   * Validate ARC puzzle solution via PlayFab CloudScript ValidateARCPuzzle
    */
   public async validateARCSolution(attempt: ARCSolutionAttempt): Promise<ARCValidationResult> {
     await playFabAuth.ensureAuthenticated();
 
-    // Transform ARC format to CloudScript format
-    const cloudScriptRequest: CloudScriptValidationRequest = {
-      taskId: attempt.puzzleId,
-      solution: attempt.solution.map(row => row.map(cell => cell.toString())), // Convert number[][] to string[][]
-      timeElapsed: attempt.timeElapsed,
-      hintsUsed: attempt.hintsUsed,
-      sessionId: attempt.sessionId,
-      attemptId: attempt.attemptNumber
+    // Prepare CloudScript request for ValidateARCPuzzle function
+    // Use solutions array if available (multi-test case), otherwise wrap single solution
+    const solutions = attempt.solutions || [attempt.solution];
+    
+    const cloudScriptRequest: ExecuteCloudScriptRequest = {
+      FunctionName: 'ValidateARCPuzzle',
+      FunctionParameter: {
+        puzzleId: attempt.puzzleId,
+        solutions: solutions, // Array of solutions for multiple test cases
+        timeElapsed: attempt.timeElapsed,
+        attemptNumber: attempt.attemptNumber,
+        sessionId: attempt.sessionId
+      }
     };
 
-    playFabCore.logOperation('ARC Solution Validation', `Puzzle: ${attempt.puzzleId}`);
+    playFabCore.logOperation('ARC Solution Validation', `Puzzle: ${attempt.puzzleId}, Test Cases: ${solutions.length}`);
 
     try {
-      // Use existing validation infrastructure
-      const result = await playFabValidation.validateSolution(cloudScriptRequest);
+      // Call ValidateARCPuzzle CloudScript function directly
+      const response: ExecuteCloudScriptResponse = await playFabCore.makeHttpRequest<ExecuteCloudScriptRequest, ExecuteCloudScriptResponse>(
+        '/Client/ExecuteCloudScript',
+        cloudScriptRequest,
+        true
+      );
+
+      // Extract result from CloudScript response
+      const cloudScriptResult = response.FunctionResult;
       
-      // Transform result back to ARC format
+      if (!cloudScriptResult) {
+        throw new Error('No result returned from ValidateARCPuzzle CloudScript function');
+      }
+
+      if (!cloudScriptResult.success) {
+        throw new Error(cloudScriptResult.error || 'CloudScript validation failed');
+      }
+      
+      // Transform result to ARC format (simplified - no complex scoring)
       const arcResult: ARCValidationResult = {
-        success: result.success,
-        correct: result.correct,
-        pointsEarned: result.pointsEarned,
-        timeBonus: result.timeBonus || 0,
-        hintPenalty: result.hintPenalty || 0,
-        message: result.message || (result.correct ? 'Puzzle solved!' : 'Incorrect solution'),
-        totalScore: result.totalScore || result.pointsEarned
+        success: true,
+        correct: cloudScriptResult.correct,
+        pointsEarned: 0, // No points in Officer Track validation
+        timeBonus: 0,
+        hintPenalty: 0,
+        message: cloudScriptResult.correct ? 'Puzzle solved!' : 'Incorrect solution',
+        totalScore: 0,
+        timeElapsed: cloudScriptResult.timeElapsed,
+        completedAt: cloudScriptResult.completedAt
       };
 
       playFabCore.logOperation('ARC Validation Complete', {
         correct: arcResult.correct,
-        points: arcResult.pointsEarned
+        timeElapsed: arcResult.timeElapsed
       });
 
       return arcResult;

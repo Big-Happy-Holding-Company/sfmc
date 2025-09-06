@@ -15,7 +15,7 @@
 import { useEffect, useState } from 'react';
 import { X, CheckCircle, AlertCircle, Star, Award, TrendingUp, Target, ArrowRight } from 'lucide-react';
 import { getRandomOfficer } from '@/constants/trainers';
-import type { ARCGrid, OfficerRank, OfficerPlayerData, ARCPuzzleFile } from '@/types/arcTypes';
+import type { ARCGrid, OfficerRank, OfficerTrackPlayer, OfficerTrackPuzzle } from '@/types/arcTypes';
 import { OfficerDisplayGrid } from './OfficerGrid';
 import { OfficerRankBadge } from './OfficerRankBadge';
 
@@ -27,7 +27,7 @@ interface OfficerResultModalProps {
   /** Whether puzzle was solved correctly */
   success: boolean;
   /** The puzzle that was attempted */
-  puzzle: ARCPuzzleFile;
+  puzzle: OfficerTrackPuzzle;
   /** Player's submitted solution */
   submittedSolution: ARCGrid;
   /** Expected correct solution */
@@ -41,7 +41,7 @@ interface OfficerResultModalProps {
   /** Player's rank after this attempt */
   currentRank: OfficerRank;
   /** Updated player data */
-  playerData: OfficerPlayerData;
+  playerData: OfficerTrackPlayer;
   /** Callback when continuing to next puzzle */
   onNextPuzzle?: () => void;
   /** Callback when retrying current puzzle */
