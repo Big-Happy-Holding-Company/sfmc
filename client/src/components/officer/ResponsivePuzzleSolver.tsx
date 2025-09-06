@@ -119,6 +119,23 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
   const currentDimensions = outputDimensions[currentTestIndex] || { width: 3, height: 3 };
   const hasExistingData = currentSolution.some(row => row.some(cell => cell !== 0));
 
+  // Calculate dynamic cell sizes for full screen usage
+  const calculateCellSize = (gridWidth: number, gridHeight: number) => {
+    // Use roughly 45% of viewport width for each grid (leaving space for arrow and padding)
+    const availableWidth = Math.floor(window.innerWidth * 0.45);
+    const availableHeight = Math.floor(window.innerHeight * 0.6); // 60% of viewport height
+    
+    const cellSizeByWidth = Math.floor(availableWidth / gridWidth);
+    const cellSizeByHeight = Math.floor(availableHeight / gridHeight);
+    
+    // Use the smaller dimension but ensure minimum size
+    const cellSize = Math.max(12, Math.min(cellSizeByWidth, cellSizeByHeight));
+    return Math.min(cellSize, 80); // Cap at 80px for readability
+  };
+
+  const inputCellSize = calculateCellSize(testInput[0]?.length || 1, testInput.length);
+  const outputCellSize = calculateCellSize(currentDimensions.width, currentDimensions.height);
+
   // Update current solution
   const updateCurrentSolution = (newGrid: ARCGrid) => {
     const newSolutions = [...solutions];
@@ -225,6 +242,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                 grid={testInput}
                 containerType="solver"
                 className="w-full h-full"
+                fixedCellSize={inputCellSize}
               />
             </div>
 
@@ -241,6 +259,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                 containerType="solver"
                 className="w-full h-full"
                 onChange={updateCurrentSolution}
+                fixedCellSize={outputCellSize}
               />
               
               <div className="flex justify-center space-x-2 mt-4">

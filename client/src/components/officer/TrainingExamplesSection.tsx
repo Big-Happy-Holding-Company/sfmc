@@ -146,28 +146,38 @@ export function TrainingExamplesSection({
       {/* Compact Horizontal Layout for ALL grid sizes */}
       <div className="overflow-x-auto">
         <div className="flex gap-4 pb-2">
-          {examples.map((example, index) => (
-            <div key={index} className="flex-shrink-0 bg-slate-700 rounded border border-slate-600 p-3">
-              <h3 className="text-amber-300 text-xs font-semibold mb-2 text-center">
-                EX {index + 1}
-              </h3>
-              <div className="flex items-center gap-2">
-                <ResponsiveOfficerDisplayGrid
-                  grid={example.input}
-                  containerType="example"
-                  emojiSet={emojiSet}
-                  className="scale-75"
-                />
-                <div className="text-cyan-400 text-sm font-bold">→</div>
-                <ResponsiveOfficerDisplayGrid
-                  grid={example.output}
-                  containerType="example"
-                  emojiSet={emojiSet}
-                  className="scale-75"
-                />
+          {examples.map((example, index) => {
+            // Calculate cell size for training examples (smaller, more compact)
+            const maxInputDim = Math.max(example.input.length, example.input[0]?.length || 1);
+            const maxOutputDim = Math.max(example.output.length, example.output[0]?.length || 1);
+            const maxDim = Math.max(maxInputDim, maxOutputDim);
+            
+            // Use smaller fixed sizes for training examples
+            const cellSize = maxDim > 15 ? 12 : maxDim > 10 ? 16 : 20;
+            
+            return (
+              <div key={index} className="flex-shrink-0 bg-slate-700 rounded border border-slate-600 p-3">
+                <h3 className="text-amber-300 text-xs font-semibold mb-2 text-center">
+                  EX {index + 1}
+                </h3>
+                <div className="flex items-center gap-2">
+                  <ResponsiveOfficerDisplayGrid
+                    grid={example.input}
+                    containerType="example"
+                    emojiSet={emojiSet}
+                    fixedCellSize={cellSize}
+                  />
+                  <div className="text-cyan-400 text-sm font-bold">→</div>
+                  <ResponsiveOfficerDisplayGrid
+                    grid={example.output}
+                    containerType="example"
+                    emojiSet={emojiSet}
+                    fixedCellSize={cellSize}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
