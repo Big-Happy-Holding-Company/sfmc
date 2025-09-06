@@ -89,12 +89,26 @@ export function ResponsiveOfficerGrid({
     setGrid(initialGrid);
   }, [initialGrid]);
 
-  // Handle global mouse events for drag painting
+  // Handle global mouse events for drag selection and flood fill
   useEffect(() => {
     if (!enableDragToPaint) return;
 
     const handleGlobalMouseUp = () => {
       if (dragState.isDragging) {
+        // FLOOD FILL: Fill all selected cells with current selectedValue
+        const selectedCells = getSelectedCells();
+        if (selectedCells.length > 0 && selectedValue !== undefined && selectedValue !== null) {
+          const newGrid = grid.map((row, rowIndex) =>
+            row.map((cell, colIndex) => {
+              const isSelected = selectedCells.some(sc => sc.row === rowIndex && sc.col === colIndex);
+              return isSelected ? selectedValue : cell;
+            })
+          );
+          setGrid(newGrid);
+          onChange?.(newGrid);
+        }
+        
+        // Clear selection
         setDragState({
           isDragging: false,
           startCell: null,
@@ -105,25 +119,18 @@ export function ResponsiveOfficerGrid({
 
     document.addEventListener('mouseup', handleGlobalMouseUp);
     return () => document.removeEventListener('mouseup', handleGlobalMouseUp);
-  }, [dragState.isDragging, enableDragToPaint]);
+  }, [dragState.isDragging, enableDragToPaint, selectedValue, grid, onChange]);
 
   /**
-   * Handle cell click - enhanced with value selection or traditional cycling
+   * Handle cell click - DEFAULT: cycle through 0→1→2→...→9→0
    */
   const handleCellClick = (row: number, col: number) => {
     if (!interactive || disabled) return;
 
-    // If using enhanced controls with cell interaction callback
-    if (onCellInteraction) {
-      onCellInteraction(row, col, selectedValue);
-      return;
-    }
-
-    // Traditional cycling behavior (backward compatibility)
+    // ALWAYS cycle through values on click - this is the core functionality
     const newGrid = grid.map((gridRow, rowIndex) =>
       gridRow.map((cell, colIndex) => {
         if (rowIndex === row && colIndex === col) {
-          // Cycle to next value (0-9, then back to 0)
           return (cell + 1) % 10;
         }
         return cell;
@@ -132,6 +139,11 @@ export function ResponsiveOfficerGrid({
 
     setGrid(newGrid);
     onChange?.(newGrid);
+    
+    // Call callback if provided (but doesn't override cycling behavior)
+    if (onCellInteraction) {
+      onCellInteraction(row, col, newGrid[row][col]);
+    }
   };
 
   /**
@@ -144,39 +156,63 @@ export function ResponsiveOfficerGrid({
   };
 
   /**
-   * Handle mouse down for drag painting
+   * Handle mouse down for drag selection (not immediate painting)
    */
   const handleCellMouseDown = (row: number, col: number, e: React.MouseEvent) => {
     if (!interactive || disabled || !enableDragToPaint) return;
 
-    if (e.button === 0) { // Left click
+    if (e.button === 0) { // Left click - start selection
       setDragState({
         isDragging: true,
         startCell: { row, col },
         hoveredCell: { row, col }
       });
-      
-      // Set initial cell value
-      handleCellValueChange(row, col, selectedValue);
+      // DON'T paint immediately - wait for mouse up
     } else if (e.button === 2) { // Right click
       e.preventDefault();
-      handleCellValueChange(row, col, 0); // Clear cell
+      handleCellValueChange(row, col, 0); // Clear cell immediately
     }
   };
 
   /**
-   * Handle mouse enter for drag painting
+   * Handle mouse enter for drag selection visualization
    */
   const handleCellMouseEnter = (row: number, col: number) => {
     if (!enableDragToPaint || !dragState.isDragging) return;
 
+    // Update selection area but don't paint yet
     setDragState(prev => ({
       ...prev,
       hoveredCell: { row, col }
     }));
+  };
 
-    // Paint cell with selected value during drag
-    handleCellValueChange(row, col, selectedValue);
+  /**
+   * Get cells in selection rectangle
+   */
+  const getSelectedCells = () => {
+    if (!dragState.startCell || !dragState.hoveredCell) return [];
+    
+    const minRow = Math.min(dragState.startCell.row, dragState.hoveredCell.row);
+    const maxRow = Math.max(dragState.startCell.row, dragState.hoveredCell.row);
+    const minCol = Math.min(dragState.startCell.col, dragState.hoveredCell.col);
+    const maxCol = Math.max(dragState.startCell.col, dragState.hoveredCell.col);
+    
+    const cells = [];
+    for (let r = minRow; r <= maxRow; r++) {
+      for (let c = minCol; c <= maxCol; c++) {
+        cells.push({ row: r, col: c });
+      }
+    }
+    return cells;
+  };
+
+  /**
+   * Check if cell is in current selection
+   */
+  const isCellSelected = (row: number, col: number) => {
+    if (!dragState.isDragging) return false;
+    return getSelectedCells().some(cell => cell.row === row && cell.col === col);
   };
 
   /**
@@ -260,7 +296,7 @@ export function ResponsiveOfficerGrid({
           grid.map((row, rowIndex) =>
             row.map((cellValue, colIndex) => {
               const isHovered = dragState.hoveredCell?.row === rowIndex && dragState.hoveredCell?.col === colIndex;
-              const isSelected = false; // Could be expanded for multi-select functionality
+              const isSelected = isCellSelected(rowIndex, colIndex); // Show selection rectangle
               
               return (
                 <EnhancedGridCell

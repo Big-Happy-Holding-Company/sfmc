@@ -296,7 +296,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
           <div className="flex gap-4 w-full">
             {/* Test Input - Left half */}
             <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-2">
-              <h3 className="text-amber-300 text-xs font-semibold mb-2 text-center">TEST INPUT</h3>
+              <h3 className="text-amber-300 text-xl font-semibold mb-2 text-center">TEST INPUT</h3>
               <ResponsiveOfficerDisplayGrid
                 grid={testInput}
                 containerType="solver"
@@ -314,7 +314,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
 
             {/* User Solution - Right half */}
             <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-2">
-              <h3 className="text-amber-300 text-xs font-semibold mb-2 text-center">YOUR SOLUTION</h3>
+              <h3 className="text-amber-300 text-xl font-semibold mb-2 text-center">YOUR SOLUTION</h3>
               <ResponsiveOfficerGrid
                 initialGrid={currentSolution}
                 containerType="solver"
@@ -329,10 +329,10 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
               />
               
               <div className="flex justify-center space-x-2 mt-4">
-                <Button size="sm" variant="outline" className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white" onClick={copyInput}>
+                <Button size="lg" variant="outline" className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white text-lg px-4 py-2" onClick={copyInput}>
                   Copy Input
                 </Button>
-                <Button size="sm" variant="outline" className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white" onClick={resetSolution}>
+                <Button size="lg" variant="outline" className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white text-lg px-4 py-2" onClick={resetSolution}>
                   Reset
                 </Button>
               </div>
