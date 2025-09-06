@@ -107,20 +107,33 @@ export default function OfficerTrackSimple() {
   // Handle puzzle selection from grid  
   const handleSelectPuzzle = async (puzzle: OfficerPuzzle) => {
     try {
-      console.log('🎯 Loading puzzle for solving:', puzzle.id, 'PlayFab ID:', puzzle.playFabId);
+      console.log('🎯 Loading puzzle for solving:', puzzle.id);
       
-      // Import the PlayFab loading function
-      const { loadPuzzleFromPlayFab } = await import('@/services/officerArcAPI');
-      
-      // Load full puzzle data directly from PlayFab using PlayFab ID
-      const fullPuzzleData = await loadPuzzleFromPlayFab(puzzle.playFabId);
+      // Use working arcDataService approach (loads from local /data/ files)
+      const fullPuzzleData = await arcDataService.searchPuzzleById(puzzle.id);
       
       if (fullPuzzleData) {
         setCurrentPuzzle(fullPuzzleData);
         console.log('✅ Puzzle loaded and ready to solve:', fullPuzzleData.id);
+        
+        // TODO: Investigate PlayFab loading separately
+        // Debug: Try loading from PlayFab in background for comparison
+        console.log('🔍 DEBUG: Also trying PlayFab loading for comparison...');
+        try {
+          const { loadPuzzleFromPlayFab } = await import('@/services/officerArcAPI');
+          const playFabData = await loadPuzzleFromPlayFab(puzzle.id);
+          if (playFabData) {
+            console.log('✅ DEBUG: PlayFab also found puzzle:', playFabData.id);
+          } else {
+            console.log('❌ DEBUG: PlayFab could not find puzzle:', puzzle.id);
+          }
+        } catch (pfError) {
+          console.log('❌ DEBUG: PlayFab loading error:', pfError);
+        }
+        
       } else {
-        console.error('❌ loadPuzzleFromPlayFab returned null for:', puzzle.playFabId);
-        alert(`Failed to load puzzle data for "${puzzle.playFabId}". Check console for debugging info.`);
+        console.error('❌ arcDataService returned null for:', puzzle.id);
+        alert(`Failed to load puzzle data for "${puzzle.id}". The puzzle may not exist in local data.`);
       }
       
     } catch (err) {
