@@ -97,6 +97,8 @@ export function ResponsiveOfficerGrid({
       if (dragState.isDragging) {
         // FLOOD FILL: Fill all selected cells with current selectedValue
         const selectedCells = getSelectedCells();
+        console.log('Drag ended. Selected cells:', selectedCells.length, 'Selected value:', selectedValue);
+        
         if (selectedCells.length > 0 && selectedValue !== undefined && selectedValue !== null) {
           const newGrid = grid.map((row, rowIndex) =>
             row.map((cell, colIndex) => {
@@ -104,6 +106,7 @@ export function ResponsiveOfficerGrid({
               return isSelected ? selectedValue : cell;
             })
           );
+          console.log('Applying flood fill to', selectedCells.length, 'cells with value', selectedValue);
           setGrid(newGrid);
           onChange?.(newGrid);
         }
@@ -308,7 +311,7 @@ export function ResponsiveOfficerGrid({
                   isHovered={isHovered}
                   interactive={interactive && !disabled}
                   cellSize={cellSize}
-                  onClick={() => handleCellClick(rowIndex, colIndex)}
+                  onClick={(currentValue) => handleCellClick(rowIndex, colIndex)}
                   onMouseDown={(e) => handleCellMouseDown(rowIndex, colIndex, e)}
                   onMouseEnter={() => handleCellMouseEnter(rowIndex, colIndex)}
                 />
