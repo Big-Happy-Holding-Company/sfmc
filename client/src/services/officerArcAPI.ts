@@ -287,6 +287,7 @@ export async function loadPuzzleFromPlayFab(puzzleId: string): Promise<any | nul
     
     // Extract ARC ID (remove any existing prefix)
     const arcId = puzzleId.startsWith('ARC-') ? playFabToArcId(puzzleId) : puzzleId;
+    console.log(`🔍 loadPuzzleFromPlayFab: searching for "${puzzleId}" -> arcId: "${arcId}"`);
     
     // All datasets to search
     const datasets = [
@@ -301,6 +302,7 @@ export async function loadPuzzleFromPlayFab(puzzleId: string): Promise<any | nul
       for (let i = 1; i <= dataset.batches; i++) {
         try {
           const batchKey = `officer-tasks-${dataset.name}-batch${i}.json`;
+          console.log(`🔍 Checking batch: ${batchKey}`);
           
           const result = await playFabCore.makeHttpRequest(
             '/Client/GetTitleData',
@@ -313,31 +315,40 @@ export async function loadPuzzleFromPlayFab(puzzleId: string): Promise<any | nul
             
             if (puzzleDataStr && puzzleDataStr !== "undefined") {
               const puzzleArray = JSON.parse(puzzleDataStr);
+              console.log(`📊 Batch contains ${puzzleArray.length} puzzles`);
               
               // Find puzzle by ARC ID (regardless of prefix)
               const puzzle = puzzleArray.find((p: any) => {
                 if (!p.id) return false;
                 const pArcId = playFabToArcId(p.id);
-                return pArcId === arcId;
+                const isMatch = pArcId === arcId;
+                if (isMatch) {
+                  console.log(`✅ MATCH FOUND: ${p.id} -> ${pArcId} === ${arcId}`);
+                }
+                return isMatch;
               });
               
               if (puzzle) {
-                console.log(`Found puzzle ${puzzle.id} in ${dataset.name} batch ${i}`);
+                console.log(`✅ Found puzzle ${puzzle.id} in ${dataset.name} batch ${i}`);
                 return puzzle;
               }
+            } else {
+              console.log(`❌ Batch ${batchKey} is empty or undefined`);
             }
+          } else {
+            console.log(`❌ Failed to get data for ${batchKey}:`, result);
           }
         } catch (error) {
-          // Continue to next batch
+          console.log(`❌ Error checking batch ${dataset.name}-${i}:`, error);
         }
       }
     }
     
-    console.log(`Puzzle with ARC ID ${arcId} not found in any dataset`);
+    console.log(`❌ Puzzle with ARC ID ${arcId} not found in any dataset`);
     return null;
     
   } catch (error) {
-    console.error(`Failed to load puzzle ${puzzleId}:`, error);
+    console.error(`❌ Failed to load puzzle ${puzzleId}:`, error);
     return null;
   }
 }
