@@ -98,7 +98,7 @@ export function GridSizeSelector({
   return (
     <div className={`bg-slate-700 rounded-lg p-4 border border-slate-600 ${className}`}>
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-amber-300 text-sm font-semibold">
+        <h3 className="text-amber-300 text-base font-semibold">
           ⚙️ INPUT CONTROLS
         </h3>
         <div className="flex gap-2">
@@ -116,7 +116,7 @@ export function GridSizeSelector({
       {/* Size Controls */}
       <div className="flex items-center gap-4 mb-3">
         <div className="flex items-center gap-2">
-          <label className="text-slate-300 text-sm">Width:</label>
+          <label className="text-slate-300 text-base">Width:</label>
           <select
             value={width}
             onChange={(e) => handleSizeChange(parseInt(e.target.value), height)}
@@ -129,7 +129,7 @@ export function GridSizeSelector({
         </div>
         
         <div className="flex items-center gap-2">
-          <label className="text-slate-300 text-sm">Height:</label>
+          <label className="text-slate-300 text-base">Height:</label>
           <select
             value={height}
             onChange={(e) => handleSizeChange(width, parseInt(e.target.value))}
@@ -145,7 +145,7 @@ export function GridSizeSelector({
       {/* Suggested Sizes */}
       {suggestedSizes.length > 0 && (
         <div className="space-y-2">
-          <div className="text-slate-400 text-xs">Suggested sizes from training examples:</div>
+          <div className="text-slate-400 text-sm">Suggested sizes from training examples:</div>
           <div className="flex flex-wrap gap-2">
             {suggestedSizes.map((suggestion, index) => (
               <Button
@@ -169,7 +169,7 @@ export function GridSizeSelector({
             {/* Display Mode Toggle */}
             {onDisplayModeChange && (
               <div className="flex items-center justify-between">
-                <label className="text-slate-300 text-sm font-medium">Display Mode:</label>
+                <label className="text-slate-300 text-base font-medium">Display Mode:</label>
                 <Button
                   variant="outline"
                   size="sm"
@@ -184,7 +184,7 @@ export function GridSizeSelector({
             {/* Emoji Set Selector */}
             {onEmojiSetChange && (displayMode === 'emoji' || displayMode === 'hybrid') && (
               <div>
-                <label className="text-slate-300 text-sm font-medium mb-2 block">Emoji Set:</label>
+                <label className="text-slate-300 text-base font-medium mb-2 block">Emoji Set:</label>
                 <Select value={emojiSet} onValueChange={(value: EmojiSet) => onEmojiSetChange(value)}>
                   <SelectTrigger className="bg-slate-600 border-slate-500 text-amber-100">
                     <SelectValue />
@@ -217,13 +217,13 @@ export function GridSizeSelector({
       {onValueSelect && (
         <div className="mt-4 pt-4 border-t border-slate-600">
           <div className="flex items-center justify-between mb-3">
-            <label className="text-slate-300 text-sm font-medium">Emoji Palette (Click to select):</label>
+            <label className="text-slate-300 text-base font-medium">Emoji Palette (Click to select):</label>
             <div className="text-slate-400 text-xs">
               {usedValues.length > 0 && `🔵 = Used in puzzle`}
             </div>
           </div>
           
-          <div className="grid grid-cols-5 gap-3">
+          <div className="flex flex-wrap gap-0.5">
             {getAllEmojis().map(({ emoji, value }) => {
               const isSelected = value === selectedValue;
               const isUsed = usedValues.includes(value);
@@ -235,7 +235,7 @@ export function GridSizeSelector({
                   size="sm"
                   onClick={() => onValueSelect(value)}
                   className={`
-                    h-12 w-12 p-0 text-xl font-bold
+                    h-8 w-8 p-0 text-sm font-bold flex-shrink-0
                     ${isSelected 
                       ? 'bg-amber-600 text-slate-900 hover:bg-amber-700' 
                       : isUsed
@@ -251,7 +251,7 @@ export function GridSizeSelector({
             })}
           </div>
           
-          <div className="text-xs text-slate-400 mt-2">
+          <div className="text-sm text-slate-400 mt-2">
             💡 Click emoji to select • Click grid cells to cycle through values • Drag to flood-fill
           </div>
         </div>

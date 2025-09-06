@@ -243,29 +243,6 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
 
       <main className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
-        {/* Enhanced Display Controls */}
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Display Controls */}
-          <PuzzleDisplayControls
-            displayMode={displayState.displayMode}
-            emojiSet={displayState.emojiSet}
-            selectedValue={displayState.selectedValue}
-            onDisplayModeChange={handleDisplayModeChange}
-            onEmojiSetChange={handleEmojiSetChange}
-            onValueSelect={handleValueSelect}
-            className="lg:w-80 flex-shrink-0"
-          />
-          
-          {/* Value Palette */}
-          <ValuePalette
-            selectedValue={displayState.selectedValue}
-            displayMode={displayState.displayMode}
-            emojiSet={displayState.emojiSet}
-            onValueSelect={handleValueSelect}
-            usedValues={getUsedValues()}
-            className="lg:w-80 flex-shrink-0"
-          />
-        </div>
 
         {/* Training Examples Section */}
         {trainingExamples.length > 0 && (
@@ -288,22 +265,29 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
           />
         )}
 
-        {/* Grid Size Controls */}
+        {/* Grid Size Controls + Display Controls + Emoji Palette */}
         <GridSizeSelector
           width={currentDimensions.width}
           height={currentDimensions.height}
           onSizeChange={handleSizeChange}
           hasExistingData={hasExistingData}
           suggestedSizes={getSuggestedSizes()}
+          displayMode={displayState.displayMode}
+          emojiSet={displayState.emojiSet}
+          selectedValue={displayState.selectedValue}
+          onDisplayModeChange={handleDisplayModeChange}
+          onEmojiSetChange={handleEmojiSetChange}
+          onValueSelect={handleValueSelect}
+          usedValues={getUsedValues()}
         />
 
         {/* Solving Interface - Full Screen Width */}
         <div className="w-full">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-amber-400 font-semibold">
+            <h2 className="text-amber-400 font-semibold text-lg">
               🧩 SOLVE TEST CASE {currentTestIndex + 1}
             </h2>
-            <div className="text-slate-400 text-sm">
+            <div className="text-slate-400 text-base">
               {completedTests[currentTestIndex] ? '✅ Solved!' : 'Apply the pattern to solve'}
             </div>
           </div>
