@@ -89,20 +89,15 @@ export function GridSizeSelector({
     }
   };
 
-  // Get ALL emojis from the current set
-  const getAllEmojis = () => {
-    const emojis = SPACE_EMOJIS[emojiSet];
-    return emojis.map((emoji, index) => ({ emoji, value: index }));
-  };
 
   return (
-    <div className={`bg-slate-700 rounded-lg p-6 border border-slate-600 ${className}`}>
+    <div className={`bg-slate-700 rounded-lg p-4 border border-slate-600 ${className}`}>
       {/* Centered Header with Grid Size */}
-      <div className="text-center mb-6">
-        <h3 className="text-amber-300 text-4xl font-bold mb-4">⚙️ INPUT CONTROLS</h3>
+      <div className="text-center mb-4">
+        <h3 className="text-amber-300 text-3xl font-bold mb-3">⚙️ INPUT CONTROLS</h3>
         
         {/* Ultra Compact Grid Size */}
-        <div className="flex items-center justify-center gap-3 mb-4">
+        <div className="flex items-center justify-center gap-3 mb-3">
           <span className="text-slate-300 text-2xl font-medium">Grid Size:</span>
           <div className="flex items-center gap-2">
             <input
@@ -134,7 +129,7 @@ export function GridSizeSelector({
 
       {/* Suggested Sizes - Centered */}
       {suggestedSizes.length > 0 && (
-        <div className="text-center mb-6">
+        <div className="text-center mb-4">
           <div className="text-slate-400 text-2xl font-semibold mb-4">Quick Sizes from Examples:</div>
           <div className="flex flex-wrap justify-center gap-3">
             {suggestedSizes.map((suggestion, index) => (
@@ -154,8 +149,8 @@ export function GridSizeSelector({
       
       {/* Display Controls - Centered */}
       {(onDisplayModeChange || onEmojiSetChange) && (
-        <div className="border-t border-slate-600 pt-6 mt-6">
-          <div className="space-y-6">
+        <div className="border-t border-slate-600 pt-4 mt-4">
+          <div className="space-y-4">
             {/* Display Mode Toggle - Centered */}
             {onDisplayModeChange && (
               <div className="text-center">
@@ -205,46 +200,11 @@ export function GridSizeSelector({
         </div>
       )}
 
-      {/* EMOJI PALETTE - Centered */}
+      {/* Value Selection Note - Palette moved to solver interface */}
       {onValueSelect && (
-        <div className="border-t border-slate-600 pt-6 mt-6">
-          <div className="text-center mb-6">
-            <label className="text-slate-300 text-2xl font-bold block mb-2">Emoji Palette</label>
-            <div className="text-slate-400 text-xl">
-              {usedValues.length > 0 && `🔵 = Used in puzzle`}
-            </div>
-          </div>
-          
-          <div className="flex flex-wrap justify-center gap-2 max-w-2xl mx-auto">
-            {getAllEmojis().map(({ emoji, value }) => {
-              const isSelected = value === selectedValue;
-              const isUsed = usedValues.includes(value);
-              
-              return (
-                <Button
-                  key={value}
-                  variant={isSelected ? "default" : "outline"}
-                  size="lg"
-                  onClick={() => onValueSelect(value)}
-                  className={`
-                    h-16 w-16 p-0 text-2xl font-bold flex-shrink-0
-                    ${isSelected 
-                      ? 'bg-amber-600 text-slate-900 hover:bg-amber-700 ring-4 ring-amber-400' 
-                      : isUsed
-                        ? 'border-cyan-400 text-cyan-300 hover:bg-cyan-600 hover:text-white border-2'
-                        : 'border-slate-500 text-slate-300 hover:bg-slate-600'
-                    }
-                  `}
-                  title={`Value ${value}: ${emoji} ${isUsed ? '(used in puzzle)' : ''}`}
-                >
-                  {emoji}
-                </Button>
-              );
-            })}
-          </div>
-          
-          <div className="text-center text-xl text-slate-400 mt-6 max-w-3xl mx-auto">
-            💡 Click emoji to select • Click grid cells to cycle through values • Drag to flood-fill
+        <div className="border-t border-slate-600 pt-3 mt-4">
+          <div className="text-center text-lg text-slate-400">
+            💡 Use the emoji palette between input/solution grids to select values
           </div>
         </div>
       )}

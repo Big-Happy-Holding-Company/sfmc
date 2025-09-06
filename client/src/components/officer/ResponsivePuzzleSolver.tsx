@@ -12,6 +12,7 @@ import { ResponsiveOfficerGrid, ResponsiveOfficerDisplayGrid } from '@/component
 import { TrainingExamplesSection } from '@/components/officer/TrainingExamplesSection';
 import { GridSizeSelector } from '@/components/officer/GridSizeSelector';
 import { TestCaseNavigation } from '@/components/officer/TestCaseNavigation';
+import { EmojiPaletteDivider } from '@/components/officer/EmojiPaletteDivider';
 import { PuzzleDisplayControls } from '@/components/officer/PuzzleDisplayControls';
 import { ValuePalette } from '@/components/officer/ValuePalette';
 import type { OfficerTrackPuzzle, ARCGrid } from '@/types/arcTypes';
@@ -307,9 +308,15 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
               />
             </div>
 
-            {/* Transformation Indicator */}
-            <div className="flex items-center justify-center px-1">
-              <div className="text-cyan-400 text-2xl font-bold">→</div>
+            {/* Emoji Palette Divider - Interactive Value Selection */}
+            <div className="flex items-center justify-center px-2">
+              <EmojiPaletteDivider
+                emojiSet={displayState.emojiSet}
+                selectedValue={displayState.selectedValue}
+                onValueSelect={handleValueSelect}
+                usedValues={getUsedValues()}
+                className="bg-slate-800 border border-slate-600 rounded-lg p-3"
+              />
             </div>
 
             {/* User Solution - Right half */}
