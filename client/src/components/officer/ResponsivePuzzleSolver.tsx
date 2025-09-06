@@ -12,7 +12,11 @@ import { ResponsiveOfficerGrid, ResponsiveOfficerDisplayGrid } from '@/component
 import { TrainingExamplesSection } from '@/components/officer/TrainingExamplesSection';
 import { GridSizeSelector } from '@/components/officer/GridSizeSelector';
 import { TestCaseNavigation } from '@/components/officer/TestCaseNavigation';
+import { PuzzleDisplayControls } from '@/components/officer/PuzzleDisplayControls';
+import { ValuePalette } from '@/components/officer/ValuePalette';
 import type { OfficerTrackPuzzle, ARCGrid } from '@/types/arcTypes';
+import type { DisplayMode, PuzzleDisplayState } from '@/types/puzzleDisplayTypes';
+import type { EmojiSet } from '@/constants/spaceEmojis';
 
 interface ResponsivePuzzleSolverProps {
   puzzle: OfficerTrackPuzzle;
@@ -25,6 +29,14 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
   const [solutions, setSolutions] = useState<ARCGrid[]>([]);
   const [outputDimensions, setOutputDimensions] = useState<Array<{width: number; height: number}>>([]);
   const [completedTests, setCompletedTests] = useState<boolean[]>([]);
+  
+  // Enhanced display state
+  const [displayState, setDisplayState] = useState<PuzzleDisplayState>({
+    displayMode: 'emoji',
+    emojiSet: 'tech_set1',
+    selectedValue: 1,
+    showControls: true
+  });
 
   const totalTests = puzzle.test?.length || 0;
   const currentTest = puzzle.test?.[currentTestIndex];
@@ -151,6 +163,44 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
     }
   };
 
+  // Enhanced display control handlers
+  const handleDisplayModeChange = (mode: DisplayMode) => {
+    setDisplayState(prev => ({ ...prev, displayMode: mode }));
+  };
+
+  const handleEmojiSetChange = (emojiSet: EmojiSet) => {
+    setDisplayState(prev => ({ ...prev, emojiSet }));
+  };
+
+  const handleValueSelect = (value: number) => {
+    setDisplayState(prev => ({ ...prev, selectedValue: value }));
+  };
+
+  // Enhanced cell interaction for value painting
+  const handleCellInteraction = (row: number, col: number, value: number) => {
+    const newGrid = [...currentSolution];
+    newGrid[row][col] = displayState.selectedValue;
+    updateCurrentSolution(newGrid);
+  };
+
+  // Get values used in current puzzle for palette highlighting
+  const getUsedValues = (): number[] => {
+    const allGrids = [
+      ...trainingExamples.flatMap(ex => [ex.input, ex.output]),
+      testInput,
+      expectedOutput
+    ].filter(grid => grid.length > 0);
+
+    const usedValues = new Set<number>();
+    allGrids.forEach(grid => {
+      grid.forEach(row => {
+        row.forEach(cell => usedValues.add(cell));
+      });
+    });
+
+    return Array.from(usedValues).sort((a, b) => a - b);
+  };
+
   // Copy input to solution
   const copyInput = () => {
     if (testInput.length > 0) {
@@ -193,11 +243,36 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
 
       <main className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
+        {/* Enhanced Display Controls */}
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Display Controls */}
+          <PuzzleDisplayControls
+            displayMode={displayState.displayMode}
+            emojiSet={displayState.emojiSet}
+            selectedValue={displayState.selectedValue}
+            onDisplayModeChange={handleDisplayModeChange}
+            onEmojiSetChange={handleEmojiSetChange}
+            onValueSelect={handleValueSelect}
+            className="lg:w-80 flex-shrink-0"
+          />
+          
+          {/* Value Palette */}
+          <ValuePalette
+            selectedValue={displayState.selectedValue}
+            displayMode={displayState.displayMode}
+            emojiSet={displayState.emojiSet}
+            onValueSelect={handleValueSelect}
+            usedValues={getUsedValues()}
+            className="lg:w-80 flex-shrink-0"
+          />
+        </div>
+
         {/* Training Examples Section */}
         {trainingExamples.length > 0 && (
           <TrainingExamplesSection
             examples={trainingExamples}
-            emojiSet="tech_set1"
+            emojiSet={displayState.emojiSet}
+            displayMode={displayState.displayMode}
             title="📚 TRAINING EXAMPLES - Apply what you learn from them to solve the puzzle"
             hasLargeGrids={hasLargeGrids}
           />
@@ -241,6 +316,8 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
               <ResponsiveOfficerDisplayGrid
                 grid={testInput}
                 containerType="solver"
+                emojiSet={displayState.emojiSet}
+                displayMode={displayState.displayMode}
                 className="w-full h-full"
                 fixedCellSize={inputCellSize}
               />
@@ -257,6 +334,11 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
               <ResponsiveOfficerGrid
                 initialGrid={currentSolution}
                 containerType="solver"
+                emojiSet={displayState.emojiSet}
+                displayMode={displayState.displayMode}
+                selectedValue={displayState.selectedValue}
+                onCellInteraction={handleCellInteraction}
+                enableDragToPaint={true}
                 className="w-full h-full"
                 onChange={updateCurrentSolution}
                 fixedCellSize={outputCellSize}

@@ -245,7 +245,7 @@ export interface ColorOverlayConfig {
 }
 ```
 
-### 4.2 Comprehensive Testing & Validation
+### 4.2 Comprehensive Testing & Validation  - This is overboard, the user will just try things out and let us know if something doesn't work.
 
 #### Tasks:
 - [ ] Test emoji set cycling through all available sets

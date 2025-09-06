@@ -7,6 +7,8 @@
 
 import { ResponsiveOfficerDisplayGrid } from '@/components/officer/ResponsiveOfficerGrid';
 import type { ARCGrid } from '@/types/arcTypes';
+import type { DisplayMode } from '@/types/puzzleDisplayTypes';
+import type { EmojiSet } from '@/constants/spaceEmojis';
 
 interface TrainingExample {
   input: ARCGrid;
@@ -15,20 +17,23 @@ interface TrainingExample {
 
 interface TrainingExamplesSectionProps {
   examples: TrainingExample[];
-  emojiSet?: string;
+  emojiSet?: EmojiSet;
   title?: string;
   className?: string;
   hasLargeGrids?: boolean;
+  /** Enhanced display mode - defaults to emoji for backward compatibility */
+  displayMode?: DisplayMode;
 }
 
 interface ExampleCardProps {
   example: TrainingExample;
   index: number;
-  emojiSet: string;
+  emojiSet: EmojiSet;
   hasLargeGrids?: boolean;
+  displayMode?: DisplayMode;
 }
 
-function ExampleCard({ example, index, emojiSet, hasLargeGrids }: ExampleCardProps) {
+function ExampleCard({ example, index, emojiSet, hasLargeGrids, displayMode = 'emoji' }: ExampleCardProps) {
   if (hasLargeGrids) {
     // Large grid layout: Vertical stacking, no scrollbars, use full width
     return (
@@ -45,6 +50,7 @@ function ExampleCard({ example, index, emojiSet, hasLargeGrids }: ExampleCardPro
               grid={example.input}
               containerType="example"
               emojiSet={emojiSet}
+              displayMode={displayMode}
               className="w-full max-w-none"
             />
           </div>
@@ -61,6 +67,7 @@ function ExampleCard({ example, index, emojiSet, hasLargeGrids }: ExampleCardPro
               grid={example.output}
               containerType="example"
               emojiSet={emojiSet}
+              displayMode={displayMode}
               className="w-full max-w-none"
             />
           </div>
@@ -83,6 +90,7 @@ function ExampleCard({ example, index, emojiSet, hasLargeGrids }: ExampleCardPro
             title="INPUT"
             containerType="example"
             emojiSet={emojiSet}
+            displayMode={displayMode}
           />
         </div>
             
@@ -97,6 +105,7 @@ function ExampleCard({ example, index, emojiSet, hasLargeGrids }: ExampleCardPro
             title="OUTPUT"
             containerType="example"
             emojiSet={emojiSet}
+            displayMode={displayMode}
           />
         </div>
       </div>
@@ -109,7 +118,8 @@ export function TrainingExamplesSection({
   emojiSet = 'tech_set1', 
   title = '📚 TRAINING EXAMPLES',
   className = '',
-  hasLargeGrids = false
+  hasLargeGrids = false,
+  displayMode = 'emoji'
 }: TrainingExamplesSectionProps) {
   
   if (!examples || examples.length === 0) {
@@ -165,6 +175,7 @@ export function TrainingExamplesSection({
                     grid={example.input}
                     containerType="example"
                     emojiSet={emojiSet}
+                    displayMode={displayMode}
                     fixedCellSize={cellSize}
                   />
                   <div className="text-cyan-400 text-sm font-bold">→</div>
@@ -172,6 +183,7 @@ export function TrainingExamplesSection({
                     grid={example.output}
                     containerType="example"
                     emojiSet={emojiSet}
+                    displayMode={displayMode}
                     fixedCellSize={cellSize}
                   />
                 </div>

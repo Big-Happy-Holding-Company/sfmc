@@ -2,7 +2,7 @@
 // -------------------------------------------------------------
 // Every list is exactly length-10, enabling a direct mapping of
 // emoji index → ARC colour digit (0-9).  This avoids null cells
-// in our grids: colour-0 (black or 'empty') is explicitly the first emoji.
+// in our grids: colour-0 (black or 'empty') is explicitly the first emoji, represented by '⬛'.
 // 
 // Official ARC Color Mapping (RGB values):
 // 0: (0, 0, 0)        - Black (background)
