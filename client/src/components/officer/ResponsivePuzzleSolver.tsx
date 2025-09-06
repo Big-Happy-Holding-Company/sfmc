@@ -205,10 +205,10 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
           suggestedSizes={getSuggestedSizes()}
         />
 
-        {/* Solving Interface */}
-        <div className="bg-slate-800 border border-slate-600 rounded-lg p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-amber-400 font-semibold flex items-center">
+        {/* Solving Interface - Full Screen Width */}
+        <div className="w-full">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-amber-400 font-semibold">
               🧩 SOLVE TEST CASE {currentTestIndex + 1}
             </h2>
             <div className="text-slate-400 text-sm">
@@ -216,116 +216,43 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
             </div>
           </div>
 
-          {/* Full Width Layout - No scrollbars, use all available space */}
-          {hasLargeGrids ? (
-            /* Large Grids: Vertical stacking, full width */
-            <div className="space-y-8 w-full">
-              {/* Test Input - Full width, no scrollbars */}
-              <div className="text-center w-full">
-                <h3 className="text-amber-300 text-sm font-semibold mb-6">TEST INPUT</h3>
-                <div className="w-full flex justify-center">
-                  <ResponsiveOfficerDisplayGrid
-                    grid={testInput}
-                    containerType="solver"
-                    className="w-full max-w-none"
-                  />
-                </div>
-              </div>
+          {/* Always use side-by-side layout to maximize screen usage */}
+          <div className="flex gap-4 w-full">
+            {/* Test Input - Left half */}
+            <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-2">
+              <h3 className="text-amber-300 text-xs font-semibold mb-2 text-center">TEST INPUT</h3>
+              <ResponsiveOfficerDisplayGrid
+                grid={testInput}
+                containerType="solver"
+                className="w-full h-full"
+              />
+            </div>
 
-              {/* Arrow Indicator */}
-              <div className="text-center">
-                <div className="text-cyan-400 text-3xl font-bold py-4">
-                  ↓ APPLY PATTERN ↓
-                </div>
-              </div>
+            {/* Transformation Indicator */}
+            <div className="flex items-center justify-center px-1">
+              <div className="text-cyan-400 text-2xl font-bold">→</div>
+            </div>
 
-              {/* User Solution - Full width, no scrollbars */}
-              <div className="text-center w-full">
-                <h3 className="text-amber-300 text-sm font-semibold mb-6">YOUR SOLUTION</h3>
-                <div className="w-full flex justify-center">
-                  <ResponsiveOfficerGrid
-                    initialGrid={currentSolution}
-                    containerType="solver"
-                    className="w-full max-w-none"
-                    onChange={updateCurrentSolution}
-                  />
-                </div>
-                
-                <div className="flex justify-center space-x-2 mt-6">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
-                    onClick={copyInput}
-                  >
-                    Copy Input
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
-                    onClick={resetSolution}
-                  >
-                    Reset
-                  </Button>
-                </div>
+            {/* User Solution - Right half */}
+            <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-2">
+              <h3 className="text-amber-300 text-xs font-semibold mb-2 text-center">YOUR SOLUTION</h3>
+              <ResponsiveOfficerGrid
+                initialGrid={currentSolution}
+                containerType="solver"
+                className="w-full h-full"
+                onChange={updateCurrentSolution}
+              />
+              
+              <div className="flex justify-center space-x-2 mt-4">
+                <Button size="sm" variant="outline" className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white" onClick={copyInput}>
+                  Copy Input
+                </Button>
+                <Button size="sm" variant="outline" className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white" onClick={resetSolution}>
+                  Reset
+                </Button>
               </div>
             </div>
-          ) : (
-            /* Small Grids: Side-by-side, full width */
-            <div className="flex items-start justify-center gap-8 w-full">
-              {/* Test Input */}
-              <div className="flex-1 text-center">
-                <h3 className="text-amber-300 text-sm font-semibold mb-6">TEST INPUT</h3>
-                <div className="w-full flex justify-center">
-                  <ResponsiveOfficerDisplayGrid
-                    grid={testInput}
-                    containerType="solver"
-                    className="w-full"
-                  />
-                </div>
-              </div>
-
-              {/* Transformation Indicator */}
-              <div className="flex items-center justify-center py-12 px-4">
-                <div className="text-cyan-400 text-4xl font-bold">
-                  →
-                </div>
-              </div>
-
-              {/* User Solution */}
-              <div className="flex-1 text-center">
-                <h3 className="text-amber-300 text-sm font-semibold mb-6">YOUR SOLUTION</h3>
-                <div className="w-full flex justify-center">
-                  <ResponsiveOfficerGrid
-                    initialGrid={currentSolution}
-                    containerType="solver"
-                    className="w-full"
-                    onChange={updateCurrentSolution}
-                  />
-                </div>
-                
-                <div className="flex justify-center space-x-2 mt-6">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
-                    onClick={copyInput}
-                  >
-                    Copy Input
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
-                    onClick={resetSolution}
-                  >
-                    Reset
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
+          </div>
 
           {/* Submit Button */}
           <div className="flex justify-center mt-8 pt-6 border-t border-slate-600">

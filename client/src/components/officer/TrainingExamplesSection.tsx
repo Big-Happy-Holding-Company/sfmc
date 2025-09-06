@@ -143,36 +143,33 @@ export function TrainingExamplesSection({
         </div>
       </div>
       
-      {/* Examples Layout - Adaptive based on grid size */}
-      {hasLargeGrids ? (
-        /* Large Grids: Horizontal scrollable */
-        <div className="overflow-x-auto">
-          <div className="flex gap-6 pb-4">
-            {examples.map((example, index) => (
-              <ExampleCard
-                key={index}
-                example={example}
-                index={index}
-                emojiSet={emojiSet}
-                hasLargeGrids={hasLargeGrids}
-              />
-            ))}
-          </div>
-        </div>
-      ) : (
-        /* Small Grids: Grid layout */
-        <div className={`grid gap-6 ${getGridCols()}`}>
+      {/* Compact Horizontal Layout for ALL grid sizes */}
+      <div className="overflow-x-auto">
+        <div className="flex gap-4 pb-2">
           {examples.map((example, index) => (
-            <ExampleCard
-              key={index}
-              example={example}
-              index={index}
-              emojiSet={emojiSet}
-              hasLargeGrids={hasLargeGrids}
-            />
+            <div key={index} className="flex-shrink-0 bg-slate-700 rounded border border-slate-600 p-3">
+              <h3 className="text-amber-300 text-xs font-semibold mb-2 text-center">
+                EX {index + 1}
+              </h3>
+              <div className="flex items-center gap-2">
+                <ResponsiveOfficerDisplayGrid
+                  grid={example.input}
+                  containerType="example"
+                  emojiSet={emojiSet}
+                  className="scale-75"
+                />
+                <div className="text-cyan-400 text-sm font-bold">→</div>
+                <ResponsiveOfficerDisplayGrid
+                  grid={example.output}
+                  containerType="example"
+                  emojiSet={emojiSet}
+                  className="scale-75"
+                />
+              </div>
+            </div>
           ))}
         </div>
-      )}
+      </div>
 
       {/* Pattern Analysis Hint (if many examples) */}
       {examples.length >= 3 && (
