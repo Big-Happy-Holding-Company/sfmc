@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## Recent Commits (Latest First)
 
+**2025-09-06**: 🎯 OFFICER TRACK MAJOR OVERHAUL - Dynamic Arc-Explainer Integration & PlayFab Data Parsing Fix
+- **FIXED HARDCODED PUZZLE LOADING**: Removed static 50-task limit, now dynamically loads worst-performing puzzles from arc-explainer API
+- **DYNAMIC SORTING STRATEGIES**: Added 5 sorting options (composite, accuracy, explanations, difficulty, recent) for intelligent puzzle selection
+- **PLAYFAB DATA PARSING FIX**: Fixed critical bug where `result.Data[key].Value` should be `result.Data[key]` - data was being returned but parsed incorrectly
+- **ENHANCED USEOFFICERRPUZZLES HOOK**: 
+  - Configurable limits (default 100 instead of hardcoded 50)
+  - Runtime sorting strategy changes with `setSortStrategy()`
+  - Proper arc-explainer API parameter passing
+- **RICH METADATA UTILIZATION**: Now leverages arc-explainer performance data for truly worst-performing puzzle selection
+- **UI CLEANUP**: Removed all debug UI elements (DEBUG tools, EXPECTED output displays) while keeping console logging
+- **ENVIRONMENT VARIABLE FIX**: Added missing `VITE_PLAYFAB_SECRET_KEY` for Admin API authentication
+
 **2025-09-06**: 📋 COMPREHENSIVE PLAYFAB ARC DATASET DEBUGGING - Integration Fixed & Documented
 - **COMPREHENSIVE DEBUG SESSION**: Complete investigation and fix of PlayFab ARC dataset loading issues
 - **ROOT CAUSE IDENTIFIED**: Multiple authentication and data format mismatches preventing puzzle access

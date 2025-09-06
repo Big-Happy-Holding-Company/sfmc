@@ -303,42 +303,6 @@ export default function OfficerTrackSimple() {
             Search for specific puzzles by their ID or adjust the number of hardest puzzles to display
           </p>
 
-          {/* Debug Section - only show in development */}
-          {import.meta.env.DEV && (
-            <div className="border-t border-slate-600 pt-4 mt-4">
-              <h3 className="text-amber-400 text-sm font-semibold mb-2">🧪 DEBUG TOOLS</h3>
-              <div className="flex gap-2 flex-wrap">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white text-xs"
-                  onClick={async () => {
-                    console.log('🧪 Running ID conversion tests...');
-                    const result = validateIDConversions();
-                    alert(`ID Conversion Tests: ${result.success ? 'PASSED' : 'FAILED'}\n\nCheck console for details.`);
-                  }}
-                >
-                  Test ID Conversions
-                </Button>
-                
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white text-xs"
-                  onClick={async () => {
-                    console.log('🧪 Running full data flow test...');
-                    const result = await validateDataFlow();
-                    alert(`Data Flow Test: ${result.success ? 'PASSED' : 'FAILED'}\n\nCheck console for details.`);
-                  }}
-                >
-                  Test Data Flow
-                </Button>
-              </div>
-              <p className="text-purple-300 text-xs mt-2">
-                These debug tools validate the PlayFab integration and ID conversion functions.
-              </p>
-            </div>
-          )}
         </div>
 
         {/* Difficulty Cards */}

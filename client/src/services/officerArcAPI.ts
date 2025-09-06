@@ -425,8 +425,8 @@ export async function loadPuzzleFromPlayFab(puzzleId: string): Promise<any | nul
               false // Admin API uses secret key, not user authentication
             );
             
-            if (result?.Data?.[batchKey]?.Value) {
-              const puzzleDataStr = result.Data[batchKey].Value;
+            if (result?.Data?.[batchKey]) {
+              const puzzleDataStr = result.Data[batchKey];
               
               if (puzzleDataStr && puzzleDataStr !== "undefined") {
                 puzzleArray = JSON.parse(puzzleDataStr);

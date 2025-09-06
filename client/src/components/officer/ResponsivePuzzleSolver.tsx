@@ -104,7 +104,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
 
           {/* Desktop/Tablet Layout: Side by side */}
           <div className="hidden lg:block">
-            <div className="grid grid-cols-3 gap-8">
+            <div className="grid grid-cols-2 gap-8">
               {/* Test Input */}
               <div className="text-center">
                 <h3 className="text-amber-300 text-sm font-semibold mb-4">TEST INPUT</h3>
@@ -145,17 +145,6 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                 </div>
               </div>
 
-              {/* Expected Output (debug only) */}
-              {process.env.NODE_ENV === 'development' && expectedOutput.length > 0 && (
-                <div className="text-center">
-                  <h3 className="text-green-300 text-sm font-semibold mb-4">EXPECTED (DEBUG)</h3>
-                  <ResponsiveOfficerDisplayGrid
-                    grid={expectedOutput}
-                    containerType="solver"
-                    className="mx-auto opacity-70"
-                  />
-                </div>
-              )}
             </div>
           </div>
 
@@ -208,20 +197,6 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
               </div>
             </div>
 
-            {/* Expected Output (debug only) - Mobile */}
-            {process.env.NODE_ENV === 'development' && expectedOutput.length > 0 && (
-              <div className="text-center border-t border-slate-600 pt-6">
-                <h3 className="text-green-300 text-sm font-semibold mb-4">EXPECTED OUTPUT (DEBUG)</h3>
-                <ResponsiveOfficerDisplayGrid
-                  grid={expectedOutput}
-                  containerType="solver"
-                  className="mx-auto opacity-70"
-                />
-                <div className="text-xs text-green-400 mt-2">
-                  Development mode only - shows expected solution
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Submit Button */}
