@@ -16,6 +16,7 @@ import { EmojiPaletteDivider } from '@/components/officer/EmojiPaletteDivider';
 import type { OfficerTrackPuzzle, ARCGrid } from '@/types/arcTypes';
 import type { DisplayMode, PuzzleDisplayState } from '@/types/puzzleDisplayTypes';
 import type { EmojiSet } from '@/constants/spaceEmojis';
+import { playFabValidation } from '@/services/playfab/validation';
 
 interface ResponsivePuzzleSolverProps {
   puzzle: OfficerTrackPuzzle;
@@ -36,6 +37,11 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
     selectedValue: 1,
     showControls: true
   });
+
+  // Validation state
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationResult, setValidationResult] = useState<any>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const totalTests = puzzle.test?.length || 0;
   const currentTest = puzzle.test?.[currentTestIndex];
@@ -147,6 +153,31 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
   const inputCellSize = calculateCellSize(testInput[0]?.length || 1, testInput.length);
   const outputCellSize = calculateCellSize(currentDimensions.width, currentDimensions.height);
 
+  // Validate puzzle with PlayFab when all tests are complete
+  const validatePuzzleWithPlayFab = async () => {
+    if (isValidating) return; // Prevent double submission
+    
+    setIsValidating(true);
+    setValidationError(null);
+    
+    try {
+      console.log('🎯 Submitting puzzle to PlayFab for validation...', puzzle.id);
+      const result = await playFabValidation.validateARCPuzzle(
+        puzzle.id,
+        solutions, // number[][][]
+        Date.now() // Simple time tracking
+      );
+      
+      setValidationResult(result);
+      console.log('✅ PlayFab validation result:', result);
+    } catch (error: any) {
+      console.error('❌ PlayFab validation failed:', error);
+      setValidationError(error.message || 'Validation failed');
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
   // Update current solution
   const updateCurrentSolution = (newGrid: ARCGrid) => {
     const newSolutions = [...solutions];
@@ -159,6 +190,13 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
       const newCompleted = [...completedTests];
       newCompleted[currentTestIndex] = matches;
       setCompletedTests(newCompleted);
+      
+      // Check if ALL tests are now complete
+      if (matches && newCompleted.every(test => test)) {
+        console.log('🎉 All test cases completed! Validating with PlayFab...');
+        // Small delay to let UI update, then validate
+        setTimeout(() => validatePuzzleWithPlayFab(), 500);
+      }
     }
   };
 
@@ -282,7 +320,10 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
               🧩 SOLVE TEST CASE {currentTestIndex + 1}
             </h2>
             <div className="text-slate-400 text-xl">
-              {completedTests[currentTestIndex] ? '✅ Solved!' : 'Apply the pattern to solve'}
+              {isValidating ? '🔄 Validating with PlayFab...' : 
+               validationResult?.correct ? '🎉 PlayFab Verified!' :
+               validationError ? '❌ Validation Error' :
+               completedTests[currentTestIndex] ? '✅ Solved!' : 'Apply the pattern to solve'}
             </div>
           </div>
 
@@ -428,25 +469,36 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
             </div>
           </div>
 
+          {/* Validation Status */}
+          {validationError && (
+            <div className="bg-red-900 border border-red-600 rounded-lg p-4 mt-4">
+              <div className="text-red-300 text-sm">
+                <strong>❌ Validation Error:</strong> {validationError}
+              </div>
+            </div>
+          )}
+
+          {validationResult && (
+            <div className="bg-green-900 border border-green-600 rounded-lg p-4 mt-4">
+              <div className="text-green-300 text-sm">
+                <strong>✅ PlayFab Validation Complete:</strong> 
+                {validationResult.correct ? ' Puzzle solved successfully!' : ' Some test cases failed.'}
+                {validationResult.timeElapsed && (
+                  <div>Time: {(validationResult.timeElapsed / 1000).toFixed(1)}s</div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Submit Button */}
           <div className="flex justify-center mt-8 pt-6 border-t border-slate-600">
             <Button
               size="lg"
               className="bg-green-600 hover:bg-green-700 text-white px-8 py-3"
-              onClick={() => {
-                // TODO: Add solution validation
-                alert('Solution validation not implemented yet - check console for your solution');
-                console.log('User solution:', currentSolution);
-                console.log('Expected output:', expectedOutput);
-                
-                // Compare solutions for debugging
-                if (expectedOutput.length > 0) {
-                  const matches = JSON.stringify(currentSolution) === JSON.stringify(expectedOutput);
-                  console.log('Solution matches expected:', matches);
-                }
-              }}
+              disabled={isValidating}
+              onClick={() => validatePuzzleWithPlayFab()}
             >
-              🎯 Submit Solution
+              {isValidating ? '🔄 Validating...' : '🎯 Validate with PlayFab'}
             </Button>
           </div>
         </div>

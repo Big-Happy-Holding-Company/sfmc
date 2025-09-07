@@ -243,6 +243,53 @@ export class PlayFabValidation {
   }
 
   /**
+   * Validate ARC puzzle solution via CloudScript (Officer Track)
+   */
+  public async validateARCPuzzle(puzzleId: string, solutions: number[][][], timeElapsed?: number): Promise<any> {
+    await playFabAuth.ensureAuthenticated();
+    
+    const request: ExecuteCloudScriptRequest = {
+      FunctionName: PLAYFAB_CONSTANTS.CLOUDSCRIPT_FUNCTIONS.VALIDATE_ARC_PUZZLE,
+      FunctionParameter: {
+        puzzleId,
+        solutions,
+        timeElapsed,
+        attemptNumber: 1,
+        sessionId: crypto.randomUUID()
+      },
+      GeneratePlayStreamEvent: true
+    };
+
+    playFabCore.logOperation('ARC Puzzle Validation', `Puzzle: ${puzzleId}, Tests: ${solutions.length}`);
+
+    try {
+      const result = await playFabCore.makeHttpRequest<ExecuteCloudScriptRequest, ExecuteCloudScriptResponse>(
+        '/Client/ExecuteCloudScript',
+        request,
+        true
+      );
+
+      if (result.Error) {
+        const errorMsg = `CloudScript error: ${result.Error.Error} - ${result.Error.Message}`;
+        playFabCore.logOperation('CloudScript Error', result.Error);
+        throw new Error(errorMsg);
+      }
+
+      const validationResult = result.FunctionResult;
+      
+      playFabCore.logOperation(
+        validationResult?.correct ? 'ARC Puzzle Correct' : 'ARC Puzzle Incorrect', 
+        { puzzleId, timeElapsed }
+      );
+
+      return validationResult;
+    } catch (error) {
+      playFabCore.logOperation('ARC Validation Failed', error);
+      throw error;
+    }
+  }
+
+  /**
    * Test CloudScript connection without validating a solution
    */
   public async testCloudScriptConnection(): Promise<boolean> {
