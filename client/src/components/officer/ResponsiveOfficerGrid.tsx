@@ -94,43 +94,88 @@ export function ResponsiveOfficerGrid({
     if (!enableDragToPaint) return;
 
     const handleGlobalMouseUp = () => {
-      if (dragState.isDragging) {
-        // FLOOD FILL: Fill all selected cells with current selectedValue
-        const selectedCells = getSelectedCells();
-        console.log('Drag ended. Selected cells:', selectedCells.length, 'Selected value:', selectedValue);
-        
-        if (selectedCells.length > 0 && selectedValue !== undefined && selectedValue !== null) {
-          const newGrid = grid.map((row, rowIndex) =>
-            row.map((cell, colIndex) => {
-              const isSelected = selectedCells.some(sc => sc.row === rowIndex && sc.col === colIndex);
-              return isSelected ? selectedValue : cell;
-            })
-          );
-          console.log('Applying flood fill to', selectedCells.length, 'cells with value', selectedValue);
-          setGrid(newGrid);
-          onChange?.(newGrid);
+      // Use callback to get FRESH drag state at time of mouse up
+      setDragState((currentDragState) => {
+        if (currentDragState.isDragging && currentDragState.startCell && currentDragState.hoveredCell) {
+          console.log('Mouse up detected during drag. Start:', currentDragState.startCell, 'End:', currentDragState.hoveredCell, 'Selected value:', selectedValue);
+          
+          // Calculate selected cells directly here instead of using getSelectedCells()
+          const minRow = Math.min(currentDragState.startCell.row, currentDragState.hoveredCell.row);
+          const maxRow = Math.max(currentDragState.startCell.row, currentDragState.hoveredCell.row);
+          const minCol = Math.min(currentDragState.startCell.col, currentDragState.hoveredCell.col);
+          const maxCol = Math.max(currentDragState.startCell.col, currentDragState.hoveredCell.col);
+          
+          const selectedCells = [];
+          for (let r = minRow; r <= maxRow; r++) {
+            for (let c = minCol; c <= maxCol; c++) {
+              selectedCells.push({ row: r, col: c });
+            }
+          }
+          
+          console.log('Calculated selection rectangle:', { minRow, maxRow, minCol, maxCol }, 'Total cells:', selectedCells.length);
+          
+          if (selectedCells.length > 0 && selectedValue !== undefined && selectedValue !== null) {
+            // Use callback version of setGrid to get current state
+            setGrid((currentGrid) => {
+              const newGrid = currentGrid.map((row, rowIndex) =>
+                row.map((cell, colIndex) => {
+                  const isSelected = selectedCells.some(sc => sc.row === rowIndex && sc.col === colIndex);
+                  return isSelected ? selectedValue : cell;
+                })
+              );
+              console.log('FLOOD FILL APPLIED: Filled', selectedCells.length, 'cells with value', selectedValue);
+              
+              // Call onChange with new grid
+              if (onChange) {
+                setTimeout(() => onChange(newGrid), 0);
+              }
+              
+              return newGrid;
+            });
+          } else {
+            console.log('Flood fill skipped - no cells selected or no value:', { cellCount: selectedCells.length, selectedValue });
+          }
+        } else {
+          console.log('Mouse up without active drag state:', { isDragging: currentDragState.isDragging, startCell: currentDragState.startCell, hoveredCell: currentDragState.hoveredCell });
         }
         
-        // Clear selection
-        setDragState({
+        // Always return cleared state
+        return {
           isDragging: false,
           startCell: null,
           hoveredCell: null
-        });
-      }
+        };
+      });
     };
 
     document.addEventListener('mouseup', handleGlobalMouseUp);
     return () => document.removeEventListener('mouseup', handleGlobalMouseUp);
-  }, [dragState.isDragging, enableDragToPaint, selectedValue, grid, onChange]);
+  }, [enableDragToPaint, selectedValue, onChange]);
 
   /**
-   * Handle cell click - DEFAULT: cycle through 0→1→2→...→9→0
+   * Handle cell click - Paint with selectedValue when in painting mode, otherwise cycle through values
    */
   const handleCellClick = (row: number, col: number) => {
     if (!interactive || disabled) return;
 
-    // ALWAYS cycle through values on click - this is the core functionality
+    // PAINTING MODE: Use selectedValue when onCellInteraction is provided
+    if (onCellInteraction && selectedValue !== undefined && selectedValue !== null) {
+      const newGrid = grid.map((gridRow, rowIndex) =>
+        gridRow.map((cell, colIndex) => {
+          if (rowIndex === row && colIndex === col) {
+            return selectedValue;
+          }
+          return cell;
+        })
+      );
+
+      setGrid(newGrid);
+      onChange?.(newGrid);
+      onCellInteraction(row, col, selectedValue);
+      return;
+    }
+
+    // DEFAULT MODE: Cycle through values (0→1→2→...→9→0)
     const newGrid = grid.map((gridRow, rowIndex) =>
       gridRow.map((cell, colIndex) => {
         if (rowIndex === row && colIndex === col) {
@@ -143,7 +188,7 @@ export function ResponsiveOfficerGrid({
     setGrid(newGrid);
     onChange?.(newGrid);
     
-    // Call callback if provided (but doesn't override cycling behavior)
+    // Call callback if provided
     if (onCellInteraction) {
       onCellInteraction(row, col, newGrid[row][col]);
     }
@@ -152,10 +197,19 @@ export function ResponsiveOfficerGrid({
   /**
    * Handle enhanced cell interaction with selected value painting
    */
-  const handleEnhancedCellClick = (value: number) => {
-    // This is called from EnhancedGridCell, value parameter is the current cell value
-    // We ignore it and use the selectedValue for painting
-    return selectedValue;
+  const handleEnhancedCellClick = (row: number, col: number, currentValue: number) => {
+    // Paint with selectedValue when in painting mode, otherwise cycle through values
+    if (onCellInteraction && selectedValue !== undefined && selectedValue !== null) {
+      handleCellValueChange(row, col, selectedValue);
+      onCellInteraction(row, col, selectedValue);
+    } else {
+      // Default cycling behavior
+      const nextValue = (currentValue + 1) % 10;
+      handleCellValueChange(row, col, nextValue);
+      if (onCellInteraction) {
+        onCellInteraction(row, col, nextValue);
+      }
+    }
   };
 
   /**
@@ -165,15 +219,28 @@ export function ResponsiveOfficerGrid({
     if (!interactive || disabled || !enableDragToPaint) return;
 
     if (e.button === 0) { // Left click - start selection
+      console.log('Starting drag at:', { row, col });
       setDragState({
         isDragging: true,
         startCell: { row, col },
         hoveredCell: { row, col }
       });
       // DON'T paint immediately - wait for mouse up
-    } else if (e.button === 2) { // Right click
-      e.preventDefault();
-      handleCellValueChange(row, col, 0); // Clear cell immediately
+    }
+    // Note: Right-click is now handled by handleCellRightClick via onContextMenu
+  };
+
+  /**
+   * Handle right-click to clear cell (set to 0)
+   */
+  const handleCellRightClick = (row: number, col: number, currentValue: number) => {
+    if (!interactive || disabled) return;
+    
+    console.log('Right-click clear cell at', row, col, 'from', currentValue, 'to 0');
+    handleCellValueChange(row, col, 0);
+    
+    if (onCellInteraction) {
+      onCellInteraction(row, col, 0);
     }
   };
 
@@ -181,8 +248,18 @@ export function ResponsiveOfficerGrid({
    * Handle mouse enter for drag selection visualization
    */
   const handleCellMouseEnter = (row: number, col: number) => {
-    if (!enableDragToPaint || !dragState.isDragging) return;
+    if (!enableDragToPaint) {
+      console.log('Mouse enter skipped - enableDragToPaint is false');
+      return;
+    }
+    
+    if (!dragState.isDragging) {
+      console.log('Mouse enter skipped - not dragging');
+      return;
+    }
 
+    console.log('Mouse enter during drag:', { row, col }, 'Previous hovered:', dragState.hoveredCell);
+    
     // Update selection area but don't paint yet
     setDragState(prev => ({
       ...prev,
@@ -314,6 +391,7 @@ export function ResponsiveOfficerGrid({
                   onClick={(currentValue) => handleCellClick(rowIndex, colIndex)}
                   onMouseDown={(e) => handleCellMouseDown(rowIndex, colIndex, e)}
                   onMouseEnter={() => handleCellMouseEnter(rowIndex, colIndex)}
+                  onRightClick={(currentValue) => handleCellRightClick(rowIndex, colIndex, currentValue)}
                 />
               );
             })

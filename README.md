@@ -2,7 +2,6 @@
 
 A Space Force-themed puzzle platform featuring two distinct training systems: **Enlisted Track** with 155 curated operational tasks, and **Officer Track** with 1,920+ ARC-AGI puzzles for advanced training. Built on the Abstract Reasoning Corpus (ARC) framework while maintaining accessibility for all players.
 
-## About
 
 - **Purpose**: Develop human reasoning skills through space operations-themed puzzles
 - **Dual Track System**: Enlisted (themed tasks) + Officer (raw ARC-AGI datasets)  

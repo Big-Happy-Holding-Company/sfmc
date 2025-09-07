@@ -16,6 +16,8 @@ import { EmojiPaletteDivider } from '@/components/officer/EmojiPaletteDivider';
 import type { OfficerTrackPuzzle, ARCGrid } from '@/types/arcTypes';
 import type { DisplayMode, PuzzleDisplayState } from '@/types/puzzleDisplayTypes';
 import type { EmojiSet } from '@/constants/spaceEmojis';
+import { playFabValidation } from '@/services/playfab/validation';
+import { playFabEvents } from '@/services/playfab/events';
 
 interface ResponsivePuzzleSolverProps {
   puzzle: OfficerTrackPuzzle;
@@ -36,6 +38,17 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
     selectedValue: 1,
     showControls: true
   });
+
+  // Validation state
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationResult, setValidationResult] = useState<any>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  // Session tracking state
+  const [sessionId] = useState(() => crypto.randomUUID());
+  const [sessionStartTime] = useState(() => Date.now());
+  const [stepIndex, setStepIndex] = useState(0);
+  const [attemptId] = useState(1);
 
   const totalTests = puzzle.test?.length || 0;
   const currentTest = puzzle.test?.[currentTestIndex];
@@ -68,6 +81,73 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
       setCompletedTests(newCompleted);
     }
   }, [puzzle.test]);
+
+  // Initialize session and log puzzle start event
+  useEffect(() => {
+    const logSessionStart = async () => {
+      try {
+        await playFabEvents.logPuzzleEvent(
+          "SFMC",                    // eventName
+          sessionId,                 // sessionId
+          attemptId,                 // attemptId
+          puzzle.id,                 // game_id (puzzle ID)
+          stepIndex,                 // stepIndex (starts at 0)
+          0,                         // positionX
+          0,                         // positionY
+          {                          // payloadSummary
+            totalTests: totalTests,
+            trainingExamples: trainingExamples.length,
+            puzzleId: puzzle.id
+          },
+          0,                         // deltaMs (0 for start)
+          "Officer Track Puzzle",    // game_title
+          "start",                   // status
+          "officer-track",           // category
+          "game_start",             // event_type
+          0,                         // selection_value
+          new Date().toISOString()   // game_time
+        );
+      } catch (error) {
+        // Event logging failures should not break gameplay - fail silently
+      }
+    };
+
+    logSessionStart();
+
+    // Cleanup function to log session end when component unmounts
+    return () => {
+      const logSessionEnd = async () => {
+        try {
+          const sessionDuration = Date.now() - sessionStartTime;
+          await playFabEvents.logPuzzleEvent(
+            "SFMC",                    // eventName
+            sessionId,                 // sessionId
+            attemptId,                 // attemptId
+            puzzle.id,                 // game_id (puzzle ID)
+            stepIndex + 1,             // stepIndex (increment for final step)
+            0,                         // positionX
+            0,                         // positionY
+            {                          // payloadSummary
+              sessionDurationMs: sessionDuration,
+              finalStepIndex: stepIndex,
+              puzzleId: puzzle.id
+            },
+            sessionDuration,           // deltaMs (total session time)
+            "Officer Track Puzzle",    // game_title
+            "stop",                    // status
+            "officer-track",           // category
+            "game_completion",         // event_type
+            0,                         // selection_value
+            new Date().toISOString()   // game_time
+          );
+        } catch (error) {
+          // Event logging failures should not break gameplay - fail silently
+        }
+      };
+
+      logSessionEnd();
+    };
+  }, [sessionId, attemptId, puzzle.id, stepIndex, totalTests, trainingExamples.length, sessionStartTime]);
 
   // Determine if grids are large (need special layout)
   const isLargeGrid = (grid: ARCGrid) => {
@@ -102,8 +182,47 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
     return suggestions.slice(0, 4); // Limit to 4 suggestions
   };
 
+  // Helper function to log player actions and increment step index
+  const logPlayerAction = async (
+    eventType: string,
+    positionX: number,
+    positionY: number,
+    payloadSummary: object | null,
+    status: "won" | "fail" | "stop" | "start" = "start"
+  ) => {
+    try {
+      const currentTime = Date.now();
+      const deltaMs = currentTime - sessionStartTime;
+      
+      await playFabEvents.logPuzzleEvent(
+        "SFMC",                    // eventName
+        sessionId,                 // sessionId
+        attemptId,                 // attemptId
+        puzzle.id,                 // game_id (puzzle ID)
+        stepIndex,                 // stepIndex (current step)
+        positionX,                 // positionX
+        positionY,                 // positionY
+        payloadSummary,            // payloadSummary
+        deltaMs,                   // deltaMs (time since session start)
+        "Officer Track Puzzle",    // game_title
+        status,                    // status
+        "officer-track",           // category
+        "player_action",           // event_type
+        displayState.selectedValue,// selection_value
+        new Date().toISOString()   // game_time
+      );
+      
+      // Increment step index for next action
+      setStepIndex(prev => prev + 1);
+    } catch (error) {
+      // Event logging failures should not break gameplay - fail silently
+    }
+  };
+
   // Handle output size change for current test
   const handleSizeChange = (newWidth: number, newHeight: number) => {
+    const oldDimensions = outputDimensions[currentTestIndex];
+    
     const newDimensions = [...outputDimensions];
     newDimensions[currentTestIndex] = { width: newWidth, height: newHeight };
     setOutputDimensions(newDimensions);
@@ -118,11 +237,36 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
     const newCompleted = [...completedTests];
     newCompleted[currentTestIndex] = false;
     setCompletedTests(newCompleted);
+
+    // Log grid size change event
+    logPlayerAction(
+      "grid_resize",
+      0,
+      currentTestIndex,
+      {
+        fromSize: oldDimensions,
+        toSize: { width: newWidth, height: newHeight },
+        testCase: currentTestIndex
+      }
+    );
   };
 
   // Handle test case selection
   const handleTestSelect = (testIndex: number) => {
+    const oldTestIndex = currentTestIndex;
     setCurrentTestIndex(testIndex);
+
+    // Log test case navigation event
+    logPlayerAction(
+      "test_navigation",
+      0,
+      testIndex,
+      {
+        fromTest: oldTestIndex,
+        toTest: testIndex,
+        totalTests: totalTests
+      }
+    );
   };
 
   // Get current solution for active test
@@ -147,6 +291,72 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
   const inputCellSize = calculateCellSize(testInput[0]?.length || 1, testInput.length);
   const outputCellSize = calculateCellSize(currentDimensions.width, currentDimensions.height);
 
+  // Validate puzzle with PlayFab when all tests are complete
+  const validatePuzzleWithPlayFab = async () => {
+    if (isValidating) return; // Prevent double submission
+    
+    setIsValidating(true);
+    setValidationError(null);
+    
+    // Log validation start event
+    logPlayerAction(
+      "validation_start",
+      0,
+      0,
+      {
+        validationType: "playfab_cloudscript",
+        totalTests: totalTests,
+        puzzleId: puzzle.id
+      },
+      "start"
+    );
+    
+    try {
+      const validationStartTime = Date.now();
+      const result = await playFabValidation.validateARCPuzzle(
+        puzzle.id,
+        solutions, // number[][][]
+        Date.now() - sessionStartTime // Time elapsed since session start
+      );
+      
+      const validationDuration = Date.now() - validationStartTime;
+      setValidationResult(result);
+      
+      // Log validation complete event (success)
+      logPlayerAction(
+        "validation_complete",
+        0,
+        0,
+        {
+          serverResult: result,
+          validationDurationMs: validationDuration,
+          correct: result?.correct,
+          puzzleId: puzzle.id
+        },
+        result?.correct ? "won" : "fail"
+      );
+      
+    } catch (error: any) {
+      setValidationError(error.message || 'Validation failed');
+      
+      // Log validation complete event (error)
+      logPlayerAction(
+        "validation_complete",
+        0,
+        0,
+        {
+          error: error.message || 'Validation failed',
+          validationType: "playfab_cloudscript",
+          puzzleId: puzzle.id
+        },
+        "fail"
+      );
+      
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
   // Update current solution
   const updateCurrentSolution = (newGrid: ARCGrid) => {
     const newSolutions = [...solutions];
@@ -157,28 +367,117 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
     if (expectedOutput.length > 0) {
       const matches = JSON.stringify(newGrid) === JSON.stringify(expectedOutput);
       const newCompleted = [...completedTests];
+      const wasAlreadyCompleted = newCompleted[currentTestIndex];
       newCompleted[currentTestIndex] = matches;
       setCompletedTests(newCompleted);
+      
+      // Log individual test case completion (only on state change)
+      if (matches && !wasAlreadyCompleted) {
+        logPlayerAction(
+          "test_case_complete",
+          0,
+          currentTestIndex,
+          {
+            testCase: currentTestIndex,
+            totalTests: totalTests,
+            correctSolution: true
+          },
+          "won"
+        );
+      }
+      
+      // Check if ALL tests are now complete
+      if (matches && newCompleted.every(test => test)) {
+        // Log pre-validation event (all tests ready for server validation)
+        logPlayerAction(
+          "ready_for_validation",
+          0,
+          0,
+          {
+            allTestsComplete: true,
+            totalTests: totalTests,
+            completedTests: newCompleted.filter(Boolean).length
+          },
+          "won"
+        );
+        
+        // Small delay to let UI update, then validate
+        setTimeout(() => validatePuzzleWithPlayFab(), 500);
+      }
     }
   };
 
   // Enhanced display control handlers
   const handleDisplayModeChange = (mode: DisplayMode) => {
+    const oldMode = displayState.displayMode;
     setDisplayState(prev => ({ ...prev, displayMode: mode }));
+
+    // Log display mode change event
+    logPlayerAction(
+      "display_mode_change",
+      0,
+      0,
+      {
+        fromMode: oldMode,
+        toMode: mode,
+        emojiSet: displayState.emojiSet
+      }
+    );
   };
 
   const handleEmojiSetChange = (emojiSet: EmojiSet) => {
+    const oldEmojiSet = displayState.emojiSet;
     setDisplayState(prev => ({ ...prev, emojiSet }));
+
+    // Log emoji set change event
+    logPlayerAction(
+      "emoji_set_change",
+      0,
+      0,
+      {
+        fromSet: oldEmojiSet,
+        toSet: emojiSet,
+        displayMode: displayState.displayMode
+      }
+    );
   };
 
   const handleValueSelect = (value: number) => {
+    const oldValue = displayState.selectedValue;
     setDisplayState(prev => ({ ...prev, selectedValue: value }));
+
+    // Log palette value selection event
+    logPlayerAction(
+      "palette_selection",
+      0,
+      0,
+      {
+        fromValue: oldValue,
+        toValue: value,
+        displayMode: displayState.displayMode
+      }
+    );
   };
 
   // Enhanced cell interaction for value painting
   const handleCellInteraction = (row: number, col: number, value: number) => {
+    const oldValue = currentSolution[row]?.[col] || 0;
     const newGrid = [...currentSolution];
     newGrid[row][col] = displayState.selectedValue;
+    
+    // Log cell modification event
+    logPlayerAction(
+      "cell_change",
+      row,
+      col,
+      {
+        oldValue: oldValue,
+        newValue: displayState.selectedValue,
+        testCase: currentTestIndex,
+        tool: "paint"
+      }
+    );
+    
     updateCurrentSolution(newGrid);
   };
 
@@ -282,7 +581,10 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
               🧩 SOLVE TEST CASE {currentTestIndex + 1}
             </h2>
             <div className="text-slate-400 text-xl">
-              {completedTests[currentTestIndex] ? '✅ Solved!' : 'Apply the pattern to solve'}
+              {isValidating ? '🔄 Validating with PlayFab...' : 
+               validationResult?.correct ? '🎉 PlayFab Verified!' :
+               validationError ? '❌ Validation Error' :
+               completedTests[currentTestIndex] ? '✅ Solved!' : 'Apply the pattern to solve'}
             </div>
           </div>
 
@@ -380,9 +682,12 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                   >
                     <option value="tech_set1">Tech Set 1</option>
                     <option value="tech_set2">Tech Set 2</option>
-                    <option value="nature_set1">Nature Set 1</option>
-                    <option value="space_set1">Space Set 1</option>
-                    <option value="geometric_set1">Geometric Set 1</option>
+                    <option value="celestial_set1">Celestial Set 1</option>
+                    <option value="celestial_set2">Celestial Set 2</option>
+                    <option value="status_alerts">Status Alerts</option>
+                    <option value="weather_climate">Weather Climate</option>
+                    <option value="ai_emojis">AI Systems</option>
+                    <option value="status_emojis">Human Crew</option>
                   </select>
                 )}
               </div>
@@ -425,25 +730,36 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
             </div>
           </div>
 
+          {/* Validation Status */}
+          {validationError && (
+            <div className="bg-red-900 border border-red-600 rounded-lg p-4 mt-4">
+              <div className="text-red-300 text-sm">
+                <strong>❌ Validation Error:</strong> {validationError}
+              </div>
+            </div>
+          )}
+
+          {validationResult && (
+            <div className="bg-green-900 border border-green-600 rounded-lg p-4 mt-4">
+              <div className="text-green-300 text-sm">
+                <strong>✅ PlayFab Validation Complete:</strong> 
+                {validationResult.correct ? ' Puzzle solved successfully!' : ' Some test cases failed.'}
+                {validationResult.timeElapsed && (
+                  <div>Time: {(validationResult.timeElapsed / 1000).toFixed(1)}s</div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Submit Button */}
           <div className="flex justify-center mt-8 pt-6 border-t border-slate-600">
             <Button
               size="lg"
               className="bg-green-600 hover:bg-green-700 text-white px-8 py-3"
-              onClick={() => {
-                // TODO: Add solution validation
-                alert('Solution validation not implemented yet - check console for your solution');
-                console.log('User solution:', currentSolution);
-                console.log('Expected output:', expectedOutput);
-                
-                // Compare solutions for debugging
-                if (expectedOutput.length > 0) {
-                  const matches = JSON.stringify(currentSolution) === JSON.stringify(expectedOutput);
-                  console.log('Solution matches expected:', matches);
-                }
-              }}
+              disabled={isValidating}
+              onClick={() => validatePuzzleWithPlayFab()}
             >
-              🎯 Submit Solution
+              {isValidating ? '🔄 Validating...' : '🎯 Validate with PlayFab'}
             </Button>
           </div>
         </div>

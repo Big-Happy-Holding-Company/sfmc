@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ## Recent Commits (Latest First)
 
+**2025-09-07**: 🎨 DRAW TOOLS SELECTION FILLING FIX - Single Clicks Now Paint with Selected Value
+- **CRITICAL UX BUG RESOLVED**: Fixed draw tools that didn't actually fill selections with chosen values
+- **PROBLEM**: Single clicks were cycling through values (0→1→2→...→9→0) instead of painting with palette selection
+- **ROOT CAUSE**: `handleCellClick` function always used cycling behavior, ignored `selectedValue` from emoji palette
+- **SOLUTION**: 
+  - Modified `handleCellClick` to detect painting mode via `onCellInteraction` callback presence
+  - When `onCellInteraction` exists and `selectedValue` is set, paint with selected value
+  - Maintains backward compatibility - cycling behavior preserved when no `onCellInteraction`
+- **BEHAVIORAL FIX**: Enhanced `handleEnhancedCellClick` to properly handle painting vs cycling modes
+- **CONSISTENCY ACHIEVED**: Single clicks and drag-to-paint now both respect emoji palette selection
+- **FILES MODIFIED**: `client/src/components/officer/ResponsiveOfficerGrid.tsx` (lines 130-185)
+- **TESTING REQUIRED**: User should verify single clicks paint with selected palette value in Officer Track puzzle solver
+- **HOW TO TEST**: 
+  1. Go to Officer Track and select a puzzle to solve
+  2. Select a value from the emoji palette (numbers 0-9)
+  3. Single-click on grid cells - they should change to the selected palette value
+  4. Drag across multiple cells - entire selection should fill with selected value
+
 **2025-09-06**: 🔧 PRODUCTION PUZZLE LOADING FIX - Admin API to Client API Migration
 - **CRITICAL PRODUCTION ISSUE RESOLVED**: Fixed officer track puzzle loading failures in production environment
 - **PROBLEM**: URLs like `https://sfmc.bhhc.us/officer-track/solve/182e5d0f` showing "failed to load puzzle errors" 

@@ -198,7 +198,7 @@ export const PLAYFAB_CONSTANTS = {
   },
   CLOUDSCRIPT_FUNCTIONS: {
     VALIDATE_SOLUTION: 'ValidateTaskSolution',
-    VALIDATE_ARC_SOLUTION: 'ValidateARCSolution',
+    VALIDATE_ARC_PUZZLE: 'ValidateARCPuzzle',
     GENERATE_ANONYMOUS_NAME: 'GenerateAnonymousName',
   },
   USER_DATA_KEYS: {
