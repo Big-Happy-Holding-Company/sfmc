@@ -107,11 +107,8 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
           0,                         // selection_value
           new Date().toISOString()   // game_time
         );
-        
-        console.log('📊 Puzzle session started:', { sessionId, puzzleId: puzzle.id, totalTests });
       } catch (error) {
-        console.error('Failed to log session start:', error);
-        // Don't throw - event logging should not break the game
+        // Event logging failures should not break gameplay - fail silently
       }
     };
 
@@ -143,11 +140,8 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
             0,                         // selection_value
             new Date().toISOString()   // game_time
           );
-          
-          console.log('📊 Puzzle session ended:', { sessionId, duration: sessionDuration });
         } catch (error) {
-          console.error('Failed to log session end:', error);
-          // Don't throw - event logging should not break the game
+          // Event logging failures should not break gameplay - fail silently
         }
       };
 
@@ -221,8 +215,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
       // Increment step index for next action
       setStepIndex(prev => prev + 1);
     } catch (error) {
-      console.error('Failed to log player action:', error);
-      // Don't throw - event logging should not break the game
+      // Event logging failures should not break gameplay - fail silently
     }
   };
 
@@ -305,19 +298,60 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
     setIsValidating(true);
     setValidationError(null);
     
+    // Log validation start event
+    logPlayerAction(
+      "validation_start",
+      0,
+      0,
+      {
+        validationType: "playfab_cloudscript",
+        totalTests: totalTests,
+        puzzleId: puzzle.id
+      },
+      "start"
+    );
+    
     try {
-      console.log('🎯 Submitting puzzle to PlayFab for validation...', puzzle.id);
+      const validationStartTime = Date.now();
       const result = await playFabValidation.validateARCPuzzle(
         puzzle.id,
         solutions, // number[][][]
-        Date.now() // Simple time tracking
+        Date.now() - sessionStartTime // Time elapsed since session start
       );
       
+      const validationDuration = Date.now() - validationStartTime;
       setValidationResult(result);
-      console.log('✅ PlayFab validation result:', result);
+      
+      // Log validation complete event (success)
+      logPlayerAction(
+        "validation_complete",
+        0,
+        0,
+        {
+          serverResult: result,
+          validationDurationMs: validationDuration,
+          correct: result?.correct,
+          puzzleId: puzzle.id
+        },
+        result?.correct ? "won" : "fail"
+      );
+      
     } catch (error: any) {
-      console.error('❌ PlayFab validation failed:', error);
       setValidationError(error.message || 'Validation failed');
+      
+      // Log validation complete event (error)
+      logPlayerAction(
+        "validation_complete",
+        0,
+        0,
+        {
+          error: error.message || 'Validation failed',
+          validationType: "playfab_cloudscript",
+          puzzleId: puzzle.id
+        },
+        "fail"
+      );
+      
     } finally {
       setIsValidating(false);
     }
@@ -333,12 +367,40 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
     if (expectedOutput.length > 0) {
       const matches = JSON.stringify(newGrid) === JSON.stringify(expectedOutput);
       const newCompleted = [...completedTests];
+      const wasAlreadyCompleted = newCompleted[currentTestIndex];
       newCompleted[currentTestIndex] = matches;
       setCompletedTests(newCompleted);
       
+      // Log individual test case completion (only on state change)
+      if (matches && !wasAlreadyCompleted) {
+        logPlayerAction(
+          "test_case_complete",
+          0,
+          currentTestIndex,
+          {
+            testCase: currentTestIndex,
+            totalTests: totalTests,
+            correctSolution: true
+          },
+          "won"
+        );
+      }
+      
       // Check if ALL tests are now complete
       if (matches && newCompleted.every(test => test)) {
-        console.log('🎉 All test cases completed! Validating with PlayFab...');
+        // Log pre-validation event (all tests ready for server validation)
+        logPlayerAction(
+          "ready_for_validation",
+          0,
+          0,
+          {
+            allTestsComplete: true,
+            totalTests: totalTests,
+            completedTests: newCompleted.filter(Boolean).length
+          },
+          "won"
+        );
+        
         // Small delay to let UI update, then validate
         setTimeout(() => validatePuzzleWithPlayFab(), 500);
       }
@@ -399,8 +461,23 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
 
   // Enhanced cell interaction for value painting
   const handleCellInteraction = (row: number, col: number, value: number) => {
+    const oldValue = currentSolution[row]?.[col] || 0;
     const newGrid = [...currentSolution];
     newGrid[row][col] = displayState.selectedValue;
+    
+    // Log cell modification event
+    logPlayerAction(
+      "cell_change",
+      row,
+      col,
+      {
+        oldValue: oldValue,
+        newValue: displayState.selectedValue,
+        testCase: currentTestIndex,
+        tool: "paint"
+      }
+    );
+    
     updateCurrentSolution(newGrid);
   };
 
