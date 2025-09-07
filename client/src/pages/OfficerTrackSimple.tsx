@@ -272,14 +272,14 @@ export default function OfficerTrackSimple() {
                 </div>
                 
                 <div className="bg-slate-700 rounded-lg p-4 text-center">
-                  <div className="text-2xl font-bold text-red-400">
-                    {filteredPuzzles.length > 0 
-                      ? `${Math.round((filteredPuzzles.reduce((sum, p) => sum + p.avgAccuracy, 0) / filteredPuzzles.length) * 100)}%`
+                  <div className="text-2xl font-bold text-cyan-400">
+                    {filteredPuzzles.length > 0 && filteredPuzzles.some(p => p.avgConfidence !== undefined)
+                      ? `${Math.round(filteredPuzzles.filter(p => p.avgConfidence !== undefined).reduce((sum, p) => sum + (p.avgConfidence || 0), 0) / filteredPuzzles.filter(p => p.avgConfidence !== undefined).length)}%`
                       : 'N/A'
                     }
                   </div>
-                  <div className="text-sm text-slate-400">Average AI Success</div>
-                  <div className="text-xs text-slate-500">Accuracy Rate</div>
+                  <div className="text-sm text-slate-400">Average AI Confidence</div>
+                  <div className="text-xs text-slate-500">Overall confidence level</div>
                 </div>
                 
                 <div className="bg-slate-700 rounded-lg p-4 text-center">
