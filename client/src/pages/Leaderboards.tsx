@@ -42,10 +42,9 @@ export default function Leaderboards() {
         const leaderboards = getEnabledLeaderboards();
         setAvailableLeaderboards(leaderboards);
         
-        // Set default to Officer Track (priority #1) or first available
+        // Set default to Officer Track (ARC puzzles are primary focus)
         const defaultType = leaderboards.find(lb => lb.type === LeaderboardType.OFFICER_TRACK)?.type 
-          || leaderboards[0]?.type 
-          || LeaderboardType.GLOBAL;
+          || LeaderboardType.OFFICER_TRACK;
         
         setSelectedType(defaultType);
 
@@ -102,10 +101,10 @@ export default function Leaderboards() {
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">
-            🏆 Space Force Leaderboards
+            🏆 Officer Rankings
           </h1>
           <p className="text-blue-200 text-lg">
-            See how you rank among the galaxy's finest
+            ARC Puzzle Performance & Mission Completion Rankings
           </p>
         </div>
 

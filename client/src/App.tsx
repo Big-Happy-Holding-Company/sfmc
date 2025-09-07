@@ -27,6 +27,7 @@ import OfficerTrackSimple from "@/pages/OfficerTrackSimple";
 import PuzzleSolver from "@/pages/PuzzleSolver";
 import { GridSizeTest } from "@/components/officer/GridSizeTest";
 import Leaderboards from "@/pages/Leaderboards";
+import Profile from "@/pages/Profile";
 import NotFound from "@/pages/not-found";
 import { LoadingSplash } from "@/components/game/LoadingSplash";
 import { OnboardingModal } from "@/components/game/OnboardingModal";
@@ -39,6 +40,7 @@ function Router() {
       <Route path="/officer-track" component={OfficerTrackSimple} />
       <Route path="/officer-track/solve/:puzzleId" component={PuzzleSolver} />
       <Route path="/leaderboards" component={Leaderboards} />
+      <Route path="/profile" component={Profile} />
       <Route path="/grid-test" component={GridSizeTest} />
       <Route component={NotFound} />
     </Switch>
