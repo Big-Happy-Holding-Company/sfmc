@@ -46,6 +46,7 @@ export function LeaderboardTable({ entries }: LeaderboardTableProps) {
             <th className="text-left py-3 px-6 text-blue-200 font-medium">Rank</th>
             <th className="text-left py-3 px-6 text-blue-200 font-medium">Player</th>
             <th className="text-right py-3 px-6 text-blue-200 font-medium">Score</th>
+            <th className="text-right py-3 px-6 text-blue-200 font-medium">Attempts</th>
           </tr>
         </thead>
         <tbody>

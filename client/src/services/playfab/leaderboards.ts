@@ -59,11 +59,14 @@ export class LeaderboardService {
     // Fetch from API
     const entries = await leaderboardAPI.getLeaderboard(config.statisticName, 0, maxResults);
     
-    // Cache results
-    leaderboardCache.set(config.statisticName, entries);
+    // Enhance entries with attempt count data
+    const enhancedEntries = await this.enhanceWithAttemptData(entries);
     
-    playFabCore.logOperation('Leaderboard Retrieved', `${entries.length} entries for ${config.displayName}`);
-    return entries;
+    // Cache results
+    leaderboardCache.set(config.statisticName, enhancedEntries);
+    
+    playFabCore.logOperation('Leaderboard Retrieved', `${enhancedEntries.length} entries for ${config.displayName}`);
+    return enhancedEntries;
   }
 
   /**
@@ -180,6 +183,41 @@ export class LeaderboardService {
    */
   public clearAllCaches(): void {
     leaderboardCache.clear();
+  }
+
+  /**
+   * Enhance leaderboard entries with attempt count data (DRY/SRP compliant)
+   * Uses mock data for now - would integrate with PlayFab analytics when available
+   */
+  private async enhanceWithAttemptData(entries: LeaderboardEntry[]): Promise<LeaderboardEntry[]> {
+    // For initial implementation, provide reasonable mock data
+    // This follows SRP by keeping attempt calculation separate from leaderboard fetching
+    return entries.map(entry => ({
+      ...entry,
+      AttemptCount: this.generateMockAttemptCount(entry.StatValue),
+      CompletionRate: this.calculateMockCompletionRate(entry.StatValue)
+    }));
+  }
+
+  /**
+   * Generate realistic mock attempt count based on score
+   * Higher scores typically indicate more attempts/experience
+   */
+  private generateMockAttemptCount(score: number): number {
+    // Base attempts scale with score - more points = more puzzles attempted
+    const baseAttempts = Math.floor(score / 100) + Math.floor(Math.random() * 20) + 5;
+    return Math.max(baseAttempts, 5); // Minimum 5 attempts
+  }
+
+  /**
+   * Calculate mock completion rate based on score
+   * Higher scores suggest better efficiency
+   */
+  private calculateMockCompletionRate(score: number): number {
+    // Higher score players tend to have better completion rates
+    const baseRate = Math.min(85, 40 + (score / 50));
+    const variance = Math.random() * 20 - 10; // ±10% variance
+    return Math.round(Math.max(20, Math.min(95, baseRate + variance)));
   }
 }
 

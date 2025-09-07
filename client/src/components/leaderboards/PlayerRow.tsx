@@ -111,6 +111,15 @@ export function PlayerRow({ entry, isEven }: PlayerRowProps) {
         </div>
         <div className="text-xs text-gray-400">points</div>
       </td>
+      <td className="py-4 px-6 text-right">
+        <div className={`
+          text-sm font-medium
+          ${isCurrentPlayer ? 'text-blue-300' : 'text-orange-400'}
+        `}>
+          {entry.AttemptCount || 'N/A'}
+        </div>
+        <div className="text-xs text-gray-400">attempts</div>
+      </td>
     </tr>
   );
 }
