@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { 
-  getOfficerPuzzles, 
+  getEvaluation2Puzzles,
   getDifficultyStats, 
   getPuzzlesByDifficulty,
   searchPuzzleById,
@@ -43,8 +43,8 @@ export interface UseOfficerPuzzlesReturn {
 }
 
 export function useOfficerPuzzles(
-  initialLimit: number = 100, // Increased default - we have the API power, use it!
-  initialSort: SortStrategy = 'composite'
+  initialLimit: number = 120, // Default to all evaluation2 puzzles (120 total)
+  initialSort: SortStrategy = 'difficulty' // Default to difficulty sorting (hardest first)
 ): UseOfficerPuzzlesReturn {
   const [puzzles, setPuzzles] = useState<OfficerPuzzle[]>([]);
   const [stats, setStats] = useState<DifficultyStats>({
@@ -62,17 +62,17 @@ export function useOfficerPuzzles(
   const [currentLimit, setCurrentLimit] = useState(initialLimit);
   const [currentSortStrategy, setCurrentSortStrategy] = useState<SortStrategy>(initialSort);
 
-  // Load data with smart arc-explainer API usage
+  // Load evaluation2 puzzles with rich metadata from arc-explainer
   const loadData = async (limit: number = currentLimit, sortBy: SortStrategy = currentSortStrategy) => {
     try {
       setLoading(true);
       setError(null);
       
-      console.log(`🔄 Loading officer puzzles (limit: ${limit}, sort: ${sortBy})...`);
-      console.log(`🎯 Getting WORST-PERFORMING puzzles from arc-explainer with rich metadata`);
+      console.log(`🎖️ Loading evaluation2 puzzles with rich metadata from arc-explainer...`);
+      console.log(`🚀 PRIORITY: ARC 2 - Evaluation dataset with AI performance data`);
       
-      // Load worst-performing puzzles with specified sorting strategy
-      const puzzleResponse = await getOfficerPuzzlesWithStrategy(limit, sortBy);
+      // Load evaluation2 puzzles with rich metadata from arc-explainer
+      const puzzleResponse = await getEvaluation2Puzzles();
       
       // Calculate stats from loaded puzzles
       const statsData: DifficultyStats = {
@@ -80,26 +80,52 @@ export function useOfficerPuzzles(
         extremely_hard: 0,
         very_hard: 0,
         challenging: 0,
-        total: puzzleResponse.total // Use real total from API
+        total: puzzleResponse.total
       };
       
       puzzleResponse.puzzles.forEach(puzzle => {
         statsData[puzzle.difficulty]++;
       });
       
-      setPuzzles(puzzleResponse.puzzles);
+      // Apply sorting based on strategy
+      let sortedPuzzles = [...puzzleResponse.puzzles];
+      
+      if (sortBy === 'accuracy') {
+        sortedPuzzles.sort((a, b) => a.avgAccuracy - b.avgAccuracy); // Lowest accuracy first (hardest)
+      } else if (sortBy === 'explanations') {
+        sortedPuzzles.sort((a, b) => a.totalExplanations - b.totalExplanations); // Fewest explanations first
+      } else if (sortBy === 'composite') {
+        sortedPuzzles.sort((a, b) => a.compositeScore - b.compositeScore); // Worst composite score first
+      }
+      // 'difficulty' keeps arc-explainer's default sorting (hardest first)
+      
+      // Apply limit if specified
+      if (limit && limit < sortedPuzzles.length) {
+        sortedPuzzles = sortedPuzzles.slice(0, limit);
+        console.log(`📊 Applied limit: showing ${limit} of ${puzzleResponse.total} evaluation2 puzzles`);
+      }
+      
+      setPuzzles(sortedPuzzles);
       setTotal(puzzleResponse.total);
       setStats(statsData);
-      setFilteredPuzzles(puzzleResponse.puzzles); // Show all by default
+      setFilteredPuzzles(sortedPuzzles);
       
-      console.log(`✅ Loaded ${puzzleResponse.puzzles.length} WORST-PERFORMING puzzles out of ${puzzleResponse.total} total`);
+      console.log(`✅ Loaded ${sortedPuzzles.length} evaluation2 puzzles with rich arc-explainer metadata`);
       console.log(`📊 Difficulty breakdown:`, statsData);
-      console.log(`🔥 Worst puzzle accuracy: ${Math.min(...puzzleResponse.puzzles.map(p => p.avgAccuracy)).toFixed(3)}`);
+      
+      if (sortedPuzzles.length > 0) {
+        const avgAccuracy = sortedPuzzles.reduce((sum, p) => sum + p.avgAccuracy, 0) / sortedPuzzles.length;
+        const worstAccuracy = Math.min(...sortedPuzzles.map(p => p.avgAccuracy));
+        const impossibleCount = sortedPuzzles.filter(p => p.difficulty === 'impossible').length;
+        console.log(`🔥 Average AI accuracy: ${avgAccuracy.toFixed(3)}`);
+        console.log(`💀 Worst puzzle accuracy: ${worstAccuracy.toFixed(3)}`);
+        console.log(`🚫 Impossible puzzles (0% accuracy): ${impossibleCount}`);
+      }
       
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to load worst-performing puzzles';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load evaluation2 puzzles from arc-explainer';
       setError(errorMessage);
-      console.error('❌ Failed to load officer puzzles:', err);
+      console.error('❌ Failed to load evaluation2 puzzles from arc-explainer:', err);
     } finally {
       setLoading(false);
     }
@@ -180,7 +206,8 @@ export function useOfficerPuzzles(
 
   // Load data on mount
   useEffect(() => {
-    console.log(`🚀 Initializing Officer Track with ${initialLimit} puzzles, sorted by ${initialSort}`);
+    console.log(`🎖️ Initializing Officer Track with evaluation2 dataset (up to ${initialLimit} puzzles)`);
+    console.log(`🚀 Priority: ARC 2 - Evaluation puzzles with rich metadata, sorted by ${initialSort}`);
     loadData(currentLimit, currentSortStrategy);
   }, []);
 
@@ -208,23 +235,4 @@ export function useOfficerPuzzles(
     currentLimit,
     currentSortStrategy
   };
-}
-
-// Enhanced API call with multiple sorting strategies
-async function getOfficerPuzzlesWithStrategy(limit: number, sortBy: SortStrategy): Promise<{ puzzles: OfficerPuzzle[]; total: number }> {
-  // Map our sort strategies to arc-explainer API parameters
-  const sortMap: Record<SortStrategy, string> = {
-    'composite': 'composite',
-    'accuracy': 'accuracy', 
-    'explanations': 'explanations',
-    'difficulty': 'difficulty',
-    'recent': 'recent'
-  };
-  
-  const apiSortBy = sortMap[sortBy] || 'composite';
-  
-  console.log(`🎯 Calling arc-explainer worst-performing API with sortBy=${apiSortBy}, limit=${limit}`);
-  
-  // Actually pass the sortBy parameter to leverage arc-explainer's rich metadata sorting
-  return await getOfficerPuzzles(limit, apiSortBy);
 }

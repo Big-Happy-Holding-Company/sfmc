@@ -12,16 +12,21 @@ export interface OfficerPuzzle {
   id: string;                    // ARC ID (e.g., "007bbfb7")
   playFabId: string;            // PlayFab format (e.g., "ARC-TR-007bbfb7")
   avgAccuracy: number;          // 0.0 to 1.0
-  difficulty: 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging';
+  difficulty: 'practically_impossible' | 'most_llms_fail' | 'unreliable';
   totalExplanations: number;
   compositeScore: number;
+  // Rich failure metadata
+  avgConfidence?: number;       // AI confidence when failing (0-100)
+  wrongCount?: number;          // Total wrong attempts
+  totalFeedback?: number;       // Human feedback attempts
+  negativeFeedback?: number;    // Negative human feedback count
+  latestAnalysis?: string;      // ISO date of last analysis
 }
 
 export interface DifficultyStats {
-  impossible: number;
-  extremely_hard: number;
-  very_hard: number;
-  challenging: number;
+  practically_impossible: number;
+  most_llms_fail: number;
+  unreliable: number;
   total: number;
 }
 
@@ -163,74 +168,103 @@ export function playFabToArcId(playFabId: string): string {
 /**
  * Categorize puzzle difficulty based on AI accuracy
  */
-export function categorizeDifficulty(accuracy: number, hasData: boolean = true): 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging' {
-  // If no data or accuracy is exactly 0, consider it impossible
-  if (!hasData || accuracy === 0) return 'impossible';
-  if (accuracy <= 0.25) return 'extremely_hard';
-  if (accuracy <= 0.50) return 'very_hard';
-  return 'challenging';
+export function categorizeDifficulty(accuracy: number, hasData: boolean = true): 'practically_impossible' | 'most_llms_fail' | 'unreliable' {
+  // Convert to percentage for clearer thresholds
+  const percentage = accuracy * 100;
+  
+  if (percentage <= 10) return 'practically_impossible';  // 0-10%
+  if (percentage <= 50) return 'most_llms_fail';         // 10-50%
+  return 'unreliable';                                   // 50-100%
 }
 
 /**
- * Get puzzles from arc-explainer with dynamic sorting strategies
- * Now supports multiple sorting approaches to get truly worst-performing puzzles
+ * Get evaluation2 puzzles with rich metadata from arc-explainer API
+ * PRIORITY: Uses arc-explainer's rich dataset for puzzle discovery and selection
  */
-export async function getOfficerPuzzles(
-  limit: number = 50, 
-  sortBy: string = 'composite'
-): Promise<OfficerPuzzleResponse> {
+export async function getEvaluation2Puzzles(): Promise<OfficerPuzzleResponse> {
   try {
-    console.log(`🔄 Getting ${limit} puzzles from arc-explainer (sortBy: ${sortBy})...`);
+    console.log('🎖️ Getting 50 worst performing puzzles with rich metadata from arc-explainer...');
     
-    // Use dynamic sortBy parameter instead of hardcoded 'composite'
-    const data = await makeAPICall(`/api/puzzle/worst-performing?limit=${limit}&sortBy=${sortBy}`);
+    // Get 50 worst performing puzzles (server limit) with rich metadata
+    const response = await makeAPICall('/api/puzzle/worst-performing?limit=50&sortBy=composite');
     
-    // Simple: get puzzles from arc-explainer response
-    const rawPuzzles = data.data?.puzzles || [];
-    const total = data.data?.total || rawPuzzles.length;
-    
-    console.log(`📊 Arc-explainer returned ${rawPuzzles.length} puzzles with ${sortBy} sorting`);
-    
-    // Convert to our format with rich metadata preservation
-    const puzzles: OfficerPuzzle[] = rawPuzzles.map((p: any) => ({
-      id: p.id,
-      playFabId: p.id,
-      avgAccuracy: p.avgAccuracy || 0,
-      difficulty: categorizeDifficulty(p.avgAccuracy || 0, p.totalExplanations > 0),
-      totalExplanations: p.totalExplanations || 0,
-      compositeScore: p.compositeScore || 0
-    }));
-    
-    // Log insights about the worst-performing puzzles we got
-    if (puzzles.length > 0) {
-      const avgAccuracy = puzzles.reduce((sum, p) => sum + p.avgAccuracy, 0) / puzzles.length;
-      const worstAccuracy = Math.min(...puzzles.map(p => p.avgAccuracy));
-      const difficultyBreakdown = puzzles.reduce((acc, p) => {
-        acc[p.difficulty] = (acc[p.difficulty] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-      
-      console.log(`🎯 Worst-performing puzzle set (${sortBy}):`, {
-        avgAccuracy: avgAccuracy.toFixed(3),
-        worstAccuracy: worstAccuracy.toFixed(3),
-        difficultyBreakdown
-      });
+    // The actual structure is response.data.puzzles (confirmed by API test)
+    if (!response?.data?.puzzles) {
+      console.error('❌ Arc-explainer response structure:', response);
+      throw new Error('No puzzle data found in arc-explainer API response');
     }
+    
+    const puzzleData = response.data.puzzles;
+    
+    console.log(`📊 Arc-explainer returned ${puzzleData.length} worst performing puzzles with rich metadata`);
+    
+    // Use ALL the worst performing puzzles - don't filter by dataset
+    const worstPerformingPuzzles = puzzleData;
+    
+    // Convert to our format with rich arc-explainer metadata - keep original arc IDs
+    const enrichedPuzzles: OfficerPuzzle[] = worstPerformingPuzzles.map((puzzle: any) => {
+      // Performance data is nested in performanceData object
+      const perfData = puzzle.performanceData || {};
+      const accuracy = perfData.avgAccuracy || 0;
+      const explanations = perfData.totalExplanations || 0;
       
-    return { puzzles, total };
+      return {
+        id: puzzle.id, // Keep original arc ID (e.g., "007bbfb7")  
+        playFabId: puzzle.id, // Same as ID for discovery - PlayFab only needed when solving
+        avgAccuracy: accuracy,
+        difficulty: categorizeDifficulty(accuracy, explanations > 0),
+        totalExplanations: explanations,
+        compositeScore: perfData.compositeScore || 0,
+        // Rich failure metadata
+        avgConfidence: perfData.avgConfidence,
+        wrongCount: perfData.wrongCount,
+        totalFeedback: perfData.totalFeedback,
+        negativeFeedback: perfData.negativeFeedback,
+        latestAnalysis: perfData.latestAnalysis
+      };
+    });
+    
+    // Sort by difficulty and performance (hardest first)
+    enrichedPuzzles.sort((a, b) => {
+      const difficultyOrder = { practically_impossible: 0, most_llms_fail: 1, unreliable: 2 };
+      const aDiff = difficultyOrder[a.difficulty];
+      const bDiff = difficultyOrder[b.difficulty];
+      if (aDiff !== bDiff) return aDiff - bDiff;
+      return a.compositeScore - b.compositeScore; // Lower composite score = worse performance
+    });
+    
+    // Log rich insights about the worst performing puzzles dataset
+    const difficultyBreakdown = enrichedPuzzles.reduce((acc, p) => {
+      acc[p.difficulty] = (acc[p.difficulty] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const avgAccuracy = enrichedPuzzles.reduce((sum, p) => sum + p.avgAccuracy, 0) / enrichedPuzzles.length;
+    const practicallyImpossible = enrichedPuzzles.filter(p => p.difficulty === 'practically_impossible').length;
+    
+    console.log(`✅ Loaded ${enrichedPuzzles.length} worst performing puzzles with rich metadata`);
+    console.log(`📊 Difficulty breakdown:`, difficultyBreakdown);
+    console.log(`🔥 Average AI accuracy: ${avgAccuracy.toFixed(3)}`);
+    console.log(`💀 Practically impossible puzzles (≤10% accuracy): ${practicallyImpossible}`);
+    
+    return {
+      puzzles: enrichedPuzzles,
+      total: enrichedPuzzles.length
+    };
     
   } catch (error) {
-    console.error('❌ Failed to fetch officer puzzles:', error);
+    console.error('❌ Failed to load evaluation2 puzzles from arc-explainer:', error);
     throw error;
   }
 }
 
+
 /**
- * Get difficulty statistics
+ * Get difficulty statistics from evaluation2 puzzles
  */
 export async function getDifficultyStats(): Promise<DifficultyStats> {
-  console.log('🔍 Calculating difficulty statistics...');
-  const response = await getOfficerPuzzles(200); // Get larger sample for better stats
+  console.log('🔍 Calculating difficulty statistics from evaluation2 dataset...');
+  const response = await getEvaluation2Puzzles(); // Use evaluation2 dataset
   
   const stats: DifficultyStats = {
     impossible: 0,
@@ -240,38 +274,20 @@ export async function getDifficultyStats(): Promise<DifficultyStats> {
     total: response.total // Use real database total
   };
   
-  // Track some examples of each difficulty
-  const examples: Record<string, any> = {
-    impossible: [],
-    extremely_hard: [],
-    very_hard: [],
-    challenging: []
-  };
-  
   response.puzzles.forEach(puzzle => {
     stats[puzzle.difficulty]++;
-    
-    // Keep up to 3 examples of each difficulty
-    if (examples[puzzle.difficulty].length < 3) {
-      examples[puzzle.difficulty].push({
-        id: puzzle.id,
-        accuracy: puzzle.avgAccuracy,
-        explanations: puzzle.totalExplanations
-      });
-    }
   });
   
-  console.log('📊 Difficulty distribution:', stats);
-  console.log('🔍 Examples by difficulty:', JSON.stringify(examples, null, 2));
+  console.log('📊 Evaluation2 difficulty distribution:', stats);
   
   return stats;
 }
 
 /**
- * Filter puzzles by difficulty
+ * Filter evaluation2 puzzles by difficulty
  */
-export async function getPuzzlesByDifficulty(difficulty: 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging'): Promise<OfficerPuzzle[]> {
-  const response = await getOfficerPuzzles(200);
+export async function getPuzzlesByDifficulty(difficulty: 'practically_impossible' | 'most_llms_fail' | 'unreliable'): Promise<OfficerPuzzle[]> {
+  const response = await getEvaluation2Puzzles();
   return response.puzzles.filter(p => p.difficulty === difficulty);
 }
 
@@ -377,7 +393,41 @@ export async function searchWithinLoadedPuzzles(searchId: string, puzzles: Offic
 }
 
 /**
- * Load full puzzle data from PlayFab by searching all datasets for ARC ID
+ * Load puzzle from local evaluation2 files (for solving)
+ * This is the new primary method - arc-explainer for discovery, local files for content
+ */
+export async function loadPuzzleFromLocalFiles(puzzleId: string): Promise<any | null> {
+  try {
+    const arcId = puzzleId.startsWith('ARC-') ? playFabToArcId(puzzleId) : puzzleId;
+    console.log(`🎯 Loading puzzle from local evaluation2 files: ${arcId}`);
+    
+    // Try to load from local evaluation2 dataset
+    const puzzleUrl = `/data/evaluation2/${arcId}.json`;
+    
+    const response = await fetch(puzzleUrl);
+    if (!response.ok) {
+      console.log(`❌ Puzzle ${arcId} not found in local evaluation2 dataset`);
+      return null;
+    }
+    
+    const puzzleData = await response.json();
+    console.log(`✅ Loaded puzzle ${arcId} from local evaluation2 file`);
+    
+    // Convert to expected format with proper ID
+    return {
+      ...puzzleData,
+      id: `ARC-E2-${arcId}` // Use PlayFab format for compatibility with solver
+    };
+    
+  } catch (error) {
+    console.error(`❌ Failed to load puzzle ${puzzleId} from local files:`, error);
+    return null;
+  }
+}
+
+/**
+ * LEGACY: Load full puzzle data from PlayFab by searching all datasets for ARC ID
+ * Only use this as fallback when local files don't work
  */
 export async function loadPuzzleFromPlayFab(puzzleId: string): Promise<any | null> {
   try {

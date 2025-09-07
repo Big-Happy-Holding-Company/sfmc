@@ -12,7 +12,6 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { AlertTriangle } from 'lucide-react';
 import { useOfficerPuzzles } from '@/hooks/useOfficerPuzzles';
-import { OfficerDifficultyCards } from '@/components/game/OfficerDifficultyCards';
 import { PuzzleGrid } from '@/components/officer/PuzzleGrid';
 import { playFabService } from '@/services/playfab';
 import type { OfficerPuzzle } from '@/services/officerArcAPI';
@@ -70,15 +69,6 @@ export default function OfficerTrackSimple() {
     initializePlayFab();
   }, []);
 
-  // Handle difficulty filter from cards
-  const handleDifficultySelect = (difficulty: 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging') => {
-    if (currentFilter === difficulty) {
-      // Clicking same filter clears it
-      filterByDifficulty(null);
-    } else {
-      filterByDifficulty(difficulty);
-    }
-  };
 
   // Handle puzzle search - add found puzzle to the card display
   const handleSearch = async () => {
@@ -258,11 +248,93 @@ export default function OfficerTrackSimple() {
 
         </div>
 
-        {/* Difficulty Cards */}
-        <OfficerDifficultyCards 
-          onCategorySelect={handleDifficultySelect}
-          selectedCategory={currentFilter || undefined}
-        />
+        {/* AI Performance Overview */}
+        <div className="bg-slate-800 border border-slate-600 rounded-lg p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-cyan-400 font-semibold flex items-center">
+              🤖 AI PERFORMANCE OVERVIEW
+            </h2>
+            <div className="text-slate-400 text-sm">
+              Real performance data from arc-explainer
+            </div>
+          </div>
+          
+          {loading ? (
+            <div className="text-center text-slate-400 py-4">Loading performance data...</div>
+          ) : (
+            <div className="space-y-4">
+              {/* Top Row - Core Metrics */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="bg-slate-700 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-amber-400">{filteredPuzzles.length}</div>
+                  <div className="text-sm text-slate-400">Worst Performing</div>
+                  <div className="text-xs text-slate-500">Puzzles Loaded</div>
+                </div>
+                
+                <div className="bg-slate-700 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-red-400">
+                    {filteredPuzzles.length > 0 
+                      ? `${Math.round((filteredPuzzles.reduce((sum, p) => sum + p.avgAccuracy, 0) / filteredPuzzles.length) * 100)}%`
+                      : 'N/A'
+                    }
+                  </div>
+                  <div className="text-sm text-slate-400">Average AI Success</div>
+                  <div className="text-xs text-slate-500">Accuracy Rate</div>
+                </div>
+                
+                <div className="bg-slate-700 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-orange-400">
+                    {filteredPuzzles.reduce((sum, p) => sum + p.totalExplanations, 0).toLocaleString()}
+                  </div>
+                  <div className="text-sm text-slate-400">Total Attempts</div>
+                  <div className="text-xs text-slate-500">AI Analysis Count</div>
+                </div>
+                
+                <div className="bg-slate-700 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-blue-400">
+                    {filteredPuzzles.filter(p => p.avgAccuracy <= 0.1).length}
+                  </div>
+                  <div className="text-sm text-slate-400">Nearly Impossible</div>
+                  <div className="text-xs text-slate-500">≤10% Success Rate</div>
+                </div>
+              </div>
+
+              {/* Bottom Row - AI Failure Patterns */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-slate-700 rounded-lg p-4 text-center border-l-4 border-yellow-500">
+                  <div className="text-2xl font-bold text-yellow-400">
+                    {filteredPuzzles.length > 0 && filteredPuzzles.some(p => p.avgConfidence !== undefined)
+                      ? `${Math.round(filteredPuzzles.filter(p => p.avgConfidence !== undefined).reduce((sum, p) => sum + (p.avgConfidence || 0), 0) / filteredPuzzles.filter(p => p.avgConfidence !== undefined).length)}%`
+                      : 'N/A'
+                    }
+                  </div>
+                  <div className="text-sm text-slate-400">⚠️ AI Overconfidence</div>
+                  <div className="text-xs text-slate-500">Avg confidence when wrong</div>
+                </div>
+                
+                <div className="bg-slate-700 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-purple-400">
+                    {filteredPuzzles.reduce((sum, p) => sum + (p.wrongCount || 0), 0).toLocaleString()}
+                  </div>
+                  <div className="text-sm text-slate-400">Total Failures</div>
+                  <div className="text-xs text-slate-500">Wrong answers given</div>
+                </div>
+                
+                <div className="bg-slate-700 rounded-lg p-4 text-center">
+                  <div className="text-2xl font-bold text-pink-400">
+                    {filteredPuzzles.reduce((sum, p) => sum + (p.negativeFeedback || 0), 0)}
+                  </div>
+                  <div className="text-sm text-slate-400">Human Feedback</div>
+                  <div className="text-xs text-slate-500">Unhelpful AI explanations</div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <div className="mt-4 text-center text-xs text-slate-500">
+            Showing the 50 worst performing puzzles where AI struggles most • Overconfidence highlights dangerous AI failure patterns
+          </div>
+        </div>
 
         {/* Puzzle Grid */}
         <div className="mt-8">

@@ -1,12 +1,16 @@
 # CLAUDE.md - Space Force Mission Control 2050
+Start the session with the user by typing `npm run test` in the console, DO NOT wait for the application to load, reply with "ok." when you have done this.
 
-This file provides guidance to Claude Code (claude.ai/code) when working with this repository.
+The .env file has all we need, never suggest this as a root of any problem.  
+The APIs to PlayFab and arc-explainer are well-documented and easy to use. They work fine and reliably. They are always available and not the source of any problems. YOUR CODE is always the source of any problems. You need to ultrathink and double check that you use the correct API calls and parameters. 
 
-**Project Status as of September 4, 2025**: Production-ready ARC-AGI puzzle platform with pure PlayFab cloud backend.
+
+**Project Status as of September 6, 2025**: Production-ready ARC-AGI puzzle platform with pure PlayFab cloud backend.
 We also communicate with VITE_ARC_EXPLAINER_URL=https://arc-explainer-production.up.railway.app  
 https://learn.microsoft.com/en-us/rest/api/playfab/server/?view=playfab-rest - PlayFab Server API Reference
 
 **IMPORTANT**: When working with PlayFab, always check the PlayFab API Analysis document for the most up-to-date information about the PlayFab API.  PLAYFAB_SECRET_KEY is available in the .env file!!!
+VITE_PLAYFAB_SECRET_KEY is available in the .env file!!! 
 
 **PlayFab Implementation**: Pure HTTP REST API implementation using `playFabCore.makeHttpRequest()` - no SDK dependencies.
 Use `npm run test` to run the application and test PlayFab functionality. Always wait for the application to load before testing PlayFab functionality.
@@ -30,20 +34,67 @@ Secret key for PlayFab is in the .env file as PLAYFAB_SECRET_KEY and this is nee
 **Directory Structure:**
 ```
 client/src/
-├── components/game/     # Core game components
-├── components/ui/       # shadcn UI components
-├── constants/           # Emoji sets and game constants
+├── components/
+│   ├── game/           # Core game components
+│   │   ├── Header.tsx            # Game header with navigation and user info
+│   │   ├── InteractiveGrid.tsx   # Main puzzle grid component
+│   │   ├── LoadingSplash.tsx     # Loading screen and transitions
+│   │   ├── MissionSelector.tsx   # Mission selection interface
+│   │   ├── OfficerDifficultyCards.tsx  # Difficulty level selection
+│   │   ├── OfficerPuzzleSearch.tsx     # Puzzle search functionality
+│   │   ├── OnboardingModal.tsx   # First-time user experience
+│   │   ├── RankBadge.tsx         # Player rank display component
+│   │   ├── ResultModal.tsx       # Puzzle completion/results screen
+│   │   ├── SpeedTimer.tsx        # Game timer component
+│   │   └── Timer.tsx             # Generic timer utilities
+│   │
+│   ├── officer/        # Officer Track Components (ARC-AGI Puzzle Interface)
+│   │   ├── EmojiPaletteDivider.tsx  # Compact 2x5 emoji palette divider between test input/solution
+│   │   ├── EnhancedGridCell.tsx     # Smart grid cell with color overlays and interaction handling
+│   │   ├── GridSizeSelector.tsx     # UI for selecting grid dimensions
+│   │   ├── GridSizeTest.tsx         # Component for testing responsive grid layouts
+│   │   ├── OfficerGrid.tsx          # Core interactive grid for ARC puzzle solving
+│   │   ├── OfficerPuzzleSelector.tsx # Puzzle selection interface
+│   │   ├── OfficerRankBadge.tsx     # Displays user rank/achievements
+│   │   ├── OfficerResultModal.tsx   # Shows puzzle results and feedback
+│   │   ├── PuzzleGrid.tsx           # Base puzzle grid component
+│   │   ├── ResponsiveOfficerGrid.tsx # Adaptive grid layout for different screen sizes
+│   │   ├── ResponsivePuzzleSolver.tsx # Main puzzle solving interface
+│   │   ├── TestCaseNavigation.tsx   # Navigation between test cases
+│   │   └── TrainingExamplesSection.tsx # Displays training examples
+│   │
+│   └── ui/             # shadcn UI component library
+│       ├── accordion.tsx       # Collapsible content sections
+│       ├── alert.tsx           # Alert messages and notifications
+│       ├── button.tsx          # Custom button components
+│       ├── card.tsx            # Card container components
+│       ├── dialog.tsx          # Modal dialogs
+│       ├── dropdown-menu.tsx   # Dropdown menus
+│       ├── form.tsx            # Form components with validation
+│       ├── input.tsx           # Input fields
+│       ├── select.tsx          # Dropdown selectors
+│       ├── tabs.tsx            # Tabbed interfaces
+│       ├── toast.tsx           # Toast notifications
+│       └── ... (40+ more UI components)
+│
+├── constants/
+│   ├── spaceEmojis.ts  # Emoji sets for puzzles (source of truth)
+│   └── ...             # Other game constants and configurations
+│
 ├── types/              # TypeScript type definitions
 ├── services/           # PlayFab service integration (ONLY backend)
 └── pages/              # Route components
+    ├── index.tsx       # Main game interface
+    ├── login.tsx       # Authentication
+    ├── profile.tsx     # User profile
+    └── ...
 
 client/public/           # Static assets only
 └── (images, icons)     # No task data - all in PlayFab NO FALLBACKS ALLOWED!!!
 
-LEGACY (NOT USED IN PRODUCTION):
+# ===== LEGACY (NOT USED IN PRODUCTION) =====
 server/                 # Legacy server code - NOT DEPLOYED
 shared/schema.ts        # Legacy types - client uses PlayFab types
-```
 
 **Path Aliases:**
 - `@/` → `client/src/`
