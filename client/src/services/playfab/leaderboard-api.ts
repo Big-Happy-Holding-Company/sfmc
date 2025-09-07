@@ -1,6 +1,7 @@
 /**
  * Leaderboard API Layer
  * Author: Cascade
+ * Date: 2025-09-07
  * 
  * PURPOSE:
  * Single responsibility: PlayFab HTTP communication only.

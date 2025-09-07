@@ -1,6 +1,7 @@
 /**
  * Leaderboard Cache Manager
  * Author: Cascade
+ * Date: 2025-09-07
  * 
  * PURPOSE:
  * Single responsibility: manage leaderboard caching across all types.
