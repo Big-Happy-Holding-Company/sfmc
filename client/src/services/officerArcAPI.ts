@@ -15,6 +15,12 @@ export interface OfficerPuzzle {
   difficulty: 'practically_impossible' | 'most_llms_fail' | 'unreliable';
   totalExplanations: number;
   compositeScore: number;
+  // Rich failure metadata
+  avgConfidence?: number;       // AI confidence when failing (0-100)
+  wrongCount?: number;          // Total wrong attempts
+  totalFeedback?: number;       // Human feedback attempts
+  negativeFeedback?: number;    // Negative human feedback count
+  latestAnalysis?: string;      // ISO date of last analysis
 }
 
 export interface DifficultyStats {
@@ -208,7 +214,13 @@ export async function getEvaluation2Puzzles(): Promise<OfficerPuzzleResponse> {
         avgAccuracy: accuracy,
         difficulty: categorizeDifficulty(accuracy, explanations > 0),
         totalExplanations: explanations,
-        compositeScore: perfData.compositeScore || 0
+        compositeScore: perfData.compositeScore || 0,
+        // Rich failure metadata
+        avgConfidence: perfData.avgConfidence,
+        wrongCount: perfData.wrongCount,
+        totalFeedback: perfData.totalFeedback,
+        negativeFeedback: perfData.negativeFeedback,
+        latestAnalysis: perfData.latestAnalysis
       };
     });
     
