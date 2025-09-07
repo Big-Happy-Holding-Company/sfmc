@@ -114,9 +114,9 @@ export function PlayerRow({ entry, isEven }: PlayerRowProps) {
       <td className="py-4 px-6 text-right">
         <div className={`
           text-sm font-medium
-          ${isCurrentPlayer ? 'text-blue-300' : 'text-orange-400'}
+          ${isCurrentPlayer ? 'text-blue-300' : 'text-gray-500'}
         `}>
-          {entry.AttemptCount || 'N/A'}
+          {entry.AttemptCount !== undefined ? entry.AttemptCount : '-'}
         </div>
         <div className="text-xs text-gray-400">attempts</div>
       </td>
