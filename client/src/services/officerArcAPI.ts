@@ -12,16 +12,15 @@ export interface OfficerPuzzle {
   id: string;                    // ARC ID (e.g., "007bbfb7")
   playFabId: string;            // PlayFab format (e.g., "ARC-TR-007bbfb7")
   avgAccuracy: number;          // 0.0 to 1.0
-  difficulty: 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging';
+  difficulty: 'practically_impossible' | 'most_llms_fail' | 'unreliable';
   totalExplanations: number;
   compositeScore: number;
 }
 
 export interface DifficultyStats {
-  impossible: number;
-  extremely_hard: number;
-  very_hard: number;
-  challenging: number;
+  practically_impossible: number;
+  most_llms_fail: number;
+  unreliable: number;
   total: number;
 }
 
@@ -163,12 +162,13 @@ export function playFabToArcId(playFabId: string): string {
 /**
  * Categorize puzzle difficulty based on AI accuracy
  */
-export function categorizeDifficulty(accuracy: number, hasData: boolean = true): 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging' {
-  // If no data or accuracy is exactly 0, consider it impossible
-  if (!hasData || accuracy === 0) return 'impossible';
-  if (accuracy <= 0.25) return 'extremely_hard';
-  if (accuracy <= 0.50) return 'very_hard';
-  return 'challenging';
+export function categorizeDifficulty(accuracy: number, hasData: boolean = true): 'practically_impossible' | 'most_llms_fail' | 'unreliable' {
+  // Convert to percentage for clearer thresholds
+  const percentage = accuracy * 100;
+  
+  if (percentage <= 10) return 'practically_impossible';  // 0-10%
+  if (percentage <= 50) return 'most_llms_fail';         // 10-50%
+  return 'unreliable';                                   // 50-100%
 }
 
 /**
@@ -182,12 +182,13 @@ export async function getEvaluation2Puzzles(): Promise<OfficerPuzzleResponse> {
     // Get 50 worst performing puzzles (server limit) with rich metadata
     const response = await makeAPICall('/api/puzzle/worst-performing?limit=50&sortBy=composite');
     
-    // Check the actual response structure from your investigation
-    const puzzleData = response?.data?.performanceData || response?.data?.puzzles || response?.puzzles;
-    if (!puzzleData) {
+    // The actual structure is response.data.puzzles (confirmed by API test)
+    if (!response?.data?.puzzles) {
       console.error('❌ Arc-explainer response structure:', response);
       throw new Error('No puzzle data found in arc-explainer API response');
     }
+    
+    const puzzleData = response.data.puzzles;
     
     console.log(`📊 Arc-explainer returned ${puzzleData.length} worst performing puzzles with rich metadata`);
     
@@ -195,18 +196,25 @@ export async function getEvaluation2Puzzles(): Promise<OfficerPuzzleResponse> {
     const worstPerformingPuzzles = puzzleData;
     
     // Convert to our format with rich arc-explainer metadata - keep original arc IDs
-    const enrichedPuzzles: OfficerPuzzle[] = worstPerformingPuzzles.map((puzzle: any) => ({
-      id: puzzle.id, // Keep original arc ID (e.g., "007bbfb7")  
-      playFabId: puzzle.id, // Same as ID for discovery - PlayFab only needed when solving
-      avgAccuracy: puzzle.avgAccuracy || 0,
-      difficulty: categorizeDifficulty(puzzle.avgAccuracy || 0, puzzle.totalExplanations > 0),
-      totalExplanations: puzzle.totalExplanations || 0,
-      compositeScore: puzzle.compositeScore || 0
-    }));
+    const enrichedPuzzles: OfficerPuzzle[] = worstPerformingPuzzles.map((puzzle: any) => {
+      // Performance data is nested in performanceData object
+      const perfData = puzzle.performanceData || {};
+      const accuracy = perfData.avgAccuracy || 0;
+      const explanations = perfData.totalExplanations || 0;
+      
+      return {
+        id: puzzle.id, // Keep original arc ID (e.g., "007bbfb7")  
+        playFabId: puzzle.id, // Same as ID for discovery - PlayFab only needed when solving
+        avgAccuracy: accuracy,
+        difficulty: categorizeDifficulty(accuracy, explanations > 0),
+        totalExplanations: explanations,
+        compositeScore: perfData.compositeScore || 0
+      };
+    });
     
     // Sort by difficulty and performance (hardest first)
     enrichedPuzzles.sort((a, b) => {
-      const difficultyOrder = { impossible: 0, extremely_hard: 1, very_hard: 2, challenging: 3 };
+      const difficultyOrder = { practically_impossible: 0, most_llms_fail: 1, unreliable: 2 };
       const aDiff = difficultyOrder[a.difficulty];
       const bDiff = difficultyOrder[b.difficulty];
       if (aDiff !== bDiff) return aDiff - bDiff;
@@ -220,12 +228,12 @@ export async function getEvaluation2Puzzles(): Promise<OfficerPuzzleResponse> {
     }, {} as Record<string, number>);
     
     const avgAccuracy = enrichedPuzzles.reduce((sum, p) => sum + p.avgAccuracy, 0) / enrichedPuzzles.length;
-    const impossiblePuzzles = enrichedPuzzles.filter(p => p.difficulty === 'impossible').length;
+    const practicallyImpossible = enrichedPuzzles.filter(p => p.difficulty === 'practically_impossible').length;
     
     console.log(`✅ Loaded ${enrichedPuzzles.length} worst performing puzzles with rich metadata`);
     console.log(`📊 Difficulty breakdown:`, difficultyBreakdown);
     console.log(`🔥 Average AI accuracy: ${avgAccuracy.toFixed(3)}`);
-    console.log(`💀 Impossible puzzles (0% accuracy): ${impossiblePuzzles}`);
+    console.log(`💀 Practically impossible puzzles (≤10% accuracy): ${practicallyImpossible}`);
     
     return {
       puzzles: enrichedPuzzles,
@@ -266,7 +274,7 @@ export async function getDifficultyStats(): Promise<DifficultyStats> {
 /**
  * Filter evaluation2 puzzles by difficulty
  */
-export async function getPuzzlesByDifficulty(difficulty: 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging'): Promise<OfficerPuzzle[]> {
+export async function getPuzzlesByDifficulty(difficulty: 'practically_impossible' | 'most_llms_fail' | 'unreliable'): Promise<OfficerPuzzle[]> {
   const response = await getEvaluation2Puzzles();
   return response.puzzles.filter(p => p.difficulty === difficulty);
 }
