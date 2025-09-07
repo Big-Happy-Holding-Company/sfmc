@@ -380,9 +380,12 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                   >
                     <option value="tech_set1">Tech Set 1</option>
                     <option value="tech_set2">Tech Set 2</option>
-                    <option value="nature_set1">Nature Set 1</option>
-                    <option value="space_set1">Space Set 1</option>
-                    <option value="geometric_set1">Geometric Set 1</option>
+                    <option value="celestial_set1">Celestial Set 1</option>
+                    <option value="celestial_set2">Celestial Set 2</option>
+                    <option value="status_alerts">Status Alerts</option>
+                    <option value="weather_climate">Weather Climate</option>
+                    <option value="ai_emojis">AI Systems</option>
+                    <option value="status_emojis">Human Crew</option>
                   </select>
                 )}
               </div>
