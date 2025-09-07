@@ -32,7 +32,7 @@ interface LoadingSplashProps {
   duration?: number; // Duration in ms (default 1000)
 }
 
-export function LoadingSplash({ onComplete, duration = 2000 }: LoadingSplashProps) {
+export function LoadingSplash({ onComplete, duration = 3000 }: LoadingSplashProps) {
   const [progress, setProgress] = useState(0);
   const [emojiRow, setEmojiRow] = useState<string[]>([]);
   const [isExiting, setIsExiting] = useState(false);
@@ -81,7 +81,7 @@ export function LoadingSplash({ onComplete, duration = 2000 }: LoadingSplashProp
       
       // Cycle to next image every 100ms to show all images within 1 second
       setCurrentImageIndex(prev => (prev + 1) % TRAINER_IMAGES.length);
-    }, 100); // Change image every 100ms
+    }, 300); // Change image every 100ms
 
     return () => {
       clearInterval(progressInterval);

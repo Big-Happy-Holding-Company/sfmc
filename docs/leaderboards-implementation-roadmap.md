@@ -10,52 +10,53 @@
 ## Project Status Summary
 
 **READY FOR IMPLEMENTATION** - All PlayFab infrastructure exists and is production-ready:
-- ✅ Two active leaderboard statistics (`LevelPoints`, `OfficerTrackPoints`)
+- NEEDS INVESTIGATION: PlayFab already has Two active leaderboard statistics (`LevelPoints`, `OfficerTrackPoints`)  do simple for now LevelPoints is 1 per puzzle solved and OfficerTrackPoints is 10 per ARC puzzle solved (make sure this is what PlayFab is doing!)
 - ✅ Comprehensive PlayFab service layer with caching and error handling
 - ✅ Rich player profile system with avatars and display names
 - ✅ Advanced event logging and analytics data
-- ✅ 20+ exploration and management scripts for PlayFab integration
+- ✅ 20+ exploration and management scripts useful for PlayFab integration located in `D:\1Projects\sfmc\scripts`
 
 ---
+## Phase 1: Data Architecture (1 day)
 
-## Phase 1: Service Layer Enhancement (1-2 days)
+### Task 1.1: Statistics Expansion
+**Review**: Current statistics structure in PlayFab Game Manager
+- Verify existing `LevelPoints` and `OfficerTrackPoints` configuration (ask user what to do after you present your findings!!!)
+- Ask user about additional statistics if found
+- Document statistic reset schedules for temporal leaderboards
 
-### Task 1.1: Extend Leaderboard Service
+### Task 1.2: Event Data Mining
+**Files**: Review event logging in `client/src/services/playfab/events.ts`
+- Map event data to leaderboard categories
+- Identify performance metrics for advanced rankings
+- Plan event aggregation strategies for temporal data
+
+---
+## Phase 2: Service Layer Enhancement (1-2 days)
+
+### Task 2.1: Extend Leaderboard Service
 **File**: `client/src/services/playfab/leaderboards.ts`
 - Add methods for multiple statistics simultaneously
-- Implement category-based filtering (COM, NAV, PWR, SEC, etc.)
-- Add rank-based leaderboard segmentation
+- Implement category-based filtering (ARC vs non-ARC and specfic ARC datasets)
+- Add speed-based leaderboard support
+- Add comparison data from arc-explainer API (already exists in OfficerTrack service)
 - Create temporal leaderboard support (daily/weekly/monthly)
 
-### Task 1.2: Profile Integration Enhancement  
+### Task 2.2: Profile Integration Enhancement  
 **File**: `client/src/services/playfab/profiles.ts`
 - Enhance bulk profile loading for leaderboard entries
 - Add achievement data retrieval
 - Implement avatar caching optimizations
 - Add social features preparation (friend comparisons)
+- Create UI or use PlayFab solutions to Allow users to set a custom display name (already exists in PlayFab)
+- Create UI or use PlayFab solutions to Allow users to upload custom avatars (already exists in PlayFab)
 
-### Task 1.3: Analytics Service Creation
+### Task 2.3: Analytics Service Creation  THIS SHOULD BE DELAYED FOR LAST!!  NOT UNTIL YOU ARE SURE EVERYTHING ELSE IS WORKING!
 **File**: `client/src/services/playfab/analytics.ts` (new)
 - Aggregate event data for performance leaderboards
 - Calculate speed rankings, accuracy metrics
 - Track completion streaks and achievement milestones
 - Generate player performance summaries
-
----
-
-## Phase 2: Data Architecture (1 day)
-
-### Task 2.1: Statistics Expansion
-**Review**: Current statistics structure in PlayFab Game Manager
-- Verify existing `LevelPoints` and `OfficerTrackPoints` configuration
-- Plan additional statistics if needed (speed rankings, category leaders)
-- Document statistic reset schedules for temporal leaderboards
-
-### Task 2.2: Event Data Mining
-**Files**: Review event logging in `client/src/services/playfab/events.ts`
-- Map event data to leaderboard categories
-- Identify performance metrics for advanced rankings
-- Plan event aggregation strategies for temporal data
 
 ---
 
@@ -75,7 +76,7 @@
 - `PlayerRow.tsx` - Individual player entry with avatar, rank, stats
 - `LeaderboardFilters.tsx` - Category, time period, rank filtering
 - `PlayerProfile.tsx` - Expandable player details modal
-- `RankBadge.tsx` - Military rank display (reuse existing if available)
+- `RankBadge.tsx` -  rank display (reuse existing if available)
 
 ### Task 3.3: State Management Strategy
 **Approach**: Local state with service layer integration
@@ -90,8 +91,8 @@
 ### Task 4.1: Primary Leaderboard Views
 **Priority Order**:
 1. **Global Leaderboard** - All players ranked by total points
-2. **Category Leaderboards** - Separate rankings by task categories
-3. **Rank-Based Leaderboards** - Players segmented by military rank
+2. **Speed Leaderboard** - Fastest puzzle completions
+3. **Streak Leaderboard** - Consecutive puzzle completions
 4. **Officer Track Leaderboard** - ARC puzzle specialists
 
 ### Task 4.2: Player Profile Integration
@@ -108,19 +109,7 @@
 
 ---
 
-## Phase 5: Advanced Features (2-3 days)
-
-### Task 5.1: Temporal Leaderboards
-- Daily/Weekly/Monthly competition cycles
-- Historical leaderboard data preservation
-- Season/period navigation interface
-- Reset schedule management
-
-### Task 5.2: Social Features
-- Friend system integration (if PlayFab friends available)
-- "Players Near Me" ranking view  
-- Rank comparison tools
-- Challenge/rivalry features
+## Phase 5: Advanced Features 
 
 ### Task 5.3: Performance Analytics
 - Speed leaderboards (fastest completion times)
@@ -138,14 +127,8 @@
 - Optimize avatar loading and caching
 - Add loading states and skeleton screens
 
-### Task 6.2: Mobile Responsiveness
-- Ensure leaderboard tables work on mobile devices
-- Implement swipe gestures for tab navigation
-- Optimize touch interactions for player profiles
-
 ### Task 6.3: Error Handling & Fallbacks
 - Handle PlayFab service failures gracefully
-- Add offline/cached data display
 - Implement retry mechanisms for failed requests
 
 ---
@@ -163,7 +146,7 @@
 - Implement smart refresh strategies
 
 ### Scalability
-- Current architecture supports thousands of players
+- Current architecture supports thousands of players and is more than enough
 - Consider pagination strategies for growth
 - Monitor PlayFab service performance metrics
 
@@ -202,5 +185,5 @@
 
 ### Deployment Considerations
 - Feature can be deployed incrementally (phase by phase)
-- No backend changes required (pure frontend implementation)
+- No backend changes required (pure frontend implementation)  
 - Uses existing PlayFab configuration and data
