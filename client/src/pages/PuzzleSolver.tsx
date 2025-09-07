@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import { AlertTriangle, ArrowLeft } from 'lucide-react';
 import { ResponsivePuzzleSolver } from '@/components/officer/ResponsivePuzzleSolver';
 import { playFabService } from '@/services/playfab';
+import { loadPuzzleFromPlayFab } from '@/services/officerArcAPI';
 import type { OfficerTrackPuzzle } from '@/types/arcTypes';
 
 export default function PuzzleSolver() {
@@ -66,7 +67,6 @@ export default function PuzzleSolver() {
         setPlayFabReady(true);
 
         // Load puzzle data
-        const { loadPuzzleFromPlayFab } = await import('@/services/officerArcAPI');
         const puzzleData = await loadPuzzleFromPlayFab(puzzleId);
         
         if (puzzleData) {
