@@ -8,7 +8,6 @@
 import { useState, useEffect } from 'react';
 import { 
   getEvaluation2Puzzles,
-  getOfficerPuzzles, 
   getDifficultyStats, 
   getPuzzlesByDifficulty,
   searchPuzzleById,
@@ -236,23 +235,4 @@ export function useOfficerPuzzles(
     currentLimit,
     currentSortStrategy
   };
-}
-
-// Enhanced API call with multiple sorting strategies
-async function getOfficerPuzzlesWithStrategy(limit: number, sortBy: SortStrategy): Promise<{ puzzles: OfficerPuzzle[]; total: number }> {
-  // Map our sort strategies to arc-explainer API parameters
-  const sortMap: Record<SortStrategy, string> = {
-    'composite': 'composite',
-    'accuracy': 'accuracy', 
-    'explanations': 'explanations',
-    'difficulty': 'difficulty',
-    'recent': 'recent'
-  };
-  
-  const apiSortBy = sortMap[sortBy] || 'composite';
-  
-  console.log(`🎯 Calling arc-explainer worst-performing API with sortBy=${apiSortBy}, limit=${limit}`);
-  
-  // Actually pass the sortBy parameter to leverage arc-explainer's rich metadata sorting
-  return await getOfficerPuzzles(limit, apiSortBy);
 }

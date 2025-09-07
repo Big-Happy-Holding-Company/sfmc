@@ -199,8 +199,8 @@ export async function getEvaluation2Puzzles(): Promise<OfficerPuzzleResponse> {
     
     // Convert to our format with rich arc-explainer metadata
     const enrichedPuzzles: OfficerPuzzle[] = evaluation2Puzzles.map((puzzle: any) => ({
-      id: arcIdToPlayFab(puzzle.id, 'evaluation2'), // Convert to PlayFab format (ARC-E2-xxxxx)
-      playFabId: arcIdToPlayFab(puzzle.id, 'evaluation2'),
+      id: puzzle.id, // Keep original arc ID (e.g., "007bbfb7")
+      playFabId: arcIdToPlayFab(puzzle.id, 'evaluation2'), // PlayFab format (ARC-E2-xxxxx)
       avgAccuracy: puzzle.avgAccuracy || 0,
       difficulty: categorizeDifficulty(puzzle.avgAccuracy || 0, puzzle.totalExplanations > 0),
       totalExplanations: puzzle.totalExplanations || 0,
@@ -241,66 +241,13 @@ export async function getEvaluation2Puzzles(): Promise<OfficerPuzzleResponse> {
   }
 }
 
-/**
- * LEGACY: Get puzzles from arc-explainer with dynamic sorting strategies
- * Now supports multiple sorting approaches to get truly worst-performing puzzles
- */
-export async function getOfficerPuzzles(
-  limit: number = 50, 
-  sortBy: string = 'composite'
-): Promise<OfficerPuzzleResponse> {
-  try {
-    console.log(`🔄 Getting ${limit} puzzles from arc-explainer (sortBy: ${sortBy})...`);
-    
-    // Use dynamic sortBy parameter instead of hardcoded 'composite'
-    const data = await makeAPICall(`/api/puzzle/worst-performing?limit=${limit}&sortBy=${sortBy}`);
-    
-    // Simple: get puzzles from arc-explainer response
-    const rawPuzzles = data.data?.puzzles || [];
-    const total = data.data?.total || rawPuzzles.length;
-    
-    console.log(`📊 Arc-explainer returned ${rawPuzzles.length} puzzles with ${sortBy} sorting`);
-    
-    // Convert to our format with rich metadata preservation
-    const puzzles: OfficerPuzzle[] = rawPuzzles.map((p: any) => ({
-      id: p.id,
-      playFabId: p.id,
-      avgAccuracy: p.avgAccuracy || 0,
-      difficulty: categorizeDifficulty(p.avgAccuracy || 0, p.totalExplanations > 0),
-      totalExplanations: p.totalExplanations || 0,
-      compositeScore: p.compositeScore || 0
-    }));
-    
-    // Log insights about the worst-performing puzzles we got
-    if (puzzles.length > 0) {
-      const avgAccuracy = puzzles.reduce((sum, p) => sum + p.avgAccuracy, 0) / puzzles.length;
-      const worstAccuracy = Math.min(...puzzles.map(p => p.avgAccuracy));
-      const difficultyBreakdown = puzzles.reduce((acc, p) => {
-        acc[p.difficulty] = (acc[p.difficulty] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-      
-      console.log(`🎯 Worst-performing puzzle set (${sortBy}):`, {
-        avgAccuracy: avgAccuracy.toFixed(3),
-        worstAccuracy: worstAccuracy.toFixed(3),
-        difficultyBreakdown
-      });
-    }
-      
-    return { puzzles, total };
-    
-  } catch (error) {
-    console.error('❌ Failed to fetch officer puzzles:', error);
-    throw error;
-  }
-}
 
 /**
- * Get difficulty statistics
+ * Get difficulty statistics from evaluation2 puzzles
  */
 export async function getDifficultyStats(): Promise<DifficultyStats> {
-  console.log('🔍 Calculating difficulty statistics...');
-  const response = await getOfficerPuzzles(200); // Get larger sample for better stats
+  console.log('🔍 Calculating difficulty statistics from evaluation2 dataset...');
+  const response = await getEvaluation2Puzzles(); // Use evaluation2 dataset
   
   const stats: DifficultyStats = {
     impossible: 0,
@@ -310,38 +257,20 @@ export async function getDifficultyStats(): Promise<DifficultyStats> {
     total: response.total // Use real database total
   };
   
-  // Track some examples of each difficulty
-  const examples: Record<string, any> = {
-    impossible: [],
-    extremely_hard: [],
-    very_hard: [],
-    challenging: []
-  };
-  
   response.puzzles.forEach(puzzle => {
     stats[puzzle.difficulty]++;
-    
-    // Keep up to 3 examples of each difficulty
-    if (examples[puzzle.difficulty].length < 3) {
-      examples[puzzle.difficulty].push({
-        id: puzzle.id,
-        accuracy: puzzle.avgAccuracy,
-        explanations: puzzle.totalExplanations
-      });
-    }
   });
   
-  console.log('📊 Difficulty distribution:', stats);
-  console.log('🔍 Examples by difficulty:', JSON.stringify(examples, null, 2));
+  console.log('📊 Evaluation2 difficulty distribution:', stats);
   
   return stats;
 }
 
 /**
- * Filter puzzles by difficulty
+ * Filter evaluation2 puzzles by difficulty
  */
 export async function getPuzzlesByDifficulty(difficulty: 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging'): Promise<OfficerPuzzle[]> {
-  const response = await getOfficerPuzzles(200);
+  const response = await getEvaluation2Puzzles();
   return response.puzzles.filter(p => p.difficulty === difficulty);
 }
 
