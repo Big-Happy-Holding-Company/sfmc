@@ -1,6 +1,8 @@
 # PlayFab API Discovery Results
-**Date:** 2025-01-27  
-**Title ID:** 19FACB
+**Date:** 2025-09-07
+**Title ID:** 19FACB All details are in the .env file
+**PlayFab API Reference:** https://learn.microsoft.com/en-us/rest/api/playfab/server/?view=playfab-rest
+**PlayFab Documentation:** https://learn.microsoft.com/en-us/gaming/playfab/api-reference/
 
 ## Key Findings
 
@@ -11,30 +13,6 @@
 
 ### Data Storage Structure
 
-#### Title Data (GetTitleData)
-- **Available Keys:** `["LastAnonNumber"]`  
-- **Content:** Only contains `"LastAnonNumber": "5"`
-- ❌ **No game tasks stored here**
-
-#### User Data (GetUserData)  
-- **New User Data:** Empty (`{}`)
-- **DataVersion:** 0
-- Structure exists for player progress storage
-
-#### Player Statistics (GetPlayerStatistics)
-- **Available Statistics:** Empty array `[]`
-- Structure exists for game metrics
-
-#### Catalog Items (GetCatalogItems)
-- **Available Items:** Empty array `[]`  
-- Not used for game content storage
-
-#### CloudScript Functions
-- ✅ **"GetTasks" function detected** but returns `CloudScriptNotFound`
-- This suggests Unity version uses CloudScript API for data retrieval
-- **Hypothesis:** Game data is served via CloudScript, not direct Title Data
-
-## Unity Version Integration Point
 
 Based on the CloudScript function discovery, the Unity version likely:
 

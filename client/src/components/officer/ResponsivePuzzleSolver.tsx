@@ -17,6 +17,7 @@ import type { OfficerTrackPuzzle, ARCGrid } from '@/types/arcTypes';
 import type { DisplayMode, PuzzleDisplayState } from '@/types/puzzleDisplayTypes';
 import type { EmojiSet } from '@/constants/spaceEmojis';
 import { playFabValidation } from '@/services/playfab/validation';
+import { playFabEvents } from '@/services/playfab/events';
 
 interface ResponsivePuzzleSolverProps {
   puzzle: OfficerTrackPuzzle;
@@ -42,6 +43,12 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
   const [isValidating, setIsValidating] = useState(false);
   const [validationResult, setValidationResult] = useState<any>(null);
   const [validationError, setValidationError] = useState<string | null>(null);
+
+  // Session tracking state
+  const [sessionId] = useState(() => crypto.randomUUID());
+  const [sessionStartTime] = useState(() => Date.now());
+  const [stepIndex, setStepIndex] = useState(0);
+  const [attemptId] = useState(1);
 
   const totalTests = puzzle.test?.length || 0;
   const currentTest = puzzle.test?.[currentTestIndex];
@@ -74,6 +81,79 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
       setCompletedTests(newCompleted);
     }
   }, [puzzle.test]);
+
+  // Initialize session and log puzzle start event
+  useEffect(() => {
+    const logSessionStart = async () => {
+      try {
+        await playFabEvents.logPuzzleEvent(
+          "SFMC",                    // eventName
+          sessionId,                 // sessionId
+          attemptId,                 // attemptId
+          puzzle.id,                 // game_id (puzzle ID)
+          stepIndex,                 // stepIndex (starts at 0)
+          0,                         // positionX
+          0,                         // positionY
+          {                          // payloadSummary
+            totalTests: totalTests,
+            trainingExamples: trainingExamples.length,
+            puzzleId: puzzle.id
+          },
+          0,                         // deltaMs (0 for start)
+          "Officer Track Puzzle",    // game_title
+          "start",                   // status
+          "officer-track",           // category
+          "game_start",             // event_type
+          0,                         // selection_value
+          new Date().toISOString()   // game_time
+        );
+        
+        console.log('📊 Puzzle session started:', { sessionId, puzzleId: puzzle.id, totalTests });
+      } catch (error) {
+        console.error('Failed to log session start:', error);
+        // Don't throw - event logging should not break the game
+      }
+    };
+
+    logSessionStart();
+
+    // Cleanup function to log session end when component unmounts
+    return () => {
+      const logSessionEnd = async () => {
+        try {
+          const sessionDuration = Date.now() - sessionStartTime;
+          await playFabEvents.logPuzzleEvent(
+            "SFMC",                    // eventName
+            sessionId,                 // sessionId
+            attemptId,                 // attemptId
+            puzzle.id,                 // game_id (puzzle ID)
+            stepIndex + 1,             // stepIndex (increment for final step)
+            0,                         // positionX
+            0,                         // positionY
+            {                          // payloadSummary
+              sessionDurationMs: sessionDuration,
+              finalStepIndex: stepIndex,
+              puzzleId: puzzle.id
+            },
+            sessionDuration,           // deltaMs (total session time)
+            "Officer Track Puzzle",    // game_title
+            "stop",                    // status
+            "officer-track",           // category
+            "game_completion",         // event_type
+            0,                         // selection_value
+            new Date().toISOString()   // game_time
+          );
+          
+          console.log('📊 Puzzle session ended:', { sessionId, duration: sessionDuration });
+        } catch (error) {
+          console.error('Failed to log session end:', error);
+          // Don't throw - event logging should not break the game
+        }
+      };
+
+      logSessionEnd();
+    };
+  }, [sessionId, attemptId, puzzle.id, stepIndex, totalTests, trainingExamples.length, sessionStartTime]);
 
   // Determine if grids are large (need special layout)
   const isLargeGrid = (grid: ARCGrid) => {
@@ -108,8 +188,48 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
     return suggestions.slice(0, 4); // Limit to 4 suggestions
   };
 
+  // Helper function to log player actions and increment step index
+  const logPlayerAction = async (
+    eventType: string,
+    positionX: number,
+    positionY: number,
+    payloadSummary: object | null,
+    status: "won" | "fail" | "stop" | "start" = "start"
+  ) => {
+    try {
+      const currentTime = Date.now();
+      const deltaMs = currentTime - sessionStartTime;
+      
+      await playFabEvents.logPuzzleEvent(
+        "SFMC",                    // eventName
+        sessionId,                 // sessionId
+        attemptId,                 // attemptId
+        puzzle.id,                 // game_id (puzzle ID)
+        stepIndex,                 // stepIndex (current step)
+        positionX,                 // positionX
+        positionY,                 // positionY
+        payloadSummary,            // payloadSummary
+        deltaMs,                   // deltaMs (time since session start)
+        "Officer Track Puzzle",    // game_title
+        status,                    // status
+        "officer-track",           // category
+        "player_action",           // event_type
+        displayState.selectedValue,// selection_value
+        new Date().toISOString()   // game_time
+      );
+      
+      // Increment step index for next action
+      setStepIndex(prev => prev + 1);
+    } catch (error) {
+      console.error('Failed to log player action:', error);
+      // Don't throw - event logging should not break the game
+    }
+  };
+
   // Handle output size change for current test
   const handleSizeChange = (newWidth: number, newHeight: number) => {
+    const oldDimensions = outputDimensions[currentTestIndex];
+    
     const newDimensions = [...outputDimensions];
     newDimensions[currentTestIndex] = { width: newWidth, height: newHeight };
     setOutputDimensions(newDimensions);
@@ -124,11 +244,36 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
     const newCompleted = [...completedTests];
     newCompleted[currentTestIndex] = false;
     setCompletedTests(newCompleted);
+
+    // Log grid size change event
+    logPlayerAction(
+      "grid_resize",
+      0,
+      currentTestIndex,
+      {
+        fromSize: oldDimensions,
+        toSize: { width: newWidth, height: newHeight },
+        testCase: currentTestIndex
+      }
+    );
   };
 
   // Handle test case selection
   const handleTestSelect = (testIndex: number) => {
+    const oldTestIndex = currentTestIndex;
     setCurrentTestIndex(testIndex);
+
+    // Log test case navigation event
+    logPlayerAction(
+      "test_navigation",
+      0,
+      testIndex,
+      {
+        fromTest: oldTestIndex,
+        toTest: testIndex,
+        totalTests: totalTests
+      }
+    );
   };
 
   // Get current solution for active test
@@ -202,15 +347,54 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
 
   // Enhanced display control handlers
   const handleDisplayModeChange = (mode: DisplayMode) => {
+    const oldMode = displayState.displayMode;
     setDisplayState(prev => ({ ...prev, displayMode: mode }));
+
+    // Log display mode change event
+    logPlayerAction(
+      "display_mode_change",
+      0,
+      0,
+      {
+        fromMode: oldMode,
+        toMode: mode,
+        emojiSet: displayState.emojiSet
+      }
+    );
   };
 
   const handleEmojiSetChange = (emojiSet: EmojiSet) => {
+    const oldEmojiSet = displayState.emojiSet;
     setDisplayState(prev => ({ ...prev, emojiSet }));
+
+    // Log emoji set change event
+    logPlayerAction(
+      "emoji_set_change",
+      0,
+      0,
+      {
+        fromSet: oldEmojiSet,
+        toSet: emojiSet,
+        displayMode: displayState.displayMode
+      }
+    );
   };
 
   const handleValueSelect = (value: number) => {
+    const oldValue = displayState.selectedValue;
     setDisplayState(prev => ({ ...prev, selectedValue: value }));
+
+    // Log palette value selection event
+    logPlayerAction(
+      "palette_selection",
+      0,
+      0,
+      {
+        fromValue: oldValue,
+        toValue: value,
+        displayMode: displayState.displayMode
+      }
+    );
   };
 
   // Enhanced cell interaction for value painting
