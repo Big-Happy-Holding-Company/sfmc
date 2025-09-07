@@ -172,66 +172,42 @@ export function categorizeDifficulty(accuracy: number, hasData: boolean = true):
 }
 
 /**
- * Load evaluation2 puzzles from PlayFab and enrich with arc-explainer metadata
- * PRIORITY: This is the primary function for Officer Track - focuses on evaluation2 dataset
+ * Get evaluation2 puzzles with rich metadata from arc-explainer API
+ * PRIORITY: Uses arc-explainer's rich dataset for puzzle discovery and selection
  */
 export async function getEvaluation2Puzzles(): Promise<OfficerPuzzleResponse> {
   try {
-    console.log('🎖️ Loading evaluation2 puzzles from PlayFab Title Data...');
+    console.log('🎖️ Getting evaluation2 puzzles with rich metadata from arc-explainer...');
     
-    // Load all evaluation2 puzzles from PlayFab (2 batches)
-    const evaluation2Puzzles = await loadAllEvaluation2Puzzles();
-    console.log(`📦 Loaded ${evaluation2Puzzles.length} evaluation2 puzzles from PlayFab`);
+    // Get ALL evaluation2 puzzles with rich metadata from arc-explainer
+    // This gives us the full dataset with performance statistics
+    const response = await makeAPICall('/api/puzzle/worst-performing?limit=200&sortBy=composite');
     
-    // Enrich with arc-explainer metadata where available
-    const enrichedPuzzles: OfficerPuzzle[] = [];
-    
-    for (const puzzle of evaluation2Puzzles) {
-      try {
-        // Convert PlayFab ID to arc-explainer format (ARC-E2-1ae2feb7 -> 1ae2feb7)
-        const arcId = playFabToArcId(puzzle.id);
-        
-        // Try to get rich metadata from arc-explainer
-        let metadata = null;
-        try {
-          const aiData = await makeAPICall(`/api/puzzle/task/${arcId}`);
-          if (aiData.success && aiData.data) {
-            metadata = aiData.data.performanceData || {};
-          }
-        } catch (error) {
-          console.log(`⚠️ No arc-explainer metadata for ${arcId}`);
-        }
-        
-        // Create enriched puzzle with PlayFab data + arc-explainer metadata
-        // IMPORTANT: Use PlayFab ID format for UI consistency and validation compatibility
-        const enrichedPuzzle: OfficerPuzzle = {
-          id: puzzle.id, // Keep PlayFab format (ARC-E2-1ae2feb7) for validation compatibility
-          playFabId: puzzle.id, // Same as id
-          avgAccuracy: metadata?.avgAccuracy || 0,
-          difficulty: categorizeDifficulty(metadata?.avgAccuracy || 0, metadata?.totalExplanations > 0),
-          totalExplanations: metadata?.totalExplanations || 0,
-          compositeScore: metadata?.compositeScore || 0
-        };
-        
-        enrichedPuzzles.push(enrichedPuzzle);
-        
-      } catch (error) {
-        console.warn(`⚠️ Failed to enrich puzzle ${puzzle.id}:`, error);
-        
-        // Fallback: use puzzle without metadata
-        const fallbackPuzzle: OfficerPuzzle = {
-          id: puzzle.id, // Keep PlayFab format for validation compatibility
-          playFabId: puzzle.id,
-          avgAccuracy: 0,
-          difficulty: 'challenging' as const,
-          totalExplanations: 0,
-          compositeScore: 0
-        };
-        enrichedPuzzles.push(fallbackPuzzle);
-      }
+    if (!response?.data?.puzzles) {
+      throw new Error('No puzzles returned from arc-explainer API');
     }
     
-    // Sort by difficulty (impossible first, then by composite score)
+    console.log(`📊 Arc-explainer returned ${response.data.puzzles.length} puzzles with rich metadata`);
+    
+    // Filter for evaluation2 puzzles specifically (they should be 8-character IDs)
+    // evaluation2 dataset contains the hardest ARC puzzles
+    const evaluation2Puzzles = response.data.puzzles.filter((puzzle: any) => {
+      return puzzle.id && puzzle.id.length === 8; // evaluation2 IDs are 8 characters
+    });
+    
+    console.log(`🎯 Filtered to ${evaluation2Puzzles.length} evaluation2 puzzles`);
+    
+    // Convert to our format with rich arc-explainer metadata
+    const enrichedPuzzles: OfficerPuzzle[] = evaluation2Puzzles.map((puzzle: any) => ({
+      id: arcIdToPlayFab(puzzle.id, 'evaluation2'), // Convert to PlayFab format (ARC-E2-xxxxx)
+      playFabId: arcIdToPlayFab(puzzle.id, 'evaluation2'),
+      avgAccuracy: puzzle.avgAccuracy || 0,
+      difficulty: categorizeDifficulty(puzzle.avgAccuracy || 0, puzzle.totalExplanations > 0),
+      totalExplanations: puzzle.totalExplanations || 0,
+      compositeScore: puzzle.compositeScore || 0
+    }));
+    
+    // Sort by difficulty and performance (hardest first)
     enrichedPuzzles.sort((a, b) => {
       const difficultyOrder = { impossible: 0, extremely_hard: 1, very_hard: 2, challenging: 3 };
       const aDiff = difficultyOrder[a.difficulty];
@@ -240,13 +216,19 @@ export async function getEvaluation2Puzzles(): Promise<OfficerPuzzleResponse> {
       return a.compositeScore - b.compositeScore; // Lower composite score = worse performance
     });
     
-    console.log(`✅ Enriched ${enrichedPuzzles.length} evaluation2 puzzles with metadata`);
-    console.log(`📊 Difficulty breakdown:`, 
-      enrichedPuzzles.reduce((acc, p) => {
-        acc[p.difficulty] = (acc[p.difficulty] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>)
-    );
+    // Log rich insights about the evaluation2 dataset
+    const difficultyBreakdown = enrichedPuzzles.reduce((acc, p) => {
+      acc[p.difficulty] = (acc[p.difficulty] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const avgAccuracy = enrichedPuzzles.reduce((sum, p) => sum + p.avgAccuracy, 0) / enrichedPuzzles.length;
+    const impossiblePuzzles = enrichedPuzzles.filter(p => p.difficulty === 'impossible').length;
+    
+    console.log(`✅ Loaded ${enrichedPuzzles.length} evaluation2 puzzles with rich metadata`);
+    console.log(`📊 Difficulty breakdown:`, difficultyBreakdown);
+    console.log(`🔥 Average AI accuracy: ${avgAccuracy.toFixed(3)}`);
+    console.log(`💀 Impossible puzzles (0% accuracy): ${impossiblePuzzles}`);
     
     return {
       puzzles: enrichedPuzzles,
@@ -254,68 +236,9 @@ export async function getEvaluation2Puzzles(): Promise<OfficerPuzzleResponse> {
     };
     
   } catch (error) {
-    console.error('❌ Failed to load evaluation2 puzzles:', error);
+    console.error('❌ Failed to load evaluation2 puzzles from arc-explainer:', error);
     throw error;
   }
-}
-
-/**
- * Load all evaluation2 puzzles from PlayFab Title Data batches
- */
-async function loadAllEvaluation2Puzzles(): Promise<any[]> {
-  const allPuzzles: any[] = [];
-  const batchKeys = [
-    'officer-tasks-evaluation2-batch1.json',
-    'officer-tasks-evaluation2-batch2.json'
-  ];
-  
-  // Initialize PlayFab if needed
-  if (!playFabCore.isReady()) {
-    console.log('🔧 Initializing PlayFab for evaluation2 data loading...');
-    const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
-    await playFabCore.initialize({ titleId });
-  }
-  
-  for (const batchKey of batchKeys) {
-    try {
-      console.log(`📥 Loading ${batchKey}...`);
-      
-      // Check cache first
-      if (isBatchCached(batchKey)) {
-        const cachedPuzzles = getBatchFromCache(batchKey);
-        allPuzzles.push(...cachedPuzzles);
-        console.log(`📋 Used cached ${batchKey}: ${cachedPuzzles.length} puzzles`);
-        continue;
-      }
-      
-      // Load from PlayFab
-      const result = await playFabCore.makeHttpRequest(
-        '/Client/GetTitleData',
-        { Keys: [batchKey] },
-        true
-      );
-      
-      if (result?.Data?.[batchKey]) {
-        const puzzleDataStr = result.Data[batchKey];
-        
-        if (puzzleDataStr && puzzleDataStr !== "undefined") {
-          const puzzleArray = JSON.parse(puzzleDataStr);
-          setBatchCache(batchKey, puzzleArray);
-          allPuzzles.push(...puzzleArray);
-          console.log(`📊 Loaded ${batchKey}: ${puzzleArray.length} puzzles`);
-        } else {
-          console.warn(`⚠️ ${batchKey} is empty or undefined`);
-        }
-      } else {
-        console.warn(`⚠️ Failed to load ${batchKey} from PlayFab`);
-      }
-      
-    } catch (error) {
-      console.error(`❌ Error loading ${batchKey}:`, error);
-    }
-  }
-  
-  return allPuzzles;
 }
 
 /**
