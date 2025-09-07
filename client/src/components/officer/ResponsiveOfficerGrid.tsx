@@ -94,21 +94,35 @@ export function ResponsiveOfficerGrid({
     if (!enableDragToPaint) return;
 
     const handleGlobalMouseUp = () => {
-      // Use callback version of setGrid to get current state
-      setGrid((currentGrid) => {
-        if (dragState.isDragging) {
-          // FLOOD FILL: Fill all selected cells with current selectedValue
-          const selectedCells = getSelectedCells();
-          console.log('Drag ended. Selected cells:', selectedCells.length, 'Selected value:', selectedValue);
-          
-          if (selectedCells.length > 0 && selectedValue !== undefined && selectedValue !== null) {
+      // Check if we were dragging and get current drag state
+      if (dragState.isDragging && dragState.startCell && dragState.hoveredCell) {
+        console.log('Mouse up detected during drag. Start:', dragState.startCell, 'End:', dragState.hoveredCell, 'Selected value:', selectedValue);
+        
+        // Calculate selected cells directly here instead of using getSelectedCells()
+        const minRow = Math.min(dragState.startCell.row, dragState.hoveredCell.row);
+        const maxRow = Math.max(dragState.startCell.row, dragState.hoveredCell.row);
+        const minCol = Math.min(dragState.startCell.col, dragState.hoveredCell.col);
+        const maxCol = Math.max(dragState.startCell.col, dragState.hoveredCell.col);
+        
+        const selectedCells = [];
+        for (let r = minRow; r <= maxRow; r++) {
+          for (let c = minCol; c <= maxCol; c++) {
+            selectedCells.push({ row: r, col: c });
+          }
+        }
+        
+        console.log('Calculated selection rectangle:', { minRow, maxRow, minCol, maxCol }, 'Total cells:', selectedCells.length);
+        
+        if (selectedCells.length > 0 && selectedValue !== undefined && selectedValue !== null) {
+          // Use callback version of setGrid to get current state
+          setGrid((currentGrid) => {
             const newGrid = currentGrid.map((row, rowIndex) =>
               row.map((cell, colIndex) => {
                 const isSelected = selectedCells.some(sc => sc.row === rowIndex && sc.col === colIndex);
                 return isSelected ? selectedValue : cell;
               })
             );
-            console.log('Applying flood fill to', selectedCells.length, 'cells with value', selectedValue);
+            console.log('FLOOD FILL APPLIED: Filled', selectedCells.length, 'cells with value', selectedValue);
             
             // Call onChange with new grid
             if (onChange) {
@@ -116,19 +130,20 @@ export function ResponsiveOfficerGrid({
             }
             
             return newGrid;
-          }
+          });
+        } else {
+          console.log('Flood fill skipped - no cells selected or no value:', { cellCount: selectedCells.length, selectedValue });
         }
-        return currentGrid;
-      });
+      } else {
+        console.log('Mouse up without active drag state:', { isDragging: dragState.isDragging, startCell: dragState.startCell, hoveredCell: dragState.hoveredCell });
+      }
       
       // Always clear selection state on mouse up
-      if (dragState.isDragging) {
-        setDragState({
-          isDragging: false,
-          startCell: null,
-          hoveredCell: null
-        });
-      }
+      setDragState({
+        isDragging: false,
+        startCell: null,
+        hoveredCell: null
+      });
     };
 
     document.addEventListener('mouseup', handleGlobalMouseUp);
