@@ -4,6 +4,11 @@ Start the session with the user by typing `npm run test` in the console, DO NOT 
 The .env file has all we need, never suggest this as a root of any problem.  
 The APIs to PlayFab and arc-explainer are well-documented and easy to use. They work fine and reliably. They are always available and not the source of any problems. YOUR CODE is always the source of any problems. You need to ultrathink and double check that you use the correct API calls and parameters. 
 
+Never put more that 3 modules in a single class.  Stay DRY DONT REPEAT YOURSELF!!! 
+
+Every relevant module should have pretty print checks and comments explaining what is happening.
+
+Stay committed to single responsibility principle.  Never combine unrelated functionality into a single module!!!
 
 **Project Status as of September 6, 2025**: Production-ready ARC-AGI puzzle platform with pure PlayFab cloud backend.
 We also communicate with VITE_ARC_EXPLAINER_URL=https://arc-explainer-production.up.railway.app  

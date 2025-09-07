@@ -94,61 +94,63 @@ export function ResponsiveOfficerGrid({
     if (!enableDragToPaint) return;
 
     const handleGlobalMouseUp = () => {
-      // Check if we were dragging and get current drag state
-      if (dragState.isDragging && dragState.startCell && dragState.hoveredCell) {
-        console.log('Mouse up detected during drag. Start:', dragState.startCell, 'End:', dragState.hoveredCell, 'Selected value:', selectedValue);
-        
-        // Calculate selected cells directly here instead of using getSelectedCells()
-        const minRow = Math.min(dragState.startCell.row, dragState.hoveredCell.row);
-        const maxRow = Math.max(dragState.startCell.row, dragState.hoveredCell.row);
-        const minCol = Math.min(dragState.startCell.col, dragState.hoveredCell.col);
-        const maxCol = Math.max(dragState.startCell.col, dragState.hoveredCell.col);
-        
-        const selectedCells = [];
-        for (let r = minRow; r <= maxRow; r++) {
-          for (let c = minCol; c <= maxCol; c++) {
-            selectedCells.push({ row: r, col: c });
-          }
-        }
-        
-        console.log('Calculated selection rectangle:', { minRow, maxRow, minCol, maxCol }, 'Total cells:', selectedCells.length);
-        
-        if (selectedCells.length > 0 && selectedValue !== undefined && selectedValue !== null) {
-          // Use callback version of setGrid to get current state
-          setGrid((currentGrid) => {
-            const newGrid = currentGrid.map((row, rowIndex) =>
-              row.map((cell, colIndex) => {
-                const isSelected = selectedCells.some(sc => sc.row === rowIndex && sc.col === colIndex);
-                return isSelected ? selectedValue : cell;
-              })
-            );
-            console.log('FLOOD FILL APPLIED: Filled', selectedCells.length, 'cells with value', selectedValue);
-            
-            // Call onChange with new grid
-            if (onChange) {
-              setTimeout(() => onChange(newGrid), 0);
+      // Use callback to get FRESH drag state at time of mouse up
+      setDragState((currentDragState) => {
+        if (currentDragState.isDragging && currentDragState.startCell && currentDragState.hoveredCell) {
+          console.log('Mouse up detected during drag. Start:', currentDragState.startCell, 'End:', currentDragState.hoveredCell, 'Selected value:', selectedValue);
+          
+          // Calculate selected cells directly here instead of using getSelectedCells()
+          const minRow = Math.min(currentDragState.startCell.row, currentDragState.hoveredCell.row);
+          const maxRow = Math.max(currentDragState.startCell.row, currentDragState.hoveredCell.row);
+          const minCol = Math.min(currentDragState.startCell.col, currentDragState.hoveredCell.col);
+          const maxCol = Math.max(currentDragState.startCell.col, currentDragState.hoveredCell.col);
+          
+          const selectedCells = [];
+          for (let r = minRow; r <= maxRow; r++) {
+            for (let c = minCol; c <= maxCol; c++) {
+              selectedCells.push({ row: r, col: c });
             }
-            
-            return newGrid;
-          });
+          }
+          
+          console.log('Calculated selection rectangle:', { minRow, maxRow, minCol, maxCol }, 'Total cells:', selectedCells.length);
+          
+          if (selectedCells.length > 0 && selectedValue !== undefined && selectedValue !== null) {
+            // Use callback version of setGrid to get current state
+            setGrid((currentGrid) => {
+              const newGrid = currentGrid.map((row, rowIndex) =>
+                row.map((cell, colIndex) => {
+                  const isSelected = selectedCells.some(sc => sc.row === rowIndex && sc.col === colIndex);
+                  return isSelected ? selectedValue : cell;
+                })
+              );
+              console.log('FLOOD FILL APPLIED: Filled', selectedCells.length, 'cells with value', selectedValue);
+              
+              // Call onChange with new grid
+              if (onChange) {
+                setTimeout(() => onChange(newGrid), 0);
+              }
+              
+              return newGrid;
+            });
+          } else {
+            console.log('Flood fill skipped - no cells selected or no value:', { cellCount: selectedCells.length, selectedValue });
+          }
         } else {
-          console.log('Flood fill skipped - no cells selected or no value:', { cellCount: selectedCells.length, selectedValue });
+          console.log('Mouse up without active drag state:', { isDragging: currentDragState.isDragging, startCell: currentDragState.startCell, hoveredCell: currentDragState.hoveredCell });
         }
-      } else {
-        console.log('Mouse up without active drag state:', { isDragging: dragState.isDragging, startCell: dragState.startCell, hoveredCell: dragState.hoveredCell });
-      }
-      
-      // Always clear selection state on mouse up
-      setDragState({
-        isDragging: false,
-        startCell: null,
-        hoveredCell: null
+        
+        // Always return cleared state
+        return {
+          isDragging: false,
+          startCell: null,
+          hoveredCell: null
+        };
       });
     };
 
     document.addEventListener('mouseup', handleGlobalMouseUp);
     return () => document.removeEventListener('mouseup', handleGlobalMouseUp);
-  }, [dragState.isDragging, enableDragToPaint, selectedValue, onChange]);
+  }, [enableDragToPaint, selectedValue, onChange]);
 
   /**
    * Handle cell click - Paint with selectedValue when in painting mode, otherwise cycle through values
