@@ -217,6 +217,7 @@ export function ResponsiveOfficerGrid({
     if (!interactive || disabled || !enableDragToPaint) return;
 
     if (e.button === 0) { // Left click - start selection
+      console.log('Starting drag at:', { row, col });
       setDragState({
         isDragging: true,
         startCell: { row, col },
@@ -245,8 +246,18 @@ export function ResponsiveOfficerGrid({
    * Handle mouse enter for drag selection visualization
    */
   const handleCellMouseEnter = (row: number, col: number) => {
-    if (!enableDragToPaint || !dragState.isDragging) return;
+    if (!enableDragToPaint) {
+      console.log('Mouse enter skipped - enableDragToPaint is false');
+      return;
+    }
+    
+    if (!dragState.isDragging) {
+      console.log('Mouse enter skipped - not dragging');
+      return;
+    }
 
+    console.log('Mouse enter during drag:', { row, col }, 'Previous hovered:', dragState.hoveredCell);
+    
     // Update selection area but don't paint yet
     setDragState(prev => ({
       ...prev,
