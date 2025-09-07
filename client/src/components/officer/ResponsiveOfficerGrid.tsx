@@ -94,24 +94,35 @@ export function ResponsiveOfficerGrid({
     if (!enableDragToPaint) return;
 
     const handleGlobalMouseUp = () => {
-      if (dragState.isDragging) {
-        // FLOOD FILL: Fill all selected cells with current selectedValue
-        const selectedCells = getSelectedCells();
-        console.log('Drag ended. Selected cells:', selectedCells.length, 'Selected value:', selectedValue);
-        
-        if (selectedCells.length > 0 && selectedValue !== undefined && selectedValue !== null) {
-          const newGrid = grid.map((row, rowIndex) =>
-            row.map((cell, colIndex) => {
-              const isSelected = selectedCells.some(sc => sc.row === rowIndex && sc.col === colIndex);
-              return isSelected ? selectedValue : cell;
-            })
-          );
-          console.log('Applying flood fill to', selectedCells.length, 'cells with value', selectedValue);
-          setGrid(newGrid);
-          onChange?.(newGrid);
+      // Use callback version of setGrid to get current state
+      setGrid((currentGrid) => {
+        if (dragState.isDragging) {
+          // FLOOD FILL: Fill all selected cells with current selectedValue
+          const selectedCells = getSelectedCells();
+          console.log('Drag ended. Selected cells:', selectedCells.length, 'Selected value:', selectedValue);
+          
+          if (selectedCells.length > 0 && selectedValue !== undefined && selectedValue !== null) {
+            const newGrid = currentGrid.map((row, rowIndex) =>
+              row.map((cell, colIndex) => {
+                const isSelected = selectedCells.some(sc => sc.row === rowIndex && sc.col === colIndex);
+                return isSelected ? selectedValue : cell;
+              })
+            );
+            console.log('Applying flood fill to', selectedCells.length, 'cells with value', selectedValue);
+            
+            // Call onChange with new grid
+            if (onChange) {
+              setTimeout(() => onChange(newGrid), 0);
+            }
+            
+            return newGrid;
+          }
         }
-        
-        // Clear selection
+        return currentGrid;
+      });
+      
+      // Always clear selection state on mouse up
+      if (dragState.isDragging) {
         setDragState({
           isDragging: false,
           startCell: null,
@@ -122,7 +133,7 @@ export function ResponsiveOfficerGrid({
 
     document.addEventListener('mouseup', handleGlobalMouseUp);
     return () => document.removeEventListener('mouseup', handleGlobalMouseUp);
-  }, [dragState.isDragging, enableDragToPaint, selectedValue, grid, onChange]);
+  }, [dragState.isDragging, enableDragToPaint, selectedValue, onChange]);
 
   /**
    * Handle cell click - Paint with selectedValue when in painting mode, otherwise cycle through values
@@ -197,9 +208,21 @@ export function ResponsiveOfficerGrid({
         hoveredCell: { row, col }
       });
       // DON'T paint immediately - wait for mouse up
-    } else if (e.button === 2) { // Right click
-      e.preventDefault();
-      handleCellValueChange(row, col, 0); // Clear cell immediately
+    }
+    // Note: Right-click is now handled by handleCellRightClick via onContextMenu
+  };
+
+  /**
+   * Handle right-click to clear cell (set to 0)
+   */
+  const handleCellRightClick = (row: number, col: number, currentValue: number) => {
+    if (!interactive || disabled) return;
+    
+    console.log('Right-click clear cell at', row, col, 'from', currentValue, 'to 0');
+    handleCellValueChange(row, col, 0);
+    
+    if (onCellInteraction) {
+      onCellInteraction(row, col, 0);
     }
   };
 
@@ -340,6 +363,7 @@ export function ResponsiveOfficerGrid({
                   onClick={(currentValue) => handleCellClick(rowIndex, colIndex)}
                   onMouseDown={(e) => handleCellMouseDown(rowIndex, colIndex, e)}
                   onMouseEnter={() => handleCellMouseEnter(rowIndex, colIndex)}
+                  onRightClick={(currentValue) => handleCellRightClick(rowIndex, colIndex, currentValue)}
                 />
               );
             })

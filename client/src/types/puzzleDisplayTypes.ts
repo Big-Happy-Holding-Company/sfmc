@@ -66,6 +66,7 @@ export interface EnhancedGridCellProps {
   onClick?: (value: number) => void;
   onMouseDown?: (e: React.MouseEvent) => void;
   onMouseEnter?: () => void;
+  onRightClick?: (value: number) => void;
   cellSize: number;
   className?: string;
 }

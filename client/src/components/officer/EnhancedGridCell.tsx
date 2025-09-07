@@ -19,6 +19,7 @@ export const EnhancedGridCell = React.memo(({
   onClick,
   onMouseDown,
   onMouseEnter,
+  onRightClick,
   cellSize,
   className = ''
 }: EnhancedGridCellProps) => {
@@ -103,8 +104,10 @@ export const EnhancedGridCell = React.memo(({
   const handleContextMenu = (e: React.MouseEvent) => {
     if (interactive) {
       e.preventDefault();
-      // Right-click to set to 0 (clear)
-      if (onClick) {
+      // Use dedicated right-click handler if provided, otherwise default to clear
+      if (onRightClick) {
+        onRightClick(value);
+      } else if (onClick) {
         onClick(0);
       }
     }
