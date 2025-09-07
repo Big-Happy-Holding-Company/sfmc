@@ -125,12 +125,29 @@ export function ResponsiveOfficerGrid({
   }, [dragState.isDragging, enableDragToPaint, selectedValue, grid, onChange]);
 
   /**
-   * Handle cell click - DEFAULT: cycle through 0→1→2→...→9→0
+   * Handle cell click - Paint with selectedValue when in painting mode, otherwise cycle through values
    */
   const handleCellClick = (row: number, col: number) => {
     if (!interactive || disabled) return;
 
-    // ALWAYS cycle through values on click - this is the core functionality
+    // PAINTING MODE: Use selectedValue when onCellInteraction is provided
+    if (onCellInteraction && selectedValue !== undefined && selectedValue !== null) {
+      const newGrid = grid.map((gridRow, rowIndex) =>
+        gridRow.map((cell, colIndex) => {
+          if (rowIndex === row && colIndex === col) {
+            return selectedValue;
+          }
+          return cell;
+        })
+      );
+
+      setGrid(newGrid);
+      onChange?.(newGrid);
+      onCellInteraction(row, col, selectedValue);
+      return;
+    }
+
+    // DEFAULT MODE: Cycle through values (0→1→2→...→9→0)
     const newGrid = grid.map((gridRow, rowIndex) =>
       gridRow.map((cell, colIndex) => {
         if (rowIndex === row && colIndex === col) {
@@ -143,7 +160,7 @@ export function ResponsiveOfficerGrid({
     setGrid(newGrid);
     onChange?.(newGrid);
     
-    // Call callback if provided (but doesn't override cycling behavior)
+    // Call callback if provided
     if (onCellInteraction) {
       onCellInteraction(row, col, newGrid[row][col]);
     }
@@ -152,10 +169,19 @@ export function ResponsiveOfficerGrid({
   /**
    * Handle enhanced cell interaction with selected value painting
    */
-  const handleEnhancedCellClick = (value: number) => {
-    // This is called from EnhancedGridCell, value parameter is the current cell value
-    // We ignore it and use the selectedValue for painting
-    return selectedValue;
+  const handleEnhancedCellClick = (row: number, col: number, currentValue: number) => {
+    // Paint with selectedValue when in painting mode, otherwise cycle through values
+    if (onCellInteraction && selectedValue !== undefined && selectedValue !== null) {
+      handleCellValueChange(row, col, selectedValue);
+      onCellInteraction(row, col, selectedValue);
+    } else {
+      // Default cycling behavior
+      const nextValue = (currentValue + 1) % 10;
+      handleCellValueChange(row, col, nextValue);
+      if (onCellInteraction) {
+        onCellInteraction(row, col, nextValue);
+      }
+    }
   };
 
   /**
