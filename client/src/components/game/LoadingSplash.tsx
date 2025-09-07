@@ -81,7 +81,7 @@ export function LoadingSplash({ onComplete, duration = 3000 }: LoadingSplashProp
       
       // Cycle to next image every 100ms to show all images within 1 second
       setCurrentImageIndex(prev => (prev + 1) % TRAINER_IMAGES.length);
-    }, 300); // Change image every 100ms
+    }, 100); // Change image every 100ms
 
     return () => {
       clearInterval(progressInterval);
