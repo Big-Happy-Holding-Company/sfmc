@@ -278,8 +278,8 @@ export default function OfficerTrackSimple() {
                       : 'N/A'
                     }
                   </div>
-                  <div className="text-sm text-slate-400">Average AI Confidence</div>
-                  <div className="text-xs text-slate-500">Overall confidence level</div>
+                  <div className="text-sm text-slate-400">Overall Confidence</div>
+                  <div className="text-xs text-slate-500">Average confidence level</div>
                 </div>
                 
                 <div className="bg-slate-700 rounded-lg p-4 text-center">
@@ -308,31 +308,35 @@ export default function OfficerTrackSimple() {
                       : 'N/A'
                     }
                   </div>
-                  <div className="text-sm text-slate-400">⚠️ AI Overconfidence</div>
-                  <div className="text-xs text-slate-500">Avg confidence when wrong</div>
+                  <div className="text-sm text-slate-400">⚠️ Calibration Gap</div>
+                  <div className="text-xs text-slate-500">Confidence when incorrect</div>
                 </div>
                 
                 <div className="bg-slate-700 rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold text-purple-400">
                     {filteredPuzzles.reduce((sum, p) => sum + (p.wrongCount || 0), 0).toLocaleString()}
                   </div>
-                  <div className="text-sm text-slate-400">Total Failures</div>
-                  <div className="text-xs text-slate-500">Wrong answers given</div>
+                  <div className="text-sm text-slate-400">Failed Attempts</div>
+                  <div className="text-xs text-slate-500">Incorrect predictions</div>
                 </div>
                 
                 <div className="bg-slate-700 rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold text-pink-400">
-                    {filteredPuzzles.reduce((sum, p) => sum + (p.negativeFeedback || 0), 0)}
+                    {(() => {
+                      const totalFeedback = filteredPuzzles.reduce((sum, p) => sum + (p.totalFeedback || 0), 0);
+                      const negativeFeedback = filteredPuzzles.reduce((sum, p) => sum + (p.negativeFeedback || 0), 0);
+                      return totalFeedback > 0 ? `${Math.round((negativeFeedback / totalFeedback) * 100)}%` : '0%';
+                    })()}
                   </div>
-                  <div className="text-sm text-slate-400">Human Feedback</div>
-                  <div className="text-xs text-slate-500">Unhelpful AI explanations</div>
+                  <div className="text-sm text-slate-400">Unhelpful Rate</div>
+                  <div className="text-xs text-slate-500">Poor explanation quality</div>
                 </div>
               </div>
             </div>
           )}
           
           <div className="mt-4 text-center text-xs text-slate-500">
-            Showing the 50 worst performing puzzles where AI struggles most • Overconfidence highlights dangerous AI failure patterns
+            Showing the 50 worst performing puzzles where AI struggles most • Calibration gap reveals dangerous overconfidence patterns
           </div>
         </div>
 
