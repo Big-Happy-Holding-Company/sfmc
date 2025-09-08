@@ -117,7 +117,7 @@ handlers.ValidateARC2EvalPuzzle = function(args, context) {
 // Extract step count from event logging system
 // Add to both scoring functions:
 const actionBonus = (stepCount && stepCount < 50) ? 
-    Math.floor((50 - stepCount) / 5) * 2 : 0; // Efficiency bonus
+    Math.floor((50 - stepCount) / 5) * 2 : 0; // Efficiency bonus   ????
 ```
 
 **Implementation Points**:
@@ -126,43 +126,6 @@ const actionBonus = (stepCount && stepCount < 50) ?
 - Track puzzle complexity based on `test_navigation` event frequency THIS IS INCORRECT LOGIC!!!
 - HOW ARE WE HANDLING PUZZLES THAT HAVE MULTIPLE TESTS?  WE ARE NOT!!!
 - HOW ARE WE TRACKING HOW MANY TIMES A USER ATTEMPTS A PUZZLE?
-
-### Task 4: Fix Profile Page PlayFab Integration
-
-**Objective**: Resolve PlayFab initialization issues in Profile.tsx
-
-**Current Issue**:
-```typescript
-// Profile.tsx lines 32-40 - Direct service calls without auth check
-const [playerData, tasksData] = await Promise.all([
-  playFabService.getPlayerData(),     // May fail if not authenticated
-  playFabService.getAllTasks()
-]);
-```
-
-**Fix Required**:
-```typescript
-// Add proper PlayFab initialization in useEffect:
-useEffect(() => {
-  const loadPageData = async () => {
-    try {
-      // Ensure authenticated before any service calls
-      await playFabAuth.ensureAuthenticated();
-      
-      const [playerData, tasksData] = await Promise.all([
-        playFabService.getPlayerData(),
-        playFabService.getAllTasks()
-      ]);
-      
-      setPlayer(playerData);
-      setTotalTasks(tasksData.length);
-    } catch (error) {
-      console.error('PlayFab initialization failed:', error);
-      // Set fallback data...
-    }
-  };
-}, []);
-```
 
 ### Task 5: Leaderboard Configuration Updates
 
