@@ -48,6 +48,14 @@ export function PlayerRow({ entry, isEven }: PlayerRowProps) {
     return score.toLocaleString();
   };
 
+  const getMilestoneMessage = (score: number) => {
+    if (score >= 100000) return "🚀 COSMIC LEGEND!";
+    if (score >= 50000) return "⭐ STELLAR CHAMPION!";
+    if (score >= 20000) return "🌟 RISING STAR!";
+    if (score >= 10000) return "✨ ELITE OFFICER!";
+    return null;
+  };
+
   const rowClasses = `
     transition-colors duration-200 border-b border-slate-700/30
     ${isCurrentPlayer 
@@ -110,6 +118,11 @@ export function PlayerRow({ entry, isEven }: PlayerRowProps) {
           {formatScore(entry.StatValue)}
         </div>
         <div className="text-xs text-gray-400">points</div>
+        {getMilestoneMessage(entry.StatValue) && (
+          <div className="text-xs text-yellow-400 font-semibold mt-1 animate-pulse">
+            {getMilestoneMessage(entry.StatValue)}
+          </div>
+        )}
       </td>
       <td className="py-4 px-6 text-right">
         <div className={`

@@ -21,6 +21,7 @@ import { PLAYFAB_CONSTANTS } from '@/types/playfab';
 export enum LeaderboardType {
   GLOBAL = 'GLOBAL',
   OFFICER_TRACK = 'OFFICER_TRACK',
+  ARC2_EVALUATION = 'ARC2_EVALUATION',
   // Future leaderboards can be added here without code changes:
   // SPEED = 'SPEED',
   // STREAK = 'STREAK',
@@ -53,6 +54,15 @@ export const LEADERBOARD_CONFIGS: Record<LeaderboardType, LeaderboardConfig> = {
     description: 'ARC puzzle specialists',
     statisticName: PLAYFAB_CONSTANTS.STATISTIC_NAMES.OFFICER_TRACK_POINTS,
     icon: '🎯',
+    category: 'specialty',
+    enabled: true
+  },
+  [LeaderboardType.ARC2_EVALUATION]: {
+    type: LeaderboardType.ARC2_EVALUATION,
+    displayName: 'ARC-2 Elite',
+    description: 'Premium evaluation puzzle masters',
+    statisticName: PLAYFAB_CONSTANTS.STATISTIC_NAMES.ARC2_EVAL_POINTS,
+    icon: '👑',
     category: 'specialty',
     enabled: true
   }
