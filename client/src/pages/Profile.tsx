@@ -21,6 +21,7 @@ import { useState, useEffect } from 'react';
 import { Header } from "@/components/game/Header";
 import { UserProfile } from "@/components/user/UserProfile";
 import { playFabService } from "@/services/playfab";
+import { playFabAuth } from "@/services/playfab/auth";
 import type { PlayFabPlayer } from "@/services/playfab";
 
 export default function Profile() {
@@ -31,6 +32,9 @@ export default function Profile() {
   useEffect(() => {
     const loadPageData = async () => {
       try {
+        // Ensure authenticated before any service calls
+        await playFabAuth.ensureAuthenticated();
+        
         const [playerData, tasksData] = await Promise.all([
           playFabService.getPlayerData(),
           playFabService.getAllTasks()
@@ -39,7 +43,7 @@ export default function Profile() {
         setPlayer(playerData);
         setTotalTasks(tasksData.length);
       } catch (error) {
-        console.error('Failed to load profile page data:', error);
+        console.error('PlayFab initialization failed:', error);
         setPlayer({ 
           id: 'unknown', 
           username: 'Officer', 
