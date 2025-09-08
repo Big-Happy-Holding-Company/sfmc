@@ -233,6 +233,15 @@ export class PlayFabAuth {
    * Ensure user is authenticated, login if necessary
    */
   public async ensureAuthenticated(): Promise<void> {
+    // Initialize PlayFab core if not already done
+    if (!playFabCore.isReady()) {
+      const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
+      if (!titleId) {
+        throw new Error('VITE_PLAYFAB_TITLE_ID environment variable not set');
+      }
+      await playFabCore.initialize({ titleId });
+    }
+
     if (!this.isAuthenticated()) {
       await this.loginAnonymously();
     }
