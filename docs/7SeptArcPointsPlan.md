@@ -23,7 +23,7 @@ This plan addresses the critical scoring gaps in the ARC puzzle system and estab
 
 ## Implementation Tasks
 
-### Task 1: Fix Standard ARC Puzzle Scoring
+### Task 1: Fix Standard ARC Puzzle Scoring   NEEDS SANITY CHECK and DESIGN REVIEW
 
 **Objective**: Make Officer Track leaderboards populate with meaningful scores
 
@@ -106,7 +106,7 @@ handlers.ValidateARC2EvalPuzzle = function(args, context) {
 - Base Points: 2000 (premium difficulty)
 - Time Bonus: 15-minute baseline,
 - Precision Bonus: Extra points for few actions
-- Maximum Possible Score: ????
+- Maximum Possible Score: ????  Needs planning and sanity check
 
 ### Task 3: Event Data Integration
 
