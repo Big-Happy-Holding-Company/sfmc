@@ -25,7 +25,7 @@ All notable changes to this project will be documented in this file.
   2. Complete ARC-2 evaluation puzzle on first try - should earn 30,000+ points and update ARC-2 Elite leaderboard  
   3. Verify milestone celebration badges appear for high scores
   4. Check PlayFab events for comprehensive scoring analytics
-- **PLAYFAB SETUP NEEDED**: Configure `OfficerTrackPoints` and `ARC2EvalPoints` statistics in PlayFab Game Manager
+- **PLAYFAB CONFIGURATION COMPLETE**: ✅ `OfficerTrackPoints` and `ARC2EvalPoints` statistics configured via `scripts/configure-statistics.cjs`
 
 **2025-09-07**: 🎨 DRAW TOOLS SELECTION FILLING FIX - Single Clicks Now Paint with Selected Value
 - **CRITICAL UX BUG RESOLVED**: Fixed draw tools that didn't actually fill selections with chosen values
