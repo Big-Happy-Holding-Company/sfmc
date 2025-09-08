@@ -346,11 +346,12 @@ handlers.ValidateARCPuzzle = function(args, context) {
             }
         });
 
-        // If puzzle solved, update user progress
+        // If puzzle solved, update user progress AND HIGH-SCORE SYSTEM
         if (allCorrect) {
+            // Get current officer points and completed puzzles
             const currentUserData = server.GetUserData({
                 PlayFabId: context.currentPlayerId,
-                Keys: ["completedARCPuzzles"]
+                Keys: ["completedARCPuzzles", "officerTrackPoints"]
             });
 
             let completedPuzzles = [];
@@ -362,17 +363,66 @@ handlers.ValidateARCPuzzle = function(args, context) {
                 }
             }
 
+            let currentOfficerPoints = 0;
+            if (currentUserData.Data && currentUserData.Data.officerTrackPoints) {
+                currentOfficerPoints = parseInt(currentUserData.Data.officerTrackPoints.Value) || 0;
+            }
+
             // Add puzzle to completed list if not already there
             if (completedPuzzles.indexOf(puzzleId) === -1) {
                 completedPuzzles.push(puzzleId);
-                
-                server.UpdateUserData({
-                    PlayFabId: context.currentPlayerId,
-                    Data: {
-                        completedARCPuzzles: JSON.stringify(completedPuzzles)
-                    }
-                });
             }
+
+            // HIGH-SCORE FORMULA (Simple & Rewarding)
+            const basePoints = 10000; // High base - everyone wins big!
+            
+            // Speed Bonus: 100 points per minute under 20 minutes
+            const timeInMinutes = Math.ceil((timeElapsed || 0) / 60);
+            const speedBonus = timeInMinutes < 20 ? (20 - timeInMinutes) * 100 : 0;
+            
+            // Efficiency Bonus: Extract step count from events, 50 points per action under 100
+            const stepCount = getStepCountFromEvents(context.currentPlayerId, sessionId) || 100;
+            const efficiencyBonus = stepCount < 100 ? (100 - stepCount) * 50 : 0;
+            
+            // Simple session validation (flags but doesn't block)
+            validateSession(timeElapsed, stepCount, sessionId, context.currentPlayerId);
+            
+            const finalScore = basePoints + speedBonus + efficiencyBonus;
+            const newOfficerPoints = currentOfficerPoints + finalScore;
+            
+            // Update Officer Track leaderboard statistic
+            server.UpdatePlayerStatistics({
+                PlayFabId: context.currentPlayerId,
+                Statistics: [
+                    { StatisticName: "OfficerTrackPoints", Value: newOfficerPoints }
+                ]
+            });
+            
+            // Update user data with new points and completed puzzles
+            server.UpdateUserData({
+                PlayFabId: context.currentPlayerId,
+                Data: {
+                    completedARCPuzzles: JSON.stringify(completedPuzzles),
+                    officerTrackPoints: newOfficerPoints.toString()
+                }
+            });
+
+            // Log high-score details for analytics
+            server.WritePlayerEvent({
+                PlayFabId: context.currentPlayerId,
+                EventName: "ARCHighScore",
+                Body: {
+                    puzzleId: puzzleId,
+                    basePoints: basePoints,
+                    speedBonus: speedBonus,
+                    efficiencyBonus: efficiencyBonus,
+                    finalScore: finalScore,
+                    newOfficerPoints: newOfficerPoints,
+                    timeInMinutes: timeInMinutes,
+                    stepCount: stepCount,
+                    sessionId: sessionId || "unknown"
+                }
+            });
         }
 
         return {
@@ -391,6 +441,245 @@ handlers.ValidateARCPuzzle = function(args, context) {
         };
     }
 };
+
+/**
+ * ValidateARC2EvalPuzzle - Premium ARC-2 Evaluation puzzle validation 
+ * 
+ * Validates ARC-2 evaluation puzzles with PREMIUM HIGH-SCORE SYSTEM for hardest puzzles.
+ * These are the most challenging puzzles and deserve massive rewards.
+ * 
+ * @param {Object} args - Function arguments
+ * @param {string} args.puzzleId - ARC puzzle ID (e.g., "ARC-E2-007bbfb7")
+ * @param {number[][][]} args.solutions - Array of user solutions, one per test case
+ * @param {number} args.timeElapsed - Time taken in seconds
+ * @param {number} args.attemptNumber - Attempt number for this puzzle
+ * @param {string} [args.sessionId] - Session ID for tracking
+ * 
+ * @returns {Object} Premium validation result with high scores
+ */
+handlers.ValidateARC2EvalPuzzle = function(args, context) {
+    const { puzzleId, solutions, timeElapsed, attemptNumber, sessionId } = args;
+    
+    // Input validation
+    if (!puzzleId || !solutions || !Array.isArray(solutions)) {
+        return {
+            success: false,
+            error: "Missing required parameters: puzzleId and solutions array"
+        };
+    }
+
+    try {
+        // Find puzzle in Title Data batches (focusing on evaluation2 batches)
+        const puzzle = findPuzzleInBatches(puzzleId);
+        if (!puzzle) {
+            return {
+                success: false,
+                error: `ARC-2 Evaluation puzzle ${puzzleId} not found in Title Data`
+            };
+        }
+
+        // Validate that user provided correct number of solutions
+        const expectedTestCases = puzzle.test ? puzzle.test.length : 0;
+        if (solutions.length !== expectedTestCases) {
+            return {
+                success: false,
+                error: `Expected ${expectedTestCases} solutions, got ${solutions.length}`
+            };
+        }
+
+        // Validate ALL test cases must pass
+        let allCorrect = true;
+        for (let i = 0; i < puzzle.test.length; i++) {
+            const expectedOutput = puzzle.test[i].output;
+            const userSolution = solutions[i];
+            
+            if (!arraysEqual(userSolution, expectedOutput)) {
+                allCorrect = false;
+                break;
+            }
+        }
+
+        // Record attempt in PlayFab events
+        server.WritePlayerEvent({
+            PlayFabId: context.currentPlayerId,
+            EventName: "ARC2EvalPuzzleAttempt",
+            Body: {
+                puzzleId: puzzleId,
+                correct: allCorrect,
+                timeElapsed: timeElapsed || 0,
+                attemptNumber: attemptNumber || 1,
+                sessionId: sessionId || "unknown",
+                testCases: expectedTestCases,
+                completedAt: new Date().toISOString()
+            }
+        });
+
+        // If puzzle solved, PREMIUM HIGH-SCORE SYSTEM
+        if (allCorrect) {
+            // Get current ARC-2 points and completed puzzles
+            const currentUserData = server.GetUserData({
+                PlayFabId: context.currentPlayerId,
+                Keys: ["completedARC2Puzzles", "arc2EvalPoints"]
+            });
+
+            let completedARC2Puzzles = [];
+            if (currentUserData.Data && currentUserData.Data.completedARC2Puzzles) {
+                try {
+                    completedARC2Puzzles = JSON.parse(currentUserData.Data.completedARC2Puzzles.Value);
+                } catch (e) {
+                    completedARC2Puzzles = [];
+                }
+            }
+
+            let currentARC2Points = 0;
+            if (currentUserData.Data && currentUserData.Data.arc2EvalPoints) {
+                currentARC2Points = parseInt(currentUserData.Data.arc2EvalPoints.Value) || 0;
+            }
+
+            // Add puzzle to completed list if not already there
+            if (completedARC2Puzzles.indexOf(puzzleId) === -1) {
+                completedARC2Puzzles.push(puzzleId);
+            }
+
+            // PREMIUM HIGH-SCORE FORMULA
+            const basePoints = 25000; // Massive base for hardest puzzles!
+            
+            // Premium Speed Bonus: 200 points per minute under 30 minutes
+            const timeInMinutes = Math.ceil((timeElapsed || 0) / 60);
+            const speedBonus = timeInMinutes < 30 ? (30 - timeInMinutes) * 200 : 0;
+            
+            // Premium Efficiency Bonus: 100 points per action under 150
+            const stepCount = getStepCountFromEvents(context.currentPlayerId, sessionId) || 150;
+            const efficiencyBonus = stepCount < 150 ? (150 - stepCount) * 100 : 0;
+            
+            // First Try Bonus: Huge reward for getting it right immediately
+            const firstTryBonus = (attemptNumber === 1) ? 5000 : 0;
+            
+            // Simple session validation (flags but doesn't block)
+            validateSession(timeElapsed, stepCount, sessionId, context.currentPlayerId);
+            
+            const finalScore = basePoints + speedBonus + efficiencyBonus + firstTryBonus;
+            const newARC2Points = currentARC2Points + finalScore;
+            
+            // Update separate ARC2EvalPoints statistic
+            server.UpdatePlayerStatistics({
+                PlayFabId: context.currentPlayerId,
+                Statistics: [
+                    { StatisticName: "ARC2EvalPoints", Value: newARC2Points }
+                ]
+            });
+            
+            // Update user data with new points and completed puzzles
+            server.UpdateUserData({
+                PlayFabId: context.currentPlayerId,
+                Data: {
+                    completedARC2Puzzles: JSON.stringify(completedARC2Puzzles),
+                    arc2EvalPoints: newARC2Points.toString()
+                }
+            });
+
+            // Log premium high-score details for analytics
+            server.WritePlayerEvent({
+                PlayFabId: context.currentPlayerId,
+                EventName: "ARC2EvalHighScore",
+                Body: {
+                    puzzleId: puzzleId,
+                    basePoints: basePoints,
+                    speedBonus: speedBonus,
+                    efficiencyBonus: efficiencyBonus,
+                    firstTryBonus: firstTryBonus,
+                    finalScore: finalScore,
+                    newARC2Points: newARC2Points,
+                    timeInMinutes: timeInMinutes,
+                    stepCount: stepCount,
+                    attemptNumber: attemptNumber,
+                    sessionId: sessionId || "unknown"
+                }
+            });
+        }
+
+        return {
+            success: true,
+            correct: allCorrect,
+            timeElapsed: timeElapsed || 0,
+            completedAt: new Date().toISOString(),
+            premium: true // Flag to indicate this was a premium evaluation puzzle
+        };
+
+    } catch (error) {
+        log.error("ValidateARC2EvalPuzzle error", error);
+        
+        return {
+            success: false,
+            error: "Internal server error during ARC-2 evaluation puzzle validation"
+        };
+    }
+};
+
+/**
+ * Get step count from events for bonus calculation
+ * Extracts cell_change events from recent player events for the given session
+ */
+function getStepCountFromEvents(playFabId, sessionId) {
+    // Query recent events for this session
+    const events = server.GetPlayerEvents({
+        PlayFabId: playFabId,
+        EventNamespace: "custom.SFMC"
+    });
+    
+    // Count cell_change events in this session
+    let stepCount = 0;
+    if (events && events.History) {
+        for (let event of events.History) {
+            if (event.EventName === "SFMC" && 
+                event.EventData && 
+                event.EventData.sessionId === sessionId &&
+                event.EventData.event_type === "cell_change") {
+                stepCount++;
+            }
+        }
+    }
+    
+    return stepCount || 100; // Default to 100 if no data
+}
+
+/**
+ * Simple session validation for fraud detection
+ * 
+ * Flags suspicious activity without blocking legitimate solves.
+ * Philosophy: Data collection over punishment.
+ */
+function validateSession(timeElapsed, stepCount, sessionId, playFabId) {
+    const flags = [];
+    
+    // Suspiciously fast (under 30 seconds)
+    if (timeElapsed && timeElapsed < 30) {
+        flags.push("FAST_SOLVE");
+    }
+    
+    // Too few actions for complex puzzle (under 5 actions)
+    if (stepCount && stepCount < 5) {
+        flags.push("LOW_ACTION_COUNT");
+    }
+    
+    // Log flags for analysis, don't block scoring
+    if (flags.length > 0) {
+        server.WritePlayerEvent({
+            PlayFabId: playFabId,
+            EventName: "SuspiciousSolve",
+            Body: {
+                flags: flags,
+                timeElapsed: timeElapsed,
+                stepCount: stepCount,
+                sessionId: sessionId,
+                timestamp: new Date().toISOString()
+            }
+        });
+    }
+    
+    // Always return true - we don't block, just flag
+    return true;
+}
 
 /**
  * Find puzzle data from Title Data batches

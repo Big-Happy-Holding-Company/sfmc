@@ -1,3 +1,7 @@
+/// This is an ancient relic from the original implementation. 
+// Beware.  It is hopefully never used.
+
+
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 

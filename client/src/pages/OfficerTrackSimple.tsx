@@ -11,10 +11,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { AlertTriangle } from 'lucide-react';
+import { Header } from '@/components/game/Header';
 import { useOfficerPuzzles } from '@/hooks/useOfficerPuzzles';
 import { PuzzleGrid } from '@/components/officer/PuzzleGrid';
 import { playFabService } from '@/services/playfab';
 import type { OfficerPuzzle } from '@/services/officerArcAPI';
+import type { PlayFabPlayer } from '@/services/playfab';
 
 export default function OfficerTrackSimple() {
   const [location, setLocation] = useLocation();
@@ -38,8 +40,10 @@ export default function OfficerTrackSimple() {
   const [searching, setSearching] = useState(false);
   const [playFabReady, setPlayFabReady] = useState(false);
   const [playFabInitializing, setPlayFabInitializing] = useState(true);
+  const [player, setPlayer] = useState<PlayFabPlayer | null>(null);
+  const [totalTasks, setTotalTasks] = useState(0);
 
-  // Initialize PlayFab on mount
+  // Initialize PlayFab and load player data on mount
   useEffect(() => {
     const initializePlayFab = async () => {
       try {
@@ -54,6 +58,14 @@ export default function OfficerTrackSimple() {
           await playFabService.loginAnonymously();
         }
         
+        // Load player data and tasks for header
+        const [playerData, tasksData] = await Promise.all([
+          playFabService.getPlayerData(),
+          playFabService.getAllTasks()
+        ]);
+        
+        setPlayer(playerData);
+        setTotalTasks(tasksData.length);
         setPlayFabReady(true);
         console.log('✅ PlayFab ready for Officer Track');
       } catch (err) {
@@ -61,6 +73,18 @@ export default function OfficerTrackSimple() {
         // Continue anyway - arc-explainer API doesn't require PlayFab
         // But warn user that puzzle loading might be limited
         setPlayFabReady(false);
+        // Set fallback player data
+        setPlayer({ 
+          id: 'unknown', 
+          username: 'Officer', 
+          rank: 'Cadet', 
+          rankLevel: 1, 
+          totalPoints: 0, 
+          completedMissions: 0,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+        setTotalTasks(0);
       } finally {
         setPlayFabInitializing(false);
       }
@@ -121,12 +145,25 @@ export default function OfficerTrackSimple() {
     setLocation(`/officer-track/solve/${puzzle.id}`);
   };
 
+  if (!player) {
+    return (
+      <div className="min-h-screen bg-slate-900 text-amber-50">
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <div className="text-white text-lg">Loading Officer Academy...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-slate-900 text-amber-50">
-      {/* Header */}
-      <header className="bg-slate-800 border-b-2 border-amber-400 shadow-lg">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800">
+      <Header player={player} totalTasks={totalTasks} />
+      
+      <div className="bg-slate-800 border-b-2 border-amber-400 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-center items-center">
             <div className="flex items-center space-x-4">
               <h1 className="text-2xl font-bold text-amber-400">
                 🎖️ OFFICER ACADEMY
@@ -135,17 +172,9 @@ export default function OfficerTrackSimple() {
                 ARC-AGI CHALLENGES
               </Badge>
             </div>
-            
-            <Button 
-              variant="outline" 
-              className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900"
-              onClick={() => window.history.back()}
-            >
-              ← Return to Base
-            </Button>
           </div>
         </div>
-      </header>
+      </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
@@ -248,95 +277,158 @@ export default function OfficerTrackSimple() {
 
         </div>
 
-        {/* AI Performance Overview */}
+        {/* Rich AI Failure Analysis Overview */}
         <div className="bg-slate-800 border border-slate-600 rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-cyan-400 font-semibold flex items-center">
-              🤖 AI PERFORMANCE OVERVIEW
+              🧠 AI FAILURE ANALYSIS - ARC-EXPLAINER DATA
             </h2>
             <div className="text-slate-400 text-sm">
-              Real performance data from arc-explainer
+              Live failure patterns & trustworthiness metrics
             </div>
           </div>
           
           {loading ? (
-            <div className="text-center text-slate-400 py-4">Loading performance data...</div>
+            <div className="text-center text-slate-400 py-4">Loading failure analysis data...</div>
           ) : (
             <div className="space-y-4">
-              {/* Top Row - Core Metrics */}
+              {/* Top Row - Failure Analysis Core Metrics */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-slate-700 rounded-lg p-4 text-center">
+                <div className="bg-slate-700 rounded-lg p-4 text-center border-l-4 border-amber-500">
                   <div className="text-2xl font-bold text-amber-400">{filteredPuzzles.length}</div>
-                  <div className="text-sm text-slate-400">Worst Performing</div>
-                  <div className="text-xs text-slate-500">Puzzles Loaded</div>
+                  <div className="text-sm text-slate-400">🔥 Hardest Puzzles</div>
+                  <div className="text-xs text-slate-500">AI struggles significantly</div>
                 </div>
                 
-                <div className="bg-slate-700 rounded-lg p-4 text-center">
-                  <div className="text-2xl font-bold text-cyan-400">
-                    {filteredPuzzles.length > 0 && filteredPuzzles.some(p => p.avgConfidence !== undefined)
-                      ? `${Math.round(filteredPuzzles.filter(p => p.avgConfidence !== undefined).reduce((sum, p) => sum + (p.avgConfidence || 0), 0) / filteredPuzzles.filter(p => p.avgConfidence !== undefined).length)}%`
-                      : 'N/A'
-                    }
+                <div className="bg-slate-700 rounded-lg p-4 text-center border-l-4 border-red-500">
+                  <div className="text-2xl font-bold text-red-400">
+                    {filteredPuzzles.filter(p => p.avgAccuracy === 0).length}
                   </div>
-                  <div className="text-sm text-slate-400">Overall Confidence</div>
-                  <div className="text-xs text-slate-500">Average confidence level</div>
+                  <div className="text-sm text-slate-400">💀 Impossible Tasks</div>
+                  <div className="text-xs text-slate-500">0% success rate</div>
                 </div>
                 
-                <div className="bg-slate-700 rounded-lg p-4 text-center">
-                  <div className="text-2xl font-bold text-orange-400">
-                    {filteredPuzzles.reduce((sum, p) => sum + p.totalExplanations, 0).toLocaleString()}
-                  </div>
-                  <div className="text-sm text-slate-400">Total Attempts</div>
-                  <div className="text-xs text-slate-500">AI Analysis Count</div>
-                </div>
-                
-                <div className="bg-slate-700 rounded-lg p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-400">
-                    {filteredPuzzles.filter(p => p.avgAccuracy <= 0.1).length}
-                  </div>
-                  <div className="text-sm text-slate-400">Nearly Impossible</div>
-                  <div className="text-xs text-slate-500">≤10% Success Rate</div>
-                </div>
-              </div>
-
-              {/* Bottom Row - AI Failure Patterns */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-slate-700 rounded-lg p-4 text-center border-l-4 border-yellow-500">
-                  <div className="text-2xl font-bold text-yellow-400">
-                    {filteredPuzzles.length > 0 && filteredPuzzles.some(p => p.avgConfidence !== undefined)
-                      ? `${Math.round(filteredPuzzles.filter(p => p.avgConfidence !== undefined).reduce((sum, p) => sum + (p.avgConfidence || 0), 0) / filteredPuzzles.filter(p => p.avgConfidence !== undefined).length)}%`
-                      : 'N/A'
-                    }
-                  </div>
-                  <div className="text-sm text-slate-400">⚠️ Calibration Gap</div>
-                  <div className="text-xs text-slate-500">Confidence when incorrect</div>
-                </div>
-                
-                <div className="bg-slate-700 rounded-lg p-4 text-center">
+                <div className="bg-slate-700 rounded-lg p-4 text-center border-l-4 border-purple-500">
                   <div className="text-2xl font-bold text-purple-400">
                     {filteredPuzzles.reduce((sum, p) => sum + (p.wrongCount || 0), 0).toLocaleString()}
                   </div>
-                  <div className="text-sm text-slate-400">Failed Attempts</div>
-                  <div className="text-xs text-slate-500">Incorrect predictions</div>
+                  <div className="text-sm text-slate-400">❌ Total Failures</div>
+                  <div className="text-xs text-slate-500">Wrong predictions</div>
                 </div>
                 
-                <div className="bg-slate-700 rounded-lg p-4 text-center">
-                  <div className="text-2xl font-bold text-pink-400">
-                    {(() => {
-                      const totalFeedback = filteredPuzzles.reduce((sum, p) => sum + (p.totalFeedback || 0), 0);
-                      const negativeFeedback = filteredPuzzles.reduce((sum, p) => sum + (p.negativeFeedback || 0), 0);
-                      return totalFeedback > 0 ? `${Math.round((negativeFeedback / totalFeedback) * 100)}%` : '0%';
-                    })()}
+                <div className="bg-slate-700 rounded-lg p-4 text-center border-l-4 border-orange-500">
+                  <div className="text-2xl font-bold text-orange-400">
+                    {filteredPuzzles.reduce((sum, p) => sum + p.totalExplanations, 0).toLocaleString()}
                   </div>
-                  <div className="text-sm text-slate-400">Unhelpful Rate</div>
-                  <div className="text-xs text-slate-500">Poor explanation quality</div>
+                  <div className="text-sm text-slate-400">🤖 AI Attempts</div>
+                  <div className="text-xs text-slate-500">Analysis sessions</div>
+                </div>
+              </div>
+
+              {/* Middle Row - Trustworthiness & Overconfidence Analysis */}
+              <div className="bg-gradient-to-r from-yellow-900/20 to-red-900/20 border border-yellow-600/30 rounded-lg p-4">
+                <h3 className="text-yellow-400 font-semibold mb-3 flex items-center">
+                  ⚠️ DANGEROUS OVERCONFIDENCE PATTERNS
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-slate-700/50 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-yellow-400">
+                      {filteredPuzzles.length > 0 && filteredPuzzles.some(p => p.avgConfidence !== undefined)
+                        ? `${Math.round(filteredPuzzles.filter(p => p.avgConfidence !== undefined).reduce((sum, p) => sum + (p.avgConfidence || 0), 0) / filteredPuzzles.filter(p => p.avgConfidence !== undefined).length)}%`
+                        : 'N/A'
+                      }
+                    </div>
+                    <div className="text-sm text-slate-400">Avg Confidence</div>
+                    <div className="text-xs text-slate-500">When making errors</div>
+                  </div>
+                  
+                  <div className="bg-slate-700/50 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-red-400">
+                      {(() => {
+                        const highConfidenceWrong = filteredPuzzles.filter(p => 
+                          p.avgAccuracy < 0.5 && (p.avgConfidence || 0) > 70
+                        ).length;
+                        return `${Math.round((highConfidenceWrong / filteredPuzzles.length) * 100)}%`;
+                      })()}
+                    </div>
+                    <div className="text-sm text-slate-400">Overconfident</div>
+                    <div className="text-xs text-slate-500">High conf, low accuracy</div>
+                  </div>
+                  
+                  <div className="bg-slate-700/50 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-pink-400">
+                      {(() => {
+                        const totalFeedback = filteredPuzzles.reduce((sum, p) => sum + (p.totalFeedback || 0), 0);
+                        const negativeFeedback = filteredPuzzles.reduce((sum, p) => sum + (p.negativeFeedback || 0), 0);
+                        return totalFeedback > 0 ? `${Math.round((negativeFeedback / totalFeedback) * 100)}%` : '0%';
+                      })()}
+                    </div>
+                    <div className="text-sm text-slate-400">Poor Explanations</div>
+                    <div className="text-xs text-slate-500">Human feedback negative</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Row - Human Feedback Insights */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-slate-700 rounded-lg p-4 border-l-4 border-cyan-500">
+                  <h4 className="text-cyan-400 font-semibold mb-2">👥 Human Feedback Quality</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-slate-400">Total Feedback:</span>
+                      <span className="text-sm text-cyan-400 font-mono">
+                        {filteredPuzzles.reduce((sum, p) => sum + (p.totalFeedback || 0), 0)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-slate-400">Negative:</span>
+                      <span className="text-sm text-pink-400 font-mono">
+                        {filteredPuzzles.reduce((sum, p) => sum + (p.negativeFeedback || 0), 0)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-slate-400">Quality Score:</span>
+                      <span className="text-sm text-green-400 font-mono">
+                        {(() => {
+                          const total = filteredPuzzles.reduce((sum, p) => sum + (p.totalFeedback || 0), 0);
+                          const negative = filteredPuzzles.reduce((sum, p) => sum + (p.negativeFeedback || 0), 0);
+                          return total > 0 ? `${Math.round(((total - negative) / total) * 100)}%` : 'N/A';
+                        })()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-slate-700 rounded-lg p-4 border-l-4 border-blue-500">
+                  <h4 className="text-blue-400 font-semibold mb-2">📊 Analysis Depth</h4>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-slate-400">Extensively Analyzed:</span>
+                      <span className="text-sm text-green-400 font-mono">
+                        {filteredPuzzles.filter(p => p.totalExplanations >= 50).length}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-slate-400">Well Analyzed:</span>
+                      <span className="text-sm text-blue-400 font-mono">
+                        {filteredPuzzles.filter(p => p.totalExplanations >= 20 && p.totalExplanations < 50).length}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-slate-400">Limited Data:</span>
+                      <span className="text-sm text-red-400 font-mono">
+                        {filteredPuzzles.filter(p => p.totalExplanations < 5).length}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           )}
           
-          <div className="mt-4 text-center text-xs text-slate-500">
-            Showing the 50 worst performing puzzles where AI struggles most • Calibration gap reveals dangerous overconfidence patterns
+          <div className="mt-4 text-center text-xs text-slate-500 bg-slate-900/50 rounded p-2">
+            🧠 <strong>Arc-Explainer Intelligence:</strong> This data reveals where AI systems fail most dramatically. 
+            High confidence + low accuracy = dangerous overconfidence requiring human oversight.
           </div>
         </div>
 

@@ -41,6 +41,7 @@ export class PlayFabAuth {
   private isLoggedIn: boolean = false;
   private playFabId: string | null = null;
   private displayName: string | null = null;
+  private loginPromise: Promise<AuthenticationResult> | null = null;
 
   private constructor() {}
 
@@ -55,49 +56,62 @@ export class PlayFabAuth {
    * Anonymous authentication using device ID (HTTP implementation)
    */
   public async loginAnonymously(): Promise<AuthenticationResult> {
+    // Prevent concurrent login attempts
+    if (this.loginPromise) {
+      playFabCore.logOperation('Anonymous Login', 'Already in progress, waiting...');
+      return await this.loginPromise;
+    }
+
     playFabCore.logOperation('Anonymous Login', 'Starting...');
     
     const customId = this.getOrCreateDeviceId();
 
     const request = {
       CustomId: customId,
-      CreateAccount: true,
-      InfoRequestParameters: {
-        GetPlayerProfile: true
-      }
+      CreateAccount: true
+      // Remove InfoRequestParameters as it's causing 400 error
+      // We'll get profile data separately if needed
     };
 
-    try {
-      const result = await playFabCore.makeHttpRequest<typeof request, LoginWithCustomIDResponse>(
-        '/Client/LoginWithCustomID',
-        request,
-        false // No auth required for login
-      );
+    // Create and store the login promise
+    this.loginPromise = (async () => {
+      try {
+        const result = await playFabCore.makeHttpRequest<typeof request, LoginWithCustomIDResponse>(
+          '/Client/LoginWithCustomID',
+          request,
+          false // No auth required for login
+        );
 
-      // Store session data
-      this.isLoggedIn = true;
-      this.playFabId = result.PlayFabId;
-      
-      // Store session token in core for authenticated requests
-      playFabCore.setSessionToken(result.SessionTicket);
-      
-      playFabCore.logOperation('Anonymous Login Success', {
-        playFabId: result.PlayFabId,
-        newlyCreated: result.NewlyCreated
-      });
+        // Store session data
+        this.isLoggedIn = true;
+        this.playFabId = result.PlayFabId;
+        
+        // Store session token in core for authenticated requests
+        playFabCore.setSessionToken(result.SessionTicket);
+        
+        playFabCore.logOperation('Anonymous Login Success', {
+          playFabId: result.PlayFabId,
+          newlyCreated: result.NewlyCreated
+        });
 
-      // Handle display name like Unity does
-      await this.handleDisplayName(result);
+        // Handle display name like Unity does
+        await this.handleDisplayName(result);
 
-      return {
-        PlayFabId: result.PlayFabId,
-        DisplayName: this.displayName || undefined,
-        NewlyCreated: result.NewlyCreated
-      };
-    } catch (error) {
-      playFabCore.logOperation('Anonymous Login Failed', error);
-      throw error;
-    }
+        return {
+          PlayFabId: result.PlayFabId,
+          DisplayName: this.displayName || undefined,
+          NewlyCreated: result.NewlyCreated
+        };
+      } catch (error) {
+        playFabCore.logOperation('Anonymous Login Failed', error);
+        throw error;
+      } finally {
+        // Clear the promise when done (success or failure)
+        this.loginPromise = null;
+      }
+    })();
+
+    return await this.loginPromise;
   }
 
   /**
@@ -233,6 +247,15 @@ export class PlayFabAuth {
    * Ensure user is authenticated, login if necessary
    */
   public async ensureAuthenticated(): Promise<void> {
+    // Initialize PlayFab core if not already done
+    if (!playFabCore.isReady()) {
+      const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
+      if (!titleId) {
+        throw new Error('VITE_PLAYFAB_TITLE_ID environment variable not set');
+      }
+      await playFabCore.initialize({ titleId });
+    }
+
     if (!this.isAuthenticated()) {
       await this.loginAnonymously();
     }

@@ -2,6 +2,8 @@
 trigger: always_on
 ---
 
+Adhere to DRY and SRP. 
+
 The token '&&' is not a valid statement separator in this version! NEVER USE &&
 We are on Windows.  Use Windows syntax.
 You need to use ; instead!!!

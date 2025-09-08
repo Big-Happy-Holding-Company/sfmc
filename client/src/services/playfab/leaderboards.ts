@@ -1,238 +1,123 @@
 /**
- * PlayFab Leaderboards Service - Pure HTTP Implementation  
- * Manages score submission, leaderboard retrieval, and ranking operations
- * Direct REST API calls - no SDK dependencies
+ * Leaderboard Service - Clean Orchestration Layer
+ * Author: Cascade
+ * Date: 2025-09-07
+ * 
+ * PURPOSE:
+ * Orchestrates leaderboard operations using modular components.
+ * Configuration-driven - adding leaderboards requires zero code changes.
+ * 
+ * HOW IT WORKS:
+ * - Uses LeaderboardAPI for HTTP calls
+ * - Uses LeaderboardCache for caching
+ * - Uses LeaderboardTypes for configuration
+ * - Provides clean, simple interface to UI components
+ * 
+ * HOW THE PROJECT USES IT:
+ * - UI components call simple methods like getLeaderboard(LeaderboardType.GLOBAL)
+ * - All complexity hidden behind clean interface
  */
 
 import type { LeaderboardEntry } from '@/types/playfab';
-import { playFabCore } from './core';
 import { playFabAuth } from './auth';
-import { PLAYFAB_CONSTANTS } from '@/types/playfab';
+import { playFabCore } from './core';
+import { leaderboardAPI } from './leaderboard-api';
+import { leaderboardCache } from './leaderboard-cache';
+import { 
+  LeaderboardType, 
+  getLeaderboardConfig, 
+  getEnabledLeaderboards 
+} from './leaderboard-types';
 
-// PlayFab UpdatePlayerStatistics request format
-interface UpdatePlayerStatisticsRequest {
-  Statistics: Array<{
-    StatisticName: string;
-    Value: number;
-  }>;
-}
-
-// PlayFab GetLeaderboard request format  
-interface GetLeaderboardRequest {
-  StatisticName: string;
-  StartPosition: number;
-  MaxResultsCount: number;
-}
-
-// PlayFab GetLeaderboardAroundPlayer request format
-interface GetLeaderboardAroundPlayerRequest {
-  StatisticName: string;
-  PlayFabId: string;
-  MaxResultsCount: number;
-}
-
-// PlayFab leaderboard response format
-interface LeaderboardResponse {
-  Leaderboard: Array<{
-    DisplayName?: string;
-    StatValue: number;
-    Position: number;
-    PlayFabId: string;
-  }>;
-  NextReset?: string;
-  Version: number;
-}
-
-export class PlayFabLeaderboards {
-  private static instance: PlayFabLeaderboards;
-  private leaderboardCache: LeaderboardEntry[] = [];
-  private lastCacheTime: number = 0;
-  private readonly CACHE_DURATION = 2 * 60 * 1000; // 2 minutes
+export class LeaderboardService {
+  private static instance: LeaderboardService;
 
   private constructor() {}
 
-  public static getInstance(): PlayFabLeaderboards {
-    if (!PlayFabLeaderboards.instance) {
-      PlayFabLeaderboards.instance = new PlayFabLeaderboards();
+  public static getInstance(): LeaderboardService {
+    if (!LeaderboardService.instance) {
+      LeaderboardService.instance = new LeaderboardService();
     }
-    return PlayFabLeaderboards.instance;
+    return LeaderboardService.instance;
   }
 
   /**
-   * Submit score to leaderboard (HTTP implementation)
-   * Matches Unity's UpdatePlayerStatistics functionality
+   * Get leaderboard by type - works for any configured leaderboard
    */
-  public async submitScore(score: number): Promise<void> {
-    await playFabAuth.ensureAuthenticated();
-
-    const request: UpdatePlayerStatisticsRequest = {
-      Statistics: [{
-        StatisticName: PLAYFAB_CONSTANTS.STATISTIC_NAMES.LEVEL_POINTS,
-        Value: score
-      }]
-    };
-
-    try {
-      await playFabCore.makeHttpRequest<UpdatePlayerStatisticsRequest, {}>(
-        '/Client/UpdatePlayerStatistics',
-        request,
-        true // Requires authentication
-      );
-
-      // Clear cache since scores have changed
-      this.clearCache();
-
-      playFabCore.logOperation('Score Submitted', {
-        statistic: PLAYFAB_CONSTANTS.STATISTIC_NAMES.LEVEL_POINTS,
-        value: score
-      });
-    } catch (error) {
-      playFabCore.logOperation('Score Submission Failed', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get leaderboard (HTTP implementation)
-   * Matches Unity's GetLeaderboard exactly
-   */
-  public async getLeaderboard(maxResults: number = 10): Promise<LeaderboardEntry[]> {
-    // Check cache first
-    if (this.isCacheValid() && this.leaderboardCache.length > 0) {
-      playFabCore.logOperation('Leaderboard Cache Hit', `${this.leaderboardCache.length} entries`);
-      return this.leaderboardCache.slice(0, maxResults);
-    }
-
-    await playFabAuth.ensureAuthenticated();
-
-    const request: GetLeaderboardRequest = {
-      StatisticName: PLAYFAB_CONSTANTS.STATISTIC_NAMES.LEVEL_POINTS,
-      StartPosition: 0,
-      MaxResultsCount: maxResults
-    };
-
-    try {
-      const result = await playFabCore.makeHttpRequest<GetLeaderboardRequest, LeaderboardResponse>(
-        '/Client/GetLeaderboard',
-        request,
-        true // Requires authentication
-      );
-
-      const entries: LeaderboardEntry[] = result.Leaderboard.map((entry: any) => ({
-        DisplayName: entry.DisplayName || 'Unknown',
-        StatValue: entry.StatValue || 0,
-        Position: entry.Position + 1, // Convert to 1-based ranking
-        PlayFabId: entry.PlayFabId
-      }));
-
-      // Update cache
-      this.leaderboardCache = entries;
-      this.lastCacheTime = Date.now();
-
-      playFabCore.logOperation('Leaderboard Retrieved', `${entries.length} entries`);
-      
-      // Log top entries for debugging
-      entries.slice(0, 3).forEach((entry, index) => {
-        playFabCore.logOperation(`Leaderboard #${index + 1}`, 
-          `${entry.DisplayName}: ${entry.StatValue} pts`
-        );
-      });
-
-      return entries;
-    } catch (error) {
-      playFabCore.logOperation('Leaderboard Retrieval Failed', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get leaderboard around a specific player (HTTP implementation)
-   */
-  public async getLeaderboardAroundPlayer(
-    playerId: string, 
+  public async getLeaderboard(
+    type: LeaderboardType, 
     maxResults: number = 10
   ): Promise<LeaderboardEntry[]> {
-    await playFabAuth.ensureAuthenticated();
-
-    const request: GetLeaderboardAroundPlayerRequest = {
-      StatisticName: PLAYFAB_CONSTANTS.STATISTIC_NAMES.LEVEL_POINTS,
-      PlayFabId: playerId,
-      MaxResultsCount: maxResults
-    };
-
-    try {
-      const result = await playFabCore.makeHttpRequest<GetLeaderboardAroundPlayerRequest, LeaderboardResponse>(
-        '/Client/GetLeaderboardAroundPlayer',
-        request,
-        true // Requires authentication
-      );
-
-      const entries: LeaderboardEntry[] = result.Leaderboard.map((entry: any) => ({
-        DisplayName: entry.DisplayName || 'Unknown',
-        StatValue: entry.StatValue || 0,
-        Position: entry.Position + 1,
-        PlayFabId: entry.PlayFabId
-      }));
-
-      playFabCore.logOperation('Player-Centered Leaderboard Retrieved', 
-        `${entries.length} entries around ${playerId}`
-      );
-
-      return entries;
-    } catch (error) {
-      playFabCore.logOperation('Player-Centered Leaderboard Failed', error);
-      throw error;
+    const config = getLeaderboardConfig(type);
+    
+    // Try cache first
+    const cached = leaderboardCache.get(config.statisticName, maxResults);
+    if (cached) {
+      return cached;
     }
+
+    // Fetch from API
+    const entries = await leaderboardAPI.getLeaderboard(config.statisticName, 0, maxResults);
+    
+    // Cache results
+    leaderboardCache.set(config.statisticName, entries);
+    
+    playFabCore.logOperation('Leaderboard Retrieved', `${entries.length} entries for ${config.displayName}`);
+    return entries;
   }
 
   /**
-   * Get current player's ranking
+   * Submit score to specific leaderboard type
    */
-  public async getPlayerRanking(): Promise<LeaderboardEntry | null> {
+  public async submitScore(type: LeaderboardType, score: number): Promise<void> {
+    const config = getLeaderboardConfig(type);
+    await leaderboardAPI.submitScore(config.statisticName, score);
+    
+    // Clear cache since scores changed
+    leaderboardCache.clear(config.statisticName);
+  }
+
+  /**
+   * Get player's ranking in specific leaderboard
+   */
+  public async getPlayerRanking(type: LeaderboardType): Promise<LeaderboardEntry | null> {
     const currentPlayerId = playFabAuth.getPlayFabId();
     if (!currentPlayerId) {
       throw new Error('No current player ID available');
     }
 
-    try {
-      const aroundPlayerResults = await this.getLeaderboardAroundPlayer(currentPlayerId, 1);
-      const playerEntry = aroundPlayerResults.find(entry => entry.PlayFabId === currentPlayerId);
-      
-      if (playerEntry) {
-        playFabCore.logOperation('Player Ranking Retrieved', 
-          `Rank: ${playerEntry.Position}, Score: ${playerEntry.StatValue}`
-        );
-        return playerEntry;
-      } else {
-        playFabCore.logOperation('Player Not Found in Leaderboard', currentPlayerId);
-        return null;
-      }
-    } catch (error) {
-      playFabCore.logOperation('Player Ranking Retrieval Failed', error);
-      throw error;
+    const config = getLeaderboardConfig(type);
+    const results = await leaderboardAPI.getLeaderboardAroundPlayer(
+      config.statisticName, 
+      currentPlayerId, 
+      1
+    );
+    
+    const playerEntry = results.find(entry => entry.PlayFabId === currentPlayerId);
+    
+    if (playerEntry) {
+      playFabCore.logOperation('Player Ranking Retrieved', 
+        `${config.displayName}: Rank ${playerEntry.Position}, Score ${playerEntry.StatValue}`
+      );
     }
+    
+    return playerEntry || null;
   }
 
   /**
-   * Get top N players from leaderboard
+   * Get leaderboard statistics for any type
    */
-  public async getTopPlayers(count: number = 10): Promise<LeaderboardEntry[]> {
-    const leaderboard = await this.getLeaderboard(count);
-    return leaderboard.slice(0, count);
-  }
-
-  /**
-   * Get leaderboard statistics
-   */
-  public async getLeaderboardStats(): Promise<{
+  public async getLeaderboardStats(type: LeaderboardType): Promise<{
     totalPlayers: number;
     highestScore: number;
     averageScore: number;
     playerRank?: number;
     playerScore?: number;
   }> {
-    const leaderboard = await this.getLeaderboard(100); // Get larger sample
-    const playerRanking = await this.getPlayerRanking();
+    const [leaderboard, playerRanking] = await Promise.all([
+      this.getLeaderboard(type, 100), // Get larger sample
+      this.getPlayerRanking(type)
+    ]);
 
     if (leaderboard.length === 0) {
       return {
@@ -246,86 +131,60 @@ export class PlayFabLeaderboards {
     const totalScore = leaderboard.reduce((sum, entry) => sum + entry.StatValue, 0);
     const averageScore = Math.round(totalScore / leaderboard.length);
 
-    const stats = {
+    return {
       totalPlayers: leaderboard.length,
       highestScore,
       averageScore,
       playerRank: playerRanking?.Position,
       playerScore: playerRanking?.StatValue
     };
-
-    playFabCore.logOperation('Leaderboard Stats', stats);
-    return stats;
   }
 
   /**
-   * Refresh leaderboard data
+   * Refresh specific leaderboard
    */
-  public async refreshLeaderboard(maxResults: number = 10): Promise<LeaderboardEntry[]> {
-    this.clearCache();
-    return await this.getLeaderboard(maxResults);
+  public async refreshLeaderboard(type: LeaderboardType, maxResults: number = 10): Promise<LeaderboardEntry[]> {
+    const config = getLeaderboardConfig(type);
+    leaderboardCache.clear(config.statisticName);
+    return this.getLeaderboard(type, maxResults);
   }
 
   /**
-   * Clear leaderboard cache
+   * Get all enabled leaderboard configurations for UI
    */
-  public clearCache(): void {
-    this.leaderboardCache = [];
-    this.lastCacheTime = 0;
-    playFabCore.logOperation('Leaderboard Cache Cleared');
+  public getAvailableLeaderboards() {
+    return getEnabledLeaderboards();
   }
 
   /**
-   * Check if cached data is still valid
+   * Check if player is in top N for specific leaderboard
    */
-  private isCacheValid(): boolean {
-    const cacheAge = Date.now() - this.lastCacheTime;
-    return this.leaderboardCache.length > 0 && cacheAge < this.CACHE_DURATION;
-  }
-
-  /**
-   * Get cached leaderboard data
-   */
-  public getCachedLeaderboard(): LeaderboardEntry[] {
-    return this.leaderboardCache;
-  }
-
-  /**
-   * Get cache information
-   */
-  public getCacheInfo(): { 
-    count: number; 
-    ageMs: number; 
-    valid: boolean;
-    lastUpdate: Date | null;
-  } {
-    return {
-      count: this.leaderboardCache.length,
-      ageMs: Date.now() - this.lastCacheTime,
-      valid: this.isCacheValid(),
-      lastUpdate: this.lastCacheTime > 0 ? new Date(this.lastCacheTime) : null
-    };
-  }
-
-  /**
-   * Check if player is in top N
-   */
-  public async isPlayerInTop(topN: number): Promise<boolean> {
+  public async isPlayerInTop(type: LeaderboardType, topN: number): Promise<boolean> {
     const currentPlayerId = playFabAuth.getPlayFabId();
     if (!currentPlayerId) return false;
 
-    const topPlayers = await this.getTopPlayers(topN);
+    const topPlayers = await this.getLeaderboard(type, topN);
     return topPlayers.some(entry => entry.PlayFabId === currentPlayerId);
   }
 
   /**
-   * Get players better than current player
+   * Get cache information for debugging
    */
-  public async getPlayersAbove(): Promise<number> {
-    const playerRanking = await this.getPlayerRanking();
-    return playerRanking ? playerRanking.Position - 1 : 0;
+  public getCacheInfo(type: LeaderboardType) {
+    const config = getLeaderboardConfig(type);
+    return leaderboardCache.getInfo(config.statisticName);
+  }
+
+  /**
+   * Clear all caches
+   */
+  public clearAllCaches(): void {
+    leaderboardCache.clear();
   }
 }
 
 // Export singleton instance
-export const playFabLeaderboards = PlayFabLeaderboards.getInstance();
+export const leaderboards = LeaderboardService.getInstance();
+
+// Backward compatibility exports
+export const playFabLeaderboards = leaderboards;

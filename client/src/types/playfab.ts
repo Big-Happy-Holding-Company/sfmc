@@ -61,6 +61,8 @@ export interface LeaderboardEntry {
   Position: number;
   PlayFabId: string;
   Profile?: PlayerProfile;
+  AttemptCount?: number; // Total number of puzzle attempts
+  CompletionRate?: number; // Success rate as percentage
 }
 
 // =============================================================================
@@ -191,6 +193,7 @@ export const PLAYFAB_CONSTANTS = {
   STATISTIC_NAMES: {
     LEVEL_POINTS: 'LevelPoints',
     OFFICER_TRACK_POINTS: 'OfficerTrackPoints',
+    ARC2_EVAL_POINTS: 'ARC2EvalPoints',
   },
   TITLE_DATA_KEYS: {
     TASKS: 'tasks.json',
@@ -199,6 +202,7 @@ export const PLAYFAB_CONSTANTS = {
   CLOUDSCRIPT_FUNCTIONS: {
     VALIDATE_SOLUTION: 'ValidateTaskSolution',
     VALIDATE_ARC_PUZZLE: 'ValidateARCPuzzle',
+    VALIDATE_ARC2_EVAL_PUZZLE: 'ValidateARC2EvalPuzzle',
     GENERATE_ANONYMOUS_NAME: 'GenerateAnonymousName',
   },
   USER_DATA_KEYS: {

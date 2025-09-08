@@ -44,14 +44,26 @@ export function PuzzleGrid({ puzzles, loading, onSelectPuzzle }: PuzzleGridProps
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-        {Array.from({ length: 8 }).map((_, i) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+        {Array.from({ length: 6 }).map((_, i) => (
           <Card key={i} className="bg-slate-800 border-slate-600">
-            <CardContent className="p-4">
+            <CardContent className="p-6">
               <div className="animate-pulse">
-                <div className="h-4 bg-slate-600 rounded mb-2"></div>
-                <div className="h-6 bg-slate-600 rounded mb-2"></div>
-                <div className="h-4 bg-slate-600 rounded w-2/3"></div>
+                <div className="flex justify-between mb-4">
+                  <div className="space-y-2">
+                    <div className="h-4 bg-slate-600 rounded w-16"></div>
+                    <div className="h-4 bg-slate-600 rounded w-20"></div>
+                  </div>
+                  <div className="h-8 bg-slate-600 rounded w-12"></div>
+                </div>
+                <div className="h-6 bg-slate-600 rounded mb-4 w-24"></div>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="h-16 bg-slate-600 rounded"></div>
+                  <div className="h-16 bg-slate-600 rounded"></div>
+                  <div className="h-16 bg-slate-600 rounded"></div>
+                  <div className="h-16 bg-slate-600 rounded"></div>
+                </div>
+                <div className="h-8 bg-slate-600 rounded"></div>
               </div>
             </CardContent>
           </Card>
@@ -69,10 +81,24 @@ export function PuzzleGrid({ puzzles, loading, onSelectPuzzle }: PuzzleGridProps
     );
   }
 
+
+  // Get analysis quality badge based on arc-explainer metadata
+  const getAnalysisQualityBadge = (puzzle: OfficerPuzzle) => {
+    const attempts = puzzle.totalExplanations;
+    const hasData = attempts > 0;
+    
+    if (!hasData) return { label: 'No Analysis', className: 'bg-gray-600 text-white' };
+    if (attempts >= 50) return { label: 'Extensively Analyzed', className: 'bg-green-600 text-white' };
+    if (attempts >= 20) return { label: 'Well Analyzed', className: 'bg-blue-600 text-white' };
+    if (attempts >= 5) return { label: 'Analyzed', className: 'bg-orange-600 text-white' };
+    return { label: 'Limited Data', className: 'bg-red-600 text-white' };
+  };
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
       {puzzles.map((puzzle) => {
         const difficultyBadge = getDifficultyBadge(puzzle.difficulty);
+        const analysisQualityBadge = getAnalysisQualityBadge(puzzle);
         
         return (
           <Card 
@@ -80,45 +106,66 @@ export function PuzzleGrid({ puzzles, loading, onSelectPuzzle }: PuzzleGridProps
             className="bg-slate-800 border-slate-600 hover:border-amber-500 transition-colors cursor-pointer group"
             onClick={() => onSelectPuzzle(puzzle)}
           >
-            <CardContent className="p-4">
-              {/* Header */}
-              <div className="flex justify-between items-start mb-3">
-                <Badge className="bg-amber-600 text-slate-900 text-xs">
-                  ARC PUZZLE
-                </Badge>
-                <div className="text-xs text-slate-400">
-                  #{puzzle.totalExplanations}
+            <CardContent className="p-6">
+              {/* Header with Analysis Quality and Attempts */}
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex flex-col gap-2">
+                  <Badge className={`text-xs ${analysisQualityBadge.className} font-semibold`}>
+                    🤖 {analysisQualityBadge.label}
+                  </Badge>
+                  <Badge className={`text-xs ${difficultyBadge.className}`}>
+                    💀 {difficultyBadge.label}
+                  </Badge>
+                </div>
+                <div className="text-right">
+                  <div className="text-xs text-slate-400">Analysis Count</div>
+                  <div className="text-lg font-bold text-amber-400">#{puzzle.totalExplanations}</div>
                 </div>
               </div>
 
-              {/* Difficulty Badge */}
-              <div className="mb-3">
-                <Badge className={`text-xs ${difficultyBadge.className}`}>
-                  {difficultyBadge.label}
-                </Badge>
-              </div>
-
-              {/* Puzzle ID */}
-              <div className="mb-3">
-                <div className="text-amber-200 font-mono text-sm font-semibold">
+              {/* Puzzle ID - Larger and more prominent */}
+              <div className="mb-4">
+                <div className="text-amber-200 font-mono text-lg font-bold">
                   {puzzle.id}
                 </div>
-                <div className="text-xs text-slate-400">
-                  AI Accuracy: {(puzzle.avgAccuracy * 100).toFixed(0)}%
-                </div>
               </div>
 
-              {/* AI Performance Indicator */}
-              <div className="mb-4">
-                <div className="flex items-center space-x-2 text-xs">
-                  <span className="text-slate-400">🤖 AI:</span>
-                  <div className={`px-2 py-1 rounded text-xs ${
-                    puzzle.avgAccuracy === 0 ? 'bg-red-900 text-red-200' :
-                    puzzle.avgAccuracy <= 0.25 ? 'bg-orange-900 text-orange-200' :
-                    puzzle.avgAccuracy <= 0.50 ? 'bg-yellow-900 text-yellow-200' :
-                    'bg-blue-900 text-blue-200'
+              {/* Rich Metadata Grid */}
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                {/* AI Success Rate */}
+                <div className="bg-slate-700 rounded-lg p-3">
+                  <div className="text-xs text-slate-400 mb-1">Success Rate</div>
+                  <div className={`text-lg font-bold ${
+                    puzzle.avgAccuracy === 0 ? 'text-red-400' :
+                    puzzle.avgAccuracy <= 0.25 ? 'text-orange-400' :
+                    puzzle.avgAccuracy <= 0.50 ? 'text-yellow-400' :
+                    'text-blue-400'
                   }`}>
-                    {puzzle.avgAccuracy === 0 ? 'Never Solved' : `${(puzzle.avgAccuracy * 100).toFixed(0)}% Success`}
+                    {puzzle.avgAccuracy === 0 ? 'Never' : `${(puzzle.avgAccuracy * 100).toFixed(0)}%`}
+                  </div>
+                </div>
+
+                {/* AI Confidence when Wrong */}
+                <div className="bg-slate-700 rounded-lg p-3">
+                  <div className="text-xs text-slate-400 mb-1">Confidence</div>
+                  <div className="text-lg font-bold text-cyan-400">
+                    {puzzle.avgConfidence ? `${Math.round(puzzle.avgConfidence)}%` : 'N/A'}
+                  </div>
+                </div>
+
+                {/* Failed Attempts */}
+                <div className="bg-slate-700 rounded-lg p-3">
+                  <div className="text-xs text-slate-400 mb-1">Failed</div>
+                  <div className="text-lg font-bold text-purple-400">
+                    {puzzle.wrongCount?.toLocaleString() || '0'}
+                  </div>
+                </div>
+
+                {/* Human Feedback */}
+                <div className="bg-slate-700 rounded-lg p-3">
+                  <div className="text-xs text-slate-400 mb-1">Feedback</div>
+                  <div className="text-lg font-bold text-pink-400">
+                    {puzzle.totalFeedback ? `${puzzle.negativeFeedback || 0}/${puzzle.totalFeedback}` : '0/0'}
                   </div>
                 </div>
               </div>
@@ -126,9 +173,9 @@ export function PuzzleGrid({ puzzles, loading, onSelectPuzzle }: PuzzleGridProps
               {/* Action Button */}
               <Button 
                 size="sm" 
-                className="w-full bg-amber-600 hover:bg-amber-700 text-slate-900 group-hover:bg-amber-500"
+                className="w-full bg-amber-600 hover:bg-amber-700 text-slate-900 group-hover:bg-amber-500 font-semibold"
               >
-                Select Challenge
+                🎯 Accept Challenge
               </Button>
             </CardContent>
           </Card>

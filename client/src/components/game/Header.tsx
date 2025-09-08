@@ -42,10 +42,26 @@ export function Header({ player, totalTasks }: HeaderProps) {
               </div>
             </div>
             
-            {/* Officer Academy Access */}
+            {/* Navigation Buttons */}
+            <Button
+              onClick={() => setLocation('/profile')}
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold px-3 py-2 border border-green-400"
+              size="sm"
+            >
+              👤 Profile
+            </Button>
+            
+            <Button
+              onClick={() => setLocation('/leaderboards')}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-2 border border-blue-400"
+              size="sm"
+            >
+              🏆 Rankings
+            </Button>
+            
             <Button
               onClick={() => setLocation('/officer-track')}
-              className="bg-amber-600 hover:bg-amber-700 text-slate-900 font-semibold px-4 py-2 border border-amber-400"
+              className="bg-amber-600 hover:bg-amber-700 text-slate-900 font-semibold px-3 py-2 border border-amber-400"
               size="sm"
             >
               🎖️ Officer Academy
