@@ -697,7 +697,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                 <h4 className="text-amber-300 text-xs font-semibold mb-2 text-center">ACTIONS</h4>
                 
                 {/* Primary Actions Row */}
-                <div className="flex flex-col gap-2 mb-3">
+                <div className="flex flex-col gap-2">
                   <Button 
                     size="lg" 
                     variant="outline" 
@@ -715,16 +715,6 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                     Reset
                   </Button>
                 </div>
-
-                {/* Validation Button */}
-                <Button
-                  size="lg"
-                  className="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-3 h-12 text-sm"
-                  disabled={isValidating}
-                  onClick={() => validatePuzzleWithPlayFab()}
-                >
-                  {isValidating ? '🔄 Validating...' : '🎯 Validate'}
-                </Button>
               </div>
 
               {/* Emoji Palette - Main Selection */}
@@ -736,6 +726,18 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                 displayMode={displayState.displayMode}
                 className="bg-slate-800 border border-slate-600 rounded-lg p-3 w-full"
               />
+
+              {/* Validation Button - Separated with margin */}
+              <div className="mt-4">
+                <Button
+                  size="lg"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-3 h-12 text-sm"
+                  disabled={isValidating}
+                  onClick={() => validatePuzzleWithPlayFab()}
+                >
+                  {isValidating ? '🔄 Validating...' : '🎯 Validate'}
+                </Button>
+              </div>
             </div>
 
             {/* User Solution - Right half */}
