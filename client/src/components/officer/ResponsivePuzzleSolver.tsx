@@ -499,6 +499,20 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
     return Array.from(usedValues).sort((a, b) => a - b);
   };
 
+  // Get context-aware validation message based on puzzle structure
+  const getValidationMessage = (): string => {
+    if (!validationResult) return '';
+    
+    if (validationResult.correct) return ' Puzzle solved successfully!';
+    
+    const testCount = puzzle.test?.length || 1;
+    if (testCount === 1) {
+      return ' Solution is incorrect. Try again!';
+    } else {
+      return ` Some test cases failed. (${testCount} tests required)`;
+    }
+  };
+
   // Copy input to solution
   const copyInput = () => {
     if (testInput.length > 0) {
@@ -771,7 +785,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
             <div className="bg-green-900 border border-green-600 rounded-lg p-4 mt-4">
               <div className="text-green-300 text-sm">
                 <strong>✅ PlayFab Validation Complete:</strong> 
-                {validationResult.correct ? ' Puzzle solved successfully!' : ' Some test cases failed.'}
+                {getValidationMessage()}
                 {validationResult.timeElapsed && (
                   <div>Time: {(validationResult.timeElapsed / 1000).toFixed(1)}s</div>
                 )}
