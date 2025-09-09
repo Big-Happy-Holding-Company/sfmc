@@ -234,9 +234,9 @@ export function OfficerPuzzleSelector({
               className="w-full bg-slate-700 border border-amber-700 rounded px-2 py-1 text-white text-xs disabled:opacity-50"
             >
               <option value="all">All Sizes</option>
-              <option value="small">Small (≤5×5)</option>
+              <option value="small">Small (&le;5×5)</option>
               <option value="medium">Medium (6-10)</option>
-              <option value="large">Large (>10)</option>
+              <option value="large">Large (&gt;10)</option>
               <option value="fixed">Fixed Size</option>
               <option value="variable">Variable Size</option>
             </select>
