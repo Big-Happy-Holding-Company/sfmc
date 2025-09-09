@@ -13,8 +13,11 @@
 
 import { useState, useEffect } from 'react';
 import { ChevronDown, Star, Lock, CheckCircle, Grid3x3, Target, Brain, Clock } from 'lucide-react';
-import type { ARCDataset, OfficerRank } from '@/types/arcTypes';
+import type { ARCDatasetType, OfficerRank } from '@/types/arcTypes';
 import { useARCData, type EnhancedPuzzleFile } from '@/services/arcDataService';
+
+// Type alias for backward compatibility
+type ARCDataset = ARCDatasetType;
 
 interface OfficerPuzzleSelectorProps {
   /** Currently selected puzzle file */
