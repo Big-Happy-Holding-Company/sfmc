@@ -108,31 +108,9 @@ export function OfficerPuzzleSelector({
   const paginatedPuzzles = filteredPuzzles.slice(startIndex, startIndex + PUZZLES_PER_PAGE);
   const totalPages = Math.ceil(filteredPuzzles.length / PUZZLES_PER_PAGE);
 
-  // Get rank access level (higher ranks can access more content)
-  const getRankAccessLevel = (rank: OfficerRank): number => {
-    const levels: Record<OfficerRank, number> = {
-      'LIEUTENANT': 1,
-      'CAPTAIN': 2,
-      'MAJOR': 3,
-      'COLONEL': 4,
-      'GENERAL': 5
-    };
-    return levels[rank] || 1;
-  };
-
-  // Check if puzzle is accessible based on rank
+  // Check if puzzle is accessible - all puzzles are accessible to all ranks
   const isPuzzleAccessible = (puzzle: EnhancedPuzzleFile): boolean => {
-    const accessLevel = getRankAccessLevel(playerRank);
-    // Use puzzle difficulty for access control
-    const difficultyLevels: Record<string, number> = {
-      'LIEUTENANT': 1,
-      'CAPTAIN': 2,
-      'MAJOR': 3,
-      'COLONEL': 4,
-      'GENERAL': 5
-    };
-    const puzzleDifficultyLevel = difficultyLevels[puzzle.difficulty] || 1;
-    return accessLevel >= puzzleDifficultyLevel;
+    return true; // All puzzles accessible
   };
 
   // Get completion status for a puzzle
