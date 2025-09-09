@@ -33,7 +33,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
   
   // Enhanced display state
   const [displayState, setDisplayState] = useState<PuzzleDisplayState>({
-    displayMode: 'emoji',
+    displayMode: 'hybrid',
     emojiSet: 'tech_set1',
     selectedValue: 1,
     showControls: true
@@ -655,19 +655,19 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                 <div className="flex justify-center gap-1 mb-2">
                   <button
                     onClick={() => handleDisplayModeChange('arc-colors')}
-                    className={`px-2 py-1 text-xs rounded ${displayState.displayMode === 'arc-colors' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
+                    className={`px-3 py-2 text-sm rounded h-10 ${displayState.displayMode === 'arc-colors' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
                   >
                     123
                   </button>
                   <button
                     onClick={() => handleDisplayModeChange('emoji')}
-                    className={`px-2 py-1 text-xs rounded ${displayState.displayMode === 'emoji' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
+                    className={`px-3 py-2 text-sm rounded h-10 ${displayState.displayMode === 'emoji' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
                   >
                     🎨
                   </button>
                   <button
                     onClick={() => handleDisplayModeChange('hybrid')}
-                    className={`px-2 py-1 text-xs rounded ${displayState.displayMode === 'hybrid' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
+                    className={`px-3 py-2 text-sm rounded h-10 ${displayState.displayMode === 'hybrid' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
                   >
                     MIX
                   </button>
@@ -690,6 +690,41 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                     <option value="status_emojis">Human Crew</option>
                   </select>
                 )}
+              </div>
+
+              {/* Action Controls - Puzzle Actions */}
+              <div className="bg-slate-800 border border-slate-600 rounded-lg p-2 w-full">
+                <h4 className="text-amber-300 text-xs font-semibold mb-2 text-center">ACTIONS</h4>
+                
+                {/* Primary Actions Row */}
+                <div className="flex flex-col gap-2 mb-3">
+                  <Button 
+                    size="lg" 
+                    variant="outline" 
+                    className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white text-sm px-3 py-3 h-12" 
+                    onClick={copyInput}
+                  >
+                    Copy Input
+                  </Button>
+                  <Button 
+                    size="lg" 
+                    variant="outline" 
+                    className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white text-sm px-3 py-3 h-12" 
+                    onClick={resetSolution}
+                  >
+                    Reset
+                  </Button>
+                </div>
+
+                {/* Validation Button */}
+                <Button
+                  size="lg"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-3 h-12 text-sm"
+                  disabled={isValidating}
+                  onClick={() => validatePuzzleWithPlayFab()}
+                >
+                  {isValidating ? '🔄 Validating...' : '🎯 Validate'}
+                </Button>
               </div>
 
               {/* Emoji Palette - Main Selection */}
@@ -718,15 +753,6 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                 onChange={updateCurrentSolution}
                 fixedCellSize={outputCellSize}
               />
-              
-              <div className="flex justify-center space-x-2 mt-4">
-                <Button size="lg" variant="outline" className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white text-lg px-4 py-2" onClick={copyInput}>
-                  Copy Input
-                </Button>
-                <Button size="lg" variant="outline" className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white text-lg px-4 py-2" onClick={resetSolution}>
-                  Reset
-                </Button>
-              </div>
             </div>
           </div>
 
@@ -751,17 +777,6 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
             </div>
           )}
 
-          {/* Submit Button */}
-          <div className="flex justify-center mt-8 pt-6 border-t border-slate-600">
-            <Button
-              size="lg"
-              className="bg-green-600 hover:bg-green-700 text-white px-8 py-3"
-              disabled={isValidating}
-              onClick={() => validatePuzzleWithPlayFab()}
-            >
-              {isValidating ? '🔄 Validating...' : '🎯 Validate with PlayFab'}
-            </Button>
-          </div>
         </div>
 
         {/* Pattern Analysis Tip */}
