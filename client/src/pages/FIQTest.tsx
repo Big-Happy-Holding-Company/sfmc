@@ -45,6 +45,17 @@ export default function FIQTest() {
       setError(null);
       
       try {
+        // Initialize PlayFab if not already done
+        if (!playFabService.core.isReady()) {
+          console.log('🎖️ Initializing PlayFab for FIQ Test...');
+          await playFabService.initialize();
+        }
+        
+        // Ensure user is authenticated
+        if (!playFabService.isAuthenticated()) {
+          await playFabService.loginAnonymously();
+        }
+        
         const allTasks = await playFabService.getAllTasks();
         // Filter for onboarding tasks (any task with OB- in the name)
         const obTasks = allTasks.filter(task => task.id.includes('OB-'));
