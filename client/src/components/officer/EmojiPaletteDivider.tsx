@@ -59,7 +59,7 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
         size="sm"
         onClick={() => onValueSelect(value)}
         className={`
-          h-12 w-12 p-0 text-lg font-bold flex-shrink-0
+          h-14 w-12 p-0 text-lg font-bold flex-shrink-0
           ${isSelected 
             ? 'bg-amber-600 text-slate-900 hover:bg-amber-700 ring-2 ring-amber-400' 
             : isUsed
