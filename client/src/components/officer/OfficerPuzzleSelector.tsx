@@ -12,15 +12,15 @@
  */
 
 import { useState, useEffect } from 'react';
-import { ChevronDown, Star, Lock, CheckCircle } from 'lucide-react';
-import type { ARCPuzzleFile, OfficerRank, ARCDataset } from '@/types/arcTypes';
-import { useARCData } from '@/services/arcDataService';
+import { ChevronDown, Star, Lock, CheckCircle, Grid3x3, Target, Brain, Clock } from 'lucide-react';
+import type { ARCDataset, OfficerRank } from '@/types/arcTypes';
+import { useARCData, type EnhancedPuzzleFile } from '@/services/arcDataService';
 
 interface OfficerPuzzleSelectorProps {
   /** Currently selected puzzle file */
-  selectedPuzzle?: ARCPuzzleFile;
+  selectedPuzzle?: EnhancedPuzzleFile;
   /** Callback when puzzle is selected */
-  onPuzzleSelect: (puzzle: ARCPuzzleFile) => void;
+  onPuzzleSelect: (puzzle: EnhancedPuzzleFile) => void;
   /** Player's current officer rank */
   playerRank: OfficerRank;
   /** Completed puzzle IDs for progress tracking */
@@ -46,6 +46,10 @@ export function OfficerPuzzleSelector({
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCompleted, setShowCompleted] = useState(true);
+  const [aiDifficultyFilter, setAiDifficultyFilter] = useState<string>('all');
+  const [gridSizeFilter, setGridSizeFilter] = useState<string>('all');
+  const [testCaseFilter, setTestCaseFilter] = useState<string>('all');
+  const [complexityFilter, setComplexityFilter] = useState<string>('all');
   
   const { 
     puzzleFiles, 
@@ -61,15 +65,39 @@ export function OfficerPuzzleSelector({
     loadDataset(currentDataset);
   }, [currentDataset, loadDataset]);
 
-  // Filter puzzles based on search and completion status
+  // Filter puzzles based on search and all filters
   const filteredPuzzles = puzzleFiles.filter(puzzle => {
     const matchesSearch = !searchQuery || 
-      puzzle.filename.toLowerCase().includes(searchQuery.toLowerCase());
+      puzzle.filename.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      puzzle.id.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesCompletion = showCompleted || 
-      !completedPuzzles.has(`ARC-${currentDataset.toUpperCase()}-${puzzle.filename}`);
+      !completedPuzzles.has(puzzle.id);
     
-    return matchesSearch && matchesCompletion;
+    // AI difficulty filter
+    const matchesAiDifficulty = aiDifficultyFilter === 'all' || 
+      (aiDifficultyFilter === 'has_ai_data' && puzzle.aiPerformance) ||
+      (aiDifficultyFilter === 'no_ai_data' && !puzzle.aiPerformance) ||
+      (puzzle.aiPerformance?.difficultyCategory === aiDifficultyFilter);
+    
+    // Grid size filter
+    const matchesGridSize = gridSizeFilter === 'all' || 
+      (gridSizeFilter === 'small' && puzzle.gridSize.maxWidth <= 5 && puzzle.gridSize.maxHeight <= 5) ||
+      (gridSizeFilter === 'medium' && puzzle.gridSize.maxWidth > 5 && puzzle.gridSize.maxWidth <= 10 && puzzle.gridSize.maxHeight > 5 && puzzle.gridSize.maxHeight <= 10) ||
+      (gridSizeFilter === 'large' && (puzzle.gridSize.maxWidth > 10 || puzzle.gridSize.maxHeight > 10)) ||
+      (gridSizeFilter === 'fixed' && puzzle.gridSize.minWidth === puzzle.gridSize.maxWidth && puzzle.gridSize.minHeight === puzzle.gridSize.maxHeight) ||
+      (gridSizeFilter === 'variable' && (puzzle.gridSize.minWidth !== puzzle.gridSize.maxWidth || puzzle.gridSize.minHeight !== puzzle.gridSize.maxHeight));
+    
+    // Test case filter
+    const matchesTestCases = testCaseFilter === 'all' ||
+      (testCaseFilter === 'single' && puzzle.testCaseCount === 1) ||
+      (testCaseFilter === 'multiple' && puzzle.testCaseCount > 1);
+    
+    // Complexity filter
+    const matchesComplexity = complexityFilter === 'all' ||
+      puzzle.complexity.transformationComplexity === complexityFilter;
+    
+    return matchesSearch && matchesCompletion && matchesAiDifficulty && matchesGridSize && matchesTestCases && matchesComplexity;
   });
 
   // Paginated puzzles
@@ -90,16 +118,23 @@ export function OfficerPuzzleSelector({
   };
 
   // Check if puzzle is accessible based on rank
-  const isPuzzleAccessible = (puzzle: ARCPuzzleFile): boolean => {
+  const isPuzzleAccessible = (puzzle: EnhancedPuzzleFile): boolean => {
     const accessLevel = getRankAccessLevel(playerRank);
-    // For now, all training puzzles are accessible
-    // Could implement difficulty-based access later
-    return currentDataset === 'training' || accessLevel >= 2;
+    // Use puzzle difficulty for access control
+    const difficultyLevels: Record<string, number> = {
+      'LIEUTENANT': 1,
+      'CAPTAIN': 2,
+      'MAJOR': 3,
+      'COLONEL': 4,
+      'GENERAL': 5
+    };
+    const puzzleDifficultyLevel = difficultyLevels[puzzle.difficulty] || 1;
+    return accessLevel >= puzzleDifficultyLevel;
   };
 
   // Get completion status for a puzzle
-  const getPuzzleStatus = (puzzle: ARCPuzzleFile) => {
-    const puzzleId = `ARC-${currentDataset.toUpperCase()}-${puzzle.filename}`;
+  const getPuzzleStatus = (puzzle: EnhancedPuzzleFile) => {
+    const puzzleId = puzzle.id; // Use the proper puzzle ID
     const isCompleted = completedPuzzles.has(puzzleId);
     const isAccessible = isPuzzleAccessible(puzzle);
     
@@ -168,7 +203,7 @@ export function OfficerPuzzleSelector({
       </div>
 
       {/* Search and Filters */}
-      <div className="mb-4 space-y-2">
+      <div className="mb-4 space-y-3">
         <input
           type="text"
           placeholder="Search by puzzle ID..."
@@ -180,7 +215,93 @@ export function OfficerPuzzleSelector({
           disabled={disabled}
           className="w-full bg-slate-700 border border-amber-700 rounded px-3 py-2 text-white text-sm placeholder-slate-400 disabled:opacity-50"
         />
-        <div className="flex items-center gap-2">
+        
+        {/* Filter Controls */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+          {/* AI Difficulty Filter */}
+          <div>
+            <label className="block text-xs text-amber-300 mb-1">AI Difficulty:</label>
+            <select
+              value={aiDifficultyFilter}
+              onChange={(e) => {
+                setAiDifficultyFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              disabled={disabled}
+              className="w-full bg-slate-700 border border-amber-700 rounded px-2 py-1 text-white text-xs disabled:opacity-50"
+            >
+              <option value="all">All</option>
+              <option value="has_ai_data">Has AI Data</option>
+              <option value="no_ai_data">No AI Data</option>
+              <option value="impossible">Impossible (0%)</option>
+              <option value="extremely_hard">Extremely Hard</option>
+              <option value="very_hard">Very Hard</option>
+              <option value="challenging">Challenging</option>
+            </select>
+          </div>
+
+          {/* Grid Size Filter */}
+          <div>
+            <label className="block text-xs text-amber-300 mb-1">Grid Size:</label>
+            <select
+              value={gridSizeFilter}
+              onChange={(e) => {
+                setGridSizeFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              disabled={disabled}
+              className="w-full bg-slate-700 border border-amber-700 rounded px-2 py-1 text-white text-xs disabled:opacity-50"
+            >
+              <option value="all">All Sizes</option>
+              <option value="small">Small (≤5×5)</option>
+              <option value="medium">Medium (6-10)</option>
+              <option value="large">Large (>10)</option>
+              <option value="fixed">Fixed Size</option>
+              <option value="variable">Variable Size</option>
+            </select>
+          </div>
+
+          {/* Test Case Filter */}
+          <div>
+            <label className="block text-xs text-amber-300 mb-1">Test Cases:</label>
+            <select
+              value={testCaseFilter}
+              onChange={(e) => {
+                setTestCaseFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              disabled={disabled}
+              className="w-full bg-slate-700 border border-amber-700 rounded px-2 py-1 text-white text-xs disabled:opacity-50"
+            >
+              <option value="all">All</option>
+              <option value="single">Single Test</option>
+              <option value="multiple">Multiple Tests</option>
+            </select>
+          </div>
+
+          {/* Complexity Filter */}
+          <div>
+            <label className="block text-xs text-amber-300 mb-1">Complexity:</label>
+            <select
+              value={complexityFilter}
+              onChange={(e) => {
+                setComplexityFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              disabled={disabled}
+              className="w-full bg-slate-700 border border-amber-700 rounded px-2 py-1 text-white text-xs disabled:opacity-50"
+            >
+              <option value="all">All</option>
+              <option value="simple">Simple</option>
+              <option value="moderate">Moderate</option>
+              <option value="complex">Complex</option>
+              <option value="expert">Expert</option>
+            </select>
+          </div>
+        </div>
+        
+        {/* Completion Status Filter */}
+        <div className="flex items-center gap-4">
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
@@ -194,6 +315,11 @@ export function OfficerPuzzleSelector({
             />
             <span className="text-xs text-amber-300">Show completed</span>
           </label>
+          
+          {/* Filter stats */}
+          <div className="text-xs text-slate-400">
+            {filteredPuzzles.length} puzzle{filteredPuzzles.length !== 1 ? 's' : ''} match filters
+          </div>
         </div>
       </div>
 
@@ -204,22 +330,18 @@ export function OfficerPuzzleSelector({
             {filteredPuzzles.length === 0 ? 'No puzzles match your filters' : 'No puzzles on this page'}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {paginatedPuzzles.map((puzzle) => {
               const { isCompleted, isAccessible } = getPuzzleStatus(puzzle);
-              const isSelected = selectedPuzzle?.filename === puzzle.filename &&
-                               selectedPuzzle?.dataset === currentDataset;
+              const isSelected = selectedPuzzle?.id === puzzle.id;
 
               return (
                 <button
-                  key={puzzle.filename}
-                  onClick={() => !disabled && isAccessible && onPuzzleSelect({
-                    ...puzzle,
-                    dataset: currentDataset
-                  })}
+                  key={puzzle.id}
+                  onClick={() => !disabled && isAccessible && onPuzzleSelect(puzzle)}
                   disabled={disabled || !isAccessible}
                   className={`
-                    p-3 rounded border text-left transition-all duration-200
+                    p-3 rounded border text-left transition-all duration-200 min-h-[120px]
                     ${isSelected
                       ? 'bg-amber-900 border-amber-400 text-amber-100'
                       : 'bg-slate-700 border-amber-700 text-white hover:bg-slate-600 hover:border-amber-500'
@@ -231,8 +353,9 @@ export function OfficerPuzzleSelector({
                     ${disabled ? 'cursor-not-allowed opacity-50' : ''}
                   `}
                 >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-mono">
+                  {/* Header with puzzle ID and status */}
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-mono font-bold">
                       {puzzle.filename.replace('.json', '')}
                     </span>
                     <div className="flex items-center gap-1">
@@ -244,8 +367,58 @@ export function OfficerPuzzleSelector({
                       )}
                     </div>
                   </div>
-                  <div className="text-xs text-amber-300">
-                    Dataset: {currentDataset}
+
+                  {/* Grid size information */}
+                  <div className="flex items-center gap-1 mb-1">
+                    <Grid3x3 className="w-3 h-3 text-amber-400" />
+                    <span className="text-xs text-amber-300">
+                      {puzzle.gridSize.minWidth === puzzle.gridSize.maxWidth && 
+                       puzzle.gridSize.minHeight === puzzle.gridSize.maxHeight
+                        ? `${puzzle.gridSize.minWidth}×${puzzle.gridSize.minHeight}`
+                        : `${puzzle.gridSize.minWidth}-${puzzle.gridSize.maxWidth}×${puzzle.gridSize.minHeight}-${puzzle.gridSize.maxHeight}`
+                      }
+                    </span>
+                  </div>
+
+                  {/* Test cases and training examples */}
+                  <div className="flex items-center gap-1 mb-1">
+                    <Target className="w-3 h-3 text-amber-400" />
+                    <span className="text-xs text-amber-300">
+                      {puzzle.testCaseCount} test{puzzle.testCaseCount !== 1 ? 's' : ''}, {puzzle.trainingExampleCount} examples
+                    </span>
+                  </div>
+
+                  {/* Difficulty and complexity */}
+                  <div className="flex items-center gap-1 mb-1">
+                    <Star className="w-3 h-3 text-amber-400" />
+                    <span className="text-xs text-amber-300">
+                      {puzzle.difficulty} • {puzzle.complexity.uniqueColors} colors • {puzzle.complexity.transformationComplexity}
+                    </span>
+                  </div>
+
+                  {/* AI Performance data if available */}
+                  {puzzle.aiPerformance && (
+                    <div className="flex items-center gap-1 mb-1">
+                      <Brain className="w-3 h-3 text-amber-400" />
+                      <span className="text-xs text-amber-300">
+                        AI: {Math.round(puzzle.aiPerformance.avgAccuracy * 100)}% accuracy
+                        {puzzle.aiPerformance.difficultyCategory && (
+                          <span className={`ml-1 px-1 rounded text-xs ${
+                            puzzle.aiPerformance.difficultyCategory === 'impossible' ? 'bg-red-800 text-red-200' :
+                            puzzle.aiPerformance.difficultyCategory === 'extremely_hard' ? 'bg-orange-800 text-orange-200' :
+                            puzzle.aiPerformance.difficultyCategory === 'very_hard' ? 'bg-yellow-800 text-yellow-200' :
+                            'bg-green-800 text-green-200'
+                          }`}>
+                            {puzzle.aiPerformance.difficultyCategory.replace('_', ' ')}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Dataset info */}
+                  <div className="text-xs text-slate-400 mt-auto">
+                    Dataset: {puzzle.dataset}
                   </div>
                 </button>
               );
@@ -282,12 +455,46 @@ export function OfficerPuzzleSelector({
       {/* Selected Puzzle Info */}
       {selectedPuzzle && (
         <div className="mt-4 pt-4 border-t border-amber-700">
-          <div className="text-xs text-amber-300">Selected Mission:</div>
-          <div className="text-sm text-white font-mono">
+          <div className="text-xs text-amber-300 mb-2">Selected Mission:</div>
+          <div className="text-sm text-white font-mono mb-2">
             {selectedPuzzle.filename.replace('.json', '')}
           </div>
-          <div className="text-xs text-slate-400">
-            {selectedPuzzle.dataset} • Ready for deployment
+          
+          <div className="grid grid-cols-2 gap-4 text-xs">
+            <div>
+              <div className="text-amber-300 mb-1">Mission Parameters:</div>
+              <div className="text-slate-300">
+                • Grid: {selectedPuzzle.gridSize.minWidth === selectedPuzzle.gridSize.maxWidth && 
+                         selectedPuzzle.gridSize.minHeight === selectedPuzzle.gridSize.maxHeight
+                          ? `${selectedPuzzle.gridSize.minWidth}×${selectedPuzzle.gridSize.minHeight}`
+                          : `${selectedPuzzle.gridSize.minWidth}-${selectedPuzzle.gridSize.maxWidth}×${selectedPuzzle.gridSize.minHeight}-${selectedPuzzle.gridSize.maxHeight}`
+                        }<br />
+                • {selectedPuzzle.testCaseCount} test case{selectedPuzzle.testCaseCount !== 1 ? 's' : ''}<br />
+                • {selectedPuzzle.trainingExampleCount} training examples<br />
+                • {selectedPuzzle.complexity.uniqueColors} colors<br />
+                • {selectedPuzzle.complexity.transformationComplexity} complexity
+              </div>
+            </div>
+            
+            <div>
+              <div className="text-amber-300 mb-1">Intelligence Data:</div>
+              <div className="text-slate-300">
+                • Difficulty: {selectedPuzzle.difficulty}<br />
+                • Dataset: {selectedPuzzle.dataset}<br />
+                {selectedPuzzle.aiPerformance && (
+                  <>
+                    • AI Success: {Math.round(selectedPuzzle.aiPerformance.avgAccuracy * 100)}%<br />
+                    {selectedPuzzle.aiPerformance.difficultyCategory && (
+                      <span>• Category: {selectedPuzzle.aiPerformance.difficultyCategory.replace('_', ' ')}</span>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <div className="text-xs text-green-400 mt-2 font-bold">
+            🎯 Ready for deployment
           </div>
         </div>
       )}

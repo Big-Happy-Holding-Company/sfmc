@@ -712,12 +712,44 @@ export class ARCDataService {
 export const arcDataService = ARCDataService.getInstance();
 
 /**
- * React hook for using ARC data service
+ * React hook for using ARC data service with rich metadata
  */
 import { useState, useCallback, useEffect } from 'react';
+import { puzzlePerformanceService, type MergedPuzzleData } from './puzzlePerformanceService';
+
+export interface EnhancedPuzzleFile {
+  filename: string;
+  dataset: ARCDatasetType;
+  id: string;
+  // Grid dimension metadata
+  gridSize: {
+    minWidth: number;
+    maxWidth: number;
+    minHeight: number;
+    maxHeight: number;
+  };
+  // Test case information
+  testCaseCount: number;
+  trainingExampleCount: number;
+  // Complexity metrics
+  complexity: {
+    uniqueColors: number;
+    transformationComplexity: 'simple' | 'moderate' | 'complex' | 'expert';
+  };
+  // AI performance data (if available)
+  aiPerformance?: {
+    avgAccuracy: number;
+    avgConfidence?: number;
+    wrongCount?: number;
+    totalExplanations?: number;
+    difficultyCategory?: 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging';
+  };
+  // Difficulty from local analysis
+  difficulty: OfficerRankRequirement;
+}
 
 export function useARCData() {
-  const [puzzleFiles, setPuzzleFiles] = useState<any[]>([]);
+  const [puzzleFiles, setPuzzleFiles] = useState<EnhancedPuzzleFile[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -726,18 +758,35 @@ export function useARCData() {
     setError(null);
     
     try {
-      const puzzles = await arcDataService.loadARCPuzzles({
+      // Load rich metadata using puzzlePerformanceService
+      const mergedData = await puzzlePerformanceService.getMergedPuzzleDataset({
         datasets: [dataset],
         // Load all available puzzles - no artificial limits
       });
       
-      // Convert to file format expected by components
-      const fileData = puzzles.puzzles.map(puzzle => ({
+      // Convert to enhanced format with rich metadata
+      const enhancedFiles: EnhancedPuzzleFile[] = mergedData.map(puzzle => ({
         filename: `${puzzle.filename}.json`,
-        dataset: puzzle.dataset
+        dataset: puzzle.dataset,
+        id: puzzle.id,
+        gridSize: puzzle.gridSize,
+        testCaseCount: puzzle.test?.length || 0,
+        trainingExampleCount: puzzle.train?.length || 0,
+        complexity: {
+          uniqueColors: puzzle.complexity.uniqueColors,
+          transformationComplexity: puzzle.complexity.transformationComplexity
+        },
+        aiPerformance: puzzle.hasPerformanceData ? {
+          avgAccuracy: puzzle.aiPerformance!.avgAccuracy,
+          avgConfidence: puzzle.aiPerformance!.avgConfidence,
+          wrongCount: puzzle.aiPerformance!.wrongCount,
+          totalExplanations: puzzle.aiPerformance!.totalExplanations,
+          difficultyCategory: puzzle.difficultyCategory
+        } : undefined,
+        difficulty: puzzle.difficulty
       }));
       
-      setPuzzleFiles(fileData);
+      setPuzzleFiles(enhancedFiles);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load dataset');
       setPuzzleFiles([]);
