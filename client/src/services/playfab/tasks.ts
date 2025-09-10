@@ -6,7 +6,7 @@
 
 import type { PlayFabTask } from '@/types/playfab';
 import { playFabCore } from './core';
-import { playFabAuth } from './auth';
+import { playFabRequestManager } from './requestManager';
 import { PLAYFAB_CONSTANTS } from '@/types/playfab';
 
 // PlayFab GetTitleData request format
@@ -45,18 +45,16 @@ export class PlayFabTasks {
       return this.taskCache;
     }
 
-    // Ensure user is authenticated
-    await playFabAuth.ensureAuthenticated();
+    // Authentication handled automatically by requestManager
 
     const request: GetTitleDataRequest = {
       Keys: [PLAYFAB_CONSTANTS.TITLE_DATA_KEYS.TASKS]
     };
 
     try {
-      const result = await playFabCore.makeHttpRequest<GetTitleDataRequest, GetTitleDataResponse>(
-        '/Client/GetTitleData',
-        request,
-        true // Requires authentication
+      const result = await playFabRequestManager.makeRequest<GetTitleDataRequest, GetTitleDataResponse>(
+        'getTitleData',
+        request
       );
 
       const tasksData = result?.Data?.[PLAYFAB_CONSTANTS.TITLE_DATA_KEYS.TASKS];
