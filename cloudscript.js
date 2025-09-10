@@ -292,23 +292,37 @@ function getRankName(rankLevel) {
 handlers.ValidateARCPuzzle = function(args, context) {
     const { puzzleId, solutions, timeElapsed, attemptNumber, sessionId } = args;
     
+    // Enhanced debug logging
+    log.info("=== ValidateARCPuzzle Debug Info ===");
+    log.info("Puzzle ID received: " + puzzleId);
+    log.info("Solutions count: " + (solutions ? solutions.length : 'undefined'));
+    log.info("Time elapsed: " + timeElapsed);
+    log.info("Session ID: " + sessionId);
+    
     // Input validation
     if (!puzzleId || !solutions || !Array.isArray(solutions)) {
+        const error = "Missing required parameters: puzzleId and solutions array";
+        log.error("Input validation failed: " + error);
         return {
             success: false,
-            error: "Missing required parameters: puzzleId and solutions array"
+            error: error
         };
     }
 
     try {
-        // Find puzzle in Title Data batches
+        // Find puzzle in Title Data batches with enhanced logging
+        log.info("Searching for puzzle ID: " + puzzleId);
         const puzzle = findPuzzleInBatches(puzzleId);
         if (!puzzle) {
+            log.error("Puzzle not found in Title Data: " + puzzleId);
             return {
                 success: false,
                 error: `Puzzle ${puzzleId} not found in Title Data`
             };
         }
+        
+        log.info("Found puzzle in Title Data: " + puzzle.id);
+        log.info("Puzzle has " + (puzzle.test ? puzzle.test.length : 0) + " test cases");
 
         // Validate that user provided correct number of solutions
         const expectedTestCases = puzzle.test ? puzzle.test.length : 0;
@@ -682,9 +696,12 @@ function validateSession(timeElapsed, stepCount, sessionId, playFabId) {
 }
 
 /**
- * Find puzzle data from Title Data batches
+ * Find puzzle data from Title Data batches with enhanced debugging
  */
 function findPuzzleInBatches(puzzleId) {
+    log.info("=== findPuzzleInBatches Debug ===");
+    log.info("Looking for puzzle: " + puzzleId);
+    
     // Define batch keys to search
     const batchKeys = [
         // Training batches
@@ -713,9 +730,12 @@ function findPuzzleInBatches(puzzleId) {
         "officer-tasks-evaluation2-batch2.json"
     ];
 
+    log.info("Searching " + batchKeys.length + " batches");
+    
     // Search through batches
     for (let i = 0; i < batchKeys.length; i++) {
         try {
+            log.info("Checking batch: " + batchKeys[i]);
             const titleDataResponse = server.GetTitleData({ Keys: [batchKeys[i]] });
             
             if (titleDataResponse.Data && titleDataResponse.Data[batchKeys[i]]) {
@@ -723,21 +743,34 @@ function findPuzzleInBatches(puzzleId) {
                 
                 if (dataValue && dataValue !== "undefined") {
                     const puzzles = JSON.parse(dataValue);
+                    log.info("Batch " + batchKeys[i] + " has " + puzzles.length + " puzzles");
                     
                     // Look for puzzle in this batch
                     for (let j = 0; j < puzzles.length; j++) {
                         if (puzzles[j].id === puzzleId) {
+                            log.info("FOUND MATCH! Puzzle " + puzzleId + " found in " + batchKeys[i]);
+                            log.info("Puzzle ID in data: " + puzzles[j].id);
                             return puzzles[j];
                         }
+                        
+                        // Also try matching without prefix for debugging
+                        if (puzzles[j].id && (puzzles[j].id.endsWith(puzzleId) || puzzleId.endsWith(puzzles[j].id))) {
+                            log.info("PARTIAL MATCH found: data has '" + puzzles[j].id + "', looking for '" + puzzleId + "'");
+                        }
                     }
+                } else {
+                    log.info("Batch " + batchKeys[i] + " has no data or undefined");
                 }
+            } else {
+                log.info("Batch " + batchKeys[i] + " not found in Title Data");
             }
         } catch (batchError) {
-            // Continue searching other batches
+            log.error("Error checking batch " + batchKeys[i] + ": " + batchError.message);
             continue;
         }
     }
     
+    log.error("Puzzle " + puzzleId + " NOT FOUND in any batch");
     return null; // Puzzle not found
 }
 
