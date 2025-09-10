@@ -14,7 +14,12 @@ import { AlertTriangle } from 'lucide-react';
 import { Header } from '@/components/game/Header';
 import { useOfficerPuzzles } from '@/hooks/useOfficerPuzzles';
 import { PuzzleGrid } from '@/components/officer/PuzzleGrid';
-import { playFabService } from '@/services/playfab';
+import {
+  playFabRequestManager,
+  playFabAuthManager,
+  playFabUserData,
+  playFabTasks
+} from '@/services/playfab';
 import type { OfficerPuzzle } from '@/services/officerArcAPI';
 import type { PlayFabPlayer } from '@/services/playfab';
 
@@ -44,24 +49,28 @@ export default function OfficerTrackSimple() {
   const [totalTasks, setTotalTasks] = useState(0);
 
   // Initialize PlayFab and load player data on mount
-  useEffect(() => {
+    useEffect(() => {
     const initializePlayFab = async () => {
       try {
         console.log('🎖️ Initializing PlayFab for Officer Track...');
         setPlayFabInitializing(true);
         
-        if (!playFabService.core.isReady()) {
-          await playFabService.initialize();
+        const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
+        if (!titleId) {
+          throw new Error('VITE_PLAYFAB_TITLE_ID environment variable not found');
+        }
+        if (!playFabRequestManager.isInitialized()) {
+          await playFabRequestManager.initialize({ titleId, secretKey: import.meta.env.VITE_PLAYFAB_SECRET_KEY });
         }
         
-        if (!playFabService.isAuthenticated()) {
-          await playFabService.loginAnonymously();
+        if (!playFabAuthManager.isAuthenticated()) {
+          await playFabAuthManager.loginAnonymously();
         }
         
         // Load player data and tasks for header
         const [playerData, tasksData] = await Promise.all([
-          playFabService.getPlayerData(),
-          playFabService.getAllTasks()
+          playFabUserData.getPlayerData(),
+          playFabTasks.getAllTasks()
         ]);
         
         setPlayer(playerData);
