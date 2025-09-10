@@ -245,7 +245,7 @@ function arraysEqual(a, b) {
         if (a[i].length !== b[i].length) return false;
         
         for (let j = 0; j < a[i].length; j++) {
-            if (a[i][j] !== b[i][j]) return false;
+            if (a[i][j] != b[i][j]) return false;
         }
     }
     return true;

@@ -142,7 +142,7 @@ async function makeAPICall(endpoint: string): Promise<any> {
  * Convert arc-ID to PlayFab format
  * 007bbfb7 -> ARC-TR-007bbfb7 (assumes training by default)
  */
-export function arcIdToPlayFab(arcId: string, dataset: 'training' | 'evaluation' | 'training2' | 'evaluation2' = 'training'): string {
+export function arcIdToPlayFab(arcId: string, dataset: 'training' | 'evaluation' | 'training2' | 'evaluation2'): string {
   return idConverter.arcToPlayFab(arcId, dataset);
 }
 

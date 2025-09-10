@@ -223,7 +223,7 @@ export class ArcExplainerAPI {
    * 007bbfb7 → ARC-TR-007bbfb7 (assumes training dataset by default)
    * Note: Cannot definitively determine dataset without additional context
    */
-  public convertArcIdToPlayFabId(arcId: string, dataset: 'training' | 'evaluation' | 'training2' | 'evaluation2' = 'training'): string {
+  public convertArcIdToPlayFabId(arcId: string, dataset: 'training' | 'evaluation' | 'training2' | 'evaluation2'): string {
     if (!arcId || typeof arcId !== 'string') {
       console.warn('convertArcIdToPlayFabId: Invalid input:', arcId);
       return arcId || '';

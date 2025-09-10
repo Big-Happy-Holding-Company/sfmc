@@ -57,7 +57,7 @@ export class IDConverter {
    * Convert raw ARC ID to PlayFab prefixed format
    * 007bbfb7 + training -> ARC-TR-007bbfb7
    */
-  arcToPlayFab(arcId: string, dataset: ARCDatasetType = 'training'): string {
+  arcToPlayFab(arcId: string, dataset: ARCDatasetType): string {
     // Return as-is if already in PlayFab format
     if (this.isPlayFabFormat(arcId)) {
       return arcId;
