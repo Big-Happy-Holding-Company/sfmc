@@ -6,7 +6,8 @@
 
 import type { PlayFabPlayer, RankLevel } from '@/types/playfab';
 import { playFabCore } from './core';
-import { playFabAuth } from './auth';
+import { playFabAuthManager } from './authManager';
+import { playFabRequestManager } from './requestManager';
 
 // PlayFab GetUserData response format
 interface GetUserDataResponse {
@@ -41,18 +42,15 @@ export class PlayFabUserData {
    * Creates default player data for new users
    */
   public async getPlayerData(): Promise<PlayFabPlayer> {
-    await playFabAuth.ensureAuthenticated();
-
-    const playFabId = playFabAuth.getPlayFabId();
+    const playFabId = playFabAuthManager.getPlayFabId();
     if (!playFabId) {
       throw new Error('No PlayFab ID available');
     }
 
     try {
-      const result = await playFabCore.makeHttpRequest<{}, GetUserDataResponse>(
-        '/Client/GetUserData',
-        {}, // Empty request body
-        true // Requires authentication
+      const result = await playFabRequestManager.makeRequest<{}, GetUserDataResponse>(
+        'getUserData',
+        {} // Empty request body
       );
 
       const userData = result?.Data || {};
@@ -60,7 +58,7 @@ export class PlayFabUserData {
       // Create player object from PlayFab data or defaults for new players
       const player: PlayFabPlayer = {
         id: playFabId,
-        username: userData.username?.Value || playFabAuth.getDisplayName() || 'Anonymous',
+        username: userData.username?.Value || playFabAuthManager.getDisplayName() || 'Anonymous',
         rank: userData.rank?.Value || 'Specialist 1',
         rankLevel: parseInt(userData.rankLevel?.Value || '1'),
         totalPoints: parseInt(userData.totalPoints?.Value || '0'),
@@ -118,10 +116,9 @@ export class PlayFabUserData {
         Data: dataToUpdate
       };
 
-      await playFabCore.makeHttpRequest<UpdateUserDataRequest, {}>(
-        '/Client/UpdateUserData',
-        request,
-        true // Requires authentication
+      await playFabRequestManager.makeRequest<UpdateUserDataRequest, {}>(
+        'updateUserData',
+        request
       );
 
       playFabCore.logOperation('Player Data Updated', Object.keys(dataToUpdate));
@@ -251,10 +248,9 @@ export class PlayFabUserData {
         Data: initialData
       };
 
-      await playFabCore.makeHttpRequest<UpdateUserDataRequest, {}>(
-        '/Client/UpdateUserData',
-        request,
-        true // Requires authentication
+      await playFabRequestManager.makeRequest<UpdateUserDataRequest, {}>(
+        'updateUserData',
+        request
       );
 
       playFabCore.logOperation('New Player Initialized', player.username);
@@ -281,10 +277,9 @@ export class PlayFabUserData {
         Data: resetData
       };
 
-      await playFabCore.makeHttpRequest<UpdateUserDataRequest, {}>(
-        '/Client/UpdateUserData',
-        request,
-        true // Requires authentication
+      await playFabRequestManager.makeRequest<UpdateUserDataRequest, {}>(
+        'updateUserData',
+        request
       );
 
       // Update local cache
