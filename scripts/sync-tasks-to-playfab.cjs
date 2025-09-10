@@ -1,6 +1,6 @@
 /*
  * PlayFab Task Sync Script
- * 
+ * THIS IS HOW WE UPLOADED THE TASKS TO PLAYFAB.
  * Uploads all JSON task files from data/tasks/ to PlayFab Title Data
  * Run this once to migrate all tasks to PlayFab
  */

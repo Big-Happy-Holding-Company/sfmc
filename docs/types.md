@@ -1,4 +1,8 @@
-## 40 ARC-AGI Transformation Types with Implementation Instructions
+### 40 ARC-AGI Transformation Types with Implementation Instructions
+##  Author:  Unknown AI
+#   Beware of logical errors.
+
+
 
 **GEOMETRIC TRANSFORMATIONS**
 
