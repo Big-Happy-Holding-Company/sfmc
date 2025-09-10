@@ -55,8 +55,12 @@ export function UserProfile({ className, onProfileUpdate }: UserProfileProps) {
       setIsLoading(true);
       setError(null);
       
-      // Ensure authenticated
-      await playFabAuth.ensureAuthenticated();
+      // Explicit PlayFab initialization check
+      if (!playFabAuth.isAuthenticated()) {
+        console.log('🎖️ Initializing PlayFab for User Profile...');
+        // Ensure authenticated (this will initialize PlayFab if needed)
+        await playFabAuth.ensureAuthenticated();
+      }
       
       // Get current profile
       const currentProfile = await playFabProfiles.getCurrentPlayerProfile();
@@ -84,6 +88,9 @@ export function UserProfile({ className, onProfileUpdate }: UserProfileProps) {
       setError(null);
       setSuccess(null);
 
+      // Ensure PlayFab is ready before profile operations
+      await playFabAuth.ensureAuthenticated();
+      
       await playFabAuth.setDisplayName(displayName.trim());
       
       // Refresh profile to get updated data
@@ -120,6 +127,9 @@ export function UserProfile({ className, onProfileUpdate }: UserProfileProps) {
       setError(null);
       setSuccess(null);
 
+      // Ensure PlayFab is ready before profile operations
+      await playFabAuth.ensureAuthenticated();
+      
       await playFabProfiles.setPlayerAvatar(avatarUrl.trim());
       
       // Refresh profile to get updated data

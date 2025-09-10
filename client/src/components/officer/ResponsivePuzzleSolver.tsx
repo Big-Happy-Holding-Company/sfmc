@@ -34,7 +34,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
   // Enhanced display state
   const [displayState, setDisplayState] = useState<PuzzleDisplayState>({
     displayMode: 'hybrid',
-    emojiSet: 'tech_set1',
+    emojiSet: 'savory_foods',
     selectedValue: 1,
     showControls: true
   });
@@ -693,16 +693,32 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                     value={displayState.emojiSet}
                     onChange={(e) => handleEmojiSetChange(e.target.value as any)}
                     className="w-full bg-slate-700 border border-slate-500 rounded px-2 py-1 text-amber-100 text-xs"
-                  >
-                    <option value="tech_set1">Tech Set 1</option>
-                    <option value="tech_set2">Tech Set 2</option>
-                    <option value="celestial_set1">Celestial Set 1</option>
-                    <option value="celestial_set2">Celestial Set 2</option>
-                    <option value="status_alerts">Status Alerts</option>
-                    <option value="weather_climate">Weather Climate</option>
-                    <option value="ai_emojis">AI Systems</option>
-                    <option value="status_emojis">Human Crew</option>
-                  </select>
+                    >
+                      <option value="tech_set1">⚡ Tech Set 1 - Power & Fuel</option>
+                      <option value="tech_set2">📡 Tech Set 2 - Communications</option>
+                      <option value="celestial_set1">🌍 Celestial Set 1 - Planets</option>
+                      <option value="celestial_set2">🌓 Celestial Set 2 - Moon Phases</option>
+                      <option value="status_alerts">⚠️ Status Alerts - Warnings</option>
+                      <option value="weather_climate">🌞 Weather & Climate</option>
+                      <option value="nav_alerts">🧭 Navigation Alerts</option>
+                      <option value="ai_emojis">🤖 AI Systems</option>
+                      <option value="status_emojis">😂 Human Crew</option>
+                      <option value="vague_symbols">♊ Vague Symbols</option>
+                      <option value="alien_language">👽 Alien Language</option>
+                      <option value="big_mammals">🐯 Wild Mammals</option>
+                      <option value="reptiles_amphibians">🐢 Reptiles & Amphibians</option>
+                      <option value="fruits_remaining">🍊 Fresh Fruits</option>
+                      <option value="sweets_desserts">🍰 Sweets & Desserts</option>
+                      <option value="savory_foods">🍔 Comfort Foods</option>
+                      <option value="games_chance">🎲 Games & Chance</option>
+                      <option value="rare_plants">🍄 Rare Plants & Nature</option>
+                      <option value="alchemy_science">⚗️ Alchemy & Science</option>
+                      <option value="ancient_scripts">𓀀 Ancient Scripts</option>
+                      <option value="zodiac_signs">♈ Zodiac Signs</option>
+                      <option value="foreign_celestial">🈶 Foreign Celestial</option>
+                      <option value="cosmic_portals">🚪 Cosmic Portals</option>
+                      <option value="void_dwellers">🐙 Void Dwellers</option>
+                    </select>
                 )}
               </div>
 

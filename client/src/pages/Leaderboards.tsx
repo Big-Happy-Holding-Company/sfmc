@@ -38,6 +38,17 @@ export default function Leaderboards() {
   useEffect(() => {
     const loadPageData = async () => {
       try {
+        // Initialize PlayFab if not already done
+        if (!playFabService.core.isReady()) {
+          console.log('🎖️ Initializing PlayFab for Leaderboards...');
+          await playFabService.initialize();
+        }
+        
+        // Ensure user is authenticated
+        if (!playFabService.isAuthenticated()) {
+          await playFabService.loginAnonymously();
+        }
+        
         // Get available leaderboard configurations
         const leaderboards = getEnabledLeaderboards();
         setAvailableLeaderboards(leaderboards);

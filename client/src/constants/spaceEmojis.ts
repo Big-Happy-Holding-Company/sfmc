@@ -50,6 +50,45 @@ export const SPACE_EMOJIS = {
 
   // Alien Language - For the hardest tasks
   alien_language: ['⬛', '👽', '👤', '🪐', '🌍', '🛸', '☄️', '♥️', '⚠️', '🛰'],
+
+  // Big & Wild Mammals
+  big_mammals: ['⬛','🐯','🦁','🐺','🐗','🐴','🦄','🐐','🐑','🦌'],
+
+  // Reptiles & Amphibians
+  reptiles_amphibians: ['⬛','🐢','🐍','🦎','🦖','🦕','🐊','🐸','🪱','🐲'],
+
+  // Fruits (remaining)
+  fruits_remaining: ['⬛','🍊','🍋','🍐','🍍','🥭','🥝','🥥','🍑','🍈'],
+
+  // Sweets & Desserts
+  sweets_desserts: ['⬛','🍰','🧁','🍪','🍩','🍫','🍬','🍭','🥧','🍯'],
+
+  // Savory & Comfort Foods
+  savory_foods: ['⬛','🍔','🍟','🌭','🍗','🍖','🥓','🍝','🍛','🍲'],
+
+  // Games & Chance
+  games_chance: ['⬛', '🎲', '🃏', '🀄', '🎴', '🕹️', '🎯', '🎰', '🏁', '🏆'],
+
+  // Rare Plants & Nature
+  rare_plants: ['⬛', '🍄', '🌵', '🌲', '🌴', '🪴', '🌱', '🍂', '🍁', '🌿'],
+
+  // Alchemy & Science
+  alchemy_science: ['⬛', '⚗️', '🪄', '🔭', '📡', '🧲', '🌡️', '🧬', '💉', '🧪'],
+
+  // Ancient Scripts
+  ancient_scripts: ['⬛', '𓀀', '𓂀', '𓃒', '𓆏', '𓋹', '𓍯', '𓎛', '𓏤', '𓐍'],
+
+  // Zodiac Signs
+  zodiac_signs: ['⬛', '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐'],
+
+  // Foreign Celestial
+  foreign_celestial: ['⬛', '🈶', '🈚', '🈯', '🈸', '🈴', '🈳', '㊗️', '㊙️', '🈺'],
+
+  // Symbolic Portals & Gateways
+  cosmic_portals: ['⬛', '🚪', '⛩️', '🏞️', '🛤️', '🌉', '🕳️', '🌀', '🌌', '🌠'],
+
+  // Void Dwellers
+  void_dwellers: ['⬛', '🐙', '🦑', '🦐', '🦀', '🐡', '🐠', '🐟', '🐬', '🐋'],
 } as const;
 
 // Emoji set metadata for UI display
@@ -108,6 +147,71 @@ export const EMOJI_SET_INFO = {
     name: 'Alien Language',
     description: 'Alien language',
     theme: 'Officer Candidate'
+  },
+  big_mammals: {
+    name: 'Wild Mammals',
+    description: 'Large mammals and wild creatures',
+    theme: 'Natural World'
+  },
+  reptiles_amphibians: {
+    name: 'Reptiles & Amphibians',
+    description: 'Cold-blooded creatures and prehistoric life',
+    theme: 'Natural World'
+  },
+  fruits_remaining: {
+    name: 'Fresh Fruits',
+    description: 'Tropical and citrus fruits collection',
+    theme: 'Natural World'
+  },
+  sweets_desserts: {
+    name: 'Sweets & Desserts',
+    description: 'Cakes, candy, and sweet treats',
+    theme: 'Food & Nutrition'
+  },
+  savory_foods: {
+    name: 'Comfort Foods',
+    description: 'Hearty meals and savory dishes',
+    theme: 'Food & Nutrition'
+  },
+  games_chance: {
+    name: 'Games & Chance',
+    description: 'Gaming, luck, and competition symbols',
+    theme: 'Entertainment'
+  },
+  rare_plants: {
+    name: 'Rare Plants & Nature',
+    description: 'Exotic plants and natural elements',
+    theme: 'Natural World'
+  },
+  alchemy_science: {
+    name: 'Alchemy & Science',
+    description: 'Laboratory equipment, magic, and scientific instruments',
+    theme: 'Science & Magic'
+  },
+  ancient_scripts: {
+    name: 'Ancient Scripts',
+    description: 'Egyptian hieroglyphs and ancient writing systems',
+    theme: 'Ancient Languages'
+  },
+  zodiac_signs: {
+    name: 'Zodiac Signs',
+    description: 'Astrological symbols and celestial signs',
+    theme: 'Astrology'
+  },
+  foreign_celestial: {
+    name: 'Foreign Celestial',
+    description: 'Eastern script symbols and celestial characters',
+    theme: 'Foreign Scripts'
+  },
+  cosmic_portals: {
+    name: 'Cosmic Portals',
+    description: 'Gateways, voids, and dimensional passages',
+    theme: 'Cosmic Mysteries'
+  },
+  void_dwellers: {
+    name: 'Void Dwellers',
+    description: 'Deep sea creatures and oceanic life forms',
+    theme: 'Oceanic Depths'
   }
 } as const;
 
