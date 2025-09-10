@@ -1,9 +1,11 @@
 /**
  * Officer Puzzle Search Component
- * 
- * Enhanced search with AI difficulty filters
- * Allows exact puzzle ID input and smart filtering based on AI trustworthiness
- * 
+ * ////  NEEDS TO BE REFACTORED  ////
+ * Enhanced search with non-working and incomplete difficulty filters
+ * Allows exact puzzle ID input and smart filtering based on AI trustworthiness?  Maybe?
+ * Date:  UNKNOWN
+ * Author:  UNKNOWN
+ * Last Modified:  ???
  * Based on arc-explainer SearchFilters pattern but adapted for SFMC
  */
 
@@ -21,14 +23,14 @@ interface OfficerPuzzleSearchProps {
   onFilterChange: (filters: SearchFilters) => void;
   isLoading?: boolean;
 }
-
+/// No idea what this does
 export interface SearchFilters {
   difficulty?: 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging' | 'all';
   zeroAccuracyOnly?: boolean;
   minAccuracy?: number;
   maxAccuracy?: number;
 }
-
+//  No idea what this does
 export function OfficerPuzzleSearch({ 
   onSearch, 
   onRandomPuzzle, 
@@ -41,7 +43,7 @@ export function OfficerPuzzleSearch({
     difficulty: 'all',
     zeroAccuracyOnly: false
   });
-
+// No idea what this does
   const handleSearch = () => {
     if (puzzleIdInput.trim()) {
       // Clean up the input - remove .json extension if present, handle various formats
@@ -49,7 +51,7 @@ export function OfficerPuzzleSearch({
       if (cleanId.endsWith('.json')) {
         cleanId = cleanId.slice(0, -5);
       }
-      
+      // No idea what this does, possibly dangerous violation of DRY
       // Remove ARC prefixes if present (user might paste full PlayFab ID)
       cleanId = cleanId.replace(/^ARC-[A-Z0-9]+-/, '');
       
@@ -62,18 +64,19 @@ export function OfficerPuzzleSearch({
       handleSearch();
     }
   };
-
+// No idea what this does
   const handleFilterChange = (key: keyof SearchFilters, value: any) => {
     const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
     onFilterChange(newFilters);
   };
-
+// No idea what this does or why we would want it
+//  Seems like it should be removed or improved
   const handleRandomPuzzle = () => {
     const difficulty = filters.difficulty === 'all' ? undefined : filters.difficulty;
     onRandomPuzzle(difficulty);
   };
-
+// No idea what this does or how it is doing it.
   return (
     <div className="bg-slate-800 border border-slate-600 rounded-lg p-6 space-y-6">
       {/* Header */}
@@ -83,7 +86,6 @@ export function OfficerPuzzleSearch({
           PUZZLE LOOKUP & AI FILTERING
         </h2>
       </div>
-
       {/* Exact Puzzle ID Search */}
       <div className="space-y-4">
         <div>
@@ -114,7 +116,8 @@ export function OfficerPuzzleSearch({
         </div>
       </div>
 
-      {/* AI Difficulty Filters */}
+      {/* AI Difficulty Filters */} 
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label htmlFor="difficulty" className="text-slate-300">
@@ -130,10 +133,11 @@ export function OfficerPuzzleSearch({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Difficulties</SelectItem>
-              <SelectItem value="impossible">🤖❌ Impossible (0%)</SelectItem>
-              <SelectItem value="extremely_hard">🤖😰 Extremely Hard (0-25%)</SelectItem>
-              <SelectItem value="very_hard">🤖😅 Very Hard (25-50%)</SelectItem>
+              <SelectItem value="impossible">🤯🤪 Impossible or No Data (0%)</SelectItem>
+              <SelectItem value="extremely_hard">🤖😰 Extremely Hard (1-25%)</SelectItem>
+              <SelectItem value="very_hard">🤖😨 Very Hard (25-50%)</SelectItem>
               <SelectItem value="challenging">🤖🤔 Challenging (50-75%)</SelectItem>
+              <SelectItem value="easy">🤖 Easy (75-100%)</SelectItem>
             </SelectContent>
           </Select>
         </div>

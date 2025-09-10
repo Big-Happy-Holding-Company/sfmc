@@ -1,6 +1,8 @@
 /**
  * PlayFab API Strategy Pattern
- * 
+ * date:  UNKNOWN
+ * author:  UNKNOWN
+ * last modified:  ???
  * Single Responsibility: Route PlayFab API calls to correct endpoint based on data type and auth context
  * DRY Compliance: Eliminates duplicate API selection logic across services
  * 
@@ -150,7 +152,7 @@ export class ClientApiStrategy implements PlayFabApiStrategy {
     
     return {
       endpoint,
-      data: requestData ? { ...requestData, TitleId: titleId } : { TitleId: titleId },
+      data: { ...requestData, TitleId: titleId } as T,
       headers,
       requiresAuth
     };
