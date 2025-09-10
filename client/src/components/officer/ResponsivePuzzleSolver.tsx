@@ -707,6 +707,13 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                       <option value="status_emojis">😂 Human Crew</option>
                       <option value="vague_symbols">♊ Vague Symbols</option>
                       <option value="alien_language">👽 Alien Language</option>
+                      <option value="big_mammals">🐯 Wild Mammals</option>
+                      <option value="reptiles_amphibians">🐢 Reptiles & Amphibians</option>
+                      <option value="fruits_remaining">🍊 Fresh Fruits</option>
+                      <option value="sweets_desserts">🍰 Sweets & Desserts</option>
+                      <option value="savory_foods">🍔 Comfort Foods</option>
+                      <option value="games_chance">🎲 Games & Chance</option>
+                      <option value="rare_plants">🍄 Rare Plants & Nature</option>
                     </select>
                   </div>
                 )}
