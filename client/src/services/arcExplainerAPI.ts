@@ -454,7 +454,6 @@ export class ArcExplainerAPI {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache', // Bypass potential cache issues
           },
           // For Railway.app certificate issues on Windows
           cache: 'no-cache',
