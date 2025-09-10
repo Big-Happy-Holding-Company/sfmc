@@ -23,6 +23,7 @@ import type {
   ARCPuzzleFilters,
   ARCDisplayGrid
 } from '@/types/arcTypes';
+import { DATASET_DEFINITIONS } from '@shared/datasets';
 import { SPACE_EMOJIS } from '@/constants/spaceEmojis';
 import { loadPuzzleFromPlayFab } from '@/services/officerArcAPI';
 
@@ -148,15 +149,14 @@ export class ARCDataService {
   private async loadDatasetFromPlayFab(dataset: ARCDatasetType): Promise<OfficerTrackPuzzle[]> {
     const allPuzzles: OfficerTrackPuzzle[] = [];
 
-    // Determine number of batches for this dataset
-    const batchCounts: Record<ARCDatasetType, number> = {
-      training: 4,      // 400 puzzles in 4 batches
-      training2: 10,    // 1000 puzzles in 10 batches  
-      evaluation: 4,    // 400 puzzles in 4 batches
-      evaluation2: 2    // 120 puzzles in 2 batches
-    };
+    // Get dataset definition from the single source of truth
+    const datasetDef = DATASET_DEFINITIONS[dataset];
+    if (!datasetDef) {
+      console.error(`Unknown dataset type: ${dataset}`);
+      return [];
+    }
 
-    const totalBatches = batchCounts[dataset];
+    const totalBatches = datasetDef.batchCount;
 
     // Load all batches for this dataset
     for (let batchNum = 1; batchNum <= totalBatches; batchNum++) {

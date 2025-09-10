@@ -702,33 +702,7 @@ function findPuzzleInBatches(puzzleId) {
     log.info("=== findPuzzleInBatches Debug ===");
     log.info("Looking for puzzle: " + puzzleId);
     
-    // Define batch keys to search
-    const batchKeys = [
-        // Training batches
-        "officer-tasks-training-batch1.json",
-        "officer-tasks-training-batch2.json", 
-        "officer-tasks-training-batch3.json",
-        "officer-tasks-training-batch4.json",
-        // Training2 batches  
-        "officer-tasks-training2-batch1.json",
-        "officer-tasks-training2-batch2.json",
-        "officer-tasks-training2-batch3.json",
-        "officer-tasks-training2-batch4.json",
-        "officer-tasks-training2-batch5.json",
-        "officer-tasks-training2-batch6.json",
-        "officer-tasks-training2-batch7.json",
-        "officer-tasks-training2-batch8.json",
-        "officer-tasks-training2-batch9.json",
-        "officer-tasks-training2-batch10.json",
-        // Evaluation batches
-        "officer-tasks-evaluation-batch1.json",
-        "officer-tasks-evaluation-batch2.json",
-        "officer-tasks-evaluation-batch3.json", 
-        "officer-tasks-evaluation-batch4.json",
-        // Evaluation2 batches
-        "officer-tasks-evaluation2-batch1.json",
-        "officer-tasks-evaluation2-batch2.json"
-    ];
+    const batchKeys = getAllBatchKeys();
 
     log.info("Searching " + batchKeys.length + " batches");
     
