@@ -20,13 +20,14 @@ import type {
 } from '@/types/playfab';
 
 // Import all service modules (updated with new architecture)
-import { playFabCore } from './core';
+import { playFabRequestManager } from './requestManager';
 import { playFabAuthManager } from './authManager'; // Updated to new auth manager
 import { playFabTasks } from './tasks';
 import { playFabValidation } from './validation';
 import { playFabEvents } from './events';
 import { playFabUserData } from './userData';
 import { playFabLeaderboards } from './leaderboards';
+import { LeaderboardType } from './leaderboard-types';
 import { playFabProfiles } from './profiles';
 import { playFabOfficerTrack } from './officerTrack';
 
@@ -34,7 +35,6 @@ export class PlayFabService {
   private static instance: PlayFabService;
   
   // Expose individual services for advanced usage
-  public readonly core = playFabCore;
   public readonly auth = playFabAuthManager; // Updated to new auth manager
   public readonly tasks = playFabTasks;
   public readonly validation = playFabValidation;
@@ -62,15 +62,12 @@ export class PlayFabService {
       throw new Error('VITE_PLAYFAB_TITLE_ID environment variable not found');
     }
 
-    await this.core.initialize({ 
+    await playFabRequestManager.initialize({ 
       titleId,
       secretKey: import.meta.env.VITE_PLAYFAB_SECRET_KEY 
     });
 
-    this.core.logOperation('PlayFab Service Initialized', { 
-      titleId, 
-      modulesLoaded: 8 
-    });
+    console.log('[PlayFabService] Initialized', { titleId, modulesLoaded: 8 });
   }
 
   // =============================================================================
@@ -123,14 +120,14 @@ export class PlayFabService {
    * Submit score to leaderboard (unified API)
    */
   public async submitScore(score: number): Promise<void> {
-    return await this.leaderboards.submitScore(score);
+    return await this.leaderboards.submitScore(LeaderboardType.GLOBAL, score);
   }
 
   /**
    * Get leaderboard (unified API)
    */
   public async getLeaderboard(): Promise<LeaderboardEntry[]> {
-    const leaderboard = await this.leaderboards.getLeaderboard();
+    const leaderboard = await this.leaderboards.getLeaderboard(LeaderboardType.GLOBAL);
     return await this.profiles.enhanceLeaderboardWithProfiles(leaderboard);
   }
 
@@ -213,7 +210,7 @@ export class PlayFabService {
       // Update player progress if correct
       if (validationResult.correct) {
         await this.userData.addPoints(validationResult.pointsEarned, true);
-        await this.leaderboards.submitScore(validationResult.totalScore);
+        await this.leaderboards.submitScore(LeaderboardType.GLOBAL, validationResult.totalScore);
       }
 
       // Increment attempt counter
@@ -228,19 +225,17 @@ export class PlayFabService {
       // Clear current task
       await this.userData.setCurrentTask(undefined);
 
-      this.core.logOperation('Game Completed', {
+      console.log('[PlayFabService] Game Completed', {
         taskId,
         correct: validationResult.correct,
-        points: validationResult.pointsEarned,
-        timeElapsed,
-        hintsUsed
+        points: validationResult.pointsEarned
       });
 
       return validationResult;
     } catch (error) {
       // Log failure and end session
       await this.events.endGameSession("fail", 0);
-      this.core.logOperation('Game Completion Failed', error);
+      console.error('[PlayFabService] Game Completion Failed:', error);
       throw error;
     }
   }
@@ -251,7 +246,7 @@ export class PlayFabService {
   public async abandonGame(): Promise<void> {
     await this.events.endGameSession("stop");
     await this.userData.setCurrentTask(undefined);
-    this.core.logOperation('Game Abandoned');
+    console.log('[PlayFabService] Game Abandoned');
   }
 
   // =============================================================================
@@ -269,8 +264,8 @@ export class PlayFabService {
   }> {
     const [player, ranking, leaderboardStats] = await Promise.all([
       this.userData.getPlayerData(),
-      this.leaderboards.getPlayerRanking(),
-      this.leaderboards.getLeaderboardStats()
+      this.leaderboards.getPlayerRanking(LeaderboardType.GLOBAL),
+      this.leaderboards.getLeaderboardStats(LeaderboardType.GLOBAL)
     ]);
 
     const stats = this.userData.getPlayerStats();
@@ -301,61 +296,15 @@ export class PlayFabService {
     ]);
 
     return {
-      core: this.core.isReady(),
+      core: playFabRequestManager.isInitialized(),
       auth: this.auth.isAuthenticated(),
       cloudScript: cloudScriptHealth.status === 'fulfilled' ? cloudScriptHealth.value : false,
       services: {
         tasks: { ...this.tasks.getCacheInfo(), cached: 0 },
-        leaderboards: { ...this.leaderboards.getCacheInfo(), cached: 0 },
+        leaderboards: { ...this.leaderboards.getCacheInfo(LeaderboardType.GLOBAL), cached: 0 },
         profiles: { ...this.profiles.getCacheStats(), cached: 0 }
       }
     };
-  }
-
-  // =============================================================================
-  // OFFICER TRACK METHODS (UNIFIED API)
-  // =============================================================================
-
-  /**
-   * Get officer track player data (unified API)
-   */
-  public async getOfficerPlayerData(): Promise<import('@/types/arcTypes').OfficerTrackPlayer> {
-    return await this.officerTrack.getOfficerPlayerData();
-  }
-
-  /**
-   * Get officer track leaderboard (unified API)
-   */
-  public async getOfficerLeaderboard(maxResults?: number): Promise<import('@/types/arcTypes').OfficerLeaderboardEntry[]> {
-    return await this.officerTrack.getOfficerLeaderboard(maxResults);
-  }
-
-  /**
-   * Validate ARC puzzle solution (unified API)
-   */
-  public async validateARCSolution(attempt: import('@/types/arcTypes').ARCSolutionAttempt): Promise<import('@/types/arcTypes').ARCValidationResult> {
-    return await this.officerTrack.validateARCSolution(attempt);
-  }
-
-  /**
-   * Submit officer track score (unified API)
-   */
-  public async submitOfficerScore(points: number): Promise<void> {
-    return await this.officerTrack.submitOfficerScore(points);
-  }
-
-  /**
-   * Award officer achievement (unified API)
-   */
-  public async awardOfficerAchievement(achievementId: string): Promise<void> {
-    return await this.officerTrack.awardAchievement(achievementId);
-  }
-
-  /**
-   * Get current officer ranking (unified API)
-   */
-  public async getOfficerPlayerRanking(): Promise<import('@/types/arcTypes').OfficerLeaderboardEntry | null> {
-    return await this.officerTrack.getOfficerPlayerRanking();
   }
 
   /**
@@ -363,10 +312,10 @@ export class PlayFabService {
    */
   public clearAllCaches(): void {
     this.tasks.clearCache();
-    this.leaderboards.clearCache();
+    this.leaderboards.clearAllCaches();
     this.profiles.clearAllProfileCaches();
     this.officerTrack.clearCache();
-    this.core.logOperation('All Caches Cleared');
+    console.log('[PlayFabService] All caches cleared');
   }
 
   // =============================================================================
@@ -377,7 +326,7 @@ export class PlayFabService {
    * Ensure all services are ready
    */
   public async ensureReady(): Promise<void> {
-    if (!this.core.isReady()) {
+    if (!playFabRequestManager.isInitialized()) {
       this.initialize();
     }
     
@@ -391,7 +340,7 @@ export class PlayFabService {
       this.tasks.getAllTasks()
     ]);
 
-    this.core.logOperation('Service Ready', 'All systems initialized');
+    console.log('[PlayFabService] Service Ready');
   }
 }
 
@@ -404,16 +353,14 @@ export const playFabService = PlayFabService.getInstance();
 
 // Export individual services for advanced usage
 export {
-  playFabCore,
-  playFabAuth,
+  playFabAuthManager as playFabAuth,
   playFabTasks,
   playFabValidation,
   playFabEvents,
   playFabUserData,
   playFabLeaderboards,
   playFabProfiles,
-  playFabOfficerTrack
-};
+}
 
 // Export types
 export type * from '@/types/playfab';

@@ -9,7 +9,6 @@ import type {
   CloudScriptValidationResponse,
   TaskValidationResult 
 } from '@/types/playfab';
-import { playFabCore } from './core';
 import { playFabAuthManager } from './authManager';
 import { playFabRequestManager } from './requestManager';
 import { playFabTasks } from './tasks';
@@ -68,7 +67,7 @@ export class PlayFabValidation {
       GeneratePlayStreamEvent: true // Enable for analytics
     };
 
-    playFabCore.logOperation('Solution Validation', `Task: ${request.taskId}`);
+    console.log(`[PlayFabValidation] Validating solution for task: ${request.taskId}`);
 
     try {
       const result = await playFabRequestManager.makeRequest<ExecuteCloudScriptRequest, ExecuteCloudScriptResponse>(
@@ -79,7 +78,7 @@ export class PlayFabValidation {
       // Check for CloudScript execution errors
       if (result.Error) {
         const errorMsg = `CloudScript error: ${result.Error.Error} - ${result.Error.Message}`;
-        playFabCore.logOperation('CloudScript Error', result.Error);
+        console.error('[PlayFabValidation] CloudScript Error:', result.Error);
         throw new Error(errorMsg);
       }
 
@@ -100,20 +99,18 @@ export class PlayFabValidation {
       };
 
       if (validationResponse.correct) {
-        playFabCore.logOperation('Solution Correct', {
-          points: validationResponse.pointsEarned,
-          timeBonus: validationResponse.timeBonus,
-          hintPenalty: validationResponse.hintPenalty,
-          totalScore: validationResponse.totalScore
+        console.log('[PlayFabValidation] Solution Correct:', { 
+          points: validationResponse.pointsEarned, 
+          totalScore: validationResponse.totalScore 
         });
       } else {
-        playFabCore.logOperation('Solution Incorrect', request.taskId);
+        console.warn(`[PlayFabValidation] Solution Incorrect for task: ${request.taskId}`);
       }
 
       return taskValidationResult;
 
     } catch (error) {
-      playFabCore.logOperation('Validation Failed', error);
+      console.error('[PlayFabValidation] Validation Failed:', error);
       throw error;
     }
   }
@@ -136,7 +133,7 @@ export class PlayFabValidation {
         
         // Only retry on CloudScript errors, not on validation failures
         if (attempt <= maxRetries && this.isRetriableError(error)) {
-          playFabCore.logOperation('Validation Retry', `Attempt ${attempt + 1}/${maxRetries + 1}`);
+          console.warn(`[PlayFabValidation] Retrying validation... Attempt ${attempt}/${maxRetries}`);
           await this.delay(1000 * attempt); // Exponential backoff
           continue;
         }
@@ -200,7 +197,7 @@ export class PlayFabValidation {
       hintsUsed: request.hintsUsed || 0
     };
 
-    playFabCore.logOperation('Fallback Validation', { correct: isCorrect, points: pointsEarned });
+    console.log('[PlayFabValidation] Fallback validation result:', { correct: isCorrect, points: pointsEarned });
     return result;
   }
 
@@ -259,7 +256,7 @@ export class PlayFabValidation {
       GeneratePlayStreamEvent: true
     };
 
-    playFabCore.logOperation('ARC Puzzle Validation', `Puzzle: ${puzzleId}, Tests: ${solutions.length}`);
+    console.log(`[PlayFabValidation] Validating ARC puzzle: ${puzzleId}`);
 
     try {
       const result = await playFabRequestManager.makeRequest<ExecuteCloudScriptRequest, ExecuteCloudScriptResponse>(
@@ -269,20 +266,17 @@ export class PlayFabValidation {
 
       if (result.Error) {
         const errorMsg = `CloudScript error: ${result.Error.Error} - ${result.Error.Message}`;
-        playFabCore.logOperation('CloudScript Error', result.Error);
+        console.error('[PlayFabValidation] ARC CloudScript Error:', result.Error);
         throw new Error(errorMsg);
       }
 
       const validationResult = result.FunctionResult;
       
-      playFabCore.logOperation(
-        validationResult?.correct ? 'ARC Puzzle Correct' : 'ARC Puzzle Incorrect', 
-        { puzzleId, timeElapsed }
-      );
+      console.log(`[PlayFabValidation] ARC puzzle validation result: ${validationResult?.correct ? 'Correct' : 'Incorrect'}`);
 
       return validationResult;
     } catch (error) {
-      playFabCore.logOperation('ARC Validation Failed', error);
+      console.error(`[PlayFabValidation] ARC puzzle validation failed for ${puzzleId}:`, error);
       throw error;
     }
   }
@@ -293,10 +287,10 @@ export class PlayFabValidation {
   public async testCloudScriptConnection(): Promise<boolean> {
     try {
       // Try to generate an anonymous name as a CloudScript connectivity test
-      await playFabAuthManager.generateAnonymousName(playFabRequestManager.makeRequest.bind(playFabRequestManager));
+      await playFabAuthManager.generateAnonymousName();
       return true;
     } catch (error) {
-      playFabCore.logOperation('CloudScript Connection Test Failed', error);
+      console.error('[PlayFabValidation] CloudScript connection test failed:', error);
       return false;
     }
   }

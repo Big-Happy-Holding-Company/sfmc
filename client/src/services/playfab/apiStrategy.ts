@@ -23,7 +23,11 @@ export type ApiOperationType =
   | 'updateStatistics'      // Client API - requires session token
   | 'getLeaderboard'        // Client API - requires session token
   | 'executeCloudScript'    // Client API - requires session token
-  | 'loginWithCustomId';    // Client API - no auth required
+  | 'loginWithCustomId'     // Client API - no auth required
+  | 'updateUserTitleDisplayName' // Client API - requires session token
+  | 'getPlayerProfile'      // Client API - requires session token
+  | 'updateAvatarUrl'       // Client API - requires session token
+  | 'writePlayerEvent';     // Client API - requires session token
 
 // Request context for strategy selection
 export interface ApiRequestContext {
@@ -80,7 +84,11 @@ export class AdminApiStrategy implements PlayFabApiStrategy {
       updateStatistics: '',
       getLeaderboard: '',
       executeCloudScript: '',
-      loginWithCustomId: ''
+      loginWithCustomId: '',
+      updateUserTitleDisplayName: '',
+      getPlayerProfile: '',
+      updateAvatarUrl: '',
+      writePlayerEvent: ''
     };
     
     const endpoint = endpointMap[operation];
@@ -112,7 +120,7 @@ export class ClientApiStrategy implements PlayFabApiStrategy {
   canHandle(context: ApiRequestContext): boolean {
     const clientOperations: ApiOperationType[] = [
       'getUserData', 'updateUserData', 'updateStatistics', 
-      'getLeaderboard', 'executeCloudScript', 'loginWithCustomId'
+      'getLeaderboard', 'executeCloudScript', 'loginWithCustomId', 'updateUserTitleDisplayName'
     ];
     return clientOperations.includes(context.operation) && 
            (!context.requiresAuth || context.hasSessionToken);
@@ -130,6 +138,10 @@ export class ClientApiStrategy implements PlayFabApiStrategy {
       getLeaderboard: '/Client/GetLeaderboard',
       executeCloudScript: '/Client/ExecuteCloudScript',
       loginWithCustomId: '/Client/LoginWithCustomID',
+      updateUserTitleDisplayName: '/Client/UpdateUserTitleDisplayName',
+      getPlayerProfile: '/Client/GetPlayerProfile',
+      updateAvatarUrl: '/Client/UpdateAvatarUrl',
+      writePlayerEvent: '/Client/WritePlayerEvent',
       // Unused by Client API but included for type safety
       getTitleData: '',
       setTitleData: ''

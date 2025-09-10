@@ -18,7 +18,6 @@
  */
 
 import type { LeaderboardEntry } from '@/types/playfab';
-import { playFabCore } from './core';
 import { playFabRequestManager } from './requestManager';
 
 // PlayFab request/response interfaces
@@ -83,12 +82,9 @@ export class LeaderboardAPI {
         request
       );
 
-      playFabCore.logOperation('Score Submitted', {
-        statistic: statisticName,
-        value: score
-      });
+      console.log(`[LeaderboardAPI] Score Submitted for ${statisticName}: ${score}`);
     } catch (error) {
-      playFabCore.logOperation('Score Submission Failed', error);
+      console.error('[LeaderboardAPI] Score Submission Failed:', error);
       throw error;
     }
   }
@@ -117,7 +113,7 @@ export class LeaderboardAPI {
 
       return this.mapPlayFabEntries(result.Leaderboard);
     } catch (error) {
-      playFabCore.logOperation('Leaderboard Retrieval Failed', error);
+      console.error('[LeaderboardAPI] Leaderboard Retrieval Failed:', error);
       throw error;
     }
   }
@@ -146,7 +142,7 @@ export class LeaderboardAPI {
 
       return this.mapPlayFabEntries(result.Leaderboard);
     } catch (error) {
-      playFabCore.logOperation('Player-Centered Leaderboard Failed', error);
+      console.error('[LeaderboardAPI] Player-Centered Leaderboard Failed:', error);
       throw error;
     }
   }

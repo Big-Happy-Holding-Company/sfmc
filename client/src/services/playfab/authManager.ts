@@ -13,6 +13,7 @@
 
 import { PLAYFAB_CONSTANTS } from '@/types/playfab';
 import type { AuthenticationResult, AnonymousNameResponse } from '@/types/playfab';
+import { playFabRequestManager } from './requestManager';
 
 interface LoginResponse {
   PlayFabId: string;
@@ -117,9 +118,7 @@ export class PlayFabAuthManager {
    * Anonymous login with automatic device ID management
    * Prevents concurrent login attempts and handles display name generation
    */
-  async loginAnonymously(
-    makeRequest: <T, R>(endpoint: string, data?: T, requiresAuth?: boolean) => Promise<R>
-  ): Promise<AuthenticationResult> {
+  async loginAnonymously(): Promise<AuthenticationResult> {
     // Prevent concurrent login attempts
     if (this.loginPromise) {
       return await this.loginPromise;
@@ -140,10 +139,9 @@ export class PlayFabAuthManager {
 
     this.loginPromise = (async () => {
       try {
-        const result = await makeRequest<typeof request, LoginResponse>(
-          '/Client/LoginWithCustomID',
-          request,
-          false
+        const result = await playFabRequestManager.makeRequest<typeof request, LoginResponse>(
+          'loginWithCustomId',
+          request
         );
 
         this.authState = {
@@ -156,7 +154,7 @@ export class PlayFabAuthManager {
 
         // Handle display name generation for new users
         if (!this.authState.displayName) {
-          await this.generateDisplayName(makeRequest);
+          await this.generateDisplayName();
         }
 
         return {
@@ -175,18 +173,15 @@ export class PlayFabAuthManager {
   /**
    * Generate anonymous display name via CloudScript
    */
-  async generateAnonymousName(
-    makeRequest: <T, R>(endpoint: string, data?: T, requiresAuth?: boolean) => Promise<R>
-  ): Promise<string> {
+  async generateAnonymousName(): Promise<string> {
     const request = {
       FunctionName: PLAYFAB_CONSTANTS.CLOUDSCRIPT_FUNCTIONS.GENERATE_ANONYMOUS_NAME,
       GeneratePlayStreamEvent: false
     };
 
-    const result = await makeRequest<typeof request, CloudScriptResponse>(
-      '/Client/ExecuteCloudScript',
-      request,
-      true
+    const result = await playFabRequestManager.makeRequest<typeof request, CloudScriptResponse>(
+      'executeCloudScript',
+      request
     );
 
     if (result.Error) {
@@ -204,16 +199,12 @@ export class PlayFabAuthManager {
   /**
    * Update user display name
    */
-  async setDisplayName(
-    displayName: string,
-    makeRequest: <T, R>(endpoint: string, data?: T, requiresAuth?: boolean) => Promise<R>
-  ): Promise<void> {
+  async setDisplayName(displayName: string): Promise<void> {
     const request = { DisplayName: displayName };
 
-    const result = await makeRequest<typeof request, DisplayNameResponse>(
-      '/Client/UpdateUserTitleDisplayName',
-      request,
-      true
+    const result = await playFabRequestManager.makeRequest<typeof request, DisplayNameResponse>(
+      'updateUserTitleDisplayName',
+      request
     );
 
     this.authState.displayName = result.DisplayName;
@@ -222,11 +213,9 @@ export class PlayFabAuthManager {
   /**
    * Ensure user is authenticated, login if necessary
    */
-  async ensureAuthenticated(
-    makeRequest: <T, R>(endpoint: string, data?: T, requiresAuth?: boolean) => Promise<R>
-  ): Promise<void> {
+  async ensureAuthenticated(): Promise<void> {
     if (!this.isAuthenticated()) {
-      await this.loginAnonymously(makeRequest);
+      await this.loginAnonymously();
     }
   }
 
@@ -269,16 +258,14 @@ export class PlayFabAuthManager {
   /**
    * Handle display name generation for new users
    */
-  private async generateDisplayName(
-    makeRequest: <T, R>(endpoint: string, data?: T, requiresAuth?: boolean) => Promise<R>
-  ): Promise<void> {
+  private async generateDisplayName(): Promise<void> {
     try {
-      const generatedName = await this.generateAnonymousName(makeRequest);
-      await this.setDisplayName(generatedName, makeRequest);
+      const generatedName = await this.generateAnonymousName();
+      await this.setDisplayName(generatedName);
     } catch (error) {
       // Fallback to simple anonymous name if CloudScript fails
       const fallbackName = `Anonymous_${Math.floor(Math.random() * 10000)}`;
-      await this.setDisplayName(fallbackName, makeRequest);
+      await this.setDisplayName(fallbackName);
     }
   }
 }

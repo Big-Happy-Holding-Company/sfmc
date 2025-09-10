@@ -20,7 +20,6 @@ import { OfficerRank, ARC_CONSTANTS } from '@/types/arcTypes';
 import type { PlayFabServiceResult, CloudScriptValidationRequest, TaskValidationResult } from '@/types/playfab';
 import { playFabRequestManager } from './requestManager';
 import { playFabAuthManager } from './authManager';
-import { playFabErrorHandler } from './errorHandler';
 import { PLAYFAB_CONSTANTS } from '@/types/playfab';
 
 // PlayFab request/response interfaces for Officer Track
@@ -113,11 +112,11 @@ export class PlayFabOfficerTrack {
   public async getOfficerPlayerData(): Promise<OfficerTrackPlayer> {
     // Return cached data if available and recent
     if (this.officerPlayerCache && this.isCacheValid()) {
-      playFabCore.logOperation('Officer Player Cache Hit', this.officerPlayerCache.officerRank);
+      console.log(`[PlayFabOfficerTrack] Officer Player Cache Hit: ${this.officerPlayerCache.officerRank}`);
       return this.officerPlayerCache;
     }
 
-    await playFabAuth.ensureAuthenticated();
+    await playFabAuthManager.ensureAuthenticated();
 
     const request: GetOfficerUserDataRequest = {
       Keys: [
@@ -145,13 +144,11 @@ export class PlayFabOfficerTrack {
           lastActive: new Date(savedData.lastActive)
         };
         
-        playFabCore.logOperation('Officer Player Data Loaded', 
-          `${officerPlayer.officerRank} - ${officerPlayer.officerPoints} points`
-        );
+        console.log(`[PlayFabOfficerTrack] Officer Player Data Loaded: ${officerPlayer.officerRank} - ${officerPlayer.officerPoints} points`);
       } else {
         // Create new officer profile
         officerPlayer = await this.createNewOfficerProfile();
-        playFabCore.logOperation('New Officer Profile Created', officerPlayer.officerRank);
+        console.log(`[PlayFabOfficerTrack] New Officer Profile Created: ${officerPlayer.officerRank}`);
       }
 
       // Update cache
@@ -159,7 +156,7 @@ export class PlayFabOfficerTrack {
       
       return officerPlayer;
     } catch (error) {
-      playFabCore.logOperation('Officer Player Data Load Failed', error);
+      console.error('[PlayFabOfficerTrack] Officer Player Data Load Failed:', error);
       throw new Error('Failed to load officer player data');
     }
   }
@@ -203,7 +200,7 @@ export class PlayFabOfficerTrack {
    * Update officer player data in PlayFab
    */
   public async updateOfficerPlayerData(playerData: Partial<OfficerTrackPlayer>): Promise<void> {
-    await playFabAuth.ensureAuthenticated();
+    await playFabAuthManager.ensureAuthenticated();
 
     // Use cached data if available, otherwise use the provided data directly (prevents infinite recursion)
     const currentData = this.officerPlayerCache || playerData as OfficerTrackPlayer;
@@ -224,12 +221,9 @@ export class PlayFabOfficerTrack {
       // Update cache
       this.officerPlayerCache = updatedData;
       
-      playFabCore.logOperation('Officer Player Data Updated', {
-        rank: updatedData.officerRank,
-        points: updatedData.officerPoints
-      });
+      console.log(`[PlayFabOfficerTrack] Officer Player Data Updated: Rank ${updatedData.officerRank}, Points ${updatedData.officerPoints}`);
     } catch (error) {
-      playFabCore.logOperation('Officer Player Data Update Failed', error);
+      console.error('[PlayFabOfficerTrack] Officer Player Data Update Failed:', error);
       throw error;
     }
   }
@@ -252,6 +246,30 @@ export class PlayFabOfficerTrack {
     return this.officerPlayerCache !== null; // Simple cache for now
   }
 
+  public async getOfficerLeaderboard(maxResults: number = 10): Promise<OfficerLeaderboardEntry[]> {
+    // This is a placeholder. A real implementation would fetch from a dedicated officer leaderboard.
+    console.warn('[PlayFabOfficerTrack] getOfficerLeaderboard is not implemented. Returning empty array.');
+    return [];
+  }
+
+  public async submitOfficerScore(points: number): Promise<void> {
+    // This is a placeholder. A real implementation would update a dedicated officer statistic.
+    console.warn(`[PlayFabOfficerTrack] submitOfficerScore is not implemented. Tried to submit ${points} points.`);
+    return Promise.resolve();
+  }
+
+  public async awardAchievement(achievementId: string): Promise<void> {
+    // This is a placeholder. A real implementation would update officer achievements.
+    console.warn(`[PlayFabOfficerTrack] awardAchievement is not implemented. Tried to award ${achievementId}.`);
+    return Promise.resolve();
+  }
+
+  public async getOfficerPlayerRanking(): Promise<OfficerLeaderboardEntry | null> {
+    // This is a placeholder. A real implementation would fetch the player's rank from a dedicated officer leaderboard.
+    console.warn('[PlayFabOfficerTrack] getOfficerPlayerRanking is not implemented. Returning null.');
+    return Promise.resolve(null);
+  }
+
   // =============================================================================
   // ARC SOLUTION VALIDATION
   // =============================================================================
@@ -260,7 +278,7 @@ export class PlayFabOfficerTrack {
    * Validate ARC puzzle solution via PlayFab CloudScript ValidateARCPuzzle
    */
   public async validateARCSolution(attempt: ARCSolutionAttempt): Promise<ARCValidationResult> {
-    await playFabAuth.ensureAuthenticated();
+    await playFabAuthManager.ensureAuthenticated();
 
     // Prepare CloudScript request for ValidateARCPuzzle function
     // Use solutions array if available (multi-test case), otherwise wrap single solution
@@ -277,7 +295,7 @@ export class PlayFabOfficerTrack {
       }
     };
 
-    playFabCore.logOperation('ARC Solution Validation', `Puzzle: ${attempt.puzzleId}, Test Cases: ${solutions.length}`);
+    console.log(`[PlayFabOfficerTrack] Validating ARC Solution for puzzle: ${attempt.puzzleId}`);
 
     try {
       // Call ValidateARCPuzzle CloudScript function directly
@@ -310,14 +328,11 @@ export class PlayFabOfficerTrack {
         completedAt: cloudScriptResult.completedAt
       };
 
-      playFabCore.logOperation('ARC Validation Complete', {
-        correct: arcResult.correct,
-        timeElapsed: arcResult.timeElapsed
-      });
+      console.log(`[PlayFabOfficerTrack] ARC Validation Complete: ${arcResult.correct ? 'Correct' : 'Incorrect'}`);
 
       return arcResult;
     } catch (error) {
-      playFabCore.logOperation('ARC Validation Failed', error);
+      console.error('[PlayFabOfficerTrack] ARC Validation Failed:', error);
       throw error;
     }
   }
@@ -327,7 +342,7 @@ export class PlayFabOfficerTrack {
    */
   public clearCache(): void {
     this.officerPlayerCache = null;
-    playFabCore.logOperation('Officer Track Cache Cleared');
+    console.log('[PlayFabOfficerTrack] Officer Track Cache Cleared');
   }
 }
 

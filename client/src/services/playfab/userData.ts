@@ -5,7 +5,6 @@
  */
 
 import type { PlayFabPlayer, RankLevel } from '@/types/playfab';
-import { playFabCore } from './core';
 import { playFabAuthManager } from './authManager';
 import { playFabRequestManager } from './requestManager';
 
@@ -69,12 +68,10 @@ export class PlayFabUserData {
       };
       
       this.currentPlayer = player;
-      playFabCore.logOperation('Player Data Loaded', {
+      console.log('[PlayFabUserData] Player Data Loaded:', {
         id: player.id,
         username: player.username,
-        rank: player.rank,
-        totalPoints: player.totalPoints,
-        missions: player.completedMissions
+        rank: player.rank
       });
 
       // Initialize new player data if this is a first-time user
@@ -84,7 +81,7 @@ export class PlayFabUserData {
 
       return player;
     } catch (error) {
-      playFabCore.logOperation('Player Data Load Failed', error);
+      console.error('[PlayFabUserData] Player Data Load Failed:', error);
       throw error;
     }
   }
@@ -121,9 +118,9 @@ export class PlayFabUserData {
         request
       );
 
-      playFabCore.logOperation('Player Data Updated', Object.keys(dataToUpdate));
+      console.log('[PlayFabUserData] Player Data Updated:', Object.keys(dataToUpdate));
     } catch (error) {
-      playFabCore.logOperation('Player Data Update Failed', error);
+      console.error('[PlayFabUserData] Player Data Update Failed:', error);
       throw error;
     }
   }
@@ -158,12 +155,7 @@ export class PlayFabUserData {
       completedMissions: newCompletedMissions
     });
 
-    playFabCore.logOperation('Points Added', {
-      points,
-      newTotal: newTotalPoints,
-      rankUp,
-      newRank
-    });
+    console.log('[PlayFabUserData] Points Added:', { points, newTotal: newTotalPoints, rankUp });
 
     return {
       newTotalPoints,
@@ -253,7 +245,7 @@ export class PlayFabUserData {
         request
       );
 
-      playFabCore.logOperation('New Player Initialized', player.username);
+      console.log(`[PlayFabUserData] New Player Initialized: ${player.username}`);
     } catch (error) {
       console.error('Failed to initialize new player:', error);
     }
@@ -295,9 +287,9 @@ export class PlayFabUserData {
         };
       }
 
-      playFabCore.logOperation('Player Data Reset');
+      console.log('[PlayFabUserData] Player Data Reset');
     } catch (error) {
-      playFabCore.logOperation('Player Data Reset Failed', error);
+      console.error('[PlayFabUserData] Player Data Reset Failed:', error);
       throw error;
     }
   }

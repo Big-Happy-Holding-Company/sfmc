@@ -194,32 +194,18 @@ export class ARCDataService {
    */
   private async loadPlayFabTitleData(key: string, isSinglePuzzleKey: boolean = false): Promise<any | null> {
     try {
-      // Import PlayFab core service for Admin API requests
-      const { playFabCore } = await import('./playfab/core');
-      
-      // Ensure PlayFab is initialized
-      if (!playFabCore.isReady()) {
-        console.warn('PlayFab not initialized, attempting initialization...');
-        const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
-        const secretKey = import.meta.env.VITE_PLAYFAB_SECRET_KEY;
-        await playFabCore.initialize({ titleId, secretKey });
-      }
-      
-      // Use Admin API to get Title Data (no user authentication required, uses secret key)
-      const result = await playFabCore.makeHttpRequest<{ Keys: string[] }, { Data?: Record<string, { Value: string }> }>(
-        '/Admin/GetTitleData',
-        { Keys: [key] },
-        false // requiresAuth = false (Admin API uses secret key instead)
+      const { playFabRequestManager } = await import('./playfab/requestManager');
+      const result = await playFabRequestManager.makeRequest<{ Keys: string[] }, { Data?: Record<string, string> }>(
+        'getTitleData',
+        { Keys: [key] }
       );
 
-      // Admin API response structure: result.Data[key].Value
-      if (!result?.Data?.[key]?.Value || result.Data[key].Value === "undefined") {
+      if (!result?.Data?.[key] || result.Data[key] === "undefined") {
         console.warn(`No title data found for key: ${key}`);
         return null;
       }
 
-      // Parse the JSON data from the Value field
-      const puzzleData = JSON.parse(result.Data[key].Value);
+      const puzzleData = JSON.parse(result.Data[key]);
       
       // If it's a single puzzle key, it might not be an array
       if (isSinglePuzzleKey) {
