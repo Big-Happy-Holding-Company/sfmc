@@ -226,30 +226,66 @@ export const EMOJI_SET_INFO = {
     description: 'Deep sea creatures and oceanic life forms',
     theme: 'Oceanic Depths'
   },
-  man_suit: {
-    name: 'Man Suit',
-    description: 'Man suit emojis',
-    theme: 'Man Suit'
+  characters: {
+    name: 'Characters / Man Suit',
+    description: 'Mahjong man suit tiles (1-9)',
+    theme: 'Mahjong Suits'
   },
-  sou_suit: {
-    name: 'Sou Suit',
-    description: 'Sou suit emojis',
-    theme: 'Sou Suit'
+  bamboos: {
+    name: 'Bamboos / Sou Suit', 
+    description: 'Mahjong bamboo suit tiles (1-9)',
+    theme: 'Mahjong Suits'
   },
-  pin_suit: {
-    name: 'Pin Suit',
-    description: 'Pin suit emojis',
-    theme: 'Pin Suit'
+  circles: {
+    name: 'Circles / Pin Suit',
+    description: 'Mahjong circle suit tiles (1-9)', 
+    theme: 'Mahjong Suits'
   },
   birds: {
     name: 'Birds',
-    description: 'Bird emojis',
-    theme: 'Birds'
+    description: 'Various bird species and poultry',
+    theme: 'Natural World'
   },
 } as const;
 
 export type EmojiSet = keyof typeof SPACE_EMOJIS;
 export type SpaceEmoji = typeof SPACE_EMOJIS[EmojiSet][number];
+
+// Dynamic dropdown generation - SINGLE SOURCE OF TRUTH
+export interface EmojiSetOption {
+  value: EmojiSet;
+  label: string;
+  icon: string;
+}
+
+/**
+ * Generate dropdown options dynamically from SPACE_EMOJIS and EMOJI_SET_INFO
+ * This ensures new emoji sets automatically appear in all UI dropdowns
+ */
+export function getEmojiSetOptions(): EmojiSetOption[] {
+  return Object.keys(SPACE_EMOJIS).map(setKey => {
+    const emojiSet = setKey as EmojiSet;
+    const emojis = SPACE_EMOJIS[emojiSet];
+    const info = EMOJI_SET_INFO[emojiSet];
+    
+    return {
+      value: emojiSet,
+      label: info ? `${info.name}` : setKey,
+      icon: emojis[1] // Use the second emoji (index 1) as icon, skip black square
+    };
+  });
+}
+
+/**
+ * Get a formatted label for dropdown display with icon and name
+ */
+export function getEmojiSetDropdownLabel(emojiSet: EmojiSet): string {
+  const emojis = SPACE_EMOJIS[emojiSet];
+  const info = EMOJI_SET_INFO[emojiSet];
+  const icon = emojis[1]; // Second emoji as icon
+  const name = info ? info.name : emojiSet;
+  return `${icon} ${name}`;
+}
 
 // Official ARC Color Constants (for when users switch to color display mode)
 export const ARC_COLORS = {
