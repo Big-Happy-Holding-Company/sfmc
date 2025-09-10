@@ -10,7 +10,8 @@ import type {
   TaskValidationResult 
 } from '@/types/playfab';
 import { playFabCore } from './core';
-import { playFabAuth } from './auth';
+import { playFabAuthManager } from './authManager';
+import { playFabRequestManager } from './requestManager';
 import { playFabTasks } from './tasks';
 import { PLAYFAB_CONSTANTS } from '@/types/playfab';
 
@@ -58,8 +59,7 @@ export class PlayFabValidation {
    * 5. Returns validation result with all scoring details
    */
   public async validateSolution(request: CloudScriptValidationRequest): Promise<TaskValidationResult> {
-    // Ensure user is authenticated
-    await playFabAuth.ensureAuthenticated();
+    // Authentication handled automatically by requestManager
     
     // Prepare CloudScript request
     const cloudScriptRequest: ExecuteCloudScriptRequest = {
@@ -71,10 +71,9 @@ export class PlayFabValidation {
     playFabCore.logOperation('Solution Validation', `Task: ${request.taskId}`);
 
     try {
-      const result = await playFabCore.makeHttpRequest<ExecuteCloudScriptRequest, ExecuteCloudScriptResponse>(
-        '/Client/ExecuteCloudScript',
-        cloudScriptRequest,
-        true // Requires authentication
+      const result = await playFabRequestManager.makeRequest<ExecuteCloudScriptRequest, ExecuteCloudScriptResponse>(
+        'executeCloudScript',
+        cloudScriptRequest
       );
 
       // Check for CloudScript execution errors
@@ -246,7 +245,7 @@ export class PlayFabValidation {
    * Validate ARC puzzle solution via CloudScript (Officer Track)
    */
   public async validateARCPuzzle(puzzleId: string, solutions: number[][][], timeElapsed?: number): Promise<any> {
-    await playFabAuth.ensureAuthenticated();
+    // Authentication handled automatically by requestManager
     
     const request: ExecuteCloudScriptRequest = {
       FunctionName: PLAYFAB_CONSTANTS.CLOUDSCRIPT_FUNCTIONS.VALIDATE_ARC_PUZZLE,
@@ -263,10 +262,9 @@ export class PlayFabValidation {
     playFabCore.logOperation('ARC Puzzle Validation', `Puzzle: ${puzzleId}, Tests: ${solutions.length}`);
 
     try {
-      const result = await playFabCore.makeHttpRequest<ExecuteCloudScriptRequest, ExecuteCloudScriptResponse>(
-        '/Client/ExecuteCloudScript',
-        request,
-        true
+      const result = await playFabRequestManager.makeRequest<ExecuteCloudScriptRequest, ExecuteCloudScriptResponse>(
+        'executeCloudScript',
+        request
       );
 
       if (result.Error) {
@@ -295,7 +293,7 @@ export class PlayFabValidation {
   public async testCloudScriptConnection(): Promise<boolean> {
     try {
       // Try to generate an anonymous name as a CloudScript connectivity test
-      await playFabAuth.generateAnonymousName();
+      await playFabAuthManager.generateAnonymousName(playFabRequestManager.makeRequest.bind(playFabRequestManager));
       return true;
     } catch (error) {
       playFabCore.logOperation('CloudScript Connection Test Failed', error);
