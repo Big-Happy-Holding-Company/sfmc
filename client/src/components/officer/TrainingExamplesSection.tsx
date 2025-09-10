@@ -141,33 +141,21 @@ export function TrainingExamplesSection({
     return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
   };
 
-  // Different background shades for example cards
-  const exampleCardBgColors = [
-    'bg-slate-700',
-    'bg-slate-700/90',
-    'bg-slate-700/80',
-    'bg-slate-700/70',
-    'bg-slate-700/60'
-  ];
-
   return (
     <div className={`bg-slate-800 border border-slate-600 rounded-lg p-6 ${className}`}>
       {/* Section Header */}
-      <div className="text-center mb-8">
-        <h2 className="text-amber-300 text-3xl font-bold mb-2">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-amber-400 font-semibold flex items-center">
           {title}
         </h2>
-        <p className="text-slate-300 text-lg">
-          Apply what you learn from these examples to solve the puzzle
-        </p>
-        <div className="text-slate-400 text-sm mt-2">
-          {examples.length} example{examples.length !== 1 ? 's' : ''} provided
+        <div className="text-slate-400 text-sm">
+          {examples.length} example{examples.length !== 1 ? 's' : ''}
         </div>
       </div>
       
       {/* Compact Horizontal Layout for ALL grid sizes */}
       <div className="overflow-x-auto">
-        <div className="flex gap-6 pb-4 px-2">
+        <div className="flex gap-4 pb-2">
           {examples.map((example, index) => {
             // Calculate cell size for training examples (smaller, more compact)
             const maxInputDim = Math.max(example.input.length, example.input[0]?.length || 1);
@@ -176,49 +164,28 @@ export function TrainingExamplesSection({
             
             // Use bigger cell sizes for training examples - much more visible
             const cellSize = maxDim > 20 ? 24 : maxDim > 15 ? 32 : maxDim > 10 ? 40 : 48;
-            const bgColor = exampleCardBgColors[index % exampleCardBgColors.length];
             
             return (
-              <div 
-                key={index} 
-                className={`flex-shrink-0 ${bgColor} rounded-lg border border-slate-600 p-4 shadow-md w-64`}
-              >
-                <h3 className="text-amber-300 text-lg font-bold mb-3 text-center border-b border-slate-600 pb-2">
-                  Training Example {index + 1}
+              <div key={index} className="flex-shrink-0 bg-slate-700 rounded border border-slate-600 p-3">
+                <h3 className="text-amber-300 text-xs font-semibold mb-2 text-center">
+                  EX {index + 1}
                 </h3>
-                
-                <div className="space-y-4">
-                  <div>
-                    <div className="text-cyan-400 text-sm font-medium mb-1">Input Grid</div>
-                    <div className="flex justify-center">
-                      <ResponsiveOfficerDisplayGrid
-                        grid={example.input}
-                        containerType="example"
-                        emojiSet={emojiSet}
-                        displayMode={displayMode}
-                        fixedCellSize={cellSize}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="flex justify-center">
-                    <div className="text-cyan-400 text-xl font-bold rotate-90 sm:rotate-0">
-                      ↓
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div className="text-emerald-400 text-sm font-medium mb-1">Output Grid</div>
-                    <div className="flex justify-center">
-                      <ResponsiveOfficerDisplayGrid
-                        grid={example.output}
-                        containerType="example"
-                        emojiSet={emojiSet}
-                        displayMode={displayMode}
-                        fixedCellSize={cellSize}
-                      />
-                    </div>
-                  </div>
+                <div className="flex items-center gap-2">
+                  <ResponsiveOfficerDisplayGrid
+                    grid={example.input}
+                    containerType="example"
+                    emojiSet={emojiSet}
+                    displayMode={displayMode}
+                    fixedCellSize={cellSize}
+                  />
+                  <div className="text-cyan-400 text-sm font-bold">→</div>
+                  <ResponsiveOfficerDisplayGrid
+                    grid={example.output}
+                    containerType="example"
+                    emojiSet={emojiSet}
+                    displayMode={displayMode}
+                    fixedCellSize={cellSize}
+                  />
                 </div>
               </div>
             );
