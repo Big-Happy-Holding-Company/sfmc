@@ -426,6 +426,56 @@ export async function loadPuzzleFromLocalFiles(puzzleId: string): Promise<any | 
 }
 
 /**
+ * Determine the correct dataset for a puzzle ID based on available data sources
+ * Priority: evaluation2 > training2 > evaluation > training (newer datasets preferred)
+ * Uses local file system to determine the most appropriate dataset
+ */
+async function determineCorrectDataset(arcId: string): Promise<'training' | 'evaluation' | 'training2' | 'evaluation2'> {
+  console.log(`🔍 Determining correct dataset for puzzle ${arcId}...`);
+  
+  // Check local file existence first (most reliable source)
+  // Priority order: evaluation2 > training2 > evaluation > training
+  const localPaths = [
+    { path: `/data/evaluation2/${arcId}.json`, dataset: 'evaluation2' as const, priority: 1 },
+    { path: `/data/training2/${arcId}.json`, dataset: 'training2' as const, priority: 2 },
+    { path: `/data/evaluation/${arcId}.json`, dataset: 'evaluation' as const, priority: 3 },
+    { path: `/data/training/${arcId}.json`, dataset: 'training' as const, priority: 4 }
+  ];
+  
+  // Find all datasets that contain this puzzle
+  const availableDatasets: Array<{ dataset: string; priority: number }> = [];
+  
+  for (const { path, dataset, priority } of localPaths) {
+    try {
+      const response = await fetch(path);
+      if (response.ok) {
+        console.log(`✅ Found ${arcId} in local ${dataset} dataset`);
+        availableDatasets.push({ dataset, priority });
+      }
+    } catch (error) {
+      // Continue checking other datasets
+    }
+  }
+  
+  if (availableDatasets.length === 0) {
+    console.log(`⚠️ No local file found for ${arcId}, defaulting to evaluation2`);
+    return 'evaluation2'; // Default for arc-explainer puzzles without local files
+  }
+  
+  // Sort by priority and return the best match
+  availableDatasets.sort((a, b) => a.priority - b.priority);
+  const selectedDataset = availableDatasets[0].dataset as 'training' | 'evaluation' | 'training2' | 'evaluation2';
+  
+  if (availableDatasets.length > 1) {
+    console.log(`🎯 Puzzle ${arcId} found in multiple datasets: ${availableDatasets.map(d => d.dataset).join(', ')}, selecting: ${selectedDataset}`);
+  } else {
+    console.log(`🎯 Puzzle ${arcId} found in dataset: ${selectedDataset}`);
+  }
+  
+  return selectedDataset;
+}
+
+/**
  * LEGACY: Load full puzzle data from PlayFab by searching all datasets for ARC ID
  * Only use this as fallback when local files don't work
  */
@@ -442,14 +492,18 @@ export async function loadPuzzleFromPlayFab(puzzleId: string): Promise<any | nul
     const arcId = puzzleId.startsWith('ARC-') ? playFabToArcId(puzzleId) : puzzleId;
     console.log(`🔍 loadPuzzleFromPlayFab: searching for "${puzzleId}" -> arcId: "${arcId}"`);
     
+    // Determine correct dataset based on available data
+    const correctDataset = await determineCorrectDataset(arcId);
+    console.log(`🎯 Determined correct dataset for ${arcId}: ${correctDataset}`);
+    
     // Try to determine dataset from existing PlayFab ID format if available
     // This optimizes search by checking most likely datasets first
     const datasets = [
-      { name: 'training', batches: 4, priority: arcId.length === 8 ? 1 : 2 },
-      { name: 'evaluation', batches: 4, priority: arcId.length === 8 ? 1 : 2 },
-      { name: 'training2', batches: 10, priority: arcId.length === 8 ? 1 : 3 },
-      { name: 'evaluation2', batches: 2, priority: arcId.length === 8 ? 1 : 3 }
-    ].sort((a, b) => a.priority - b.priority); // Search higher priority datasets first
+      { name: 'training', batches: 4, priority: correctDataset === 'training' ? 1 : 3 },
+      { name: 'evaluation', batches: 4, priority: correctDataset === 'evaluation' ? 1 : 3 },
+      { name: 'training2', batches: 10, priority: correctDataset === 'training2' ? 1 : 3 },
+      { name: 'evaluation2', batches: 2, priority: correctDataset === 'evaluation2' ? 1 : 3 }
+    ].sort((a, b) => a.priority - b.priority); // Search correct dataset first
     
     console.log(`🔍 Searching ${datasets.length} datasets for puzzle ${arcId}...`);
     
@@ -504,7 +558,17 @@ export async function loadPuzzleFromPlayFab(puzzleId: string): Promise<any | nul
           
           if (puzzle) {
             console.log(`✅ Found puzzle ${puzzle.id} in ${dataset.name} batch ${i}`);
-            return puzzle; // Exit immediately when found
+            
+            // IMPORTANT: Correct the ID to match the determined dataset
+            // PlayFab may have the puzzle in wrong dataset, but we use local files to determine correct one
+            const correctedId = arcIdToPlayFab(arcId, correctDataset);
+            const correctedPuzzle = {
+              ...puzzle,
+              id: correctedId
+            };
+            
+            console.log(`🔧 Corrected puzzle ID: ${puzzle.id} -> ${correctedId} (based on local dataset: ${correctDataset})`);
+            return correctedPuzzle; // Return puzzle with corrected ID
           }
         } catch (error) {
           console.log(`❌ Error checking batch ${dataset.name}-${i}:`, error);
