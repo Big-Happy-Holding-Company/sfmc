@@ -700,8 +700,11 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                     <option value="celestial_set2">Celestial Set 2</option>
                     <option value="status_alerts">Status Alerts</option>
                     <option value="weather_climate">Weather Climate</option>
+                    <option value="nav_alerts">Navigation Alerts</option>
                     <option value="ai_emojis">AI Systems</option>
                     <option value="status_emojis">Human Crew</option>
+                    <option value="vague_symbols">Vague Symbols</option>
+                    <option value="alien_language">Alien Language</option>
                   </select>
                 )}
               </div>
