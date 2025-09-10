@@ -241,6 +241,11 @@ export const EMOJI_SET_INFO = {
     description: 'Pin suit emojis',
     theme: 'Pin Suit'
   },
+  birds: {
+    name: 'Birds',
+    description: 'Bird emojis',
+    theme: 'Birds'
+  },
 } as const;
 
 export type EmojiSet = keyof typeof SPACE_EMOJIS;
