@@ -1,4 +1,5 @@
 // Embedded task data for production deployment
+
 import type { Task } from '../../shared/schema';
 
 export const EMBEDDED_TASKS: Task[] = [
