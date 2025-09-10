@@ -714,6 +714,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                       <option value="savory_foods">🍔 Comfort Foods</option>
                       <option value="games_chance">🎲 Games & Chance</option>
                       <option value="rare_plants">🍄 Rare Plants & Nature</option>
+                      <option value="alchemy_science">⚗️ Alchemy & Science</option>
                     </select>
                   </div>
                 )}

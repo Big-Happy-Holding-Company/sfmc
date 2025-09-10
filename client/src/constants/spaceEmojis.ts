@@ -71,6 +71,9 @@ export const SPACE_EMOJIS = {
 
   // Rare Plants & Nature
   rare_plants: ['⬛', '🍄', '🌵', '🌲', '🌴', '🪴', '🌱', '🍂', '🍁', '🌿'],
+
+  // Alchemy & Science
+  alchemy_science: ['⬛', '⚗️', '🪄', '🔭', '📡', '🧲', '🌡️', '🧬', '💉', '🧪'],
 } as const;
 
 // Emoji set metadata for UI display
@@ -164,6 +167,11 @@ export const EMOJI_SET_INFO = {
     name: 'Rare Plants & Nature',
     description: 'Exotic plants and natural elements',
     theme: 'Natural World'
+  },
+  alchemy_science: {
+    name: 'Alchemy & Science',
+    description: 'Laboratory equipment, magic, and scientific instruments',
+    theme: 'Science & Magic'
   }
 } as const;
 
