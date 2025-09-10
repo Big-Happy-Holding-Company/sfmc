@@ -683,34 +683,26 @@ export class ARCDataService {
    * Iterates through all possible dataset prefixes to find a match.
    */
   public async findPlayFabIdForArcId(arcId: string): Promise<string | null> {
-    const prefixMap = {
-      'training': 'ARC-TR',
-      'training2': 'ARC-T2',
-      'evaluation': 'ARC-EV',
-      'evaluation2': 'ARC-E2'
-    };
+    console.log(`🔄 Searching all datasets for ARC ID: ${arcId}`);
+    const datasetsToSearch: ARCDatasetType[] = ['training', 'evaluation', 'training2', 'evaluation2'];
 
-    const prefixes = Object.keys(DATASET_DEFINITIONS).map(key => {
-      return prefixMap[key as keyof typeof prefixMap];
-    });
-
-    for (const prefix of prefixes) {
-      const potentialId = `${prefix}-${arcId}`;
+    // Load all puzzles from all datasets into memory to search.
+    // This is inefficient, but necessary given the data structure.
+    for (const dataset of datasetsToSearch) {
       try {
-        const puzzle = await this.loadPlayFabTitleData(potentialId, true); // Pass true to indicate this is a direct key
-        if (puzzle) {
-          console.log(`✅ Found matching PlayFab ID: ${potentialId}`);
-          return potentialId;
+        const puzzles = await this.loadDatasetPuzzles(dataset, false); // forceRefresh = false to use cache
+        const foundPuzzle = puzzles.find(p => p.filename === arcId);
+
+        if (foundPuzzle) {
+          console.log(`✅ Found matching puzzle in dataset '${dataset}'. PlayFab ID: ${foundPuzzle.id}`);
+          return foundPuzzle.id;
         }
       } catch (error) {
-        // Suppress errors for not found keys, but log others
-        if (!(error instanceof Error && error.message.includes('Not found'))) {
-            console.warn(`Error checking potential ID ${potentialId}:`, error);
-        }
+        console.error(`❌ Error loading dataset '${dataset}' while searching for ${arcId}:`, error);
       }
     }
 
-    console.error(`❌ No matching PlayFab ID found for ARC ID: ${arcId}`);
+    console.error(`❌ No matching PlayFab ID found for ARC ID: ${arcId} after searching all datasets.`);
     return null;
   }
 
