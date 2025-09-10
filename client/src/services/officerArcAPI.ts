@@ -426,53 +426,60 @@ export async function loadPuzzleFromLocalFiles(puzzleId: string): Promise<any | 
 }
 
 /**
- * Determine the correct dataset for a puzzle ID based on available data sources
- * Priority: evaluation2 > training2 > evaluation > training (newer datasets preferred)
- * Uses local file system to determine the most appropriate dataset
+ * Intelligently determine where puzzle actually exists in PlayFab Title Data
+ * Searches all batches to find the actual dataset, no hardcoded priorities
  */
-async function determineCorrectDataset(arcId: string): Promise<'training' | 'evaluation' | 'training2' | 'evaluation2'> {
-  console.log(`🔍 Determining correct dataset for puzzle ${arcId}...`);
+async function findPuzzleInPlayFabTitleData(arcId: string): Promise<'training' | 'evaluation' | 'training2' | 'evaluation2' | null> {
+  console.log(`🔍 Searching PlayFab Title Data for puzzle ${arcId}...`);
   
-  // Check local file existence first (most reliable source)
-  // Priority order: evaluation2 > training2 > evaluation > training
-  const localPaths = [
-    { path: `/data/evaluation2/${arcId}.json`, dataset: 'evaluation2' as const, priority: 1 },
-    { path: `/data/training2/${arcId}.json`, dataset: 'training2' as const, priority: 2 },
-    { path: `/data/evaluation/${arcId}.json`, dataset: 'evaluation' as const, priority: 3 },
-    { path: `/data/training/${arcId}.json`, dataset: 'training' as const, priority: 4 }
+  // Define all possible batch locations to search
+  const batchSearches = [
+    { dataset: 'training' as const, batches: 4 },
+    { dataset: 'training2' as const, batches: 10 }, 
+    { dataset: 'evaluation' as const, batches: 4 },
+    { dataset: 'evaluation2' as const, batches: 2 }
   ];
   
-  // Find all datasets that contain this puzzle
-  const availableDatasets: Array<{ dataset: string; priority: number }> = [];
-  
-  for (const { path, dataset, priority } of localPaths) {
-    try {
-      const response = await fetch(path);
-      if (response.ok) {
-        console.log(`✅ Found ${arcId} in local ${dataset} dataset`);
-        availableDatasets.push({ dataset, priority });
+  for (const { dataset, batches } of batchSearches) {
+    for (let i = 1; i <= batches; i++) {
+      try {
+        const batchKey = `officer-tasks-${dataset}-batch${i}.json`;
+        console.log(`🔍 Checking ${batchKey} for puzzle ${arcId}...`);
+        
+        const result = await playFabCore.makeHttpRequest(
+          '/Client/GetTitleData',
+          { Keys: [batchKey] },
+          true
+        );
+        
+        if (result?.Data?.[batchKey]) {
+          const puzzleDataStr = result.Data[batchKey];
+          if (puzzleDataStr && puzzleDataStr !== "undefined") {
+            const puzzles = JSON.parse(puzzleDataStr);
+            
+            // Search for puzzle in this batch
+            const found = puzzles.find((p: any) => {
+              if (!p.id) return false;
+              const pArcId = p.id.replace(/^ARC-(TR|T2|EV|E2)-/, '');
+              return pArcId === arcId;
+            });
+            
+            if (found) {
+              console.log(`✅ FOUND puzzle ${arcId} in PlayFab batch: ${batchKey}`);
+              console.log(`🎯 Puzzle stored as: ${found.id}`);
+              return dataset;
+            }
+          }
+        }
+      } catch (error) {
+        console.log(`❌ Error checking batch ${dataset}-${i}:`, error);
+        continue;
       }
-    } catch (error) {
-      // Continue checking other datasets
     }
   }
   
-  if (availableDatasets.length === 0) {
-    console.log(`⚠️ No local file found for ${arcId}, defaulting to evaluation2`);
-    return 'evaluation2'; // Default for arc-explainer puzzles without local files
-  }
-  
-  // Sort by priority and return the best match
-  availableDatasets.sort((a, b) => a.priority - b.priority);
-  const selectedDataset = availableDatasets[0].dataset as 'training' | 'evaluation' | 'training2' | 'evaluation2';
-  
-  if (availableDatasets.length > 1) {
-    console.log(`🎯 Puzzle ${arcId} found in multiple datasets: ${availableDatasets.map(d => d.dataset).join(', ')}, selecting: ${selectedDataset}`);
-  } else {
-    console.log(`🎯 Puzzle ${arcId} found in dataset: ${selectedDataset}`);
-  }
-  
-  return selectedDataset;
+  console.log(`❌ Puzzle ${arcId} not found in any PlayFab Title Data batch`);
+  return null;
 }
 
 /**
