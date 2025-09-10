@@ -34,7 +34,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
   // Enhanced display state
   const [displayState, setDisplayState] = useState<PuzzleDisplayState>({
     displayMode: 'hybrid',
-    emojiSet: 'tech_set1',
+    emojiSet: 'savory_foods',
     selectedValue: 1,
     showControls: true
   });
