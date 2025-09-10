@@ -19,7 +19,7 @@
 
 import type { LeaderboardEntry } from '@/types/playfab';
 import { playFabCore } from './core';
-import { playFabAuth } from './auth';
+import { playFabRequestManager } from './requestManager';
 
 // PlayFab request/response interfaces
 interface UpdatePlayerStatisticsRequest {
@@ -68,7 +68,7 @@ export class LeaderboardAPI {
    * Submit score to any PlayFab statistic
    */
   public async submitScore(statisticName: string, score: number): Promise<void> {
-    await playFabAuth.ensureAuthenticated();
+    // Authentication handled automatically by requestManager
 
     const request: UpdatePlayerStatisticsRequest = {
       Statistics: [{
@@ -78,10 +78,9 @@ export class LeaderboardAPI {
     };
 
     try {
-      await playFabCore.makeHttpRequest<UpdatePlayerStatisticsRequest, {}>(
-        '/Client/UpdatePlayerStatistics',
-        request,
-        true
+      await playFabRequestManager.makeRequest<UpdatePlayerStatisticsRequest, {}>(
+        'updateStatistics',
+        request
       );
 
       playFabCore.logOperation('Score Submitted', {
@@ -102,7 +101,7 @@ export class LeaderboardAPI {
     startPosition: number = 0,
     maxResults: number = 10
   ): Promise<LeaderboardEntry[]> {
-    await playFabAuth.ensureAuthenticated();
+    // Authentication handled automatically by requestManager
 
     const request: GetLeaderboardRequest = {
       StatisticName: statisticName,
@@ -111,10 +110,9 @@ export class LeaderboardAPI {
     };
 
     try {
-      const result = await playFabCore.makeHttpRequest<GetLeaderboardRequest, PlayFabLeaderboardResponse>(
-        '/Client/GetLeaderboard',
-        request,
-        true
+      const result = await playFabRequestManager.makeRequest<GetLeaderboardRequest, PlayFabLeaderboardResponse>(
+        'getLeaderboard',
+        request
       );
 
       return this.mapPlayFabEntries(result.Leaderboard);
@@ -132,7 +130,7 @@ export class LeaderboardAPI {
     playerId: string,
     maxResults: number = 10
   ): Promise<LeaderboardEntry[]> {
-    await playFabAuth.ensureAuthenticated();
+    // Authentication handled automatically by requestManager
 
     const request: GetLeaderboardAroundPlayerRequest = {
       StatisticName: statisticName,
@@ -141,10 +139,9 @@ export class LeaderboardAPI {
     };
 
     try {
-      const result = await playFabCore.makeHttpRequest<GetLeaderboardAroundPlayerRequest, PlayFabLeaderboardResponse>(
-        '/Client/GetLeaderboardAroundPlayer',
-        request,
-        true
+      const result = await playFabRequestManager.makeRequest<GetLeaderboardAroundPlayerRequest, PlayFabLeaderboardResponse>(
+        'getLeaderboard',
+        request
       );
 
       return this.mapPlayFabEntries(result.Leaderboard);
