@@ -6,7 +6,8 @@
 
 import type { PuzzleEventData, GameSession, GameStatus, EventType } from '@/types/playfab';
 import { playFabCore } from './core';
-import { playFabAuth } from './auth';
+import { playFabAuthManager } from './authManager';
+import { playFabRequestManager } from './requestManager';
 
 // PlayFab WritePlayerEvent request format
 interface WritePlayerEventRequest {
@@ -54,10 +55,8 @@ export class PlayFabEvents {
     selection_value: number,
     game_time: string
   ): Promise<void> {
-    // Ensure user is authenticated
-    await playFabAuth.ensureAuthenticated();
-
-    const displayName = playFabAuth.getDisplayName() || 'Unknown';
+    // Authentication handled automatically by requestManager
+    const displayName = playFabAuthManager.getDisplayName() || 'Unknown';
 
     // Build event body matching Unity structure exactly
     const eventBody: any = {
@@ -86,10 +85,9 @@ export class PlayFabEvents {
     };
 
     try {
-      await playFabCore.makeHttpRequest<WritePlayerEventRequest, WritePlayerEventResponse>(
-        '/Client/WritePlayerEvent',
-        request,
-        true // Requires authentication
+      await playFabRequestManager.makeRequest<WritePlayerEventRequest, WritePlayerEventResponse>(
+        'writePlayerEvent',
+        request
       );
 
       playFabCore.logOperation('Event Logged', {
@@ -109,7 +107,7 @@ export class PlayFabEvents {
    * Matches the existing React implementation
    */
   public async logEvent(eventName: string, eventData: Record<string, any>): Promise<void> {
-    await playFabAuth.ensureAuthenticated();
+    // Authentication handled automatically by requestManager
 
     const request: WritePlayerEventRequest = {
       EventName: eventName,
@@ -117,10 +115,9 @@ export class PlayFabEvents {
     };
 
     try {
-      await playFabCore.makeHttpRequest<WritePlayerEventRequest, WritePlayerEventResponse>(
-        '/Client/WritePlayerEvent',
-        request,
-        true // Requires authentication
+      await playFabRequestManager.makeRequest<WritePlayerEventRequest, WritePlayerEventResponse>(
+        'writePlayerEvent',
+        request
       );
 
       playFabCore.logOperation('Simple Event Logged', eventName);
