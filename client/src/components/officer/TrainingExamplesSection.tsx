@@ -141,14 +141,14 @@ export function TrainingExamplesSection({
     return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
   };
 
-  // Different background shades for example cards to distinguish them
+  // Different background color shades for example cards to distinguish them
   const getExampleBgClass = (index: number) => {
     const bgClasses = [
       'bg-slate-700',
-      'bg-slate-700/90',
-      'bg-slate-700/80', 
-      'bg-slate-700/70',
-      'bg-slate-700/60'
+      'bg-gray-700',
+      'bg-zinc-700', 
+      'bg-stone-700',
+      'bg-neutral-700'
     ];
     return bgClasses[index % bgClasses.length];
   };
