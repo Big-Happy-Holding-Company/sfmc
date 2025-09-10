@@ -7,6 +7,7 @@
 
 import { arcDataService } from '@/services/arcDataService';
 import { playFabCore } from '@/services/playfab/core';
+import { idConverter } from '@/services/idConverter';
 
 export interface OfficerPuzzle {
   id: string;                    // ARC ID (e.g., "007bbfb7")
@@ -142,17 +143,7 @@ async function makeAPICall(endpoint: string): Promise<any> {
  * 007bbfb7 -> ARC-TR-007bbfb7 (assumes training by default)
  */
 export function arcIdToPlayFab(arcId: string, dataset: 'training' | 'evaluation' | 'training2' | 'evaluation2' = 'training'): string {
-  if (arcId.startsWith('ARC-')) return arcId; // Already in PlayFab format
-  
-  // FIXED: Use actual prefixes from upload script
-  const prefixMap = {
-    'training': 'ARC-TR-',
-    'evaluation': 'ARC-EV-', 
-    'training2': 'ARC-T2-',    // Was ARC-TR2-, now matches upload script
-    'evaluation2': 'ARC-E2-'   // Was ARC-EV2-, now matches upload script
-  };
-  
-  return prefixMap[dataset] + arcId;
+  return idConverter.arcToPlayFab(arcId, dataset);
 }
 
 /**
@@ -161,8 +152,7 @@ export function arcIdToPlayFab(arcId: string, dataset: 'training' | 'evaluation'
  * ARC-T2-11852cab -> 11852cab
  */
 export function playFabToArcId(playFabId: string): string {
-  // FIXED: Handle all actual uploaded prefixes: ARC-TR-, ARC-T2-, ARC-EV-, ARC-E2-
-  return playFabId.replace(/^ARC-(TR|T2|EV|E2)-/, '');
+  return idConverter.playFabToArc(playFabId);
 }
 
 /**
@@ -416,7 +406,7 @@ export async function loadPuzzleFromLocalFiles(puzzleId: string): Promise<any | 
     // Convert to expected format with proper ID
     return {
       ...puzzleData,
-      id: `ARC-E2-${arcId}` // Use PlayFab format for compatibility with solver
+      id: idConverter.arcToPlayFab(arcId, 'evaluation2') // Use PlayFab format for compatibility with solver
     };
     
   } catch (error) {

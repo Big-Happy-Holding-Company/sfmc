@@ -26,6 +26,7 @@ import type {
 import { DATASET_DEFINITIONS } from '@shared/datasets';
 import { SPACE_EMOJIS } from '@/constants/spaceEmojis';
 import { loadPuzzleFromPlayFab } from '@/services/officerArcAPI';
+import { idConverter } from '@/services/idConverter';
 
 /**
  * ARC Data Service - Singleton for managing ARC puzzle data
@@ -407,7 +408,7 @@ export class ARCDataService {
   ): Promise<OfficerTrackPuzzle> {
     
     const filename = filePath.split('/').pop()?.replace('.json', '') || 'unknown';
-    const id = this.generateARCId(filename, dataset);
+    const id = idConverter.arcToPlayFab(filename, dataset);
     
     // Analyze grid dimensions
     const allGrids = [
@@ -431,22 +432,7 @@ export class ARCDataService {
     };
   }
 
-  /**
-   * Generate unique ARC ID with dataset prefix
-   */
-  private generateARCId(filename: string, dataset: ARCDatasetType): string {
-    const prefixMap: Record<ARCDatasetType, string> = {
-      training: 'ARC-TR',
-      training2: 'ARC-T2',
-      evaluation: 'ARC-EV', 
-      evaluation2: 'ARC-E2'
-    };
-    
-    const prefix = prefixMap[dataset];
-    const cleanFilename = filename.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8);
-    
-    return `${prefix}-${cleanFilename}`;
-  }
+  // ID generation now handled by centralized idConverter service
 
   /**
    * Analyze grid dimensions across all examples
