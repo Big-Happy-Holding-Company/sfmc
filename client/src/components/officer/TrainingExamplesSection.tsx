@@ -141,6 +141,18 @@ export function TrainingExamplesSection({
     return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
   };
 
+  // Different background shades for example cards to distinguish them
+  const getExampleBgClass = (index: number) => {
+    const bgClasses = [
+      'bg-slate-700',
+      'bg-slate-700/90',
+      'bg-slate-700/80', 
+      'bg-slate-700/70',
+      'bg-slate-700/60'
+    ];
+    return bgClasses[index % bgClasses.length];
+  };
+
   return (
     <div className={`bg-slate-800 border border-slate-600 rounded-lg p-6 ${className}`}>
       {/* Section Header */}
@@ -166,7 +178,7 @@ export function TrainingExamplesSection({
             const cellSize = maxDim > 20 ? 24 : maxDim > 15 ? 32 : maxDim > 10 ? 40 : 48;
             
             return (
-              <div key={index} className="flex-shrink-0 bg-slate-700 rounded border border-slate-600 p-3">
+              <div key={index} className={`flex-shrink-0 ${getExampleBgClass(index)} rounded border border-slate-600 p-3`}>
                 <h3 className="text-amber-300 text-xs font-semibold mb-2 text-center">
                   EX {index + 1}
                 </h3>
