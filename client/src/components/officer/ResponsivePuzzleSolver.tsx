@@ -298,6 +298,13 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
     setIsValidating(true);
     setValidationError(null);
     
+    // DEBUG: Log puzzle ID being sent to PlayFab
+    console.log('🔍 DEBUG - Puzzle validation details:');
+    console.log('  Puzzle ID:', puzzle.id);
+    console.log('  Solutions array:', solutions);
+    console.log('  Total test cases:', totalTests);
+    console.log('  Expected outputs:', puzzle.test?.map(t => t.output));
+    
     // Log validation start event
     logPlayerAction(
       "validation_start",
@@ -306,7 +313,12 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
       {
         validationType: "playfab_cloudscript",
         totalTests: totalTests,
-        puzzleId: puzzle.id
+        puzzleId: puzzle.id,
+        debugInfo: {
+          puzzleIdSent: puzzle.id,
+          solutionsCount: solutions.length,
+          expectedTestCases: totalTests
+        }
       },
       "start"
     );
@@ -321,6 +333,8 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
       
       const validationDuration = Date.now() - validationStartTime;
       setValidationResult(result);
+      
+      console.log('✅ DEBUG - PlayFab validation result:', result);
       
       // Log validation complete event (success)
       logPlayerAction(
@@ -337,6 +351,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
       );
       
     } catch (error: any) {
+      console.error('❌ DEBUG - PlayFab validation error:', error);
       setValidationError(error.message || 'Validation failed');
       
       // Log validation complete event (error)
@@ -363,7 +378,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
     newSolutions[currentTestIndex] = newGrid;
     setSolutions(newSolutions);
 
-    // Check if solution matches expected output
+    // Check if solution matches expected output (FRONTEND VALIDATION ONLY)
     if (expectedOutput.length > 0) {
       const matches = JSON.stringify(newGrid) === JSON.stringify(expectedOutput);
       const newCompleted = [...completedTests];
@@ -380,30 +395,15 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
           {
             testCase: currentTestIndex,
             totalTests: totalTests,
-            correctSolution: true
+            correctSolution: true,
+            validationType: "frontend_only"
           },
           "won"
         );
       }
       
-      // Check if ALL tests are now complete
-      if (matches && newCompleted.every(test => test)) {
-        // Log pre-validation event (all tests ready for server validation)
-        logPlayerAction(
-          "ready_for_validation",
-          0,
-          0,
-          {
-            allTestsComplete: true,
-            totalTests: totalTests,
-            completedTests: newCompleted.filter(Boolean).length
-          },
-          "won"
-        );
-        
-        // Small delay to let UI update, then validate
-        setTimeout(() => validatePuzzleWithPlayFab(), 500);
-      }
+      // NOTE: We don't auto-validate with PlayFab anymore - user must click Submit
+      // This prevents confusion between frontend validation and server validation
     }
   };
 
@@ -597,8 +597,8 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
             <div className="text-slate-400 text-xl">
               {isValidating ? '🔄 Validating with PlayFab...' : 
                validationResult?.correct ? '🎉 PlayFab Verified!' :
-               validationError ? '❌ Validation Error' :
-               completedTests[currentTestIndex] ? '✅ Solved!' : 'Apply the pattern to solve'}
+               validationError ? '❌ PlayFab Validation Error' :
+               completedTests[currentTestIndex] ? '✅ Frontend Check Passed - Submit Required!' : 'Apply the pattern to solve'}
             </div>
           </div>
 
@@ -761,12 +761,25 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
               <div className="mt-4">
                 <Button
                   size="lg"
-                  className="w-full bg-green-600 hover:bg-green-700 text-white px-3 py-3 h-12 text-sm"
+                  className={`w-full px-3 py-3 h-12 text-sm ${
+                    completedTests.every(test => test) 
+                      ? 'bg-green-600 hover:bg-green-700 text-white' 
+                      : 'bg-gray-600 hover:bg-gray-700 text-white'
+                  }`}
                   disabled={isValidating}
                   onClick={() => validatePuzzleWithPlayFab()}
                 >
-                  {isValidating ? '🔄 Validating...' : '🎯 Validate'}
+                  {isValidating ? '🔄 Submitting to PlayFab...' : 
+                   completedTests.every(test => test) ? '🎯 Submit for Official Validation' : 
+                   '🎯 Submit Solution (Incomplete)'}
                 </Button>
+                
+                {/* Helper text */}
+                <div className="text-xs text-slate-400 mt-2 text-center">
+                  {completedTests.every(test => test) ? 
+                    'All tests pass locally! Submit for official verification.' :
+                    'Frontend validation checks your solution as you work.'}
+                </div>
               </div>
             </div>
 

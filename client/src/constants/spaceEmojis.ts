@@ -89,7 +89,20 @@ export const SPACE_EMOJIS = {
 
   // Void Dwellers
   void_dwellers: ['⬛', '🐙', '🦑', '🦐', '🦀', '🐡', '🐠', '🐟', '🐬', '🐋'],
-} as const;
+
+  // Characters / "Man" suit (1-9)
+  characters: ['⬛','🀇','🀈','🀉','🀊','🀋','🀌','🀍','🀎','🀏'],
+
+ // Bamboos / "Sou" suit (1-9)
+  bamboos: ['⬛','🀐','🀑','🀒','🀓','🀔','🀕','🀖','🀗','🀘'],
+  
+// Circles / "Pin" suit (1-9)
+    circles: ['⬛','🀙','🀚','🀛','🀜','🀝','🀞','🀟','🀠','🀡'],
+
+  // Birds 
+    birds: ['⬛','🐤','🦜','🦩','🦚','🦢','🕊️','🦃','🐦','🐔'],
+  };
+
 
 // Emoji set metadata for UI display
 export const EMOJI_SET_INFO = {
@@ -212,7 +225,27 @@ export const EMOJI_SET_INFO = {
     name: 'Void Dwellers',
     description: 'Deep sea creatures and oceanic life forms',
     theme: 'Oceanic Depths'
-  }
+  },
+  man_suit: {
+    name: 'Man Suit',
+    description: 'Man suit emojis',
+    theme: 'Man Suit'
+  },
+  sou_suit: {
+    name: 'Sou Suit',
+    description: 'Sou suit emojis',
+    theme: 'Sou Suit'
+  },
+  pin_suit: {
+    name: 'Pin Suit',
+    description: 'Pin suit emojis',
+    theme: 'Pin Suit'
+  },
+  birds: {
+    name: 'Birds',
+    description: 'Bird emojis',
+    theme: 'Birds'
+  },
 } as const;
 
 export type EmojiSet = keyof typeof SPACE_EMOJIS;
