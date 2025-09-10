@@ -144,11 +144,11 @@ export function TrainingExamplesSection({
   // Different background color shades for example cards to distinguish them
   const getExampleBgClass = (index: number) => {
     const bgClasses = [
-      'bg-slate-700',
-      'bg-gray-700',
-      'bg-zinc-700', 
-      'bg-stone-700',
-      'bg-neutral-700'
+      'bg-red-700',
+      'bg-blue-700',
+      'bg-green-700', 
+      'bg-purple-700',
+      'bg-orange-700'
     ];
     return bgClasses[index % bgClasses.length];
   };
