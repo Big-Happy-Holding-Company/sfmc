@@ -128,3 +128,7 @@ Do this:
 4. **Test with actual API calls** - verify the integration works end-to-end
 
 The arc-explainer API is solid. The problem is entirely in how I integrated it with the SFMC PlayFab data.
+
+### Update: September 10, 2025
+
+This is done.  The ID matching service now properly converts between ARC-TR-007bbfb7 and 007bbfb7 in most cases except for validation on PlayFab side.  We need to investigate what is going on.  We know how PlayFab stores the IDs and know they exist.

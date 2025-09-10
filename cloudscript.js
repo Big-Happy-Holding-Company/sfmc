@@ -81,7 +81,7 @@ handlers.ValidateTaskSolution = function(args, context) {
                 timeBonus: 0,
                 hintPenalty: 0,
                 totalScore: 0,
-                message: "Mission failed. Review the examples and try again."
+                message: "Incorrect. Review the examples and try again."
             };
         }
 
@@ -324,7 +324,10 @@ handlers.ValidateARCPuzzle = function(args, context) {
         log.info("Found puzzle in Title Data: " + puzzle.id);
         log.info("Puzzle has " + (puzzle.test ? puzzle.test.length : 0) + " test cases");
 
-        // Validate that user provided correct number of solutions
+        // Validate that user provided correct number of solutions 
+        // (should be equal to number of test cases)
+        // Most will have only 1 test case, but some will have multiple
+        
         const expectedTestCases = puzzle.test ? puzzle.test.length : 0;
         if (solutions.length !== expectedTestCases) {
             return {
@@ -334,6 +337,12 @@ handlers.ValidateARCPuzzle = function(args, context) {
         }
 
         // Validate ALL test cases must pass
+        // (some puzzles have multiple test cases)
+        //  we need to account for this in the validation and inform the user which test case failed
+        //  we will also need to modify the response to include which test case failed
+        //  we will need to modify the client side to handle this information
+        //  THIS IS POSSIBLE THE SOURCE OF THE PROBLEM WE ARE SEEING IN THE CLIENT SIDE!! 
+
         let allCorrect = true;
         for (let i = 0; i < puzzle.test.length; i++) {
             const expectedOutput = puzzle.test[i].output;
@@ -746,6 +755,41 @@ function findPuzzleInBatches(puzzleId) {
     
     log.error("Puzzle " + puzzleId + " NOT FOUND in any batch");
     return null; // Puzzle not found
+}
+
+/**
+ * Get all available batch keys from Title Data
+ */
+function getAllBatchKeys() {
+    // Define batch keys to search
+    const batchKeys = [
+        // Training batches
+        "officer-tasks-training-batch1.json",
+        "officer-tasks-training-batch2.json",
+        "officer-tasks-training-batch3.json",
+        "officer-tasks-training-batch4.json",
+        // Training2 batches
+        "officer-tasks-training2-batch1.json",
+        "officer-tasks-training2-batch2.json",
+        "officer-tasks-training2-batch3.json",
+        "officer-tasks-training2-batch4.json",
+        "officer-tasks-training2-batch5.json",
+        "officer-tasks-training2-batch6.json",
+        "officer-tasks-training2-batch7.json",
+        "officer-tasks-training2-batch8.json",
+        "officer-tasks-training2-batch9.json",
+        "officer-tasks-training2-batch10.json",
+        // Evaluation batches
+        "officer-tasks-evaluation-batch1.json",
+        "officer-tasks-evaluation-batch2.json",
+        "officer-tasks-evaluation-batch3.json",
+        "officer-tasks-evaluation-batch4.json",
+        // Evaluation2 batches
+        "officer-tasks-evaluation2-batch1.json",
+        "officer-tasks-evaluation2-batch2.json"
+    ];
+
+    return batchKeys;
 }
 
 /**

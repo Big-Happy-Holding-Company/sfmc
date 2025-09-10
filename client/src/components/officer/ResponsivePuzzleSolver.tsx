@@ -17,6 +17,7 @@ import type { OfficerTrackPuzzle, ARCGrid } from '@/types/arcTypes';
 import type { DisplayMode, PuzzleDisplayState } from '@/types/puzzleDisplayTypes';
 import type { EmojiSet } from '@/constants/spaceEmojis';
 import { getEmojiSetOptions, getEmojiSetDropdownLabel } from '@/constants/spaceEmojis';
+import { puzzlePerformanceService } from '@/services/puzzlePerformanceService';
 import { playFabValidation } from '@/services/playfab/validation';
 import { playFabEvents } from '@/services/playfab/events';
 
@@ -25,7 +26,8 @@ interface ResponsivePuzzleSolverProps {
   onBack: () => void;
 }
 
-export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolverProps) {
+export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: ResponsivePuzzleSolverProps) {
+  const [puzzle, setPuzzle] = useState<OfficerTrackPuzzle>(initialPuzzle);
   // Multi-test case state
   const [currentTestIndex, setCurrentTestIndex] = useState(0);
   const [solutions, setSolutions] = useState<ARCGrid[]>([]);
@@ -51,11 +53,16 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
   const [stepIndex, setStepIndex] = useState(0);
   const [attemptId] = useState(1);
 
+  if (!puzzle) {
+    return <div className="min-h-screen bg-slate-900 text-amber-50 flex items-center justify-center">No puzzle data.</div>;
+  }
+
   const totalTests = puzzle.test?.length || 0;
   const currentTest = puzzle.test?.[currentTestIndex];
   const testInput = currentTest?.input || [];
   const expectedOutput = currentTest?.output || [];
   const trainingExamples = puzzle.train || [];
+
 
   // Initialize state for all test cases
   useEffect(() => {
@@ -81,7 +88,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
       setOutputDimensions(newDimensions);
       setCompletedTests(newCompleted);
     }
-  }, [puzzle.test]);
+  }, [puzzle]);
 
   // Initialize session and log puzzle start event
   useEffect(() => {

@@ -1,6 +1,6 @@
 # Comprehensive PlayFab Analysis - Complete System Architecture
 
-## Critical Discovery: PlayFab is a Full User Behavior Analytics Platform
+## Critical Discovery: PlayFab is a Full User Behavior Analytics Platform and is our primary data store for puzzle-solving behavior and validation.
 
 ### Current PlayFab Usage in Unity (Complete Picture)
 

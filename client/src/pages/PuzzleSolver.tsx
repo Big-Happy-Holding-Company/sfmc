@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button';
 import { AlertTriangle, ArrowLeft } from 'lucide-react';
 import { ResponsivePuzzleSolver } from '@/components/officer/ResponsivePuzzleSolver';
 import { playFabService } from '@/services/playfab';
-import { loadPuzzleFromLocalFiles, loadPuzzleFromPlayFab } from '@/services/officerArcAPI';
+import { puzzlePerformanceService } from '@/services/puzzlePerformanceService'; // Use the correct service
 import type { OfficerTrackPuzzle } from '@/types/arcTypes';
 
 export default function PuzzleSolver() {
@@ -66,13 +66,8 @@ export default function PuzzleSolver() {
         
         setPlayFabReady(true);
 
-        // Load puzzle data from local files first, fallback to PlayFab
-        let puzzleData = await loadPuzzleFromLocalFiles(puzzleId);
-        
-        if (!puzzleData) {
-          console.log('🔄 Local file not found, trying PlayFab as fallback...');
-          puzzleData = await loadPuzzleFromPlayFab(puzzleId);
-        }
+        // Use the centralized service to find the puzzle
+        const puzzleData = await puzzlePerformanceService.findPuzzleById(puzzleId);
         
         if (puzzleData) {
           setPuzzle(puzzleData);
@@ -175,7 +170,7 @@ export default function PuzzleSolver() {
     );
   }
 
-  // Success state - render puzzle solver
+  // Success state - render puzzle solver with just the ID
   if (puzzle) {
     return <ResponsivePuzzleSolver puzzle={puzzle} onBack={handleBack} />;
   }
