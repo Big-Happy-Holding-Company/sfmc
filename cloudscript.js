@@ -729,16 +729,19 @@ function findPuzzleInBatches(puzzleId) {
                     log.info("Batch " + batchKeys[i] + " has " + puzzles.length + " puzzles");
                     
                     // Look for puzzle in this batch
+                    // Flexible puzzle lookup
+                    const cleanPuzzleId = puzzleId.replace(/^ARC-(TR|T2|EV|E2)-/, '');
                     for (let j = 0; j < puzzles.length; j++) {
-                        if (puzzles[j].id === puzzleId) {
-                            log.info("FOUND MATCH! Puzzle " + puzzleId + " found in " + batchKeys[i]);
-                            log.info("Puzzle ID in data: " + puzzles[j].id);
+                        const storedId = puzzles[j].id;
+                        if (storedId === puzzleId) {
+                            log.info(`FOUND EXACT MATCH! Puzzle ${puzzleId} in ${batchKeys[i]}`);
                             return puzzles[j];
                         }
                         
-                        // Also try matching without prefix for debugging
-                        if (puzzles[j].id && (puzzles[j].id.endsWith(puzzleId) || puzzleId.endsWith(puzzles[j].id))) {
-                            log.info("PARTIAL MATCH found: data has '" + puzzles[j].id + "', looking for '" + puzzleId + "'");
+                        const cleanStoredId = storedId.replace(/^ARC-(TR|T2|EV|E2)-/, '');
+                        if (cleanStoredId === cleanPuzzleId) {
+                            log.info(`FOUND CLEAN ID MATCH! Puzzle ${puzzleId} (as ${cleanStoredId}) in ${batchKeys[i]}`);
+                            return puzzles[j];
                         }
                     }
                 } else {
