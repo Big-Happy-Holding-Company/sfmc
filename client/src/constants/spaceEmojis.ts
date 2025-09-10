@@ -98,7 +98,11 @@ export const SPACE_EMOJIS = {
   
 // Circles / "Pin" suit (1-9)
     circles: ['⬛','🀙','🀚','🀛','🀜','🀝','🀞','🀟','🀠','🀡'],
-} as const;
+
+  // Birds 
+    birds: ['⬛','🐤','🦜','🦩','🦚','🦢','🕊️','🦃','🐦','🐔'],
+  };
+
 
 // Emoji set metadata for UI display
 export const EMOJI_SET_INFO = {
