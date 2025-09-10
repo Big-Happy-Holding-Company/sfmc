@@ -6,7 +6,8 @@
 
 import type { PlayerProfile, LeaderboardEntry } from '@/types/playfab';
 import { playFabCore } from './core';
-import { playFabAuth } from './auth';
+import { playFabAuthManager } from './authManager';
+import { playFabRequestManager } from './requestManager';
 
 // PlayFab GetPlayerProfile request format
 interface GetPlayerProfileRequest {
@@ -68,7 +69,7 @@ export class PlayFabProfiles {
       return cachedProfile;
     }
 
-    await playFabAuth.ensureAuthenticated();
+    // Authentication handled automatically by requestManager
 
     const request: GetPlayerProfileRequest = {
       PlayFabId: playerId,
@@ -81,10 +82,9 @@ export class PlayFabProfiles {
     };
 
     try {
-      const result = await playFabCore.makeHttpRequest<GetPlayerProfileRequest, GetPlayerProfileResponse>(
-        '/Client/GetPlayerProfile',
-        request,
-        true // Requires authentication
+      const result = await playFabRequestManager.makeRequest<GetPlayerProfileRequest, GetPlayerProfileResponse>(
+        'getPlayerProfile',
+        request
       );
 
       const profile: PlayerProfile = {
@@ -216,21 +216,20 @@ export class PlayFabProfiles {
    * Set player avatar URL (HTTP implementation)
    */
   public async setPlayerAvatar(avatarUrl: string): Promise<void> {
-    await playFabAuth.ensureAuthenticated();
+    // Authentication handled automatically by requestManager
 
     const request: UpdateAvatarUrlRequest = {
       ImageUrl: avatarUrl
     };
 
     try {
-      await playFabCore.makeHttpRequest<UpdateAvatarUrlRequest, UpdateAvatarUrlResponse>(
-        '/Client/UpdateAvatarUrl',
-        request,
-        true // Requires authentication
+      await playFabRequestManager.makeRequest<UpdateAvatarUrlRequest, UpdateAvatarUrlResponse>(
+        'updateAvatarUrl',
+        request
       );
 
       // Clear cached profile for current player
-      const currentPlayerId = playFabAuth.getPlayFabId();
+      const currentPlayerId = playFabAuthManager.getPlayFabId();
       if (currentPlayerId) {
         this.clearProfileCache(currentPlayerId);
         this.avatarUrlCache.set(currentPlayerId, avatarUrl);
@@ -247,7 +246,7 @@ export class PlayFabProfiles {
    * Get current player's profile
    */
   public async getCurrentPlayerProfile(): Promise<PlayerProfile | null> {
-    const currentPlayerId = playFabAuth.getPlayFabId();
+    const currentPlayerId = playFabAuthManager.getPlayFabId();
     if (!currentPlayerId) {
       return null;
     }
