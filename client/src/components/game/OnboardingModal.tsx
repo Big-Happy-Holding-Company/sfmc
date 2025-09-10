@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { getRandomTrainer } from "@/constants/trainers";
+import { useLocation } from "wouter";
 
 interface OnboardingModalProps {
   open: boolean;
@@ -8,6 +9,12 @@ interface OnboardingModalProps {
 }
 
 export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
+  const [pathname] = useLocation();
+
+  // Disable the onboarding modal on any officer track pages
+  if (pathname.startsWith('/officer-track')) {
+    return null;
+  }
   const trainer = getRandomTrainer();
 
   return (
