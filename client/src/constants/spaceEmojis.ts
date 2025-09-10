@@ -80,6 +80,12 @@ export const SPACE_EMOJIS = {
 
   // Zodiac Signs
   zodiac_signs: ['⬛', '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐'],
+
+  // Foreign Celestial
+  foreign_celestial: ['⬛', '🈶', '🈚', '🈯', '🈸', '🈴', '🈳', '㊗️', '㊙️', '🈺'],
+
+  // Symbolic Portals & Gateways
+  cosmic_portals: ['⬛', '🚪', '⛩️', '🏞️', '🛤️', '🌉', '🕳️', '🌀', '🌌', '🌠'],
 } as const;
 
 // Emoji set metadata for UI display
@@ -188,6 +194,16 @@ export const EMOJI_SET_INFO = {
     name: 'Zodiac Signs',
     description: 'Astrological symbols and celestial signs',
     theme: 'Astrology'
+  },
+  foreign_celestial: {
+    name: 'Foreign Celestial',
+    description: 'Eastern script symbols and celestial characters',
+    theme: 'Foreign Scripts'
+  },
+  cosmic_portals: {
+    name: 'Cosmic Portals',
+    description: 'Gateways, voids, and dimensional passages',
+    theme: 'Cosmic Mysteries'
   }
 } as const;
 

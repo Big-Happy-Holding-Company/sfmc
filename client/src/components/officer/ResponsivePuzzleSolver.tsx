@@ -717,6 +717,8 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                       <option value="alchemy_science">⚗️ Alchemy & Science</option>
                       <option value="ancient_scripts">𓀀 Ancient Scripts</option>
                       <option value="zodiac_signs">♈ Zodiac Signs</option>
+                      <option value="foreign_celestial">🈶 Foreign Celestial</option>
+                      <option value="cosmic_portals">🚪 Cosmic Portals</option>
                     </select>
                   </div>
                 )}
