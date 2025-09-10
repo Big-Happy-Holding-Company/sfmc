@@ -165,6 +165,15 @@ export class ARCDataService {
       try {
         const batchPuzzles = await this.loadPlayFabTitleData(titleDataKey);
         if (batchPuzzles && Array.isArray(batchPuzzles)) {
+          // Debug: Log structure of first puzzle to understand PlayFab data format
+          if (batchPuzzles.length > 0) {
+            console.log(`🔍 PlayFab puzzle structure sample from ${titleDataKey}:`, {
+              keys: Object.keys(batchPuzzles[0]),
+              id: batchPuzzles[0].id,
+              filename: batchPuzzles[0].filename,
+              sample: batchPuzzles[0]
+            });
+          }
           allPuzzles.push(...batchPuzzles);
           console.log(`📦 Loaded batch ${batchNum}/${totalBatches}: ${batchPuzzles.length} puzzles`);
         } else {
@@ -686,15 +695,30 @@ export class ARCDataService {
     console.log(`🔄 Searching all datasets for ARC ID: ${arcId}`);
     const datasetsToSearch: ARCDatasetType[] = ['training', 'evaluation', 'training2', 'evaluation2'];
 
-    // Load all puzzles from all datasets into memory to search.
-    // This is inefficient, but necessary given the data structure.
     for (const dataset of datasetsToSearch) {
       try {
         const puzzles = await this.loadDatasetPuzzles(dataset, false); // forceRefresh = false to use cache
-        const foundPuzzle = puzzles.find(p => p.filename === arcId);
+        console.log(`🔍 Dataset ${dataset}: loaded ${puzzles.length} puzzles`);
+        
+        // Debug: Log first few puzzles to see actual structure
+        if (puzzles.length > 0) {
+          console.log(`🔍 Sample puzzle from ${dataset}:`, {
+            id: puzzles[0].id,
+            filename: puzzles[0].filename,
+            hasFilename: 'filename' in puzzles[0],
+            keys: Object.keys(puzzles[0])
+          });
+        }
+        
+        // Try multiple search strategies
+        const foundPuzzle = puzzles.find(p => {
+          return p.filename === arcId || // Primary: filename should be raw ARC ID
+                 p.id?.endsWith(`-${arcId}`) || // Fallback: check if ID ends with the ARC ID
+                 (p as any).puzzleId === arcId; // Fallback: check puzzleId field
+        });
 
         if (foundPuzzle) {
-          console.log(`✅ Found matching puzzle in dataset '${dataset}'. PlayFab ID: ${foundPuzzle.id}`);
+          console.log(`✅ Found matching puzzle in dataset '${dataset}'. PlayFab ID: ${foundPuzzle.id}, filename: ${foundPuzzle.filename}`);
           return foundPuzzle.id;
         }
       } catch (error) {
