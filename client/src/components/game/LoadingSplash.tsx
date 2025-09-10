@@ -9,8 +9,11 @@
  *   A fun splash screen that displays when the app first loads.
  *   Features Master Chief Wyatt with animated space emojis and a percentage counter.
  *   Purely decorative - not tied to actual loading processes.
+ *   Added check to skip splash for /officer-track/solve/* routes.
+ * Enhanced in September 2025 by Claude 4 Sonnet to add other chars
  */
 import { useState, useEffect, useMemo } from 'react';
+import { useLocation } from 'wouter';
 import { SPACE_EMOJIS } from "@/constants/spaceEmojis";
 
 const TRAINER_IMAGES = [
@@ -33,6 +36,14 @@ interface LoadingSplashProps {
 }
 
 export function LoadingSplash({ onComplete, duration = 3000 }: LoadingSplashProps) {
+  const [pathname] = useLocation();
+
+  if (pathname.startsWith('/officer-track/solve/')) {
+    useEffect(() => {
+      onComplete();
+    }, [onComplete]);
+    return null;
+  }
   const [progress, setProgress] = useState(0);
   const [emojiRow, setEmojiRow] = useState<string[]>([]);
   const [isExiting, setIsExiting] = useState(false);
