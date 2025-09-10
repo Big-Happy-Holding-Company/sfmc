@@ -182,7 +182,7 @@ export class ARCDataService {
   /**
    * Load data from PlayFab Title Data using Admin API
    */
-  private async loadPlayFabTitleData(key: string): Promise<OfficerTrackPuzzle[] | null> {
+  private async loadPlayFabTitleData(key: string, isSinglePuzzleKey: boolean = false): Promise<any | null> {
     try {
       // Import PlayFab core service for Admin API requests
       const { playFabCore } = await import('./playfab/core');
@@ -210,6 +210,12 @@ export class ARCDataService {
 
       // Parse the JSON data from the Value field
       const puzzleData = JSON.parse(result.Data[key].Value);
+      
+      // If it's a single puzzle key, it might not be an array
+      if (isSinglePuzzleKey) {
+        return puzzleData;
+      }
+
       return Array.isArray(puzzleData) ? puzzleData : null;
 
     } catch (error) {
@@ -672,6 +678,43 @@ export class ARCDataService {
   /**
    * Get cache statistics
    */
+  /**
+   * Find the correct PlayFab ID for a given raw ARC puzzle ID.
+   * Iterates through all possible dataset prefixes to find a match.
+   */
+  public async findPlayFabIdForArcId(arcId: string): Promise<string | null> {
+    const prefixes = Object.keys(DATASET_DEFINITIONS).map(key => {
+      const dataset = DATASET_DEFINITIONS[key as ARCDatasetType];
+      // This logic should mirror `convertArcIdToPlayFabId` in arcExplainerAPI
+      const prefixMap = {
+        'training': 'ARC-TR',
+        'training2': 'ARC-T2',
+        'evaluation': 'ARC-EV',
+        'evaluation2': 'ARC-E2'
+      };
+      return prefixMap[dataset.id];
+    });
+
+    for (const prefix of prefixes) {
+      const potentialId = `${prefix}-${arcId}`;
+      try {
+        const puzzle = await this.loadPlayFabTitleData(potentialId, true); // Pass true to indicate this is a direct key
+        if (puzzle) {
+          console.log(`✅ Found matching PlayFab ID: ${potentialId}`);
+          return potentialId;
+        }
+      } catch (error) {
+        // Suppress errors for not found keys, but log others
+        if (!(error instanceof Error && error.message.includes('Not found'))) {
+            console.warn(`Error checking potential ID ${potentialId}:`, error);
+        }
+      }
+    }
+
+    console.error(`❌ No matching PlayFab ID found for ARC ID: ${arcId}`);
+    return null;
+  }
+
   public getCacheStats() {
     const stats: Record<string, any> = {};
     
