@@ -683,16 +683,15 @@ export class ARCDataService {
    * Iterates through all possible dataset prefixes to find a match.
    */
   public async findPlayFabIdForArcId(arcId: string): Promise<string | null> {
+    const prefixMap = {
+      'training': 'ARC-TR',
+      'training2': 'ARC-T2',
+      'evaluation': 'ARC-EV',
+      'evaluation2': 'ARC-E2'
+    };
+
     const prefixes = Object.keys(DATASET_DEFINITIONS).map(key => {
-      const dataset = DATASET_DEFINITIONS[key as ARCDatasetType];
-      // This logic should mirror `convertArcIdToPlayFabId` in arcExplainerAPI
-      const prefixMap = {
-        'training': 'ARC-TR',
-        'training2': 'ARC-T2',
-        'evaluation': 'ARC-EV',
-        'evaluation2': 'ARC-E2'
-      };
-      return prefixMap[dataset.id];
+      return prefixMap[key as keyof typeof prefixMap];
     });
 
     for (const prefix of prefixes) {
