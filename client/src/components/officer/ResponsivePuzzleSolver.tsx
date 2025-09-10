@@ -715,6 +715,8 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                       <option value="games_chance">🎲 Games & Chance</option>
                       <option value="rare_plants">🍄 Rare Plants & Nature</option>
                       <option value="alchemy_science">⚗️ Alchemy & Science</option>
+                      <option value="ancient_scripts">𓀀 Ancient Scripts</option>
+                      <option value="zodiac_signs">♈ Zodiac Signs</option>
                     </select>
                   </div>
                 )}

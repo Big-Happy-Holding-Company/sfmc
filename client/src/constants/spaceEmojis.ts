@@ -74,6 +74,12 @@ export const SPACE_EMOJIS = {
 
   // Alchemy & Science
   alchemy_science: ['⬛', '⚗️', '🪄', '🔭', '📡', '🧲', '🌡️', '🧬', '💉', '🧪'],
+
+  // Ancient Scripts
+  ancient_scripts: ['⬛', '𓀀', '𓂀', '𓃒', '𓆏', '𓋹', '𓍯', '𓎛', '𓏤', '𓐍'],
+
+  // Zodiac Signs
+  zodiac_signs: ['⬛', '♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐'],
 } as const;
 
 // Emoji set metadata for UI display
@@ -172,6 +178,16 @@ export const EMOJI_SET_INFO = {
     name: 'Alchemy & Science',
     description: 'Laboratory equipment, magic, and scientific instruments',
     theme: 'Science & Magic'
+  },
+  ancient_scripts: {
+    name: 'Ancient Scripts',
+    description: 'Egyptian hieroglyphs and ancient writing systems',
+    theme: 'Ancient Languages'
+  },
+  zodiac_signs: {
+    name: 'Zodiac Signs',
+    description: 'Astrological symbols and celestial signs',
+    theme: 'Astrology'
   }
 } as const;
 
