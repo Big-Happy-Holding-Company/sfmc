@@ -1,5 +1,9 @@
 /**
- * PlayFab Officer Track Service - Pure HTTP Implementation
+ * PlayFab Officer Track Service - Refactored with New Architecture
+ * 
+ * Single Responsibility: Officer-specific operations using centralized services
+ * DRY Compliance: Uses new request manager and authentication manager
+ * 
  * Manages officer-specific leaderboards, player data, and ARC puzzle validation
  * Complete separation from main game systems with dedicated statistics and data keys
  */
@@ -14,9 +18,9 @@ import type {
 } from '@/types/arcTypes';
 import { OfficerRank, ARC_CONSTANTS } from '@/types/arcTypes';
 import type { PlayFabServiceResult, CloudScriptValidationRequest, TaskValidationResult } from '@/types/playfab';
-import { playFabCore } from './core';
-import { playFabAuth } from './auth';
-import { playFabValidation } from './validation';
+import { playFabRequestManager } from './requestManager';
+import { playFabAuthManager } from './authManager';
+import { playFabErrorHandler } from './errorHandler';
 import { PLAYFAB_CONSTANTS } from '@/types/playfab';
 
 // PlayFab request/response interfaces for Officer Track
@@ -124,10 +128,9 @@ export class PlayFabOfficerTrack {
     };
 
     try {
-      const result = await playFabCore.makeHttpRequest<GetOfficerUserDataRequest, GetOfficerUserDataResponse>(
-        '/Client/GetUserData',
-        request,
-        true
+      const result = await playFabRequestManager.makeRequest<GetOfficerUserDataRequest, GetOfficerUserDataResponse>(
+        'getUserData',
+        request
       );
 
       let officerPlayer: OfficerTrackPlayer;
@@ -165,7 +168,7 @@ export class PlayFabOfficerTrack {
    * Create a new officer profile for first-time players
    */
   private async createNewOfficerProfile(): Promise<OfficerTrackPlayer> {
-    const playerId = playFabAuth.getPlayFabId();
+    const playerId = playFabAuthManager.getPlayFabId();
     if (!playerId) {
       throw new Error('Player not authenticated');
     }
@@ -213,10 +216,9 @@ export class PlayFabOfficerTrack {
     };
 
     try {
-      await playFabCore.makeHttpRequest<UpdateOfficerUserDataRequest, {}>(
-        '/Client/UpdateUserData',
-        request,
-        true
+      await playFabRequestManager.makeRequest<UpdateOfficerUserDataRequest, {}>(
+        'updateUserData',
+        request
       );
 
       // Update cache
@@ -279,10 +281,9 @@ export class PlayFabOfficerTrack {
 
     try {
       // Call ValidateARCPuzzle CloudScript function directly
-      const response: ExecuteCloudScriptResponse = await playFabCore.makeHttpRequest<ExecuteCloudScriptRequest, ExecuteCloudScriptResponse>(
-        '/Client/ExecuteCloudScript',
-        cloudScriptRequest,
-        true
+      const response: ExecuteCloudScriptResponse = await playFabRequestManager.makeRequest<ExecuteCloudScriptRequest, ExecuteCloudScriptResponse>(
+        'executeCloudScript',
+        cloudScriptRequest
       );
 
       // Extract result from CloudScript response

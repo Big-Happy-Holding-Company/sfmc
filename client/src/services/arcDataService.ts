@@ -681,7 +681,7 @@ export class ARCDataService {
     this.lastLoadTime.clear();
     this.loadedFiles.clear();
     this.uniqueIds.clear();
-    console.log('🗑️  ARC data cache cleared');
+    // Cache cleared
   }
 
   /**
@@ -710,11 +710,13 @@ export class ARCDataService {
           });
         }
         
-        // Try multiple search strategies
+        // Search using the PROVEN working approach from test-officer-track-e2e.cjs
         const foundPuzzle = puzzles.find(p => {
-          return p.filename === arcId || // Primary: filename should be raw ARC ID
-                 p.id?.endsWith(`-${arcId}`) || // Fallback: check if ID ends with the ARC ID
-                 (p as any).puzzleId === arcId; // Fallback: check puzzleId field
+          // Extract clean ID from prefixed PlayFab ID (ARC-TR-007bbfb7 -> 007bbfb7)
+          const cleanId = p.id?.replace(/^ARC-[A-Z0-9]+-/, '');
+          return cleanId === arcId ||           // Primary: extract from prefixed ID  
+                 p.filename === arcId ||        // Fallback: filename field (if exists)
+                 p.id?.endsWith(`-${arcId}`);   // Fallback: ID suffix matching
         });
 
         if (foundPuzzle) {

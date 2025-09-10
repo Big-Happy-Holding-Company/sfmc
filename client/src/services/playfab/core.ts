@@ -1,46 +1,23 @@
 /**
- * PlayFab Core Service - Pure REST API Implementation
- * Direct HTTP calls to PlayFab REST endpoints using fetch()
- * No SDK dependencies - complete control over requests/responses
+ * PlayFab Core Service - Refactored with New Architecture
+ * 
+ * Single Responsibility: High-level PlayFab operations using centralized services
+ * DRY Compliance: Uses new request manager and error handler
+ * 
+ * Now delegates to:
+ * - PlayFabRequestManager for all HTTP operations
+ * - PlayFabErrorHandler for error processing
+ * - PlayFabAuthManager for authentication
  */
 
-// PlayFab configuration interface
-declare interface PlayFabConfig {
-  titleId: string;
-  secretKey?: string;
-}
-
-// PlayFab error response format
-declare interface PlayFabError {
-  error: string;
-  errorCode: number;
-  errorMessage: string;
-  errorDetails?: any;
-}
-
-// Standardized service result
-declare interface PlayFabServiceResult<T = any> {
-  data: T;
-  status: 'success' | 'error';
-  error?: PlayFabError;
-}
-
-// HTTP response from PlayFab APIs
-interface PlayFabHttpResponse<T = any> {
-  code: number;
-  status: string;
-  data?: T;
-  error?: string;
-  errorCode?: number;
-  errorMessage?: string;
-  errorDetails?: any;
-}
+import { playFabRequestManager } from './requestManager';
+import { playFabErrorHandler } from './errorHandler';
+import { playFabAuthManager } from './authManager';
+import type { PlayFabConfig } from '@/types/playfab';
+import type { ApiOperationType } from './apiStrategy';
 
 export class PlayFabCore {
   private static instance: PlayFabCore;
-  private titleId: string | null = null;
-  private secretKey: string | null = null;
-  private sessionToken: string | null = null;
   private isInitialized: boolean = false;
 
   private constructor() {}
@@ -53,57 +30,45 @@ export class PlayFabCore {
   }
 
   /**
-   * Initialize PlayFab with configuration - no CDN dependencies
+   * Initialize PlayFab with new architecture
    */
   public async initialize(config: PlayFabConfig): Promise<void> {
-    this.titleId = config.titleId;
-    this.secretKey = config.secretKey || null;
-    
+    await playFabRequestManager.initialize(config);
     this.isInitialized = true;
-    console.log(`✅ PlayFab Core initialized with Title ID: ${this.titleId} (Pure HTTP implementation)`);
   }
 
   /**
    * Check if PlayFab is properly initialized
    */
   public isReady(): boolean {
-    return this.isInitialized && this.titleId !== null;
+    return this.isInitialized && playFabRequestManager.isInitialized();
   }
 
   /**
-   * Get Title ID
+   * Get Title ID from request manager
    */
   public getTitleId(): string {
-    if (!this.titleId) {
-      throw new Error('PlayFab not initialized. Call initialize() first.');
-    }
-    return this.titleId;
+    return playFabRequestManager.getStrategyManager().getTitleId();
   }
 
   /**
-   * Get Secret Key (for server-side operations)
-   */
-  public getSecretKey(): string | null {
-    return this.secretKey;
-  }
-
-  /**
-   * Set session token from login response
+   * Set session token (delegates to auth manager)
    */
   public setSessionToken(token: string): void {
-    this.sessionToken = token;
-    this.logOperation('Session Token Set', token ? 'Token received' : 'Token cleared');
+    playFabAuthManager.updateSessionToken(token);
+    playFabRequestManager.getStrategyManager().setSessionToken(token);
   }
 
   /**
-   * Get current session token
+   * Get current session token (delegates to auth manager)
    */
   public getSessionToken(): string | null {
-    return this.sessionToken;
+    return playFabAuthManager.getSessionToken();
   }
 
   /**
    * Make HTTP request to PlayFab API endpoint
+   * Now delegates to centralized request manager
    */
   public async makeHttpRequest<TRequest = any, TResponse = any>(
     endpoint: string,
@@ -114,147 +79,64 @@ export class PlayFabCore {
       throw new Error('PlayFab not initialized');
     }
 
-    const url = `https://${this.titleId}.playfabapi.com${endpoint}`;
+    // Convert endpoint to operation type
+    const operation = this.mapEndpointToOperation(endpoint);
     
-    // Prepare headers
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json'
+    try {
+      return await playFabRequestManager.makeRequest<TRequest, TResponse>(
+        operation,
+        requestData
+      );
+    } catch (error) {
+      // Process error through centralized handler
+      const processedError = playFabErrorHandler.processError(error);
+      throw new Error(processedError.userMessage);
+    }
+  }
+
+  /**
+   * Map legacy endpoints to new operation types
+   */
+  private mapEndpointToOperation(endpoint: string): ApiOperationType {
+    const endpointMap: Record<string, ApiOperationType> = {
+      '/Admin/GetTitleData': 'getTitleData',
+      '/Admin/SetTitleData': 'setTitleData', 
+      '/Client/GetUserData': 'getUserData',
+      '/Client/UpdateUserData': 'updateUserData',
+      '/Client/UpdatePlayerStatistics': 'updateStatistics',
+      '/Client/GetLeaderboard': 'getLeaderboard',
+      '/Client/ExecuteCloudScript': 'executeCloudScript',
+      '/Client/LoginWithCustomID': 'loginWithCustomId'
     };
 
-    // Add session token for authenticated requests
-    if (requiresAuth && this.sessionToken) {
-      headers['X-Authorization'] = this.sessionToken;
+    const operation = endpointMap[endpoint];
+    if (!operation) {
+      throw new Error(`Unsupported endpoint: ${endpoint}`);
     }
 
-    // Add secret key for admin/server requests
-    if (this.secretKey) {
-      headers['X-SecretKey'] = this.secretKey;
-    }
-
-    // Prepare request body with required TitleId
-    const requestBody = requestData ? 
-      { ...requestData, TitleId: this.titleId } : 
-      { TitleId: this.titleId };
-
-    try {
-      this.logOperation(`HTTP ${endpoint}`, { 
-        requestData: requestBody, 
-        requiresAuth,
-        hasSessionToken: !!this.sessionToken 
-      });
-
-      const response = await fetch(url, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(requestBody)
-      });
-
-      // Parse response
-      const responseData: PlayFabHttpResponse<TResponse> = await response.json();
-
-      // Check for HTTP errors
-      if (!response.ok) {
-        const error: PlayFabError = {
-          error: responseData.error || 'HttpError',
-          errorCode: responseData.errorCode || response.status,
-          errorMessage: responseData.errorMessage || `HTTP ${response.status}: ${response.statusText}`,
-          errorDetails: responseData
-        };
-        
-        console.error(`❌ PlayFab HTTP Error (${endpoint}):`, error);
-        throw new Error(error.errorMessage);
-      }
-
-      // Check for PlayFab API errors
-      if (responseData.code !== 200 || responseData.error) {
-        const error: PlayFabError = {
-          error: responseData.error || 'APIError',
-          errorCode: responseData.errorCode || responseData.code || 0,
-          errorMessage: responseData.errorMessage || 'PlayFab API Error',
-          errorDetails: responseData
-        };
-        
-        console.error(`❌ PlayFab API Error (${endpoint}):`, error);
-        throw new Error(error.errorMessage);
-      }
-
-      console.log(`✅ PlayFab HTTP Success (${endpoint}):`, responseData.data);
-      return responseData.data as TResponse;
-
-    } catch (error) {
-      // Handle network errors
-      if (error instanceof TypeError && error.message.includes('fetch')) {
-        const networkError: PlayFabError = {
-          error: 'NetworkError',
-          errorCode: -1,
-          errorMessage: `Network request failed: ${error.message}`,
-          errorDetails: error
-        };
-        console.error(`❌ PlayFab Network Error (${endpoint}):`, networkError);
-        throw new Error(networkError.errorMessage);
-      }
-
-      // Re-throw PlayFab errors
-      throw error;
-    }
+    return operation;
   }
 
   /**
-   * Standardized error handling for all PlayFab operations
+   * Handle error (delegates to centralized error handler)
    */
-  public handleError(error: any): PlayFabError {
-    if (error?.error && error?.errorMessage) {
-      // PlayFab API error format
-      return {
-        error: error.error,
-        errorCode: error.errorCode || 0,
-        errorMessage: error.errorMessage,
-        errorDetails: error.errorDetails || null
-      };
-    } else if (error?.message) {
-      // Standard JavaScript error
-      return {
-        error: 'UnknownError',
-        errorCode: -1,
-        errorMessage: error.message,
-        errorDetails: error
-      };
-    } else {
-      // Fallback for unknown error formats
-      return {
-        error: 'UnknownError',
-        errorCode: -1,
-        errorMessage: 'An unknown error occurred',
-        errorDetails: error
-      };
-    }
+  public handleError(error: any) {
+    return playFabErrorHandler.processError(error).originalError;
   }
 
   /**
-   * Create a standardized service result
+   * Create standardized service result
    */
-  public createResult<T>(success: boolean, data?: T, error?: any): PlayFabServiceResult<T> {
+  public createResult<T>(success: boolean, data?: T, error?: any) {
     if (success) {
-      return {
-        status: 'success',
-        data: data as T
-      };
+      return { status: 'success' as const, data: data as T };
     } else {
-      const playFabError = this.handleError(error);
-      return {
-        status: 'error',
-        data: undefined as unknown as T,
-        error: playFabError
+      const processedError = playFabErrorHandler.processError(error);
+      return { 
+        status: 'error' as const, 
+        data: undefined as unknown as T, 
+        error: processedError.originalError 
       };
-    }
-  }
-
-  /**
-   * Log PlayFab operations for debugging
-   */
-  public logOperation(operation: string, details?: any): void {
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`🎮 PlayFab ${operation}:`, details || '');
     }
   }
 
@@ -269,11 +151,10 @@ export class PlayFabCore {
   }
 
   /**
-   * Clear session (logout)
+   * Clear session (delegates to auth manager)
    */
   public clearSession(): void {
-    this.sessionToken = null;
-    this.logOperation('Session Cleared');
+    playFabAuthManager.logout();
   }
 }
 

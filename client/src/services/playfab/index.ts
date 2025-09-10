@@ -19,9 +19,9 @@ import type {
   PlayFabServiceResult
 } from '@/types/playfab';
 
-// Import all service modules
+// Import all service modules (updated with new architecture)
 import { playFabCore } from './core';
-import { playFabAuth } from './auth';
+import { playFabAuthManager } from './authManager'; // Updated to new auth manager
 import { playFabTasks } from './tasks';
 import { playFabValidation } from './validation';
 import { playFabEvents } from './events';
@@ -35,7 +35,7 @@ export class PlayFabService {
   
   // Expose individual services for advanced usage
   public readonly core = playFabCore;
-  public readonly auth = playFabAuth;
+  public readonly auth = playFabAuthManager; // Updated to new auth manager
   public readonly tasks = playFabTasks;
   public readonly validation = playFabValidation;
   public readonly events = playFabEvents;
