@@ -19,7 +19,7 @@
  */
 
 import type { LeaderboardEntry } from '@/types/playfab';
-import { playFabAuth } from './auth';
+import { playFabAuthManager } from './authManager';
 import { playFabCore } from './core';
 import { leaderboardAPI } from './leaderboard-api';
 import { leaderboardCache } from './leaderboard-cache';
@@ -81,7 +81,7 @@ export class LeaderboardService {
    * Get player's ranking in specific leaderboard
    */
   public async getPlayerRanking(type: LeaderboardType): Promise<LeaderboardEntry | null> {
-    const currentPlayerId = playFabAuth.getPlayFabId();
+    const currentPlayerId = playFabAuthManager.getPlayFabId();
     if (!currentPlayerId) {
       throw new Error('No current player ID available');
     }
@@ -160,7 +160,7 @@ export class LeaderboardService {
    * Check if player is in top N for specific leaderboard
    */
   public async isPlayerInTop(type: LeaderboardType, topN: number): Promise<boolean> {
-    const currentPlayerId = playFabAuth.getPlayFabId();
+    const currentPlayerId = playFabAuthManager.getPlayFabId();
     if (!currentPlayerId) return false;
 
     const topPlayers = await this.getLeaderboard(type, topN);
