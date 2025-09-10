@@ -156,6 +156,16 @@ export class PlayFabCore {
   public clearSession(): void {
     playFabAuthManager.logout();
   }
+
+  /**
+   * Log operation (minimal logging for backward compatibility)
+   */
+  public logOperation(operation: string, details?: any): void {
+    // Minimal logging in development only
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`🎮 PlayFab ${operation}`);
+    }
+  }
 }
 
 // Export singleton instance
