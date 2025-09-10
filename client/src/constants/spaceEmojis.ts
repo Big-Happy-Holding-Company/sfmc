@@ -86,6 +86,9 @@ export const SPACE_EMOJIS = {
 
   // Symbolic Portals & Gateways
   cosmic_portals: ['⬛', '🚪', '⛩️', '🏞️', '🛤️', '🌉', '🕳️', '🌀', '🌌', '🌠'],
+
+  // Void Dwellers
+  void_dwellers: ['⬛', '🐙', '🦑', '🦐', '🦀', '🐡', '🐠', '🐟', '🐬', '🐋'],
 } as const;
 
 // Emoji set metadata for UI display
@@ -204,6 +207,11 @@ export const EMOJI_SET_INFO = {
     name: 'Cosmic Portals',
     description: 'Gateways, voids, and dimensional passages',
     theme: 'Cosmic Mysteries'
+  },
+  void_dwellers: {
+    name: 'Void Dwellers',
+    description: 'Deep sea creatures and oceanic life forms',
+    theme: 'Oceanic Depths'
   }
 } as const;
 

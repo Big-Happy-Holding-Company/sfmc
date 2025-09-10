@@ -719,6 +719,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                       <option value="zodiac_signs">♈ Zodiac Signs</option>
                       <option value="foreign_celestial">🈶 Foreign Celestial</option>
                       <option value="cosmic_portals">🚪 Cosmic Portals</option>
+                      <option value="void_dwellers">🐙 Void Dwellers</option>
                     </select>
                   </div>
                 )}
