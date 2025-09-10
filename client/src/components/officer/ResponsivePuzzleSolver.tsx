@@ -661,12 +661,12 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                 )}
               </div>
 
-              {/* Display Mode & Emoji Set Controls - Enhanced */}
-              <div className="bg-slate-800 border-2 border-slate-500 rounded-lg p-3 w-full">
-                <h4 className="text-amber-300 text-sm font-bold mb-3 text-center">🎨 DISPLAY MODE</h4>
+              {/* Display Mode & Emoji Set Controls - Compact */}
+              <div className="bg-slate-800 border border-slate-600 rounded-lg p-2 w-full">
+                <h4 className="text-amber-300 text-xs font-semibold mb-2 text-center">DISPLAY</h4>
                 
                 {/* Display Mode Toggle */}
-                <div className="flex justify-center gap-1 mb-3">
+                <div className="flex justify-center gap-1 mb-2">
                   <button
                     onClick={() => handleDisplayModeChange('arc-colors')}
                     className={`px-3 py-2 text-sm rounded h-10 ${displayState.displayMode === 'arc-colors' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
@@ -687,14 +687,12 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                   </button>
                 </div>
                 
-                {/* Emoji Set Dropdown - Enhanced when in emoji or hybrid mode */}
+                {/* Emoji Set Dropdown - Only show when emoji or hybrid mode */}
                 {(displayState.displayMode === 'emoji' || displayState.displayMode === 'hybrid') && (
-                  <div className="space-y-2">
-                    <h5 className="text-amber-200 text-xs font-medium text-center">EMOJI THEME</h5>
-                    <select
-                      value={displayState.emojiSet}
-                      onChange={(e) => handleEmojiSetChange(e.target.value as any)}
-                      className="w-full bg-slate-700 border-2 border-amber-500 rounded-md px-3 py-2 text-amber-100 text-sm font-medium focus:border-amber-400 focus:ring-1 focus:ring-amber-400 focus:outline-none"
+                  <select
+                    value={displayState.emojiSet}
+                    onChange={(e) => handleEmojiSetChange(e.target.value as any)}
+                    className="w-full bg-slate-700 border border-slate-500 rounded px-2 py-1 text-amber-100 text-xs"
                     >
                       <option value="tech_set1">⚡ Tech Set 1 - Power & Fuel</option>
                       <option value="tech_set2">📡 Tech Set 2 - Communications</option>
@@ -721,7 +719,6 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                       <option value="cosmic_portals">🚪 Cosmic Portals</option>
                       <option value="void_dwellers">🐙 Void Dwellers</option>
                     </select>
-                  </div>
                 )}
               </div>
 
