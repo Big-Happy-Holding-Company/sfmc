@@ -179,17 +179,17 @@ export function TrainingExamplesSection({
             const isMediumGrid = maxDim <= 10;
             const exampleCount = examples.length;
             
-            // Base cell size calculation - prioritize readability
+            // Base cell size calculation - much larger for clear visibility
             let cellSize: number;
             if (isSmallGrid) {
-              // Small grids: prioritize visibility - these should be large enough to see clearly
-              cellSize = exampleCount > 4 ? 48 : exampleCount > 2 ? 56 : 64;
+              // Small grids: make them really visible - these should be easy to read
+              cellSize = exampleCount > 4 ? 60 : exampleCount > 2 ? 72 : 80;
             } else if (isMediumGrid) {
-              // Medium grids: still need good visibility
-              cellSize = exampleCount > 3 ? 40 : exampleCount > 1 ? 44 : 48;
+              // Medium grids: still quite large for good visibility
+              cellSize = exampleCount > 3 ? 50 : exampleCount > 1 ? 58 : 64;
             } else {
-              // Large grids: balance between visibility and fitting on screen
-              cellSize = maxDim > 20 ? 24 : maxDim > 15 ? 30 : 36;
+              // Large grids: larger than before but still fit
+              cellSize = maxDim > 20 ? 32 : maxDim > 15 ? 40 : 48;
             }
             
             // Compact card styling with reduced padding
