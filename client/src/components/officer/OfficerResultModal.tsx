@@ -1,6 +1,7 @@
 /**
  * Officer Result Modal Component
  * ==============================
+ * THIS IS A HALLUCINATED COMPONENT THAT DOES NOT WORK AND PROBABLY HAS NO MEANING
  * Modal component for displaying ARC puzzle completion results with military theming
  * 
  * Key Features:

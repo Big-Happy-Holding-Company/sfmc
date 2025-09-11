@@ -1,6 +1,9 @@
 /**
  * Officer Tutorial Modal
  * ======================
+ * Author: Gemini 2.5 Pro
+ * Date: Sept 11, 2025
+ * Purpose:
  * 5-step tutorial modal for Officer Academy onboarding
  * Reuses OnboardingModal structure with Cadet Yvonne as instructor
  */

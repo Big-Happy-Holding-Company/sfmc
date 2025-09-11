@@ -38,10 +38,15 @@ interface LoadingSplashProps {
 export function LoadingSplash({ onComplete, duration = 3000 }: LoadingSplashProps) {
   const [pathname] = useLocation();
 
-  if (pathname.startsWith('/officer-track/solve/')) {
-    useEffect(() => {
+  // Skip splash screen for officer track solve pages
+  useEffect(() => {
+    if (pathname.startsWith('/officer-track/solve/')) {
       onComplete();
-    }, [onComplete]);
+      return;
+    }
+  }, [pathname, onComplete]);
+
+  if (pathname.startsWith('/officer-track/solve/')) {
     return null;
   }
   const [progress, setProgress] = useState(0);
