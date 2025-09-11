@@ -109,17 +109,29 @@ export function PuzzleGrid({ puzzles, loading, onSelectPuzzle }: PuzzleGridProps
             <CardContent className="p-6 sm:p-8">
               {/* Header with Analysis Quality and Attempts */}
               <div className="flex justify-between items-start mb-6">
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2">
                   <Badge className={`text-sm px-3 py-1 ${analysisQualityBadge.className} font-semibold`}>
                     🤖 {analysisQualityBadge.label}
                   </Badge>
                   <Badge className={`text-sm px-3 py-1 ${difficultyBadge.className}`}>
                     💀 {difficultyBadge.label}
                   </Badge>
+                  {/* Grid Size Badge */}
+                  {puzzle.gridSize && (
+                    <Badge className="text-sm px-3 py-1 bg-blue-600 text-white">
+                      📐 {puzzle.gridSize}
+                    </Badge>
+                  )}
+                  {/* Dataset Badge */}
+                  {puzzle.dataset && (
+                    <Badge className="text-sm px-3 py-1 bg-purple-600 text-white">
+                      📊 {puzzle.dataset}
+                    </Badge>
+                  )}
                 </div>
                 <div className="text-right">
-                  <div className="text-sm text-slate-400 mb-1">Analysis Count</div>
-                  <div className="text-2xl font-bold text-amber-400">#{puzzle.totalExplanations}</div>
+                  <div className="text-sm text-slate-400 mb-1">AI Attempts</div>
+                  <div className="text-2xl font-bold text-amber-400">{puzzle.totalExplanations}</div>
                 </div>
               </div>
 
@@ -131,7 +143,7 @@ export function PuzzleGrid({ puzzles, loading, onSelectPuzzle }: PuzzleGridProps
               </div>
 
               {/* Rich Metadata Grid - Better Spacing and Sizing */}
-              <div className="grid grid-cols-2 gap-4 mb-8">
+              <div className="grid grid-cols-2 gap-4 mb-6">
                 {/* AI Success Rate */}
                 <div className="bg-slate-700 rounded-lg p-4">
                   <div className="text-sm text-slate-400 mb-2">Success Rate</div>
@@ -169,6 +181,28 @@ export function PuzzleGrid({ puzzles, loading, onSelectPuzzle }: PuzzleGridProps
                   </div>
                 </div>
               </div>
+
+              {/* Puzzle Structure Info */}
+              {(puzzle.testCaseCount || puzzle.trainingExampleCount) && (
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  {puzzle.testCaseCount && (
+                    <div className="bg-slate-700 rounded p-2">
+                      <div className="text-xs text-slate-400 mb-1">Test Cases</div>
+                      <div className="text-sm font-bold text-cyan-400">
+                        {puzzle.testCaseCount}
+                      </div>
+                    </div>
+                  )}
+                  {puzzle.trainingExampleCount && (
+                    <div className="bg-slate-700 rounded p-2">
+                      <div className="text-xs text-slate-400 mb-1">Examples</div>
+                      <div className="text-sm font-bold text-green-400">
+                        {puzzle.trainingExampleCount}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Action Button - Larger and more prominent */}
               <Button 

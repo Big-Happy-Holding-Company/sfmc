@@ -225,15 +225,15 @@ export default function OfficerTrackSimple() {
           </div>
         )}
 
-        {/* Puzzle Search & Controls - Enhanced Responsive Layout */}
-        <div className="bg-slate-800 border border-slate-600 rounded-lg p-6 sm:p-8 mb-6">
-          <h2 className="text-amber-400 font-semibold text-xl mb-6 flex items-center">
+        {/* Puzzle Search & Controls - Compact Layout */}
+        <div className="bg-slate-800 border border-slate-600 rounded-lg p-3 mb-3">
+          <h2 className="text-amber-400 font-semibold text-lg mb-3 flex items-center">
             🔍 PUZZLE SEARCH & FILTERS
           </h2>
           
           {/* System Status Indicator */}
           {playFabInitializing && (
-            <div className="bg-blue-900 border border-blue-600 rounded-lg p-4 mb-6">
+            <div className="bg-blue-900 border border-blue-600 rounded p-2 mb-2">
               <div className="flex items-center">
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-400 mr-4"></div>
                 <span className="text-blue-300 text-base">Initializing PlayFab connection for puzzle data access...</span>
@@ -242,45 +242,45 @@ export default function OfficerTrackSimple() {
           )}
           
           {!playFabInitializing && !playFabReady && (
-            <div className="bg-orange-900 border border-orange-600 rounded-lg p-4 mb-6">
+            <div className="bg-orange-900 border border-orange-600 rounded p-2 mb-2">
               <div className="text-orange-300 text-base">
                 ⚠️ PlayFab connection failed - puzzle loading may be limited to arc-explainer data only
               </div>
             </div>
           )}
 
-          {/* Search Row - Better Mobile Layout */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          {/* Search Row - Compact Layout */}
+          <div className="flex flex-col sm:flex-row gap-2 mb-3">
             <Input
               type="text"
               placeholder="Enter puzzle ID (e.g., 494ef9d7)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              className="bg-slate-700 border-slate-600 text-amber-100 flex-1 h-12 text-base px-4"
+              className="bg-slate-700 border-slate-600 text-amber-100 flex-1 h-10 text-sm px-3"
               disabled={playFabInitializing}
             />
             <Button 
               onClick={handleSearch}
               disabled={playFabInitializing || searching || !searchQuery.trim()}
-              className="bg-amber-600 hover:bg-amber-700 text-slate-900 disabled:bg-amber-800 disabled:opacity-50 h-12 px-6 font-semibold text-base"
+              className="bg-amber-600 hover:bg-amber-700 text-slate-900 disabled:bg-amber-800 disabled:opacity-50 h-10 px-4 font-semibold text-sm"
             >
               {playFabInitializing ? 'Initializing...' : searching ? 'Searching...' : 'Find Puzzle'}
             </Button>
           </div>
 
-          {/* Limit Controls - Better Responsive Layout */}
-          <div className="border-t border-slate-600 pt-6">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          {/* Limit Controls - Compact Layout */}
+          <div className="border-t border-slate-600 pt-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
               <div className="flex items-center gap-3">
-                <label htmlFor="limit-select" className="text-base font-medium text-amber-300">
+                <label htmlFor="limit-select" className="text-sm font-medium text-amber-300">
                   Show hardest:
                 </label>
                 <select
                   id="limit-select"
                   value={currentLimit}
                   onChange={(e) => setLimit(parseInt(e.target.value))}
-                  className="px-4 py-3 bg-slate-700 border border-slate-600 rounded-md text-base text-amber-100 min-w-[140px]"
+                  className="px-3 py-2 bg-slate-700 border border-slate-600 rounded text-sm text-amber-100 min-w-[120px]"
                 >
                   <option value={25}>25 puzzles</option>
                   <option value={50}>50 puzzles</option>
@@ -291,62 +291,62 @@ export default function OfficerTrackSimple() {
                 </select>
               </div>
               
-              <div className="text-slate-400 text-base">
+              <div className="text-slate-400 text-sm">
                 Showing {filteredPuzzles.length} of {total} total analyzed puzzles
               </div>
             </div>
           </div>
 
-          <p className="text-slate-400 text-sm mt-4">
+          <p className="text-slate-400 text-xs mt-2">
             Search for specific puzzles by their ID or adjust the number of hardest puzzles to display
           </p>
 
         </div>
 
-        {/* Rich AI Failure Analysis Overview */}
-        <div className="bg-slate-800 border border-slate-600 rounded-lg p-6 sm:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
-            <h2 className="text-cyan-400 font-semibold text-xl flex items-center mb-2 sm:mb-0">
+        {/* AI Failure Analysis Overview - Compact */}
+        <div className="bg-slate-800 border border-slate-600 rounded-lg p-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3">
+            <h2 className="text-cyan-400 font-semibold text-lg flex items-center mb-1 sm:mb-0">
               🧠 AI FAILURE ANALYSIS - ARC-EXPLAINER DATA
             </h2>
-            <div className="text-slate-400 text-base">
+            <div className="text-slate-400 text-sm">
               Live failure patterns & trustworthiness metrics
             </div>
           </div>
           
           {loading ? (
-            <div className="text-center text-slate-400 py-4">Loading failure analysis data...</div>
+            <div className="text-center text-slate-400 py-2">Loading failure analysis data...</div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-2">
               {/* Top Row - Failure Analysis Core Metrics */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-slate-700 rounded-lg p-4 text-center border-l-4 border-amber-500">
-                  <div className="text-2xl font-bold text-amber-400">{filteredPuzzles.length}</div>
-                  <div className="text-sm text-slate-400">🔥 Hardest Puzzles</div>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+                <div className="bg-slate-700 rounded p-2 text-center border-l-2 border-amber-500">
+                  <div className="text-lg font-bold text-amber-400">{filteredPuzzles.length}</div>
+                  <div className="text-xs text-slate-400">🔥 Hardest Puzzles</div>
                   <div className="text-xs text-slate-500">AI struggles significantly</div>
                 </div>
                 
-                <div className="bg-slate-700 rounded-lg p-4 text-center border-l-4 border-red-500">
-                  <div className="text-2xl font-bold text-red-400">
+                <div className="bg-slate-700 rounded p-2 text-center border-l-2 border-red-500">
+                  <div className="text-lg font-bold text-red-400">
                     {filteredPuzzles.filter(p => p.avgAccuracy === 0).length}
                   </div>
-                  <div className="text-sm text-slate-400">💀 Impossible Tasks</div>
+                  <div className="text-xs text-slate-400">💀 Impossible Tasks</div>
                   <div className="text-xs text-slate-500">0% success rate</div>
                 </div>
                 
-                <div className="bg-slate-700 rounded-lg p-4 text-center border-l-4 border-purple-500">
-                  <div className="text-2xl font-bold text-purple-400">
+                <div className="bg-slate-700 rounded p-2 text-center border-l-2 border-purple-500">
+                  <div className="text-lg font-bold text-purple-400">
                     {filteredPuzzles.reduce((sum, p) => sum + (p.wrongCount || 0), 0).toLocaleString()}
                   </div>
-                  <div className="text-sm text-slate-400">❌ Total Failures</div>
+                  <div className="text-xs text-slate-400">❌ Total Failures</div>
                   <div className="text-xs text-slate-500">Wrong predictions</div>
                 </div>
                 
-                <div className="bg-slate-700 rounded-lg p-4 text-center border-l-4 border-orange-500">
-                  <div className="text-2xl font-bold text-orange-400">
+                <div className="bg-slate-700 rounded p-2 text-center border-l-2 border-orange-500">
+                  <div className="text-lg font-bold text-orange-400">
                     {filteredPuzzles.reduce((sum, p) => sum + p.totalExplanations, 0).toLocaleString()}
                   </div>
-                  <div className="text-sm text-slate-400">🤖 AI Attempts</div>
+                  <div className="text-xs text-slate-400">🤖 AI Attempts</div>
                   <div className="text-xs text-slate-500">Analysis sessions</div>
                 </div>
               </div>

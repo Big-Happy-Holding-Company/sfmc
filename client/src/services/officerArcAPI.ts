@@ -22,6 +22,11 @@ export interface OfficerPuzzle {
   totalFeedback?: number;       // Human feedback attempts
   negativeFeedback?: number;    // Negative human feedback count
   latestAnalysis?: string;      // ISO date of last analysis
+  // Puzzle structure metadata
+  gridSize?: string;            // e.g., "3x3", "5x5", "variable"
+  dataset?: string;             // e.g., "training", "evaluation", "evaluation2"
+  testCaseCount?: number;       // Number of test cases
+  trainingExampleCount?: number; // Number of training examples
 }
 
 export interface DifficultyStats {
@@ -171,12 +176,12 @@ export function categorizeDifficulty(accuracy: number, hasData: boolean = true):
  * Get evaluation2 puzzles with rich metadata from arc-explainer API
  * PRIORITY: Uses arc-explainer's rich dataset for puzzle discovery and selection
  */
-export async function getEvaluation2Puzzles(): Promise<OfficerPuzzleResponse> {
+export async function getEvaluation2Puzzles(limit: number = 50): Promise<OfficerPuzzleResponse> {
   try {
-    console.log('🎖️ Getting 50 worst performing puzzles with rich metadata from arc-explainer...');
+    console.log(`🎖️ Getting ${limit} worst performing puzzles with rich metadata from arc-explainer...`);
     
-    // Get 50 worst performing puzzles (server limit) with rich metadata
-    const response = await makeAPICall('/api/puzzle/worst-performing?limit=50&sortBy=composite');
+    // Get worst performing puzzles with rich metadata
+    const response = await makeAPICall(`/api/puzzle/worst-performing?limit=${Math.min(limit, 200)}&sortBy=composite`);
     
     // The actual structure is response.data.puzzles (confirmed by API test)
     if (!response?.data?.puzzles) {
@@ -192,27 +197,47 @@ export async function getEvaluation2Puzzles(): Promise<OfficerPuzzleResponse> {
     const worstPerformingPuzzles = puzzleData;
     
     // Convert to our format with rich arc-explainer metadata - keep original arc IDs
-    const enrichedPuzzles: OfficerPuzzle[] = worstPerformingPuzzles.map((puzzle: any) => {
-      // Performance data is nested in performanceData object
-      const perfData = puzzle.performanceData || {};
-      const accuracy = perfData.avgAccuracy || 0;
-      const explanations = perfData.totalExplanations || 0;
-      
-      return {
-        id: puzzle.id, // Keep original arc ID (e.g., "007bbfb7")  
-        playFabId: puzzle.id, // Same as ID for discovery - PlayFab only needed when solving
-        avgAccuracy: accuracy,
-        difficulty: categorizeDifficulty(accuracy, explanations > 0),
-        totalExplanations: explanations,
-        compositeScore: perfData.compositeScore || 0,
-        // Rich failure metadata
-        avgConfidence: perfData.avgConfidence,
-        wrongCount: perfData.wrongCount,
-        totalFeedback: perfData.totalFeedback,
-        negativeFeedback: perfData.negativeFeedback,
-        latestAnalysis: perfData.latestAnalysis
-      };
-    });
+    const enrichedPuzzles: OfficerPuzzle[] = await Promise.all(
+      worstPerformingPuzzles.map(async (puzzle: any) => {
+        // Performance data is nested in performanceData object
+        const perfData = puzzle.performanceData || {};
+        const accuracy = perfData.avgAccuracy || 0;
+        const explanations = perfData.totalExplanations || 0;
+        
+        // Get additional puzzle structure metadata
+        let gridSize = 'unknown';
+        let testCaseCount = 0;
+        let trainingExampleCount = 0;
+        let dataset = 'evaluation2';
+        
+        // For now, set defaults - detailed metadata will be fetched lazily when needed
+        // This avoids making 50+ API calls on initial load
+        gridSize = 'variable'; // Most ARC puzzles have variable grid sizes
+        testCaseCount = 1; // ARC puzzles typically have 1 test case
+        trainingExampleCount = 3; // ARC puzzles typically have 2-4 training examples
+        dataset = 'arc-agi'; // These come from the main ARC dataset
+        
+        return {
+          id: puzzle.id, // Keep original arc ID (e.g., "007bbfb7")  
+          playFabId: puzzle.id, // Same as ID for discovery - PlayFab only needed when solving
+          avgAccuracy: accuracy,
+          difficulty: categorizeDifficulty(accuracy, explanations > 0),
+          totalExplanations: explanations,
+          compositeScore: perfData.compositeScore || 0,
+          // Rich failure metadata
+          avgConfidence: perfData.avgConfidence,
+          wrongCount: perfData.wrongCount,
+          totalFeedback: perfData.totalFeedback,
+          negativeFeedback: perfData.negativeFeedback,
+          latestAnalysis: perfData.latestAnalysis,
+          // Puzzle structure metadata
+          gridSize,
+          dataset,
+          testCaseCount,
+          trainingExampleCount
+        };
+      })
+    );
     
     // Sort by difficulty and performance (hardest first)
     enrichedPuzzles.sort((a, b) => {
@@ -305,11 +330,37 @@ export async function searchPuzzleById(searchId: string): Promise<OfficerPuzzle 
       const aiData = await makeAPICall(`/api/puzzle/task/${cleanId}`);
       if (aiData.success && aiData.data) {
         const performanceData = aiData.data.performanceData || {};
+        const puzzleData = aiData.data.puzzle || {};
+        
+        // Performance metadata
         avgAccuracy = performanceData.avgAccuracy || 0;
         totalExplanations = performanceData.totalExplanations || 0;
         compositeScore = performanceData.compositeScore || 0;
+        
+        // Extract puzzle structure metadata
+        const train = puzzleData.train || [];
+        const test = puzzleData.test || [];
+        
+        // Calculate grid size from training examples
+        let gridSize = 'unknown';
+        if (train.length > 0) {
+          const firstExample = train[0];
+          if (firstExample.input && firstExample.output) {
+            const inputHeight = firstExample.input.length;
+            const inputWidth = firstExample.input[0]?.length || 0;
+            const outputHeight = firstExample.output.length;
+            const outputWidth = firstExample.output[0]?.length || 0;
+            
+            if (inputHeight === outputHeight && inputWidth === outputWidth) {
+              gridSize = `${inputHeight}x${inputWidth}`;
+            } else {
+              gridSize = `${inputHeight}x${inputWidth}→${outputHeight}x${outputWidth}`;
+            }
+          }
+        }
+        
         foundInArcExplainer = true;
-        console.log(`✅ Found AI metadata for ${cleanId} in arc-explainer`);
+        console.log(`✅ Found AI metadata and puzzle structure for ${cleanId} in arc-explainer`);
       }
     } catch (error) {
       console.log(`⚠️ No AI metadata found for ${cleanId} in arc-explainer`);
@@ -317,13 +368,41 @@ export async function searchPuzzleById(searchId: string): Promise<OfficerPuzzle 
     
     // If we found AI data, create puzzle object (full PlayFab data loaded later when needed)
     if (foundInArcExplainer) {
+      const aiData = await makeAPICall(`/api/puzzle/task/${cleanId}`);
+      const puzzleData = aiData.data.puzzle || {};
+      const train = puzzleData.train || [];
+      const test = puzzleData.test || [];
+      
+      // Calculate grid size
+      let gridSize = 'unknown';
+      if (train.length > 0) {
+        const firstExample = train[0];
+        if (firstExample.input && firstExample.output) {
+          const inputHeight = firstExample.input.length;
+          const inputWidth = firstExample.input[0]?.length || 0;
+          const outputHeight = firstExample.output.length;
+          const outputWidth = firstExample.output[0]?.length || 0;
+          
+          if (inputHeight === outputHeight && inputWidth === outputWidth) {
+            gridSize = `${inputHeight}x${inputWidth}`;
+          } else {
+            gridSize = `${inputHeight}x${inputWidth}→${outputHeight}x${outputWidth}`;
+          }
+        }
+      }
+      
       const puzzle: OfficerPuzzle = {
         id: cleanId,
         playFabId: cleanId,
         avgAccuracy,
         difficulty: categorizeDifficulty(avgAccuracy, totalExplanations > 0),
         totalExplanations,
-        compositeScore
+        compositeScore,
+        // Puzzle structure metadata
+        gridSize,
+        dataset: 'evaluation2', // Default dataset for arc-explainer puzzles
+        testCaseCount: test.length,
+        trainingExampleCount: train.length
       };
       
       console.log(`✅ Created puzzle metadata for ${cleanId}`);
