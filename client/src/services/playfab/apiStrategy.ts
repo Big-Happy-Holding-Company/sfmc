@@ -121,7 +121,7 @@ export class ClientApiStrategy implements PlayFabApiStrategy {
     const clientOperations: ApiOperationType[] = [
       'getUserData', 'updateUserData', 'updateStatistics', 
       'getLeaderboard', 'executeCloudScript', 'loginWithCustomId', 'updateUserTitleDisplayName',
-      'writePlayerEvent'
+      'getPlayerProfile', 'updateAvatarUrl', 'writePlayerEvent'
     ];
     return clientOperations.includes(context.operation) && 
            (!context.requiresAuth || context.hasSessionToken);
