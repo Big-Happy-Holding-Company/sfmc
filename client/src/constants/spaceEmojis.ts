@@ -96,11 +96,14 @@ export const SPACE_EMOJIS = {
  // Bamboos / "Sou" suit (1-9)
   bamboos: ['⬛','🀐','🀑','🀒','🀓','🀔','🀕','🀖','🀗','🀘'],
   
-// Circles / "Pin" suit (1-9)
+ // Circles / "Pin" suit (1-9)
     circles: ['⬛','🀙','🀚','🀛','🀜','🀝','🀞','🀟','🀠','🀡'],
 
-  // Birds 
+ // Birds 
     birds: ['⬛','🐤','🦜','🦩','🦚','🦢','🕊️','🦃','🐦','🐔'],
+
+ // Medieval 
+    medieval: ['⬛','🗡️','🛡️','🐎','👑','🏰','🏹','⚔️','📜','🗝'],
   };
 
 
@@ -245,6 +248,11 @@ export const EMOJI_SET_INFO = {
     name: 'Birds',
     description: 'Various bird species and poultry',
     theme: 'Natural World'
+  },
+  medieval: {
+    name: 'Medieval',
+    description: 'Various medieval symbols',
+    theme: 'Medieval'
   },
 } as const;
 
