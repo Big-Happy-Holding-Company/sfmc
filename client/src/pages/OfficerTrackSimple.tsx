@@ -203,7 +203,6 @@ export default function OfficerTrackSimple() {
       </div>
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-8">
-
         {/* CSS Grid Layout - Puzzle-First Priority */}
         <div className="grid grid-cols-1 gap-6 lg:gap-8">
         
@@ -433,6 +432,6 @@ export default function OfficerTrackSimple() {
           </div>
         
       </main>
-    </div>
+
   );
 }
