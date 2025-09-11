@@ -79,7 +79,7 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
       {/* Header with clear description */}
       <div className="text-center">
         <h4 className="text-amber-300 text-lg font-bold mb-1">VALUE PALETTE</h4>
-        <p className="text-slate-300 text-sm">Click to select painting tool</p>
+        <p className="text-slate-300 text-base">Click to select painting tool</p>
       </div>
       
       {/* Top row (0-4) */}
@@ -98,7 +98,7 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
       </div>
       
       {/* Usage hint */}
-      <div className="text-slate-400 text-xs text-center max-w-48">
+      <div className="text-slate-400 text-sm text-center max-w-48">
         Value 0 = Background • Values 1-9 = Different elements
       </div>
     </div>

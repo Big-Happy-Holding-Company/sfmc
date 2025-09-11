@@ -585,7 +585,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
               <h3 className="text-slate-800 text-lg font-bold flex items-center gap-2 mb-1">
                 🎯 MULTI-TEST PUZZLE - ALL {totalTests} TESTS REQUIRED
               </h3>
-              <p className="text-slate-700 text-sm">
+              <p className="text-slate-700 text-base">
                 ⚠️ You must solve ALL {totalTests} test cases to complete this puzzle. Switch between tests using the buttons below.
               </p>
             </div>
@@ -675,7 +675,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
           {/* Validation Status */}
           {validationError && (
             <div className="bg-red-900 border border-red-600 rounded-lg p-4 mt-4">
-              <div className="text-red-300 text-sm">
+              <div className="text-red-300 text-base">
                 <strong>❌ Validation Error:</strong> {validationError}
               </div>
             </div>
@@ -683,7 +683,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
 
           {validationResult && (
             <div className="bg-green-900 border border-green-600 rounded-lg p-4 mt-4">
-              <div className="text-green-300 text-sm">
+              <div className="text-green-300 text-base">
                 <strong>✅ PlayFab Validation Complete:</strong> 
                 {getValidationMessage()}
                 {validationResult.timeElapsed && (
@@ -697,7 +697,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
 
         {/* Pattern Analysis Tip */}
         <div className="bg-blue-900 border border-blue-600 rounded-lg p-4">
-          <div className="text-blue-300 text-sm">
+          <div className="text-blue-300 text-base">
             <strong>💡 Solving Strategy:</strong> 
             {trainingExamples.length > 0 
               ? ` Study the ${trainingExamples.length} training examples above to identify the transformation pattern, then apply it to the test input.`

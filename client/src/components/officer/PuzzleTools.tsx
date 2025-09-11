@@ -121,7 +121,7 @@ export function PuzzleTools({
       {/* Display Mode & Emoji Set Controls */}
       <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 w-full">
         <h4 className="text-amber-300 text-xl font-bold mb-2 text-center">DISPLAY MODE</h4>
-        <p className="text-slate-300 text-sm mb-4 text-center">Choose how to visualize puzzle values</p>
+        <p className="text-slate-300 text-base mb-4 text-center">Choose how to visualize puzzle values</p>
         
         {/* Display Mode Toggle - Clear and Verbose */}
         <div className="flex flex-col gap-3 mb-4">
@@ -157,7 +157,7 @@ export function PuzzleTools({
         {/* Emoji Set Dropdown - Only show when emoji or hybrid mode */}
         {(displayMode === 'emoji' || displayMode === 'hybrid') && (
           <div>
-            <label className="text-slate-300 text-sm font-semibold mb-2 block">Emoji Theme:</label>
+            <label className="text-slate-300 text-base font-semibold mb-2 block">Emoji Theme:</label>
             <select
               value={emojiSet}
               onChange={(e) => onEmojiSetChange(e.target.value as EmojiSet)}
@@ -226,7 +226,7 @@ export function PuzzleTools({
         </Button>
         
         {/* Helper text */}
-        <div className="text-xs text-slate-400 mt-2 text-center">
+        <div className="text-sm text-slate-400 mt-2 text-center">
           {allTestsCompleted ? 
             'All tests pass locally! Submit for official verification.' :
             'Frontend validation checks your solution as you work.'}

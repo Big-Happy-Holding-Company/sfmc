@@ -54,18 +54,18 @@ export function TestCaseNavigation({
       {/* Inline Header Layout for Efficiency */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
-          <h3 className="text-slate-700 text-sm font-semibold">
+          <h3 className="text-slate-700 text-base font-bold">
             🎯 TEST CASES
           </h3>
           <Badge 
             variant="outline" 
-            className={`text-xs ${completedCount === totalTests ? 'text-green-700 border-green-600 bg-green-100' : 'text-slate-600 border-slate-400 bg-white'}`}
+            className={`text-sm ${completedCount === totalTests ? 'text-green-700 border-green-600 bg-green-100' : 'text-slate-600 border-slate-400 bg-white'}`}
           >
             {completedCount}/{totalTests}
           </Badge>
         </div>
         {completedCount === totalTests && (
-          <Badge className="bg-green-600 text-white shadow-md text-xs">
+          <Badge className="bg-green-600 text-white shadow-md text-sm">
             ✅ SOLVED!
           </Badge>
         )}
@@ -74,7 +74,7 @@ export function TestCaseNavigation({
       {/* Detailed Progress Bar - Only for Complex Puzzles (4+ tests) */}
       {totalTests >= 4 && (
         <div className="mb-2">
-          <div className="flex justify-between text-xs text-slate-600 mb-1">
+          <div className="flex justify-between text-sm text-slate-600 mb-1">
             <span>Progress</span>
             <span>{progressPercentage}%</span>
           </div>
@@ -124,7 +124,7 @@ export function TestCaseNavigation({
       </div>
 
       {/* Current Test Info */}
-      <div className="mt-4 text-xs text-slate-400 text-center">
+      <div className="mt-4 text-sm text-slate-400 text-center">
         Currently solving: <span className="text-amber-400 font-semibold">Test Case {currentTestIndex + 1}</span>
         {completedTests[currentTestIndex] && (
           <span className="text-green-400 ml-2">✓ Completed</span>
