@@ -180,7 +180,7 @@ export default function OfficerTrackSimple() {
       <Header player={player} totalTasks={totalTasks} />
       
       <div className="bg-slate-800 border-b-2 border-amber-400 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
               <h1 className="text-2xl font-bold text-amber-400">
@@ -202,7 +202,44 @@ export default function OfficerTrackSimple() {
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-8">
+
+        {/* CSS Grid Layout - Puzzle-First Priority */}
+        <div className="grid grid-cols-1 gap-6 lg:gap-8">
+        
+        {/* Move Puzzle Grid to Top Priority */}
+        <div className="order-1">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-amber-400 font-bold text-2xl flex items-center">
+              🧩 AVAILABLE CHALLENGES
+              <Badge className="ml-4 bg-amber-600 text-slate-900 text-base px-3 py-1">
+                {filteredPuzzles.length} puzzles
+              </Badge>
+              {currentFilter && (
+                <Badge className="ml-3 bg-blue-600 text-white text-base px-3 py-1">
+                  {currentFilter.replace('_', ' ').toUpperCase()}
+                </Badge>
+              )}
+            </h2>
+            
+            {currentFilter && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => filterByDifficulty(null)}
+                className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white text-base px-4 py-2"
+              >
+                Clear Filter
+              </Button>
+            )}
+          </div>
+
+          <PuzzleGrid 
+            puzzles={filteredPuzzles}
+            loading={loading}
+            onSelectPuzzle={handleSelectPuzzle}
+          />
+        </div>
         
         {/* Error State */}
         {error && (
@@ -225,62 +262,62 @@ export default function OfficerTrackSimple() {
           </div>
         )}
 
-        {/* Puzzle Search & Controls - Compact Layout */}
-        <div className="bg-slate-800 border border-slate-600 rounded-lg p-3 mb-3">
-          <h2 className="text-amber-400 font-semibold text-lg mb-3 flex items-center">
-            🔍 PUZZLE SEARCH & FILTERS
-          </h2>
+          {/* Puzzle Search & Controls - Compact Layout */}
+          <div className="order-2 bg-slate-800 border border-slate-600 rounded-lg p-4">
+            <h2 className="text-amber-400 font-semibold text-xl mb-4 flex items-center">
+              🔍 PUZZLE DISCOVERY
+            </h2>
           
           {/* System Status Indicator */}
           {playFabInitializing && (
-            <div className="bg-blue-900 border border-blue-600 rounded p-2 mb-2">
-              <div className="flex items-center">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-400 mr-4"></div>
-                <span className="text-blue-300 text-base">Initializing PlayFab connection for puzzle data access...</span>
+              <div className="bg-blue-900 border border-blue-600 rounded p-3 mb-3">
+                <div className="flex items-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-400 mr-4"></div>
+                  <span className="text-blue-300 text-base">Initializing PlayFab connection for puzzle data access...</span>
+                </div>
               </div>
-            </div>
           )}
           
           {!playFabInitializing && !playFabReady && (
-            <div className="bg-orange-900 border border-orange-600 rounded p-2 mb-2">
-              <div className="text-orange-300 text-base">
-                ⚠️ PlayFab connection failed - puzzle loading may be limited to arc-explainer data only
+              <div className="bg-orange-900 border border-orange-600 rounded p-3 mb-3">
+                <div className="text-orange-300 text-base">
+                  ⚠️ PlayFab connection failed - puzzle loading may be limited to arc-explainer data only
+                </div>
               </div>
-            </div>
           )}
 
-          {/* Search Row - Compact Layout */}
-          <div className="flex flex-col sm:flex-row gap-2 mb-3">
+            {/* Search Row - Enhanced Layout */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
             <Input
               type="text"
               placeholder="Enter puzzle ID (e.g., 494ef9d7)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              className="bg-slate-700 border-slate-600 text-amber-100 flex-1 h-10 text-sm px-3"
+              className="bg-slate-700 border-slate-600 text-amber-100 flex-1 h-12 text-base px-4"
               disabled={playFabInitializing}
             />
             <Button 
               onClick={handleSearch}
               disabled={playFabInitializing || searching || !searchQuery.trim()}
-              className="bg-amber-600 hover:bg-amber-700 text-slate-900 disabled:bg-amber-800 disabled:opacity-50 h-10 px-4 font-semibold text-sm"
+              className="bg-amber-600 hover:bg-amber-700 text-slate-900 disabled:bg-amber-800 disabled:opacity-50 h-12 px-6 font-semibold text-base"
             >
               {playFabInitializing ? 'Initializing...' : searching ? 'Searching...' : 'Find Puzzle'}
             </Button>
           </div>
 
-          {/* Limit Controls - Compact Layout */}
-          <div className="border-t border-slate-600 pt-3">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+            {/* Limit Controls - Enhanced Layout */}
+            <div className="border-t border-slate-600 pt-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
               <div className="flex items-center gap-3">
-                <label htmlFor="limit-select" className="text-sm font-medium text-amber-300">
-                  Show hardest:
-                </label>
+                  <label htmlFor="limit-select" className="text-base font-medium text-amber-300">
+                    Show hardest:
+                  </label>
                 <select
                   id="limit-select"
                   value={currentLimit}
                   onChange={(e) => setLimit(parseInt(e.target.value))}
-                  className="px-3 py-2 bg-slate-700 border border-slate-600 rounded text-sm text-amber-100 min-w-[120px]"
+                  className="px-4 py-2 bg-slate-700 border border-slate-600 rounded text-base text-amber-100 min-w-[140px]"
                 >
                   <option value={25}>25 puzzles</option>
                   <option value={50}>50 puzzles</option>
@@ -291,213 +328,109 @@ export default function OfficerTrackSimple() {
                 </select>
               </div>
               
-              <div className="text-slate-400 text-sm">
-                Showing {filteredPuzzles.length} of {total} total analyzed puzzles
+                <div className="text-slate-300 text-base">
+                  Showing {filteredPuzzles.length} of {total} total analyzed puzzles
+                </div>
               </div>
             </div>
+
+            <p className="text-slate-400 text-sm mt-3">
+              Search for specific puzzles by their ID or adjust the number of hardest puzzles to display
+            </p>
+
           </div>
 
-          <p className="text-slate-400 text-xs mt-2">
-            Search for specific puzzles by their ID or adjust the number of hardest puzzles to display
-          </p>
-
-        </div>
-
         {/* AI Failure Analysis Overview - Compact */}
-        <div className="bg-slate-800 border border-slate-600 rounded-lg p-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-3">
-            <h2 className="text-cyan-400 font-semibold text-lg flex items-center mb-1 sm:mb-0">
-              🧠 AI FAILURE ANALYSIS - ARC-EXPLAINER DATA
+        <div className="order-3 bg-slate-800 border border-slate-600 rounded-lg p-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4">
+            <h2 className="text-cyan-400 font-semibold text-xl flex items-center mb-2 sm:mb-0">
+              🧠 AI ANALYSIS INSIGHTS
             </h2>
-            <div className="text-slate-400 text-sm">
-              Live failure patterns & trustworthiness metrics
+            <div className="text-slate-300 text-base">
+              These puzzles challenge AI systems - perfect for human training
             </div>
           </div>
           
           {loading ? (
-            <div className="text-center text-slate-400 py-2">Loading failure analysis data...</div>
+            <div className="text-center text-slate-400 py-3">Loading analysis insights...</div>
           ) : (
-            <div className="space-y-2">
-              {/* Top Row - Failure Analysis Core Metrics */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
-                <div className="bg-slate-700 rounded p-2 text-center border-l-2 border-amber-500">
-                  <div className="text-lg font-bold text-amber-400">{filteredPuzzles.length}</div>
-                  <div className="text-xs text-slate-400">🔥 Hardest Puzzles</div>
-                  <div className="text-xs text-slate-500">AI struggles significantly</div>
+            <div className="space-y-4">
+              {/* Horizontal Compact Metrics Row */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="bg-slate-700 rounded-lg p-3 text-center border-l-4 border-amber-500">
+                  <div className="text-2xl font-bold text-amber-400">{filteredPuzzles.length}</div>
+                  <div className="text-sm text-slate-300">🔥 Challenge Puzzles</div>
+                  <div className="text-xs text-slate-400">Where AI struggles</div>
                 </div>
                 
-                <div className="bg-slate-700 rounded p-2 text-center border-l-2 border-red-500">
-                  <div className="text-lg font-bold text-red-400">
+                <div className="bg-slate-700 rounded-lg p-3 text-center border-l-4 border-red-500">
+                  <div className="text-2xl font-bold text-red-400">
                     {filteredPuzzles.filter(p => p.avgAccuracy === 0).length}
                   </div>
-                  <div className="text-xs text-slate-400">💀 Impossible Tasks</div>
-                  <div className="text-xs text-slate-500">0% success rate</div>
+                  <div className="text-sm text-slate-300">💀 Impossible</div>
+                  <div className="text-xs text-slate-400">0% AI success</div>
                 </div>
                 
-                <div className="bg-slate-700 rounded p-2 text-center border-l-2 border-purple-500">
-                  <div className="text-lg font-bold text-purple-400">
-                    {filteredPuzzles.reduce((sum, p) => sum + (p.wrongCount || 0), 0).toLocaleString()}
+                <div className="bg-slate-700 rounded-lg p-3 text-center border-l-4 border-purple-500">
+                  <div className="text-2xl font-bold text-purple-400">
+                    {(() => {
+                      const overconfident = filteredPuzzles.filter(p => 
+                        p.avgAccuracy < 0.5 && (p.avgConfidence || 0) > 70
+                      ).length;
+                      return `${Math.round((overconfident / filteredPuzzles.length) * 100)}%`;
+                    })()} 
                   </div>
-                  <div className="text-xs text-slate-400">❌ Total Failures</div>
-                  <div className="text-xs text-slate-500">Wrong predictions</div>
+                  <div className="text-sm text-slate-300">⚠️ Overconfident</div>
+                  <div className="text-xs text-slate-400">Wrong but certain</div>
                 </div>
                 
-                <div className="bg-slate-700 rounded p-2 text-center border-l-2 border-orange-500">
-                  <div className="text-lg font-bold text-orange-400">
+                <div className="bg-slate-700 rounded-lg p-3 text-center border-l-4 border-orange-500">
+                  <div className="text-2xl font-bold text-orange-400">
                     {filteredPuzzles.reduce((sum, p) => sum + p.totalExplanations, 0).toLocaleString()}
                   </div>
-                  <div className="text-xs text-slate-400">🤖 AI Attempts</div>
-                  <div className="text-xs text-slate-500">Analysis sessions</div>
+                  <div className="text-sm text-slate-300">🤖 AI Attempts</div>
+                  <div className="text-xs text-slate-400">Total tries</div>
                 </div>
               </div>
 
-              {/* Middle Row - Trustworthiness & Overconfidence Analysis */}
-              <div className="bg-gradient-to-r from-yellow-900/20 to-red-900/20 border border-yellow-600/30 rounded-lg p-4">
-                <h3 className="text-yellow-400 font-semibold mb-3 flex items-center">
-                  ⚠️ DANGEROUS OVERCONFIDENCE PATTERNS
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-slate-700/50 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-yellow-400">
-                      {filteredPuzzles.length > 0 && filteredPuzzles.some(p => p.avgConfidence !== undefined)
-                        ? `${Math.round(filteredPuzzles.filter(p => p.avgConfidence !== undefined).reduce((sum, p) => sum + (p.avgConfidence || 0), 0) / filteredPuzzles.filter(p => p.avgConfidence !== undefined).length)}%`
-                        : 'N/A'
-                      }
-                    </div>
-                    <div className="text-sm text-slate-400">Avg Confidence</div>
-                    <div className="text-xs text-slate-500">When making errors</div>
+              {/* Key Insight - Compact Summary */}
+              <div className="bg-gradient-to-r from-yellow-900/20 to-amber-900/20 border border-yellow-600/30 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-yellow-400 font-semibold text-lg flex items-center">
+                      💡 Why These Puzzles Matter
+                    </h3>
+                    <p className="text-slate-300 text-base mt-1">
+                      AI systems fail dramatically on these patterns - train on what challenges machines most
+                    </p>
                   </div>
-                  
-                  <div className="bg-slate-700/50 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-red-400">
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-amber-400">
                       {(() => {
-                        const highConfidenceWrong = filteredPuzzles.filter(p => 
-                          p.avgAccuracy < 0.5 && (p.avgConfidence || 0) > 70
-                        ).length;
-                        return `${Math.round((highConfidenceWrong / filteredPuzzles.length) * 100)}%`;
-                      })()}
+                        const avg = filteredPuzzles.length > 0 
+                          ? Math.round(filteredPuzzles.reduce((sum, p) => sum + p.avgAccuracy, 0) / filteredPuzzles.length * 100)
+                          : 0;
+                        return `${avg}%`;
+                      })()} 
                     </div>
-                    <div className="text-sm text-slate-400">Overconfident</div>
-                    <div className="text-xs text-slate-500">High conf, low accuracy</div>
-                  </div>
-                  
-                  <div className="bg-slate-700/50 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-pink-400">
-                      {(() => {
-                        const totalFeedback = filteredPuzzles.reduce((sum, p) => sum + (p.totalFeedback || 0), 0);
-                        const negativeFeedback = filteredPuzzles.reduce((sum, p) => sum + (p.negativeFeedback || 0), 0);
-                        return totalFeedback > 0 ? `${Math.round((negativeFeedback / totalFeedback) * 100)}%` : '0%';
-                      })()}
-                    </div>
-                    <div className="text-sm text-slate-400">Poor Explanations</div>
-                    <div className="text-xs text-slate-500">Human feedback negative</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Bottom Row - Human Feedback Insights */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-slate-700 rounded-lg p-4 border-l-4 border-cyan-500">
-                  <h4 className="text-cyan-400 font-semibold mb-2">👥 Human Feedback Quality</h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-400">Total Feedback:</span>
-                      <span className="text-sm text-cyan-400 font-mono">
-                        {filteredPuzzles.reduce((sum, p) => sum + (p.totalFeedback || 0), 0)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-400">Negative:</span>
-                      <span className="text-sm text-pink-400 font-mono">
-                        {filteredPuzzles.reduce((sum, p) => sum + (p.negativeFeedback || 0), 0)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-400">Quality Score:</span>
-                      <span className="text-sm text-green-400 font-mono">
-                        {(() => {
-                          const total = filteredPuzzles.reduce((sum, p) => sum + (p.totalFeedback || 0), 0);
-                          const negative = filteredPuzzles.reduce((sum, p) => sum + (p.negativeFeedback || 0), 0);
-                          return total > 0 ? `${Math.round(((total - negative) / total) * 100)}%` : 'N/A';
-                        })()}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-slate-700 rounded-lg p-4 border-l-4 border-blue-500">
-                  <h4 className="text-blue-400 font-semibold mb-2">📊 Analysis Depth</h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-400">Extensively Analyzed:</span>
-                      <span className="text-sm text-green-400 font-mono">
-                        {filteredPuzzles.filter(p => p.totalExplanations >= 50).length}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-400">Well Analyzed:</span>
-                      <span className="text-sm text-blue-400 font-mono">
-                        {filteredPuzzles.filter(p => p.totalExplanations >= 20 && p.totalExplanations < 50).length}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-slate-400">Limited Data:</span>
-                      <span className="text-sm text-red-400 font-mono">
-                        {filteredPuzzles.filter(p => p.totalExplanations < 5).length}
-                      </span>
-                    </div>
+                    <div className="text-sm text-slate-300">Avg AI Success</div>
                   </div>
                 </div>
               </div>
             </div>
           )}
           
-          <div className="mt-4 text-center text-xs text-slate-500 bg-slate-900/50 rounded p-2">
-            🧠 <strong>Arc-Explainer Intelligence:</strong> This data reveals where AI systems fail most dramatically. 
-            High confidence + low accuracy = dangerous overconfidence requiring human oversight.
+          <div className="mt-4 text-center text-sm text-slate-400 bg-slate-900/50 rounded-lg p-3">
+            🎯 <strong>Officer Training Focus:</strong> These puzzles reveal critical gaps in AI reasoning - 
+            master what machines cannot.
           </div>
         </div>
 
-        {/* Puzzle Grid */}
-        <div className="mt-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-amber-400 font-semibold flex items-center">
-              🧩 AVAILABLE CHALLENGES
-              <Badge className="ml-3 bg-amber-600 text-slate-900">
-                {filteredPuzzles.length} puzzles
-              </Badge>
-              {currentFilter && (
-                <Badge className="ml-2 bg-blue-600 text-white">
-                  {currentFilter.replace('_', ' ').toUpperCase()}
-                </Badge>
-              )}
-            </h2>
-            
-            {currentFilter && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => filterByDifficulty(null)}
-                className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
-              >
-                Clear Filter
-              </Button>
-            )}
+          {/* Footer Info */}
+          <div className="order-4 text-center text-slate-400 text-base bg-slate-900/30 rounded-lg p-4">
+            <p>🤖 Puzzle difficulty data sourced from arc-explainer AI analysis</p>
+            <p className="mt-2">Find the puzzles that challenge AI systems to train the next generation of officers</p>
           </div>
-
-          <PuzzleGrid 
-            puzzles={filteredPuzzles}
-            loading={loading}
-            onSelectPuzzle={handleSelectPuzzle}
-          />
-        </div>
-
-
-        {/* Footer Info */}
-        <div className="mt-12 text-center text-slate-400 text-sm">
-          <p>🤖 Puzzle difficulty data sourced from arc-explainer AI analysis</p>
-          <p className="mt-1">Find the puzzles that challenge AI systems to train the next generation of officers</p>
-        </div>
         
       </main>
     </div>
