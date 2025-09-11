@@ -431,7 +431,8 @@ export default function OfficerTrackSimple() {
             <p className="mt-2">Find the puzzles that challenge AI systems to train the next generation of officers</p>
           </div>
         
+        </div>
       </main>
-
+    </div>
   );
 }
