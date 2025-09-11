@@ -75,7 +75,13 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
   };
 
   return (
-    <div className={`flex flex-col items-center justify-center gap-2 ${className}`}>
+    <div className={`flex flex-col items-center justify-center gap-3 ${className}`}>
+      {/* Header with clear description */}
+      <div className="text-center">
+        <h4 className="text-amber-300 text-lg font-bold mb-1">VALUE PALETTE</h4>
+        <p className="text-slate-300 text-sm">Click to select painting tool</p>
+      </div>
+      
       {/* Top row (0-4) */}
       <div className="flex gap-2">
         {topRow.map(renderValueButton)}
@@ -86,9 +92,14 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
         {bottomRow.map(renderValueButton)}
       </div>
       
-      {/* Selected value indicator */}
-      <div className="text-amber-400 text-base font-bold mt-2">
-        Selected: {selectedValue}
+      {/* Selected value indicator - more prominent */}
+      <div className="bg-amber-600 text-white px-4 py-2 rounded-lg font-bold text-base">
+        Selected: Value {selectedValue}
+      </div>
+      
+      {/* Usage hint */}
+      <div className="text-slate-400 text-xs text-center max-w-48">
+        Value 0 = Background • Values 1-9 = Different elements
       </div>
     </div>
   );

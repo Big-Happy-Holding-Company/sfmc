@@ -120,49 +120,62 @@ export function PuzzleTools({
     <>
       {/* Display Mode & Emoji Set Controls */}
       <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 w-full">
-        <h4 className="text-amber-300 text-lg font-semibold mb-4 text-center">DISPLAY</h4>
+        <h4 className="text-amber-300 text-xl font-bold mb-2 text-center">DISPLAY MODE</h4>
+        <p className="text-slate-300 text-sm mb-4 text-center">Choose how to visualize puzzle values</p>
         
-        {/* Display Mode Toggle */}
-        <div className="flex flex-wrap justify-center gap-2 mb-4">
+        {/* Display Mode Toggle - Clear and Verbose */}
+        <div className="flex flex-col gap-3 mb-4">
           <button
             onClick={() => onDisplayModeChange('arc-colors')}
-            className={`px-6 py-3 text-lg font-bold rounded h-14 min-w-[80px] flex-shrink-0 ${displayMode === 'arc-colors' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
+            className={`px-4 py-3 text-base font-bold rounded h-16 w-full flex-shrink-0 ${displayMode === 'arc-colors' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
           >
-            123
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-lg">🔢</span>
+              <span>Numbers Only</span>
+            </div>
           </button>
           <button
             onClick={() => onDisplayModeChange('emoji')}
-            className={`px-6 py-3 text-lg font-bold rounded h-14 min-w-[80px] flex-shrink-0 ${displayMode === 'emoji' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
+            className={`px-4 py-3 text-base font-bold rounded h-16 w-full flex-shrink-0 ${displayMode === 'emoji' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
           >
-            🎨
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-lg">🎨</span>
+              <span>Emojis Only</span>
+            </div>
           </button>
           <button
             onClick={() => onDisplayModeChange('hybrid')}
-            className={`px-6 py-3 text-lg font-bold rounded h-14 min-w-[80px] flex-shrink-0 ${displayMode === 'hybrid' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
+            className={`px-4 py-3 text-base font-bold rounded h-16 w-full flex-shrink-0 ${displayMode === 'hybrid' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
           >
-            MIX
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-lg">🔀</span>
+              <span>Numbers + Emojis</span>
+            </div>
           </button>
         </div>
         
         {/* Emoji Set Dropdown - Only show when emoji or hybrid mode */}
         {(displayMode === 'emoji' || displayMode === 'hybrid') && (
-          <select
-            value={emojiSet}
-            onChange={(e) => onEmojiSetChange(e.target.value as EmojiSet)}
-            className="w-full bg-slate-700 border border-slate-500 rounded px-4 py-3 text-amber-100 text-lg h-14"
-          >
-            {getEmojiSetOptions().map((option) => (
-              <option key={option.value} value={option.value}>
-                {getEmojiSetDropdownLabel(option.value)}
-              </option>
-            ))}
-          </select>
+          <div>
+            <label className="text-slate-300 text-sm font-semibold mb-2 block">Emoji Theme:</label>
+            <select
+              value={emojiSet}
+              onChange={(e) => onEmojiSetChange(e.target.value as EmojiSet)}
+              className="w-full bg-slate-700 border border-slate-500 rounded px-4 py-3 text-amber-100 text-base h-12"
+            >
+              {getEmojiSetOptions().map((option) => (
+                <option key={option.value} value={option.value}>
+                  {getEmojiSetDropdownLabel(option.value)}
+                </option>
+              ))}
+            </select>
+          </div>
         )}
       </div>
 
       {/* Action Controls - Puzzle Actions */}
       <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 w-full">
-        <h4 className="text-amber-300 text-lg font-semibold mb-4 text-center">ACTIONS</h4>
+        <h4 className="text-amber-300 text-xl font-bold mb-4 text-center">PUZZLE ACTIONS</h4>
         
         {/* Primary Actions Row */}
         <div className="flex flex-wrap gap-3 justify-center">

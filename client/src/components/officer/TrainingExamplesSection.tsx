@@ -179,23 +179,23 @@ export function TrainingExamplesSection({
             const isMediumGrid = maxDim <= 10;
             const exampleCount = examples.length;
             
-            // Base cell size calculation - much larger for clear visibility
+            // Base cell size calculation - ACTUALLY readable sizes
             let cellSize: number;
             if (isSmallGrid) {
-              // Small grids: make them really visible - these should be easy to read
-              cellSize = exampleCount > 4 ? 60 : exampleCount > 2 ? 72 : 80;
+              // Small grids: make them properly readable - no squinting required
+              cellSize = exampleCount > 4 ? 100 : exampleCount > 2 ? 110 : 120;
             } else if (isMediumGrid) {
-              // Medium grids: still quite large for good visibility
-              cellSize = exampleCount > 3 ? 50 : exampleCount > 1 ? 58 : 64;
+              // Medium grids: still very readable
+              cellSize = exampleCount > 3 ? 80 : exampleCount > 1 ? 90 : 100;
             } else {
-              // Large grids: larger than before but still fit
-              cellSize = maxDim > 20 ? 32 : maxDim > 15 ? 40 : 48;
+              // Large grids: ensure visibility while fitting on screen
+              cellSize = maxDim > 20 ? 50 : maxDim > 15 ? 60 : 70;
             }
             
-            // Compact card styling with reduced padding
-            const cardPadding = isSmallGrid ? "p-2" : "p-2.5";
-            const headerSize = isSmallGrid ? "text-xs" : "text-xs";
-            const arrowSize = isSmallGrid ? "text-sm" : "text-base";
+            // Readable card styling with proper padding and text sizes
+            const cardPadding = isSmallGrid ? "p-3" : "p-4";
+            const headerSize = isSmallGrid ? "text-sm" : "text-base";
+            const arrowSize = isSmallGrid ? "text-lg" : "text-xl";
             
             return (
               <div key={index} className={`flex-shrink-0 ${getExampleBgClass(index)} rounded border border-slate-600 ${cardPadding}`}>

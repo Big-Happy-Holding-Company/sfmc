@@ -281,20 +281,20 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
   const currentDimensions = outputDimensions[currentTestIndex] || { width: 3, height: 3 };
   const hasExistingData = currentSolution.some(row => row.some(cell => cell !== 0));
 
-  // Calculate dynamic cell sizes based on container context
+  // Calculate dynamic cell sizes for much better space utilization
   const calculateCellSize = (gridWidth: number, gridHeight: number, isLargeScreen: boolean = window.innerWidth >= 1024) => {
-    // On large screens: each grid gets ~40% of viewport (3-column layout with controls in center)
-    // On smaller screens: full width for each grid (vertical stacking)
-    const widthRatio = isLargeScreen ? 0.40 : 0.85;
+    // On large screens: each grid gets ~45% of viewport (leaving space for controls)
+    // On smaller screens: use most of the width for better visibility
+    const widthRatio = isLargeScreen ? 0.45 : 0.90;
     const availableWidth = Math.floor(window.innerWidth * widthRatio);
-    const availableHeight = Math.floor(window.innerHeight * 0.5); // Conservative height estimate
+    const availableHeight = Math.floor(window.innerHeight * 0.6); // More generous height
     
     const cellSizeByWidth = Math.floor(availableWidth / gridWidth);
     const cellSizeByHeight = Math.floor(availableHeight / gridHeight);
     
-    // Use the smaller dimension but ensure minimum size
-    const cellSize = Math.max(12, Math.min(cellSizeByWidth, cellSizeByHeight));
-    return Math.min(cellSize, 80); // Cap at 80px for readability
+    // Use the smaller dimension but ensure much larger minimum size
+    const cellSize = Math.max(40, Math.min(cellSizeByWidth, cellSizeByHeight));
+    return Math.min(cellSize, 120); // Much higher cap for better visibility
   };
 
   const isLargeScreen = window.innerWidth >= 1024;
@@ -600,11 +600,11 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
 
         {/* Solving Interface - Full Screen Width */}
         <div className="w-full">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-amber-400 font-semibold text-3xl">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-amber-400 font-bold text-4xl">
               🧩 SOLVE TEST CASE {currentTestIndex + 1}
             </h2>
-            <div className="text-slate-400 text-xl">
+            <div className="text-slate-300 text-lg font-medium">
               {isValidating ? '🔄 Validating with PlayFab...' : 
                validationResult?.correct ? '🎉 PlayFab Verified!' :
                validationError ? '❌ PlayFab Validation Error' :
@@ -615,8 +615,8 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
           {/* Responsive layout: vertical on mobile, horizontal on larger screens */}
           <div className="flex flex-col lg:flex-row gap-4 w-full">
             {/* Test Input - Full width on mobile, left column on large screens */}
-            <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-2">
-              <h3 className="text-amber-300 text-xl font-semibold mb-2 text-center">TEST INPUT</h3>
+            <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-4">
+              <h3 className="text-amber-300 text-2xl font-bold mb-4 text-center">TEST INPUT</h3>
               <ResponsiveOfficerDisplayGrid
                 grid={testInput}
                 containerType="solver"
@@ -655,8 +655,8 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
             </div>
 
             {/* User Solution - Full width on mobile, right column on large screens */}
-            <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-2">
-              <h3 className="text-amber-300 text-xl font-semibold mb-2 text-center">YOUR SOLUTION</h3>
+            <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-4">
+              <h3 className="text-amber-300 text-2xl font-bold mb-4 text-center">YOUR SOLUTION</h3>
               <ResponsiveOfficerGrid
                 initialGrid={currentSolution}
                 containerType="solver"
