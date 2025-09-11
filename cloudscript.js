@@ -6,6 +6,138 @@
  */
 
 // =============================================================================
+// REFACTOR CONSTANTS & HELPERS
+// =============================================================================
+
+const CONSTANTS = {
+    // Title Data Batch Keys
+    BATCH_KEYS: [
+        "officer-tasks-training-batch1.json", "officer-tasks-training-batch2.json",
+        "officer-tasks-training-batch3.json", "officer-tasks-training-batch4.json",
+        "officer-tasks-training2-batch1.json", "officer-tasks-training2-batch2.json",
+        "officer-tasks-training2-batch3.json", "officer-tasks-training2-batch4.json",
+        "officer-tasks-training2-batch5.json", "officer-tasks-training2-batch6.json",
+        "officer-tasks-training2-batch7.json", "officer-tasks-training2-batch8.json",
+        "officer-tasks-training2-batch9.json", "officer-tasks-training2-batch10.json",
+        "officer-tasks-evaluation-batch1.json", "officer-tasks-evaluation-batch2.json",
+        "officer-tasks-evaluation-batch3.json", "officer-tasks-evaluation-batch4.json",
+        "officer-tasks-evaluation2-batch1.json", "officer-tasks-evaluation2-batch2.json"
+    ],
+    // Player Statistic Names
+    STATS: {
+        LEVEL_POINTS: "LevelPoints",
+        OFFICER_TRACK_POINTS: "OfficerTrackPoints",
+        ARC2_EVAL_POINTS: "ARC2EvalPoints",
+    },
+    // Scoring Parameters
+    SCORING: {
+        OFFICER_TRACK: {
+            BASE_POINTS: 10000,
+            SPEED_BONUS: { PER_MINUTE_POINTS: 100, UNDER_MINUTES: 20 },
+            EFFICIENCY_BONUS: { PER_ACTION_POINTS: 50, UNDER_ACTIONS: 100 },
+        },
+        ARC2_EVAL: {
+            BASE_POINTS: 25000, FIRST_TRY_BONUS: 5000,
+            SPEED_BONUS: { PER_MINUTE_POINTS: 200, UNDER_MINUTES: 30 },
+            EFFICIENCY_BONUS: { PER_ACTION_POINTS: 100, UNDER_ACTIONS: 150 },
+        },
+    },
+};
+
+// --- Logging Helpers ---
+function logInfo(context, message, extra = {}) {
+    const logPayload = { ...context, ...extra };
+    log.info(message, logPayload);
+}
+function logError(context, message, error, extra = {}) {
+    const errorPayload = { ...context, ...extra, errorMessage: error.message, stack: error.stack };
+    log.error(message, errorPayload);
+}
+
+// --- General Utils ---
+function nowIso() { return new Date().toISOString(); }
+function safeParseJSON(str, fallback = null) {
+    try {
+        return JSON.parse(str);
+    } catch (e) {
+        return fallback;
+    }
+}
+function assert(condition, message) { if (!condition) throw new Error(message); }
+function assertArgs(obj, requiredKeys) {
+    for (const key of requiredKeys) {
+        assert(obj[key] !== undefined && obj[key] !== null, `Missing required argument: ${key}`);
+    }
+}
+
+// --- Data Access ---
+function getTitleDataJSON(key) { 
+    const res = server.GetTitleData({ Keys: [key] });
+    return res.Data && res.Data[key] ? safeParseJSON(res.Data[key]) : null;
+}
+function getPuzzleById(puzzleId, context) {
+    for (const key of CONSTANTS.BATCH_KEYS) {
+        const puzzles = getTitleDataJSON(key);
+        if (puzzles) {
+            const cleanPuzzleId = puzzleId.replace(/^ARC-(TR|T2|EV|E2)-/, '');
+            for (const puzzle of puzzles) {
+                const cleanStoredId = puzzle.id.replace(/^ARC-(TR|T2|EV|E2)-/, '');
+                if (puzzle.id === puzzleId || cleanStoredId === cleanPuzzleId) {
+                    logInfo(context, `Found puzzle ${puzzleId} in batch ${key}`);
+                    return { puzzle, batchKey: key };
+                }
+            }
+        }
+    }
+    logError(context, `Puzzle ${puzzleId} not found in any batch`, new Error("Puzzle not found"));
+    return null;
+}
+function getPlayerData(playFabId, keys) { return server.GetUserData({ PlayFabId: playFabId, Keys: keys }); }
+function updatePlayerData(playFabId, dataObj) { return server.UpdateUserData({ PlayFabId: playFabId, Data: dataObj }); }
+function updatePlayerStats(playFabId, statsArray) { return server.UpdatePlayerStatistics({ PlayFabId: playFabId, Statistics: statsArray }); }
+function writeEvent(playFabId, eventName, body) { return server.WritePlayerEvent({ PlayFabId: playFabId, EventName: eventName, Body: body }); }
+
+// --- Validation Core ---
+function compareSolutions(puzzle, solutions) {
+    const failures = [];
+    let allCorrect = true;
+    if (solutions.length !== puzzle.test.length) {
+        return { allCorrect: false, error: `Expected ${puzzle.test.length} solutions, got ${solutions.length}` };
+    }
+    for (let i = 0; i < puzzle.test.length; i++) {
+        if (!arraysEqual(solutions[i], puzzle.test[i].output)) {
+            allCorrect = false;
+            failures.push({ index: i, expected: puzzle.test[i].output, got: solutions[i] });
+        }
+    }
+    return { allCorrect, failures };
+}
+
+// --- Scoring Strategies ---
+function speedBonusFor({ time, perMinute, underMinutes }) {
+    const timeInMinutes = Math.ceil((time || 0) / 60);
+    return timeInMinutes < underMinutes ? (underMinutes - timeInMinutes) * perMinute : 0;
+}
+function efficiencyBonusFor({ steps, perAction, underActions }) {
+    return steps < underActions ? (underActions - steps) * perAction : 0;
+}
+function officerTrackScore({ timeElapsed, stepCount }) {
+    const params = CONSTANTS.SCORING.OFFICER_TRACK;
+    const speedBonus = speedBonusFor({ time: timeElapsed, ...params.SPEED_BONUS });
+    const efficiencyBonus = efficiencyBonusFor({ steps: stepCount, ...params.EFFICIENCY_BONUS });
+    const finalScore = params.BASE_POINTS + speedBonus + efficiencyBonus;
+    return { basePoints: params.BASE_POINTS, speedBonus, efficiencyBonus, finalScore };
+}
+function arc2EvalScore({ timeElapsed, stepCount, attemptNumber }) {
+    const params = CONSTANTS.SCORING.ARC2_EVAL;
+    const speedBonus = speedBonusFor({ time: timeElapsed, ...params.SPEED_BONUS });
+    const efficiencyBonus = efficiencyBonusFor({ steps: stepCount, ...params.EFFICIENCY_BONUS });
+    const firstTryBonus = (attemptNumber === 1) ? params.FIRST_TRY_BONUS : 0;
+    const finalScore = params.BASE_POINTS + speedBonus + efficiencyBonus + firstTryBonus;
+    return { basePoints: params.BASE_POINTS, speedBonus, efficiencyBonus, firstTryBonus, finalScore };
+}
+
+// =============================================================================
 // VALIDATION FUNCTIONS (SECURITY CRITICAL)
 // =============================================================================
 
