@@ -105,7 +105,7 @@ export function ResponsiveOfficerGrid({
           const minCol = Math.min(currentDragState.startCell.col, currentDragState.hoveredCell.col);
           const maxCol = Math.max(currentDragState.startCell.col, currentDragState.hoveredCell.col);
           
-          const selectedCells = [];
+          const selectedCells: Array<{ row: number; col: number }> = [];
           for (let r = minRow; r <= maxRow; r++) {
             for (let c = minCol; c <= maxCol; c++) {
               selectedCells.push({ row: r, col: c });
