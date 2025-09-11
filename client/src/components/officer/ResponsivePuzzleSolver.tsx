@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ResponsiveOfficerGrid, ResponsiveOfficerDisplayGrid } from '@/components/officer/ResponsiveOfficerGrid';
@@ -28,6 +29,7 @@ interface ResponsivePuzzleSolverProps {
 }
 
 export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorialMode = false }: ResponsivePuzzleSolverProps) {
+  const [, setLocation] = useLocation();
   const [puzzle, setPuzzle] = useState<OfficerTrackPuzzle>(initialPuzzle);
   // Multi-test case state
   const [currentTestIndex, setCurrentTestIndex] = useState(0);
@@ -533,6 +535,10 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
   };
 
   // Reset solution to empty
+  const handleReplayTutorial = () => {
+    setLocation('/tutorial');
+  };
+
   const resetSolution = () => {
     const { width, height } = currentDimensions;
     const emptyGrid = Array(height).fill(null).map(() => Array(width).fill(0));
@@ -654,6 +660,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
                 onValueSelect={handleValueSelect}
                 onCopyInput={copyInput}
                 onResetSolution={resetSolution}
+                onReplayTutorial={handleReplayTutorial}
                 onValidate={() => validatePuzzleWithPlayFab()}
                 isValidating={isValidating}
                 allTestsCompleted={completedTests.every(test => test)}

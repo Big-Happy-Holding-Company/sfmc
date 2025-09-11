@@ -25,6 +25,7 @@ import MissionControl from "@/pages/MissionControl";
 import FIQTest from "@/pages/FIQTest";
 import OfficerTrackSimple from "@/pages/OfficerTrackSimple";
 import PuzzleSolver from "@/pages/PuzzleSolver";
+import { TutorialPage } from '@/pages/TutorialPage';
 import { GridSizeTest } from "@/components/officer/GridSizeTest";
 import Leaderboards from "@/pages/Leaderboards";
 import Profile from "@/pages/Profile";
@@ -42,6 +43,7 @@ function Router() {
       <Route path="/leaderboards" component={Leaderboards} />
       <Route path="/profile" component={Profile} />
       <Route path="/grid-test" component={GridSizeTest} />
+      <Route path="/tutorial" component={TutorialPage} />
       <Route component={NotFound} />
     </Switch>
   );

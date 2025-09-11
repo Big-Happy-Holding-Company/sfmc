@@ -74,6 +74,14 @@ export default function OfficerTrackSimple() {
         ]);
         
         setPlayer(playerData);
+
+        // Redirect to tutorial if the user hasn't completed it
+        if (!playerData.hasCompletedTutorial) {
+          console.log('New user detected, redirecting to tutorial.');
+          setLocation('/tutorial');
+          return; // Stop further execution
+        }
+
         setTotalTasks(tasksData.length);
         setPlayFabReady(true);
         console.log('✅ PlayFab ready for Officer Track');
