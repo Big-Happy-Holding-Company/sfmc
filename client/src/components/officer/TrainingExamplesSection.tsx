@@ -141,14 +141,14 @@ export function TrainingExamplesSection({
     return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
   };
 
-  // Different background color shades for example cards to distinguish them
+  // Light pastel background colors for example cards - non-distracting and readable
   const getExampleBgClass = (index: number) => {
     const bgClasses = [
-      'bg-red-700',
-      'bg-blue-700',
-      'bg-green-700', 
-      'bg-purple-700',
-      'bg-orange-700'
+      'bg-rose-100',
+      'bg-sky-100',
+      'bg-emerald-100', 
+      'bg-purple-100',
+      'bg-amber-100'
     ];
     return bgClasses[index % bgClasses.length];
   };
@@ -198,8 +198,8 @@ export function TrainingExamplesSection({
             const arrowSize = isSmallGrid ? "text-lg" : "text-xl";
             
             return (
-              <div key={index} className={`flex-shrink-0 ${getExampleBgClass(index)} rounded border border-slate-600 ${cardPadding}`}>
-                <h3 className={`text-amber-300 ${headerSize} font-semibold mb-1.5 text-center`}>
+              <div key={index} className={`flex-shrink-0 ${getExampleBgClass(index)} rounded border border-slate-300 ${cardPadding}`}>
+                <h3 className={`text-slate-800 ${headerSize} font-bold mb-1.5 text-center`}>
                   EX {index + 1}
                 </h3>
                 <div className="flex items-center gap-2">
@@ -210,7 +210,7 @@ export function TrainingExamplesSection({
                     displayMode={displayMode}
                     fixedCellSize={cellSize}
                   />
-                  <div className={`text-cyan-400 ${arrowSize} font-bold px-0.5`}>→</div>
+                  <div className={`text-slate-700 ${arrowSize} font-bold px-0.5`}>→</div>
                   <ResponsiveOfficerDisplayGrid
                     grid={example.output}
                     containerType="example"
