@@ -7,6 +7,8 @@
  * ARCHITECTURE: Static-only SFMC app calls external API via HTTP
  */
 
+import { idConverter } from '@/services/idConverter';
+
 // Simplified interface for just the performance data we need
 export interface AIPuzzlePerformance {
   id: string;                    // Puzzle ID 
@@ -205,8 +207,8 @@ export class ArcExplainerAPI {
       return playFabId || '';
     }
     
-    // Remove ARC-TR-, ARC-EV-, ARC-T2-, ARC-E2- prefixes (matches upload script format)
-    const converted = playFabId.replace(/^ARC-(TR|T2|EV|E2)-/, '');
+    // Use centralized ID converter
+    const converted = idConverter.playFabToArc(playFabId);
     
     // Validation: ensure we got a reasonable result
     if (converted === playFabId) {
@@ -221,7 +223,7 @@ export class ArcExplainerAPI {
    * 007bbfb7 → ARC-TR-007bbfb7 (assumes training dataset by default)
    * Note: Cannot definitively determine dataset without additional context
    */
-  public convertArcIdToPlayFabId(arcId: string, dataset: 'training' | 'evaluation' | 'training2' | 'evaluation2' = 'training'): string {
+  public convertArcIdToPlayFabId(arcId: string, dataset: 'training' | 'evaluation' | 'training2' | 'evaluation2'): string {
     if (!arcId || typeof arcId !== 'string') {
       console.warn('convertArcIdToPlayFabId: Invalid input:', arcId);
       return arcId || '';
@@ -232,15 +234,8 @@ export class ArcExplainerAPI {
       return arcId;
     }
 
-    // Map dataset to prefix (matches upload script format)
-    const prefixMap = {
-      'training': 'ARC-TR-',
-      'evaluation': 'ARC-EV-', 
-      'training2': 'ARC-T2-',    // Fixed: matches upload script
-      'evaluation2': 'ARC-E2-'   // Fixed: matches upload script
-    };
-
-    return prefixMap[dataset] + arcId;
+    // Use centralized ID converter
+    return idConverter.arcToPlayFab(arcId, dataset);
   }
 
   /**
@@ -454,7 +449,6 @@ export class ArcExplainerAPI {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache', // Bypass potential cache issues
           },
           // For Railway.app certificate issues on Windows
           cache: 'no-cache',

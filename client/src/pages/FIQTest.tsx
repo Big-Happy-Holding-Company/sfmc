@@ -26,7 +26,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { InteractiveGrid } from "@/components/game/InteractiveGrid";
 import { SPACE_EMOJIS } from "@/constants/spaceEmojis";
-import { playFabService, type PlayFabTask } from "@/services/playfab";
+import {
+  playFabRequestManager,
+  playFabAuthManager,
+  playFabTasks,
+  type PlayFabTask
+} from '@/services/playfab';
 import type { Task } from "@shared/schema";
 import type { MissionExample } from "@/types/game";
 import type { EmojiSet } from "@/constants/spaceEmojis";
@@ -39,28 +44,27 @@ export default function FIQTest() {
   const [playerGrid, setPlayerGrid] = useState<string[][]>([]);
 
   // Fetch onboarding tasks on component mount
-  useEffect(() => {
+    useEffect(() => {
     const fetchOnboardingTasks = async () => {
       setLoading(true);
       setError(null);
       
       try {
-        // Initialize PlayFab if not already done
-        if (!playFabService.core.isReady()) {
-          console.log('🎖️ Initializing PlayFab for FIQ Test...');
-          await playFabService.initialize();
+        // New initialization flow
+        const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
+        if (!titleId) {
+          throw new Error('VITE_PLAYFAB_TITLE_ID environment variable not found');
         }
-        
-        // Ensure user is authenticated
-        if (!playFabService.isAuthenticated()) {
-          await playFabService.loginAnonymously();
+        if (!playFabRequestManager.isInitialized()) {
+          await playFabRequestManager.initialize({ titleId, secretKey: import.meta.env.VITE_PLAYFAB_SECRET_KEY });
         }
+        await playFabAuthManager.ensureAuthenticated();
         
-        const allTasks = await playFabService.getAllTasks();
+        const allTasks = await playFabTasks.getAllTasks();
         // Filter for onboarding tasks (any task with OB- in the name)
         const obTasks = allTasks.filter(task => task.id.includes('OB-'));
         
-        setOnboardingTasks(obTasks);
+        setOnboardingTasks(obTasks as Task[]);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load onboarding tasks');
       } finally {

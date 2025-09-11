@@ -5,8 +5,8 @@
  */
 
 import type { PuzzleEventData, GameSession, GameStatus, EventType } from '@/types/playfab';
-import { playFabCore } from './core';
-import { playFabAuth } from './auth';
+import { playFabAuthManager } from './authManager';
+import { playFabRequestManager } from './requestManager';
 
 // PlayFab WritePlayerEvent request format
 interface WritePlayerEventRequest {
@@ -54,10 +54,8 @@ export class PlayFabEvents {
     selection_value: number,
     game_time: string
   ): Promise<void> {
-    // Ensure user is authenticated
-    await playFabAuth.ensureAuthenticated();
-
-    const displayName = playFabAuth.getDisplayName() || 'Unknown';
+    // Authentication handled automatically by requestManager
+    const displayName = playFabAuthManager.getDisplayName() || 'Unknown';
 
     // Build event body matching Unity structure exactly
     const eventBody: any = {
@@ -86,20 +84,14 @@ export class PlayFabEvents {
     };
 
     try {
-      await playFabCore.makeHttpRequest<WritePlayerEventRequest, WritePlayerEventResponse>(
-        '/Client/WritePlayerEvent',
-        request,
-        true // Requires authentication
+      await playFabRequestManager.makeRequest<WritePlayerEventRequest, WritePlayerEventResponse>(
+        'writePlayerEvent',
+        request
       );
 
-      playFabCore.logOperation('Event Logged', {
-        event: eventName,
-        type: event_type,
-        status,
-        gameId: game_id
-      });
+      console.log(`[PlayFabEvents] Event Logged: ${eventName}`, { type: event_type, status, gameId: game_id });
     } catch (error) {
-      playFabCore.logOperation('Event Logging Failed', error);
+      console.error('[PlayFabEvents] Event Logging Failed:', error);
       throw error;
     }
   }
@@ -109,7 +101,7 @@ export class PlayFabEvents {
    * Matches the existing React implementation
    */
   public async logEvent(eventName: string, eventData: Record<string, any>): Promise<void> {
-    await playFabAuth.ensureAuthenticated();
+    // Authentication handled automatically by requestManager
 
     const request: WritePlayerEventRequest = {
       EventName: eventName,
@@ -117,15 +109,14 @@ export class PlayFabEvents {
     };
 
     try {
-      await playFabCore.makeHttpRequest<WritePlayerEventRequest, WritePlayerEventResponse>(
-        '/Client/WritePlayerEvent',
-        request,
-        true // Requires authentication
+      await playFabRequestManager.makeRequest<WritePlayerEventRequest, WritePlayerEventResponse>(
+        'writePlayerEvent',
+        request
       );
 
-      playFabCore.logOperation('Simple Event Logged', eventName);
+      console.log(`[PlayFabEvents] Simple Event Logged: ${eventName}`);
     } catch (error) {
-      playFabCore.logOperation('Simple Event Failed', error);
+      console.error('[PlayFabEvents] Simple Event Failed:', error);
       throw error;
     }
   }
@@ -148,7 +139,7 @@ export class PlayFabEvents {
     // Store session ID for persistence
     localStorage.setItem('playfab_session_id', sessionId);
 
-    playFabCore.logOperation('Game Session Started', { sessionId, taskId });
+    console.log(`[PlayFabEvents] Game Session Started: ${sessionId} for task ${taskId}`);
 
     // Log game start event
     this.logGameStartEvent(taskId, sessionId);
@@ -182,11 +173,7 @@ export class PlayFabEvents {
     this.sessionStartTime = null;
     localStorage.removeItem('playfab_session_id');
 
-    playFabCore.logOperation('Game Session Ended', {
-      sessionId: session.sessionId,
-      status,
-      duration: sessionDuration
-    });
+    console.log(`[PlayFabEvents] Game Session Ended: ${session.sessionId}`, { status, duration: sessionDuration });
   }
 
   /**
@@ -336,7 +323,7 @@ export class PlayFabEvents {
   public incrementAttempt(): void {
     if (this.currentSession) {
       this.currentSession.attemptCount++;
-      playFabCore.logOperation('Attempt Incremented', this.currentSession.attemptCount);
+      console.log(`[PlayFabEvents] Attempt Incremented to: ${this.currentSession.attemptCount}`);
     }
   }
 
@@ -353,7 +340,7 @@ export class PlayFabEvents {
         attemptCount: 1
       };
       this.sessionStartTime = new Date();
-      playFabCore.logOperation('Session Restored', storedSessionId);
+      console.log(`[PlayFabEvents] Session Restored: ${storedSessionId}`);
       return this.currentSession;
     }
     return null;

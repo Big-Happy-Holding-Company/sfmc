@@ -22,7 +22,13 @@
  *     - Uses local state management instead of React Query
  */
 import { useState, useEffect } from "react";
-import { playFabService } from "@/services/playfab";
+import {
+  playFabRequestManager,
+  playFabAuthManager,
+  playFabTasks,
+  playFabUserData,
+  playFabValidation
+} from '@/services/playfab';
 import type { PlayFabTask, PlayFabPlayer, TaskValidationResult } from "@/services/playfab";
 
 import { Header } from "@/components/game/Header";
@@ -57,35 +63,35 @@ export default function MissionControl() {
   // Get trainer for current task
   const trainer = currentTask ? getTrainerForTask(currentTask.id) : null;
 
-  // Initialize PlayFab data on mount
   useEffect(() => {
-    const initializePlayFab = async () => {
-      setLoading(true);
-      setError(null);
-      
+    const initialize = async () => {
       try {
-        // Initialize PlayFab first
-        await playFabService.initialize();
-        
-        // Login and get player data
-        await playFabService.loginAnonymously();
-        const playerData = await playFabService.getPlayerData();
-        setCurrentPlayer(playerData);
-        
-        // Load all tasks
-        const allTasks = await playFabService.getAllTasks();
-        setTasks(allTasks);
-        
-        console.log('✅ PlayFab initialization complete');
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to initialize PlayFab');
-        console.error('❌ PlayFab initialization failed:', err);
+        // New initialization flow using modular services
+        const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
+        if (!titleId) {
+          throw new Error('VITE_PLAYFAB_TITLE_ID environment variable not found');
+        }
+        await playFabRequestManager.initialize({ titleId, secretKey: import.meta.env.VITE_PLAYFAB_SECRET_KEY });
+        await playFabAuthManager.ensureAuthenticated();
+
+        // Pre-load essential data
+        const [player, tasks] = await Promise.all([
+          playFabUserData.getPlayerData(),
+          playFabTasks.getAllTasks()
+        ]);
+
+        setCurrentPlayer(player);
+        setTasks(tasks);
+
+      } catch (error) {
+        console.error("Failed to initialize PlayFab or load data:", error);
+        setError(error instanceof Error ? error.message : 'Failed to initialize PlayFab');
       } finally {
         setLoading(false);
       }
     };
 
-    initializePlayFab();
+    initialize();
   }, []);
 
   const handleSelectTask = (task: PlayFabTask) => {
@@ -111,12 +117,14 @@ export default function MissionControl() {
     const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
     
     try {
-      const result = await playFabService.validateSolution(
-        currentTask.id,
-        playerGrid,
+            const result = await playFabValidation.validateSolution({
+        taskId: currentTask.id,
+        solution: playerGrid,
         timeElapsed,
-        hintsUsed
-      );
+        hintsUsed,
+        sessionId: 'default-session', // Placeholder
+        attemptId: 1 // Placeholder
+      });
       
       setGameResult(result);
       setShowResult(true);
@@ -124,7 +132,7 @@ export default function MissionControl() {
       
       // Refresh player data after successful validation
       if (result.correct) {
-        const updatedPlayer = await playFabService.getPlayerData();
+        const updatedPlayer = await playFabUserData.getPlayerData();
         setCurrentPlayer(updatedPlayer);
       }
     } catch (err) {

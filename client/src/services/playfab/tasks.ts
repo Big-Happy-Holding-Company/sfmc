@@ -2,11 +2,14 @@
  * PlayFab Tasks Service - Pure HTTP Implementation
  * Manages task data retrieval from PlayFab Title Data
  * Direct REST API calls - no SDK dependencies
+ * Date:  Unknown
+ * Author:  Unknown
+ * Last Modified:  ???
+ * Audited by: Gemini 2.5 Pro Sept 10, 2025
  */
 
 import type { PlayFabTask } from '@/types/playfab';
-import { playFabCore } from './core';
-import { playFabAuth } from './auth';
+import { playFabRequestManager } from './requestManager';
 import { PLAYFAB_CONSTANTS } from '@/types/playfab';
 
 // PlayFab GetTitleData request format
@@ -41,22 +44,20 @@ export class PlayFabTasks {
   public async getAllTasks(): Promise<PlayFabTask[]> {
     // Check if we have valid cached data
     if (this.isCacheValid()) {
-      playFabCore.logOperation('Tasks Cache Hit', `${this.taskCache.length} tasks`);
+      console.log(`[PlayFabTasks] Cache Hit: ${this.taskCache.length} tasks`);
       return this.taskCache;
     }
 
-    // Ensure user is authenticated
-    await playFabAuth.ensureAuthenticated();
+    // Authentication handled automatically by requestManager
 
     const request: GetTitleDataRequest = {
       Keys: [PLAYFAB_CONSTANTS.TITLE_DATA_KEYS.TASKS]
     };
 
     try {
-      const result = await playFabCore.makeHttpRequest<GetTitleDataRequest, GetTitleDataResponse>(
-        '/Client/GetTitleData',
-        request,
-        true // Requires authentication
+      const result = await playFabRequestManager.makeRequest<GetTitleDataRequest, GetTitleDataResponse>(
+        'getTitleData',
+        request
       );
 
       const tasksData = result?.Data?.[PLAYFAB_CONSTANTS.TITLE_DATA_KEYS.TASKS];
@@ -70,14 +71,14 @@ export class PlayFabTasks {
         this.taskCache = tasks;
         this.lastCacheTime = Date.now();
         
-        playFabCore.logOperation('Tasks Loaded from PlayFab', `${tasks.length} tasks`);
+        console.log(`[PlayFabTasks] Loaded from PlayFab: ${tasks.length} tasks`);
         return tasks;
       } else {
         console.warn('No tasks found in PlayFab Title Data');
         return [];
       }
     } catch (error) {
-      playFabCore.logOperation('Tasks Load Failed', error);
+      console.error('[PlayFabTasks] Load Failed', error);
       throw error;
     }
   }
@@ -90,9 +91,9 @@ export class PlayFabTasks {
     const task = allTasks.find(t => t.id === id) || null;
     
     if (task) {
-      playFabCore.logOperation('Task Found', id);
+      console.log(`[PlayFabTasks] Task Found: ${id}`);
     } else {
-      playFabCore.logOperation('Task Not Found', id);
+      console.warn(`[PlayFabTasks] Task Not Found: ${id}`);
     }
     
     return task;
@@ -105,7 +106,7 @@ export class PlayFabTasks {
     const allTasks = await this.getAllTasks();
     const categoryTasks = allTasks.filter(task => task.category === category);
     
-    playFabCore.logOperation('Tasks by Category', `${categoryTasks.length} in ${category}`);
+    console.log(`[PlayFabTasks] Found ${categoryTasks.length} tasks in category: ${category}`);
     return categoryTasks;
   }
 
@@ -116,7 +117,7 @@ export class PlayFabTasks {
     const allTasks = await this.getAllTasks();
     const difficultyTasks = allTasks.filter(task => task.difficulty === difficulty);
     
-    playFabCore.logOperation('Tasks by Difficulty', `${difficultyTasks.length} ${difficulty} tasks`);
+    console.log(`[PlayFabTasks] Found ${difficultyTasks.length} tasks with difficulty: ${difficulty}`);
     return difficultyTasks;
   }
 
@@ -127,7 +128,7 @@ export class PlayFabTasks {
     const allTasks = await this.getAllTasks();
     const availableTasks = allTasks.filter(task => task.requiredRankLevel <= maxRankLevel);
     
-    playFabCore.logOperation('Tasks by Rank', `${availableTasks.length} available for rank ${maxRankLevel}`);
+    console.log(`[PlayFabTasks] Found ${availableTasks.length} tasks available for rank ${maxRankLevel}`);
     return availableTasks;
   }
 
@@ -138,7 +139,7 @@ export class PlayFabTasks {
     const allTasks = await this.getAllTasks();
     const categories = [...new Set(allTasks.map(task => task.category))].sort();
     
-    playFabCore.logOperation('Task Categories', categories);
+    console.log('[PlayFabTasks] Found categories:', categories);
     return categories;
   }
 
@@ -149,7 +150,7 @@ export class PlayFabTasks {
     const allTasks = await this.getAllTasks();
     const difficulties = [...new Set(allTasks.map(task => task.difficulty))].sort();
     
-    playFabCore.logOperation('Task Difficulties', difficulties);
+    console.log('[PlayFabTasks] Found difficulties:', difficulties);
     return difficulties;
   }
 
@@ -167,7 +168,7 @@ export class PlayFabTasks {
   public clearCache(): void {
     this.taskCache = [];
     this.lastCacheTime = 0;
-    playFabCore.logOperation('Task Cache Cleared');
+    console.log('[PlayFabTasks] Cache Cleared');
   }
 
   /**
@@ -223,7 +224,7 @@ export class PlayFabTasks {
       }
     });
 
-    playFabCore.logOperation('Task Data Validation', 'All tasks valid');
+    console.log('[PlayFabTasks] Task data validation successful.');
   }
 
   /**

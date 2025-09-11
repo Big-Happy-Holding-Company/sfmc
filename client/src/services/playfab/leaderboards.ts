@@ -19,8 +19,7 @@
  */
 
 import type { LeaderboardEntry } from '@/types/playfab';
-import { playFabAuth } from './auth';
-import { playFabCore } from './core';
+import { playFabAuthManager } from './authManager';
 import { leaderboardAPI } from './leaderboard-api';
 import { leaderboardCache } from './leaderboard-cache';
 import { 
@@ -62,7 +61,7 @@ export class LeaderboardService {
     // Cache results
     leaderboardCache.set(config.statisticName, entries);
     
-    playFabCore.logOperation('Leaderboard Retrieved', `${entries.length} entries for ${config.displayName}`);
+    console.log(`[LeaderboardService] Leaderboard Retrieved: ${entries.length} entries for ${config.displayName}`);
     return entries;
   }
 
@@ -81,7 +80,7 @@ export class LeaderboardService {
    * Get player's ranking in specific leaderboard
    */
   public async getPlayerRanking(type: LeaderboardType): Promise<LeaderboardEntry | null> {
-    const currentPlayerId = playFabAuth.getPlayFabId();
+    const currentPlayerId = playFabAuthManager.getPlayFabId();
     if (!currentPlayerId) {
       throw new Error('No current player ID available');
     }
@@ -96,9 +95,7 @@ export class LeaderboardService {
     const playerEntry = results.find(entry => entry.PlayFabId === currentPlayerId);
     
     if (playerEntry) {
-      playFabCore.logOperation('Player Ranking Retrieved', 
-        `${config.displayName}: Rank ${playerEntry.Position}, Score ${playerEntry.StatValue}`
-      );
+      console.log(`[LeaderboardService] Player Ranking Retrieved for ${config.displayName}: Rank ${playerEntry.Position}, Score ${playerEntry.StatValue}`);
     }
     
     return playerEntry || null;
@@ -160,7 +157,7 @@ export class LeaderboardService {
    * Check if player is in top N for specific leaderboard
    */
   public async isPlayerInTop(type: LeaderboardType, topN: number): Promise<boolean> {
-    const currentPlayerId = playFabAuth.getPlayFabId();
+    const currentPlayerId = playFabAuthManager.getPlayFabId();
     if (!currentPlayerId) return false;
 
     const topPlayers = await this.getLeaderboard(type, topN);

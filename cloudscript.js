@@ -81,7 +81,7 @@ handlers.ValidateTaskSolution = function(args, context) {
                 timeBonus: 0,
                 hintPenalty: 0,
                 totalScore: 0,
-                message: "Mission failed. Review the examples and try again."
+                message: "Incorrect. Review the examples and try again."
             };
         }
 
@@ -245,7 +245,7 @@ function arraysEqual(a, b) {
         if (a[i].length !== b[i].length) return false;
         
         for (let j = 0; j < a[i].length; j++) {
-            if (a[i][j] !== b[i][j]) return false;
+            if (a[i][j] != b[i][j]) return false;
         }
     }
     return true;
@@ -324,7 +324,10 @@ handlers.ValidateARCPuzzle = function(args, context) {
         log.info("Found puzzle in Title Data: " + puzzle.id);
         log.info("Puzzle has " + (puzzle.test ? puzzle.test.length : 0) + " test cases");
 
-        // Validate that user provided correct number of solutions
+        // Validate that user provided correct number of solutions 
+        // (should be equal to number of test cases)
+        // Most will have only 1 test case, but some will have multiple
+        
         const expectedTestCases = puzzle.test ? puzzle.test.length : 0;
         if (solutions.length !== expectedTestCases) {
             return {
@@ -334,6 +337,12 @@ handlers.ValidateARCPuzzle = function(args, context) {
         }
 
         // Validate ALL test cases must pass
+        // (some puzzles have multiple test cases)
+        //  we need to account for this in the validation and inform the user which test case failed
+        //  we will also need to modify the response to include which test case failed
+        //  we will need to modify the client side to handle this information
+        //  THIS IS POSSIBLE THE SOURCE OF THE PROBLEM WE ARE SEEING IN THE CLIENT SIDE!! 
+
         let allCorrect = true;
         for (let i = 0; i < puzzle.test.length; i++) {
             const expectedOutput = puzzle.test[i].output;
@@ -702,33 +711,7 @@ function findPuzzleInBatches(puzzleId) {
     log.info("=== findPuzzleInBatches Debug ===");
     log.info("Looking for puzzle: " + puzzleId);
     
-    // Define batch keys to search
-    const batchKeys = [
-        // Training batches
-        "officer-tasks-training-batch1.json",
-        "officer-tasks-training-batch2.json", 
-        "officer-tasks-training-batch3.json",
-        "officer-tasks-training-batch4.json",
-        // Training2 batches  
-        "officer-tasks-training2-batch1.json",
-        "officer-tasks-training2-batch2.json",
-        "officer-tasks-training2-batch3.json",
-        "officer-tasks-training2-batch4.json",
-        "officer-tasks-training2-batch5.json",
-        "officer-tasks-training2-batch6.json",
-        "officer-tasks-training2-batch7.json",
-        "officer-tasks-training2-batch8.json",
-        "officer-tasks-training2-batch9.json",
-        "officer-tasks-training2-batch10.json",
-        // Evaluation batches
-        "officer-tasks-evaluation-batch1.json",
-        "officer-tasks-evaluation-batch2.json",
-        "officer-tasks-evaluation-batch3.json", 
-        "officer-tasks-evaluation-batch4.json",
-        // Evaluation2 batches
-        "officer-tasks-evaluation2-batch1.json",
-        "officer-tasks-evaluation2-batch2.json"
-    ];
+    const batchKeys = getAllBatchKeys();
 
     log.info("Searching " + batchKeys.length + " batches");
     
@@ -739,23 +722,27 @@ function findPuzzleInBatches(puzzleId) {
             const titleDataResponse = server.GetTitleData({ Keys: [batchKeys[i]] });
             
             if (titleDataResponse.Data && titleDataResponse.Data[batchKeys[i]]) {
-                const dataValue = titleDataResponse.Data[batchKeys[i]].Value;
+                // In CloudScript, GetTitleData returns Data[key] directly as a JSON string (no .Value)
+                const dataValue = titleDataResponse.Data[batchKeys[i]];
                 
                 if (dataValue && dataValue !== "undefined") {
                     const puzzles = JSON.parse(dataValue);
                     log.info("Batch " + batchKeys[i] + " has " + puzzles.length + " puzzles");
                     
                     // Look for puzzle in this batch
+                    // Flexible puzzle lookup
+                    const cleanPuzzleId = puzzleId.replace(/^ARC-(TR|T2|EV|E2)-/, '');
                     for (let j = 0; j < puzzles.length; j++) {
-                        if (puzzles[j].id === puzzleId) {
-                            log.info("FOUND MATCH! Puzzle " + puzzleId + " found in " + batchKeys[i]);
-                            log.info("Puzzle ID in data: " + puzzles[j].id);
+                        const storedId = puzzles[j].id;
+                        if (storedId === puzzleId) {
+                            log.info(`FOUND EXACT MATCH! Puzzle ${puzzleId} in ${batchKeys[i]}`);
                             return puzzles[j];
                         }
                         
-                        // Also try matching without prefix for debugging
-                        if (puzzles[j].id && (puzzles[j].id.endsWith(puzzleId) || puzzleId.endsWith(puzzles[j].id))) {
-                            log.info("PARTIAL MATCH found: data has '" + puzzles[j].id + "', looking for '" + puzzleId + "'");
+                        const cleanStoredId = storedId.replace(/^ARC-(TR|T2|EV|E2)-/, '');
+                        if (cleanStoredId === cleanPuzzleId) {
+                            log.info(`FOUND CLEAN ID MATCH! Puzzle ${puzzleId} (as ${cleanStoredId}) in ${batchKeys[i]}`);
+                            return puzzles[j];
                         }
                     }
                 } else {
@@ -772,6 +759,41 @@ function findPuzzleInBatches(puzzleId) {
     
     log.error("Puzzle " + puzzleId + " NOT FOUND in any batch");
     return null; // Puzzle not found
+}
+
+/**
+ * Get all available batch keys from Title Data
+ */
+function getAllBatchKeys() {
+    // Define batch keys to search
+    const batchKeys = [
+        // Training batches
+        "officer-tasks-training-batch1.json",
+        "officer-tasks-training-batch2.json",
+        "officer-tasks-training-batch3.json",
+        "officer-tasks-training-batch4.json",
+        // Training2 batches
+        "officer-tasks-training2-batch1.json",
+        "officer-tasks-training2-batch2.json",
+        "officer-tasks-training2-batch3.json",
+        "officer-tasks-training2-batch4.json",
+        "officer-tasks-training2-batch5.json",
+        "officer-tasks-training2-batch6.json",
+        "officer-tasks-training2-batch7.json",
+        "officer-tasks-training2-batch8.json",
+        "officer-tasks-training2-batch9.json",
+        "officer-tasks-training2-batch10.json",
+        // Evaluation batches
+        "officer-tasks-evaluation-batch1.json",
+        "officer-tasks-evaluation-batch2.json",
+        "officer-tasks-evaluation-batch3.json",
+        "officer-tasks-evaluation-batch4.json",
+        // Evaluation2 batches
+        "officer-tasks-evaluation2-batch1.json",
+        "officer-tasks-evaluation2-batch2.json"
+    ];
+
+    return batchKeys;
 }
 
 /**

@@ -24,7 +24,12 @@ import { Header } from "@/components/game/Header";
 import { LeaderboardContainer } from "@/components/leaderboards/LeaderboardContainer";
 import { LeaderboardTabs } from "@/components/leaderboards/LeaderboardTabs";
 import { LeaderboardType, getEnabledLeaderboards } from "@/services/playfab/leaderboard-types";
-import { playFabService } from "@/services/playfab";
+import {
+  playFabRequestManager,
+  playFabAuthManager,
+  playFabUserData,
+  playFabTasks,
+} from '@/services/playfab';
 import type { LeaderboardConfig } from "@/services/playfab/leaderboard-types";
 import type { PlayFabPlayer } from "@/services/playfab";
 
@@ -35,20 +40,19 @@ export default function Leaderboards() {
   const [totalTasks, setTotalTasks] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+    useEffect(() => {
     const loadPageData = async () => {
       try {
-        // Initialize PlayFab if not already done
-        if (!playFabService.core.isReady()) {
-          console.log('🎖️ Initializing PlayFab for Leaderboards...');
-          await playFabService.initialize();
+        // New initialization flow
+        const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
+        if (!titleId) {
+          throw new Error('VITE_PLAYFAB_TITLE_ID environment variable not found');
         }
-        
-        // Ensure user is authenticated
-        if (!playFabService.isAuthenticated()) {
-          await playFabService.loginAnonymously();
+        if (!playFabRequestManager.isInitialized()) {
+          await playFabRequestManager.initialize({ titleId, secretKey: import.meta.env.VITE_PLAYFAB_SECRET_KEY });
         }
-        
+        await playFabAuthManager.ensureAuthenticated();
+
         // Get available leaderboard configurations
         const leaderboards = getEnabledLeaderboards();
         setAvailableLeaderboards(leaderboards);
@@ -61,8 +65,8 @@ export default function Leaderboards() {
 
         // Load player data for Header component
         const [playerData, tasksData] = await Promise.all([
-          playFabService.getPlayerData(),
-          playFabService.getAllTasks()
+          playFabUserData.getPlayerData(),
+          playFabTasks.getAllTasks()
         ]);
 
         setPlayer(playerData);

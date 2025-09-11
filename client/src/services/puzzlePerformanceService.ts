@@ -9,7 +9,6 @@
 
 import { arcDataService } from '@/services/arcDataService';
 import { arcExplainerAPI, type AIPuzzlePerformance } from '@/services/arcExplainerAPI';
-import { categorizeDifficulty } from '@/services/officerArcAPI';
 import type { OfficerTrackPuzzle } from '@/types/arcTypes';
 
 export interface MergedPuzzleData extends OfficerTrackPuzzle {
@@ -30,6 +29,17 @@ export interface PerformanceFilters {
   zeroAccuracyOnly?: boolean;
   minAccuracy?: number;
   maxAccuracy?: number;
+}
+
+/**
+ * Categorize puzzle difficulty based on AI accuracy for this service.
+ */
+function categorizeDifficulty(accuracy: number): 'impossible' | 'extremely_hard' | 'very_hard' | 'challenging' {
+  const percentage = accuracy * 100;
+  if (percentage === 0) return 'impossible';
+  if (percentage > 0 && percentage <= 25) return 'extremely_hard';
+  if (percentage > 25 && percentage <= 50) return 'very_hard';
+  return 'challenging';
 }
 
 class PuzzlePerformanceService {
@@ -76,7 +86,7 @@ class PuzzlePerformanceService {
         
         let difficultyCategory: MergedPuzzleData['difficultyCategory'] = undefined;
         if (performance) {
-          difficultyCategory = categorizeDifficulty(performance.avgAccuracy, true);
+          difficultyCategory = categorizeDifficulty(performance.avgAccuracy);
         }
         
         return {
@@ -189,41 +199,59 @@ class PuzzlePerformanceService {
   }
 
   /**
-   * Search for specific puzzle by ID in merged dataset
+   * Search for a specific puzzle by ID, prioritizing arc-explainer API
+   * and resolving the correct PlayFab ID on the fly.
    */
-  async findPuzzleById(
-    puzzleId: string,
-    datasetOptions: PuzzleDatasetOptions = {}
-  ): Promise<MergedPuzzleData | null> {
-    const mergedData = await this.getMergedPuzzleDataset(datasetOptions);
-    
-    // Try exact match first
-    let found = mergedData.find(p => p.id === puzzleId);
-    if (found) return found;
-    
-    // Try with ID conversion
-    const validation = arcExplainerAPI.validatePuzzleId(puzzleId);
-    if (validation.valid && validation.format === 'arc') {
-      // Convert arc ID to possible PlayFab formats
-      const datasets: ('training' | 'evaluation' | 'training2' | 'evaluation2')[] = 
-        ['training', 'evaluation', 'training2', 'evaluation2'];
-      
-      for (const dataset of datasets) {
-        const playFabId = arcExplainerAPI.convertArcIdToPlayFabId(puzzleId, dataset);
-        found = mergedData.find(p => p.id === playFabId);
-        if (found) return found;
+  async findPuzzleById(puzzleId: string): Promise<MergedPuzzleData | null> {
+    console.log(`🔍 Finding puzzle by ID: ${puzzleId}`);
+
+    try {
+      // Step 1: Get puzzle data from arc-explainer API (source of truth for metadata)
+      const rawArcId = arcExplainerAPI.convertPlayFabIdToArcId(puzzleId);
+      const explainerData = await arcExplainerAPI.getPuzzleById(rawArcId);
+
+      if (!explainerData) {
+        console.error(`❌ Puzzle ${rawArcId} not found in arc-explainer API.`);
+        return null;
       }
-    } else if (validation.valid && validation.format === 'playfab') {
-      // Convert PlayFab ID to arc format and search
-      const arcId = arcExplainerAPI.convertPlayFabIdToArcId(puzzleId);
-      found = mergedData.find(p => {
-        const puzzleArcId = arcExplainerAPI.convertPlayFabIdToArcId(p.id);
-        return puzzleArcId === arcId;
-      });
-      if (found) return found;
+
+      // Step 2: Find the correct PlayFab ID using the new service method
+      const correctPlayFabId = await arcDataService.findPlayFabIdForArcId(rawArcId);
+
+      if (!correctPlayFabId) {
+        console.error(`❌ Could not resolve PlayFab ID for ARC ID ${rawArcId}.`);
+        return null;
+      }
+
+      // Step 3: Load the authoritative puzzle data from PlayFab using the correct ID
+      // This assumes `loadPuzzleFromPlayFab` is updated or a similar method exists
+      // For now, we'll use the search method which is less efficient but functional
+      const puzzleData = await arcDataService.searchPuzzleById(correctPlayFabId);
+
+      if (!puzzleData) {
+        console.error(`❌ Failed to load puzzle data for PlayFab ID ${correctPlayFabId}.`);
+        return null;
+      }
+
+      // Step 4: Merge the data
+      const performance = await arcExplainerAPI.getPuzzlePerformance(correctPlayFabId);
+      const hasPerformanceData = !!performance;
+      const difficultyCategory = performance ? categorizeDifficulty(performance.avgAccuracy) : undefined;
+
+      const mergedData: MergedPuzzleData = {
+        ...puzzleData,
+        aiPerformance: performance || undefined,
+        difficultyCategory,
+        hasPerformanceData,
+      };
+
+      console.log('✅ Successfully found and merged puzzle data:', mergedData.id);
+      return mergedData;
+
+    } catch (error) {
+      console.error(`❌ Critical error in findPuzzleById for ${puzzleId}:`, error);
+      return null;
     }
-    
-    return null;
   }
 
   /**

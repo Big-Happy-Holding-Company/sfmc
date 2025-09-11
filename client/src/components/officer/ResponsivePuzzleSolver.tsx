@@ -16,6 +16,8 @@ import { EmojiPaletteDivider } from '@/components/officer/EmojiPaletteDivider';
 import type { OfficerTrackPuzzle, ARCGrid } from '@/types/arcTypes';
 import type { DisplayMode, PuzzleDisplayState } from '@/types/puzzleDisplayTypes';
 import type { EmojiSet } from '@/constants/spaceEmojis';
+import { getEmojiSetOptions, getEmojiSetDropdownLabel } from '@/constants/spaceEmojis';
+import { puzzlePerformanceService } from '@/services/puzzlePerformanceService';
 import { playFabValidation } from '@/services/playfab/validation';
 import { playFabEvents } from '@/services/playfab/events';
 
@@ -24,7 +26,8 @@ interface ResponsivePuzzleSolverProps {
   onBack: () => void;
 }
 
-export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolverProps) {
+export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: ResponsivePuzzleSolverProps) {
+  const [puzzle, setPuzzle] = useState<OfficerTrackPuzzle>(initialPuzzle);
   // Multi-test case state
   const [currentTestIndex, setCurrentTestIndex] = useState(0);
   const [solutions, setSolutions] = useState<ARCGrid[]>([]);
@@ -50,11 +53,16 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
   const [stepIndex, setStepIndex] = useState(0);
   const [attemptId] = useState(1);
 
+  if (!puzzle) {
+    return <div className="min-h-screen bg-slate-900 text-amber-50 flex items-center justify-center">No puzzle data.</div>;
+  }
+
   const totalTests = puzzle.test?.length || 0;
   const currentTest = puzzle.test?.[currentTestIndex];
   const testInput = currentTest?.input || [];
   const expectedOutput = currentTest?.output || [];
   const trainingExamples = puzzle.train || [];
+
 
   // Initialize state for all test cases
   useEffect(() => {
@@ -80,7 +88,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
       setOutputDimensions(newDimensions);
       setCompletedTests(newCompleted);
     }
-  }, [puzzle.test]);
+  }, [puzzle]);
 
   // Initialize session and log puzzle start event
   useEffect(() => {
@@ -693,32 +701,13 @@ export function ResponsivePuzzleSolver({ puzzle, onBack }: ResponsivePuzzleSolve
                     value={displayState.emojiSet}
                     onChange={(e) => handleEmojiSetChange(e.target.value as any)}
                     className="w-full bg-slate-700 border border-slate-500 rounded px-2 py-1 text-amber-100 text-xs"
-                    >
-                      <option value="tech_set1">⚡ Tech Set 1 - Power & Fuel</option>
-                      <option value="tech_set2">📡 Tech Set 2 - Communications</option>
-                      <option value="celestial_set1">🌍 Celestial Set 1 - Planets</option>
-                      <option value="celestial_set2">🌓 Celestial Set 2 - Moon Phases</option>
-                      <option value="status_alerts">⚠️ Status Alerts - Warnings</option>
-                      <option value="weather_climate">🌞 Weather & Climate</option>
-                      <option value="nav_alerts">🧭 Navigation Alerts</option>
-                      <option value="ai_emojis">🤖 AI Systems</option>
-                      <option value="status_emojis">😂 Human Crew</option>
-                      <option value="vague_symbols">♊ Vague Symbols</option>
-                      <option value="alien_language">👽 Alien Language</option>
-                      <option value="big_mammals">🐯 Wild Mammals</option>
-                      <option value="reptiles_amphibians">🐢 Reptiles & Amphibians</option>
-                      <option value="fruits_remaining">🍊 Fresh Fruits</option>
-                      <option value="sweets_desserts">🍰 Sweets & Desserts</option>
-                      <option value="savory_foods">🍔 Comfort Foods</option>
-                      <option value="games_chance">🎲 Games & Chance</option>
-                      <option value="rare_plants">🍄 Rare Plants & Nature</option>
-                      <option value="alchemy_science">⚗️ Alchemy & Science</option>
-                      <option value="ancient_scripts">𓀀 Ancient Scripts</option>
-                      <option value="zodiac_signs">♈ Zodiac Signs</option>
-                      <option value="foreign_celestial">🈶 Foreign Celestial</option>
-                      <option value="cosmic_portals">🚪 Cosmic Portals</option>
-                      <option value="void_dwellers">🐙 Void Dwellers</option>
-                    </select>
+                  >
+                    {getEmojiSetOptions().map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {getEmojiSetDropdownLabel(option.value)}
+                      </option>
+                    ))}
+                  </select>
                 )}
               </div>
 

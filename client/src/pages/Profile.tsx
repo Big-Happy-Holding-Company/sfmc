@@ -20,8 +20,12 @@
 import { useState, useEffect } from 'react';
 import { Header } from "@/components/game/Header";
 import { UserProfile } from "@/components/user/UserProfile";
-import { playFabService } from "@/services/playfab";
-import { playFabAuth } from "@/services/playfab/auth";
+import {
+  playFabRequestManager,
+  playFabAuthManager,
+  playFabUserData,
+  playFabTasks
+} from '@/services/playfab';
 import type { PlayFabPlayer } from "@/services/playfab";
 
 export default function Profile() {
@@ -29,15 +33,22 @@ export default function Profile() {
   const [totalTasks, setTotalTasks] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+    useEffect(() => {
     const loadPageData = async () => {
       try {
-        // Ensure authenticated before any service calls
-        await playFabAuth.ensureAuthenticated();
+        // New initialization flow
+        const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
+        if (!titleId) {
+          throw new Error('VITE_PLAYFAB_TITLE_ID environment variable not found');
+        }
+        if (!playFabRequestManager.isInitialized()) {
+          await playFabRequestManager.initialize({ titleId, secretKey: import.meta.env.VITE_PLAYFAB_SECRET_KEY });
+        }
+        await playFabAuthManager.ensureAuthenticated();
         
         const [playerData, tasksData] = await Promise.all([
-          playFabService.getPlayerData(),
-          playFabService.getAllTasks()
+          playFabUserData.getPlayerData(),
+          playFabTasks.getAllTasks()
         ]);
 
         setPlayer(playerData);

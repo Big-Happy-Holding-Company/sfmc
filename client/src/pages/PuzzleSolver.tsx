@@ -24,8 +24,8 @@ import { useRoute, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, ArrowLeft } from 'lucide-react';
 import { ResponsivePuzzleSolver } from '@/components/officer/ResponsivePuzzleSolver';
-import { playFabService } from '@/services/playfab';
-import { loadPuzzleFromLocalFiles, loadPuzzleFromPlayFab } from '@/services/officerArcAPI';
+import { playFabRequestManager, playFabAuthManager } from '@/services/playfab';
+import { puzzlePerformanceService } from '@/services/puzzlePerformanceService'; // Use the correct service
 import type { OfficerTrackPuzzle } from '@/types/arcTypes';
 
 export default function PuzzleSolver() {
@@ -54,25 +54,20 @@ export default function PuzzleSolver() {
         
         console.log('🎯 Loading puzzle:', puzzleId);
 
-        // Initialize PlayFab if needed
-        if (!playFabService.core.isReady()) {
-          console.log('🎖️ Initializing PlayFab for puzzle loading...');
-          await playFabService.initialize();
+                // Initialize PlayFab if needed
+        const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
+        if (!titleId) {
+          throw new Error('VITE_PLAYFAB_TITLE_ID environment variable not found');
         }
-        
-        if (!playFabService.isAuthenticated()) {
-          await playFabService.loginAnonymously();
+        if (!playFabRequestManager.isInitialized()) {
+          await playFabRequestManager.initialize({ titleId, secretKey: import.meta.env.VITE_PLAYFAB_SECRET_KEY });
         }
+        await playFabAuthManager.ensureAuthenticated();
         
         setPlayFabReady(true);
 
-        // Load puzzle data from local files first, fallback to PlayFab
-        let puzzleData = await loadPuzzleFromLocalFiles(puzzleId);
-        
-        if (!puzzleData) {
-          console.log('🔄 Local file not found, trying PlayFab as fallback...');
-          puzzleData = await loadPuzzleFromPlayFab(puzzleId);
-        }
+        // Use the centralized service to find the puzzle
+        const puzzleData = await puzzlePerformanceService.findPuzzleById(puzzleId);
         
         if (puzzleData) {
           setPuzzle(puzzleData);
@@ -175,7 +170,7 @@ export default function PuzzleSolver() {
     );
   }
 
-  // Success state - render puzzle solver
+  // Success state - render puzzle solver with just the ID
   if (puzzle) {
     return <ResponsivePuzzleSolver puzzle={puzzle} onBack={handleBack} />;
   }

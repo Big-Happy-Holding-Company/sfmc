@@ -18,7 +18,6 @@
  */
 
 import type { LeaderboardEntry } from '@/types/playfab';
-import { playFabCore } from './core';
 
 export interface CacheEntry {
   data: LeaderboardEntry[];
@@ -58,7 +57,7 @@ export class LeaderboardCache {
       return null;
     }
 
-    playFabCore.logOperation('Cache Hit', `${entry.data.length} entries for ${statisticName}`);
+    console.log(`[LeaderboardCache] Cache Hit for ${statisticName}: ${entry.data.length} entries`);
     return maxResults ? entry.data.slice(0, maxResults) : entry.data;
   }
 
@@ -77,7 +76,7 @@ export class LeaderboardCache {
       statisticName
     });
 
-    playFabCore.logOperation('Cache Set', `${data.length} entries for ${statisticName}`);
+    console.log(`[LeaderboardCache] Cache Set for ${statisticName}: ${data.length} entries`);
   }
 
   /**
@@ -86,10 +85,10 @@ export class LeaderboardCache {
   public clear(statisticName?: string): void {
     if (statisticName) {
       this.cache.delete(statisticName);
-      playFabCore.logOperation('Cache Cleared', statisticName);
+      console.log(`[LeaderboardCache] Cache Cleared for ${statisticName}`);
     } else {
       this.cache.clear();
-      playFabCore.logOperation('All Caches Cleared');
+      console.log('[LeaderboardCache] All caches cleared');
     }
   }
 
@@ -140,7 +139,7 @@ export class LeaderboardCache {
 
     if (oldestKey) {
       this.cache.delete(oldestKey);
-      playFabCore.logOperation('Cache Evicted', oldestKey);
+      console.log(`[LeaderboardCache] Cache Evicted: ${oldestKey}`);
     }
   }
 

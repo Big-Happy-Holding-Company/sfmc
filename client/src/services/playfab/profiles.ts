@@ -5,8 +5,8 @@
  */
 
 import type { PlayerProfile, LeaderboardEntry } from '@/types/playfab';
-import { playFabCore } from './core';
-import { playFabAuth } from './auth';
+import { playFabAuthManager } from './authManager';
+import { playFabRequestManager } from './requestManager';
 
 // PlayFab GetPlayerProfile request format
 interface GetPlayerProfileRequest {
@@ -64,11 +64,11 @@ export class PlayFabProfiles {
     // Check cache first
     if (this.isProfileCached(playerId)) {
       const cachedProfile = this.profileCache.get(playerId)!;
-      playFabCore.logOperation('Profile Cache Hit', playerId);
+      console.log(`[PlayFabProfiles] Profile Cache Hit: ${playerId}`);
       return cachedProfile;
     }
 
-    await playFabAuth.ensureAuthenticated();
+    // Authentication handled automatically by requestManager
 
     const request: GetPlayerProfileRequest = {
       PlayFabId: playerId,
@@ -81,10 +81,9 @@ export class PlayFabProfiles {
     };
 
     try {
-      const result = await playFabCore.makeHttpRequest<GetPlayerProfileRequest, GetPlayerProfileResponse>(
-        '/Client/GetPlayerProfile',
-        request,
-        true // Requires authentication
+      const result = await playFabRequestManager.makeRequest<GetPlayerProfileRequest, GetPlayerProfileResponse>(
+        'getPlayerProfile',
+        request
       );
 
       const profile: PlayerProfile = {
@@ -96,15 +95,11 @@ export class PlayFabProfiles {
       // Cache the profile
       this.cacheProfile(playerId, profile);
 
-      playFabCore.logOperation('Profile Retrieved', {
-        playerId,
-        displayName: profile.DisplayName,
-        hasAvatar: !!profile.AvatarUrl
-      });
+      console.log(`[PlayFabProfiles] Profile Retrieved: ${profile.DisplayName} (${playerId})`);
 
       return profile;
     } catch (error) {
-      playFabCore.logOperation('Profile Retrieval Failed', { playerId, error });
+      console.error(`[PlayFabProfiles] Profile Retrieval Failed for ${playerId}:`, error);
       
       // Return fallback profile
       const fallbackProfile: PlayerProfile = {
@@ -138,7 +133,7 @@ export class PlayFabProfiles {
         this.getPlayerProfile(playerId)
           .then(profile => ({ playerId, profile }))
           .catch(error => {
-            playFabCore.logOperation('Profile Fetch Failed', { playerId, error });
+            console.error(`[PlayFabProfiles] Profile Fetch Failed for ${playerId}:`, error);
             return {
               playerId,
               profile: { PlayFabId: playerId, DisplayName: 'Unknown Player' }
@@ -152,11 +147,7 @@ export class PlayFabProfiles {
       });
     }
 
-    playFabCore.logOperation('Multiple Profiles Retrieved', {
-      requested: playerIds.length,
-      cached: playerIds.length - uncachedIds.length,
-      fetched: uncachedIds.length
-    });
+    console.log(`[PlayFabProfiles] Multiple Profiles Retrieved: ${profiles.size}/${playerIds.length}`);
 
     return profiles;
   }
@@ -179,9 +170,7 @@ export class PlayFabProfiles {
       };
     });
 
-    playFabCore.logOperation('Leaderboard Enhanced with Profiles', 
-      `${enhancedEntries.length} entries enhanced`
-    );
+    console.log(`[PlayFabProfiles] Leaderboard Enhanced: ${enhancedEntries.length} entries`);
 
     return enhancedEntries;
   }
@@ -207,7 +196,7 @@ export class PlayFabProfiles {
 
       return avatarUrl;
     } catch (error) {
-      playFabCore.logOperation('Avatar URL Load Failed', { playerId, error });
+      console.error(`[PlayFabProfiles] Avatar URL Load Failed for ${playerId}:`, error);
       return null;
     }
   }
@@ -216,29 +205,28 @@ export class PlayFabProfiles {
    * Set player avatar URL (HTTP implementation)
    */
   public async setPlayerAvatar(avatarUrl: string): Promise<void> {
-    await playFabAuth.ensureAuthenticated();
+    // Authentication handled automatically by requestManager
 
     const request: UpdateAvatarUrlRequest = {
       ImageUrl: avatarUrl
     };
 
     try {
-      await playFabCore.makeHttpRequest<UpdateAvatarUrlRequest, UpdateAvatarUrlResponse>(
-        '/Client/UpdateAvatarUrl',
-        request,
-        true // Requires authentication
+      await playFabRequestManager.makeRequest<UpdateAvatarUrlRequest, UpdateAvatarUrlResponse>(
+        'updateAvatarUrl',
+        request
       );
 
       // Clear cached profile for current player
-      const currentPlayerId = playFabAuth.getPlayFabId();
+      const currentPlayerId = playFabAuthManager.getPlayFabId();
       if (currentPlayerId) {
         this.clearProfileCache(currentPlayerId);
         this.avatarUrlCache.set(currentPlayerId, avatarUrl);
       }
 
-      playFabCore.logOperation('Avatar URL Updated', avatarUrl);
+      console.log(`[PlayFabProfiles] Avatar URL Updated: ${avatarUrl}`);
     } catch (error) {
-      playFabCore.logOperation('Avatar URL Update Failed', error);
+      console.error('[PlayFabProfiles] Avatar URL Update Failed:', error);
       throw error;
     }
   }
@@ -247,7 +235,7 @@ export class PlayFabProfiles {
    * Get current player's profile
    */
   public async getCurrentPlayerProfile(): Promise<PlayerProfile | null> {
-    const currentPlayerId = playFabAuth.getPlayFabId();
+    const currentPlayerId = playFabAuthManager.getPlayFabId();
     if (!currentPlayerId) {
       return null;
     }
@@ -255,7 +243,7 @@ export class PlayFabProfiles {
     try {
       return await this.getPlayerProfile(currentPlayerId);
     } catch (error) {
-      playFabCore.logOperation('Current Player Profile Failed', error);
+      console.error('[PlayFabProfiles] Current Player Profile Failed:', error);
       return null;
     }
   }
@@ -287,7 +275,7 @@ export class PlayFabProfiles {
     this.profileCache.delete(playerId);
     this.cacheTimestamps.delete(playerId);
     this.avatarUrlCache.delete(playerId);
-    playFabCore.logOperation('Profile Cache Cleared', playerId);
+    console.log(`[PlayFabProfiles] Profile Cache Cleared: ${playerId}`);
   }
 
   /**
@@ -297,7 +285,7 @@ export class PlayFabProfiles {
     this.profileCache.clear();
     this.cacheTimestamps.clear();
     this.avatarUrlCache.clear();
-    playFabCore.logOperation('All Profile Caches Cleared');
+    console.log('[PlayFabProfiles] All Profile Caches Cleared');
   }
 
   /**
@@ -327,7 +315,7 @@ export class PlayFabProfiles {
     const uncachedIds = playerIds.filter(id => !this.isProfileCached(id));
     
     if (uncachedIds.length > 0) {
-      playFabCore.logOperation('Preloading Profiles', `${uncachedIds.length} profiles`);
+      console.log(`[PlayFabProfiles] Preloading ${uncachedIds.length} profiles...`);
       await this.getMultiplePlayerProfiles(uncachedIds);
     }
   }

@@ -18,7 +18,7 @@ export class TaskLoader {
   private tasksDirectory = path.join(__dirname, '../data/tasks');
 
   /**
-   * Fetch tasks from PlayFab Title Data
+   * Fetch tasks from PlayFab Title Data  THIS IS WRONG!!!! unless it is for matching them to the arc-explainer API.
    */
   private async fetchTasksFromPlayFab(): Promise<Task[] | null> {
     try {

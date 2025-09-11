@@ -4,6 +4,52 @@ All notable changes to this project will be documented in this file.
 
 ## Recent Commits (Latest First)
 
+**2025-09-10**: 🎯 PUZZLE DATASET DETECTION FIX - Correct PlayFab Validation Prefix
+- **CRITICAL VALIDATION FIX**: Solved puzzle `a68b268e` getting wrong prefix `ARC-TR-` instead of correct `ARC-E2-`
+- **ROOT CAUSE IDENTIFIED**: 
+  - Puzzle exists in both `data/training/a68b268e.json` and `data/training2/a68b268e.json` locally
+  - PlayFab fallback found puzzle in training dataset batch → assigned wrong `ARC-TR-` prefix  
+  - Frontend used local files (correct), PlayFab CloudScript used wrong prefix (validation failed)
+- **ROBUST DATASET DETECTION**: 
+  - Created `determineCorrectDataset()` function checking all local datasets systematically
+  - Priority: evaluation2 > training2 > evaluation > training (newer datasets preferred)
+  - Handles puzzles existing in multiple datasets by selecting most appropriate one
+- **ID CORRECTION LOGIC**: 
+  - PlayFab search now corrects puzzle ID using locally-determined dataset before returning
+  - Ensures frontend and PlayFab validation use identical puzzle ID formats
+  - Detailed logging shows dataset detection and ID correction process
+- **EXPECTED BEHAVIOR**: 
+  - `a68b268e` should now load as `ARC-E2-a68b268e` (evaluation2 dataset)
+  - PlayFab CloudScript should find puzzle in correct evaluation2 batches
+  - Frontend and server validation should match (validation success)
+- **FILES MODIFIED**: `client/src/services/officerArcAPI.ts` (dataset detection, ID correction)
+- **TESTING REQUIRED**: 
+  1. Go to `/officer-track/solve/a68b268e` → Check console logs show "ARC-E2-" prefix
+  2. Solve puzzle → Submit → Should succeed with PlayFab validation
+  3. Check CloudScript logs for successful puzzle ID match in evaluation2 batches
+
+**2025-09-10**: 🏗️ DYNAMIC EMOJI DROPDOWN ARCHITECTURE - Eliminate Hardcoding
+- **ARCHITECTURE PROBLEM SOLVED**: Hardcoded emoji set dropdown options prevented new sets from appearing
+- **SINGLE RESPONSIBILITY PRINCIPLE**: `spaceEmojis.ts` is now single source of truth for all emoji sets
+- **DRY COMPLIANCE**: 
+  - Added `getEmojiSetOptions()` and `getEmojiSetDropdownLabel()` helper functions
+  - Replaced 25+ hardcoded `<option>` tags with dynamic generation
+  - New emoji sets automatically appear in UI without code changes
+- **MISSING DATA FIXED**:
+  - Added proper `EMOJI_SET_INFO` entries for `characters`, `bamboos`, `circles`, `birds`
+  - Categorized new Mahjong suits and bird collections appropriately
+- **FUTURE-PROOF DESIGN**:
+  - Adding new emoji sets to `SPACE_EMOJIS` automatically populates all dropdowns
+  - Consistent metadata structure ensures proper display names and themes
+  - Scalable for unlimited emoji set expansion
+- **FILES MODIFIED**:
+  - `client/src/constants/spaceEmojis.ts` (helper functions, missing metadata)
+  - `client/src/components/officer/ResponsivePuzzleSolver.tsx` (dynamic dropdown)
+- **TESTING REQUIRED**:
+  1. Go to any puzzle solver → Emoji/Hybrid mode → Check dropdown has ALL emoji sets
+  2. Verify new sets (Characters, Bamboos, Circles, Birds) appear with proper icons
+  3. Select each new set and confirm emojis display correctly in grids
+
 **2025-09-10**: 🔧 PLAYFAB VALIDATION FLOW FIXES - Clear Frontend vs Server Validation
 - **PROBLEM SOLVED**: Fixed user confusion between frontend validation and PlayFab server validation
 - **UI IMPROVEMENTS**:

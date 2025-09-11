@@ -23,8 +23,10 @@ import type {
   ARCPuzzleFilters,
   ARCDisplayGrid
 } from '@/types/arcTypes';
+import { DATASET_DEFINITIONS } from '@shared/datasets';
 import { SPACE_EMOJIS } from '@/constants/spaceEmojis';
 import { loadPuzzleFromPlayFab } from '@/services/officerArcAPI';
+import { idConverter } from '@/services/idConverter';
 
 /**
  * ARC Data Service - Singleton for managing ARC puzzle data
@@ -148,15 +150,14 @@ export class ARCDataService {
   private async loadDatasetFromPlayFab(dataset: ARCDatasetType): Promise<OfficerTrackPuzzle[]> {
     const allPuzzles: OfficerTrackPuzzle[] = [];
 
-    // Determine number of batches for this dataset
-    const batchCounts: Record<ARCDatasetType, number> = {
-      training: 4,      // 400 puzzles in 4 batches
-      training2: 10,    // 1000 puzzles in 10 batches  
-      evaluation: 4,    // 400 puzzles in 4 batches
-      evaluation2: 2    // 120 puzzles in 2 batches
-    };
+    // Get dataset definition from the single source of truth
+    const datasetDef = DATASET_DEFINITIONS[dataset];
+    if (!datasetDef) {
+      console.error(`Unknown dataset type: ${dataset}`);
+      return [];
+    }
 
-    const totalBatches = batchCounts[dataset];
+    const totalBatches = datasetDef.batchCount;
 
     // Load all batches for this dataset
     for (let batchNum = 1; batchNum <= totalBatches; batchNum++) {
@@ -165,6 +166,15 @@ export class ARCDataService {
       try {
         const batchPuzzles = await this.loadPlayFabTitleData(titleDataKey);
         if (batchPuzzles && Array.isArray(batchPuzzles)) {
+          // Debug: Log structure of first puzzle to understand PlayFab data format
+          if (batchPuzzles.length > 0) {
+            console.log(`🔍 PlayFab puzzle structure sample from ${titleDataKey}:`, {
+              keys: Object.keys(batchPuzzles[0]),
+              id: batchPuzzles[0].id,
+              filename: batchPuzzles[0].filename,
+              sample: batchPuzzles[0]
+            });
+          }
           allPuzzles.push(...batchPuzzles);
           console.log(`📦 Loaded batch ${batchNum}/${totalBatches}: ${batchPuzzles.length} puzzles`);
         } else {
@@ -182,34 +192,26 @@ export class ARCDataService {
   /**
    * Load data from PlayFab Title Data using Admin API
    */
-  private async loadPlayFabTitleData(key: string): Promise<OfficerTrackPuzzle[] | null> {
+  private async loadPlayFabTitleData(key: string, isSinglePuzzleKey: boolean = false): Promise<any | null> {
     try {
-      // Import PlayFab core service for Admin API requests
-      const { playFabCore } = await import('./playfab/core');
-      
-      // Ensure PlayFab is initialized
-      if (!playFabCore.isReady()) {
-        console.warn('PlayFab not initialized, attempting initialization...');
-        const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
-        const secretKey = import.meta.env.VITE_PLAYFAB_SECRET_KEY;
-        await playFabCore.initialize({ titleId, secretKey });
-      }
-      
-      // Use Admin API to get Title Data (no user authentication required, uses secret key)
-      const result = await playFabCore.makeHttpRequest<{ Keys: string[] }, { Data?: Record<string, { Value: string }> }>(
-        '/Admin/GetTitleData',
-        { Keys: [key] },
-        false // requiresAuth = false (Admin API uses secret key instead)
+      const { playFabRequestManager } = await import('./playfab/requestManager');
+      const result = await playFabRequestManager.makeRequest<{ Keys: string[] }, { Data?: Record<string, string> }>(
+        'getTitleData',
+        { Keys: [key] }
       );
 
-      // Admin API response structure: result.Data[key].Value
-      if (!result?.Data?.[key]?.Value || result.Data[key].Value === "undefined") {
+      if (!result?.Data?.[key] || result.Data[key] === "undefined") {
         console.warn(`No title data found for key: ${key}`);
         return null;
       }
 
-      // Parse the JSON data from the Value field
-      const puzzleData = JSON.parse(result.Data[key].Value);
+      const puzzleData = JSON.parse(result.Data[key]);
+      
+      // If it's a single puzzle key, it might not be an array
+      if (isSinglePuzzleKey) {
+        return puzzleData;
+      }
+
       return Array.isArray(puzzleData) ? puzzleData : null;
 
     } catch (error) {
@@ -392,7 +394,7 @@ export class ARCDataService {
   ): Promise<OfficerTrackPuzzle> {
     
     const filename = filePath.split('/').pop()?.replace('.json', '') || 'unknown';
-    const id = this.generateARCId(filename, dataset);
+    const id = idConverter.arcToPlayFab(filename, dataset);
     
     // Analyze grid dimensions
     const allGrids = [
@@ -416,22 +418,7 @@ export class ARCDataService {
     };
   }
 
-  /**
-   * Generate unique ARC ID with dataset prefix
-   */
-  private generateARCId(filename: string, dataset: ARCDatasetType): string {
-    const prefixMap: Record<ARCDatasetType, string> = {
-      training: 'ARC-TR',
-      training2: 'ARC-T2',
-      evaluation: 'ARC-EV', 
-      evaluation2: 'ARC-E2'
-    };
-    
-    const prefix = prefixMap[dataset];
-    const cleanFilename = filename.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8);
-    
-    return `${prefix}-${cleanFilename}`;
-  }
+  // ID generation now handled by centralized idConverter service
 
   /**
    * Analyze grid dimensions across all examples
@@ -666,12 +653,57 @@ export class ARCDataService {
     this.lastLoadTime.clear();
     this.loadedFiles.clear();
     this.uniqueIds.clear();
-    console.log('🗑️  ARC data cache cleared');
+    // Cache cleared
   }
 
   /**
    * Get cache statistics
    */
+  /**
+   * Find the correct PlayFab ID for a given raw ARC puzzle ID.
+   * Iterates through all possible dataset prefixes to find a match.
+   */
+  public async findPlayFabIdForArcId(arcId: string): Promise<string | null> {
+    console.log(`🔄 Searching all datasets for ARC ID: ${arcId}`);
+    const datasetsToSearch: ARCDatasetType[] = ['training', 'evaluation', 'training2', 'evaluation2'];
+
+    for (const dataset of datasetsToSearch) {
+      try {
+        const puzzles = await this.loadDatasetPuzzles(dataset, false); // forceRefresh = false to use cache
+        console.log(`🔍 Dataset ${dataset}: loaded ${puzzles.length} puzzles`);
+        
+        // Debug: Log first few puzzles to see actual structure
+        if (puzzles.length > 0) {
+          console.log(`🔍 Sample puzzle from ${dataset}:`, {
+            id: puzzles[0].id,
+            filename: puzzles[0].filename,
+            hasFilename: 'filename' in puzzles[0],
+            keys: Object.keys(puzzles[0])
+          });
+        }
+        
+        // Search using the PROVEN working approach from test-officer-track-e2e.cjs
+        const foundPuzzle = puzzles.find(p => {
+          // Extract clean ID from prefixed PlayFab ID (ARC-TR-007bbfb7 -> 007bbfb7)
+          const cleanId = p.id?.replace(/^ARC-[A-Z0-9]+-/, '');
+          return cleanId === arcId ||           // Primary: extract from prefixed ID  
+                 p.filename === arcId ||        // Fallback: filename field (if exists)
+                 p.id?.endsWith(`-${arcId}`);   // Fallback: ID suffix matching
+        });
+
+        if (foundPuzzle) {
+          console.log(`✅ Found matching puzzle in dataset '${dataset}'. PlayFab ID: ${foundPuzzle.id}, filename: ${foundPuzzle.filename}`);
+          return foundPuzzle.id;
+        }
+      } catch (error) {
+        console.error(`❌ Error loading dataset '${dataset}' while searching for ${arcId}:`, error);
+      }
+    }
+
+    console.error(`❌ No matching PlayFab ID found for ARC ID: ${arcId} after searching all datasets.`);
+    return null;
+  }
+
   public getCacheStats() {
     const stats: Record<string, any> = {};
     

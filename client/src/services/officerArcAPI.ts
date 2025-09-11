@@ -6,7 +6,8 @@
  */
 
 import { arcDataService } from '@/services/arcDataService';
-import { playFabCore } from '@/services/playfab/core';
+import { playFabRequestManager } from '@/services/playfab/requestManager';
+import { idConverter } from '@/services/idConverter';
 
 export interface OfficerPuzzle {
   id: string;                    // ARC ID (e.g., "007bbfb7")
@@ -141,18 +142,8 @@ async function makeAPICall(endpoint: string): Promise<any> {
  * Convert arc-ID to PlayFab format
  * 007bbfb7 -> ARC-TR-007bbfb7 (assumes training by default)
  */
-export function arcIdToPlayFab(arcId: string, dataset: 'training' | 'evaluation' | 'training2' | 'evaluation2' = 'training'): string {
-  if (arcId.startsWith('ARC-')) return arcId; // Already in PlayFab format
-  
-  // FIXED: Use actual prefixes from upload script
-  const prefixMap = {
-    'training': 'ARC-TR-',
-    'evaluation': 'ARC-EV-', 
-    'training2': 'ARC-T2-',    // Was ARC-TR2-, now matches upload script
-    'evaluation2': 'ARC-E2-'   // Was ARC-EV2-, now matches upload script
-  };
-  
-  return prefixMap[dataset] + arcId;
+export function arcIdToPlayFab(arcId: string, dataset: 'training' | 'evaluation' | 'training2' | 'evaluation2'): string {
+  return idConverter.arcToPlayFab(arcId, dataset);
 }
 
 /**
@@ -161,8 +152,7 @@ export function arcIdToPlayFab(arcId: string, dataset: 'training' | 'evaluation'
  * ARC-T2-11852cab -> 11852cab
  */
 export function playFabToArcId(playFabId: string): string {
-  // FIXED: Handle all actual uploaded prefixes: ARC-TR-, ARC-T2-, ARC-EV-, ARC-E2-
-  return playFabId.replace(/^ARC-(TR|T2|EV|E2)-/, '');
+  return idConverter.playFabToArc(playFabId);
 }
 
 /**
@@ -266,17 +256,21 @@ export async function getDifficultyStats(): Promise<DifficultyStats> {
   console.log('🔍 Calculating difficulty statistics from evaluation2 dataset...');
   const response = await getEvaluation2Puzzles(); // Use evaluation2 dataset
   
-  const stats: DifficultyStats = {
-    impossible: 0,
-    extremely_hard: 0,
-    very_hard: 0,
-    challenging: 0,
+    const stats: DifficultyStats = {
+    practically_impossible: 0,
+    most_llms_fail: 0,
+    unreliable: 0,
     total: response.total // Use real database total
   };
   
   response.puzzles.forEach(puzzle => {
-    stats[puzzle.difficulty]++;
+    if (stats.hasOwnProperty(puzzle.difficulty)) {
+      stats[puzzle.difficulty]++;
+    }
   });
+  
+  response.puzzles.forEach(puzzle => {
+      });
   
   console.log('📊 Evaluation2 difficulty distribution:', stats);
   
@@ -346,7 +340,7 @@ export async function searchPuzzleById(searchId: string): Promise<OfficerPuzzle 
         id: cleanId,
         playFabId: cleanId,
         avgAccuracy: 0,
-        difficulty: 'challenging', // Default difficulty if no AI data
+        difficulty: 'unreliable', // Default difficulty if no AI data
         totalExplanations: 0,
         compositeScore: 0
       };
@@ -416,7 +410,7 @@ export async function loadPuzzleFromLocalFiles(puzzleId: string): Promise<any | 
     // Convert to expected format with proper ID
     return {
       ...puzzleData,
-      id: `ARC-E2-${arcId}` // Use PlayFab format for compatibility with solver
+      id: idConverter.arcToPlayFab(arcId, 'evaluation2') // Use PlayFab format for compatibility with solver
     };
     
   } catch (error) {
@@ -426,30 +420,78 @@ export async function loadPuzzleFromLocalFiles(puzzleId: string): Promise<any | 
 }
 
 /**
+ * Intelligently determine where puzzle actually exists in PlayFab Title Data
+ * Searches all batches to find the actual dataset, no hardcoded priorities
+ */
+async function findPuzzleInPlayFabTitleData(arcId: string): Promise<'training' | 'evaluation' | 'training2' | 'evaluation2' | null> {
+  console.log(`🔍 Searching PlayFab Title Data for puzzle ${arcId}...`);
+  
+  // Define all possible batch locations to search
+  const batchSearches = [
+    { dataset: 'training' as const, batches: 4 },
+    { dataset: 'training2' as const, batches: 10 }, 
+    { dataset: 'evaluation' as const, batches: 4 },
+    { dataset: 'evaluation2' as const, batches: 2 }
+  ];
+  
+  for (const { dataset, batches } of batchSearches) {
+    for (let i = 1; i <= batches; i++) {
+      try {
+        const batchKey = `officer-tasks-${dataset}-batch${i}.json`;
+        console.log(`🔍 Checking ${batchKey} for puzzle ${arcId}...`);
+        
+                    const result = await playFabRequestManager.makeRequest(
+              'getTitleData',
+              { Keys: [batchKey] }
+            );
+        
+        if (result?.Data?.[batchKey]) {
+          const puzzleDataStr = result.Data[batchKey];
+          if (puzzleDataStr && puzzleDataStr !== "undefined") {
+            const puzzles = JSON.parse(puzzleDataStr);
+            
+            // Search for puzzle in this batch
+            const found = puzzles.find((p: any) => {
+              if (!p.id) return false;
+              const pArcId = p.id.replace(/^ARC-(TR|T2|EV|E2)-/, '');
+              return pArcId === arcId;
+            });
+            
+            if (found) {
+              console.log(`✅ FOUND puzzle ${arcId} in PlayFab batch: ${batchKey}`);
+              console.log(`🎯 Puzzle stored as: ${found.id}`);
+              return dataset;
+            }
+          }
+        }
+      } catch (error) {
+        console.log(`❌ Error checking batch ${dataset}-${i}:`, error);
+        continue;
+      }
+    }
+  }
+  
+  console.log(`❌ Puzzle ${arcId} not found in any PlayFab Title Data batch`);
+  return null;
+}
+
+/**
  * LEGACY: Load full puzzle data from PlayFab by searching all datasets for ARC ID
  * Only use this as fallback when local files don't work
  */
 export async function loadPuzzleFromPlayFab(puzzleId: string): Promise<any | null> {
   try {
-    // Ensure PlayFab is initialized for client access
-    if (!playFabCore.isReady()) {
-      console.warn('PlayFab not initialized for client access, initializing...');
-      const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
-      await playFabCore.initialize({ titleId });
-    }
-    
+        
     // Extract ARC ID (remove any existing prefix)
     const arcId = puzzleId.startsWith('ARC-') ? playFabToArcId(puzzleId) : puzzleId;
     console.log(`🔍 loadPuzzleFromPlayFab: searching for "${puzzleId}" -> arcId: "${arcId}"`);
     
-    // Try to determine dataset from existing PlayFab ID format if available
-    // This optimizes search by checking most likely datasets first
-    const datasets = [
-      { name: 'training', batches: 4, priority: arcId.length === 8 ? 1 : 2 },
-      { name: 'evaluation', batches: 4, priority: arcId.length === 8 ? 1 : 2 },
-      { name: 'training2', batches: 10, priority: arcId.length === 8 ? 1 : 3 },
-      { name: 'evaluation2', batches: 2, priority: arcId.length === 8 ? 1 : 3 }
-    ].sort((a, b) => a.priority - b.priority); // Search higher priority datasets first
+        const datasets = [
+      { name: 'training', batches: 4 },
+      { name: 'evaluation', batches: 4 },
+      { name: 'training2', batches: 10 },
+      { name: 'evaluation2', batches: 2 }
+    ];
     
     console.log(`🔍 Searching ${datasets.length} datasets for puzzle ${arcId}...`);
     
@@ -468,10 +510,9 @@ export async function loadPuzzleFromPlayFab(puzzleId: string): Promise<any | nul
             console.log(`📋 Using cached batch ${batchKey}: ${puzzleArray.length} puzzles`);
           } else {
             // Load from PlayFab and cache
-            const result = await playFabCore.makeHttpRequest(
-              '/Client/GetTitleData',
-              { Keys: [batchKey] },
-              true // Client API uses user authentication
+                        const result = await playFabRequestManager.makeRequest(
+              'getTitleData',
+              { Keys: [batchKey] }
             );
             
             if (result?.Data?.[batchKey]) {
@@ -504,7 +545,8 @@ export async function loadPuzzleFromPlayFab(puzzleId: string): Promise<any | nul
           
           if (puzzle) {
             console.log(`✅ Found puzzle ${puzzle.id} in ${dataset.name} batch ${i}`);
-            return puzzle; // Exit immediately when found
+            
+                        return puzzle;
           }
         } catch (error) {
           console.log(`❌ Error checking batch ${dataset.name}-${i}:`, error);
