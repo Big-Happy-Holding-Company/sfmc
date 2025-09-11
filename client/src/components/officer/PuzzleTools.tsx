@@ -123,22 +123,22 @@ export function PuzzleTools({
         <h4 className="text-amber-300 text-lg font-semibold mb-4 text-center">DISPLAY</h4>
         
         {/* Display Mode Toggle */}
-        <div className="flex justify-center gap-2 mb-4">
+        <div className="flex flex-wrap justify-center gap-2 mb-4">
           <button
             onClick={() => onDisplayModeChange('arc-colors')}
-            className={`px-6 py-3 text-lg font-bold rounded h-14 min-w-[80px] ${displayMode === 'arc-colors' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
+            className={`px-6 py-3 text-lg font-bold rounded h-14 min-w-[80px] flex-shrink-0 ${displayMode === 'arc-colors' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
           >
             123
           </button>
           <button
             onClick={() => onDisplayModeChange('emoji')}
-            className={`px-6 py-3 text-lg font-bold rounded h-14 min-w-[80px] ${displayMode === 'emoji' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
+            className={`px-6 py-3 text-lg font-bold rounded h-14 min-w-[80px] flex-shrink-0 ${displayMode === 'emoji' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
           >
             🎨
           </button>
           <button
             onClick={() => onDisplayModeChange('hybrid')}
-            className={`px-6 py-3 text-lg font-bold rounded h-14 min-w-[80px] ${displayMode === 'hybrid' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
+            className={`px-6 py-3 text-lg font-bold rounded h-14 min-w-[80px] flex-shrink-0 ${displayMode === 'hybrid' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
           >
             MIX
           </button>
@@ -165,11 +165,11 @@ export function PuzzleTools({
         <h4 className="text-amber-300 text-lg font-semibold mb-4 text-center">ACTIONS</h4>
         
         {/* Primary Actions Row */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-wrap gap-3 justify-center">
           <Button 
             size="lg" 
             variant="outline" 
-            className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white text-lg font-bold px-6 py-4 h-16" 
+            className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white text-lg font-bold px-6 py-4 h-16 flex-1 sm:flex-none min-w-[120px]" 
             onClick={onCopyInput}
           >
             Copy Input
@@ -177,7 +177,7 @@ export function PuzzleTools({
           <Button 
             size="lg" 
             variant="outline" 
-            className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white text-lg font-bold px-6 py-4 h-16" 
+            className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white text-lg font-bold px-6 py-4 h-16 flex-1 sm:flex-none min-w-[120px]" 
             onClick={onResetSolution}
           >
             Reset

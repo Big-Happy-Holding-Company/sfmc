@@ -59,7 +59,7 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
         size="sm"
         onClick={() => onValueSelect(value)}
         className={`
-          h-14 w-12 p-0 text-lg font-bold flex-shrink-0
+          h-20 w-16 p-0 text-xl font-bold flex-shrink-0
           ${isSelected 
             ? 'bg-amber-600 text-slate-900 hover:bg-amber-700 ring-2 ring-amber-400' 
             : isUsed
@@ -75,19 +75,19 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
   };
 
   return (
-    <div className={`flex flex-col items-center justify-center gap-1 ${className}`}>
+    <div className={`flex flex-col items-center justify-center gap-2 ${className}`}>
       {/* Top row (0-4) */}
-      <div className="flex gap-1">
+      <div className="flex gap-2">
         {topRow.map(renderValueButton)}
       </div>
       
       {/* Bottom row (5-9) */}
-      <div className="flex gap-1">
+      <div className="flex gap-2">
         {bottomRow.map(renderValueButton)}
       </div>
       
       {/* Selected value indicator */}
-      <div className="text-amber-400 text-sm font-bold mt-1">
+      <div className="text-amber-400 text-base font-bold mt-2">
         Selected: {selectedValue}
       </div>
     </div>

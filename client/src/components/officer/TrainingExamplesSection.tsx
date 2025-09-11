@@ -165,24 +165,44 @@ export function TrainingExamplesSection({
         </div>
       </div>
       
-      {/* Compact Horizontal Layout for ALL grid sizes */}
+      {/* Dynamic Layout Based on Grid Complexity */}
       <div className="overflow-x-auto">
-        <div className="flex gap-4 pb-2">
+        <div className="flex gap-1.5 pb-2">
           {examples.map((example, index) => {
-            // Calculate cell size for training examples (smaller, more compact)
+            // Calculate optimal cell size based on grid complexity and available space
             const maxInputDim = Math.max(example.input.length, example.input[0]?.length || 1);
             const maxOutputDim = Math.max(example.output.length, example.output[0]?.length || 1);
             const maxDim = Math.max(maxInputDim, maxOutputDim);
             
-            // Use bigger cell sizes for training examples - much more visible
-            const cellSize = maxDim > 20 ? 24 : maxDim > 15 ? 32 : maxDim > 10 ? 40 : 48;
+            // More intelligent cell sizing - smaller grids get more space efficiency
+            const isSmallGrid = maxDim <= 5;
+            const isMediumGrid = maxDim <= 10;
+            const exampleCount = examples.length;
+            
+            // Base cell size calculation
+            let cellSize: number;
+            if (isSmallGrid) {
+              // Small grids: prioritize space efficiency
+              cellSize = exampleCount > 4 ? 20 : exampleCount > 2 ? 24 : 28;
+            } else if (isMediumGrid) {
+              // Medium grids: balance between visibility and space
+              cellSize = exampleCount > 3 ? 18 : exampleCount > 1 ? 22 : 26;
+            } else {
+              // Large grids: prioritize fitting on screen
+              cellSize = maxDim > 20 ? 12 : maxDim > 15 ? 16 : 20;
+            }
+            
+            // Compact card styling with reduced padding
+            const cardPadding = isSmallGrid ? "p-2" : "p-2.5";
+            const headerSize = isSmallGrid ? "text-xs" : "text-xs";
+            const arrowSize = isSmallGrid ? "text-sm" : "text-base";
             
             return (
-              <div key={index} className={`flex-shrink-0 ${getExampleBgClass(index)} rounded border border-slate-600 p-3`}>
-                <h3 className="text-amber-300 text-xs font-semibold mb-2 text-center">
+              <div key={index} className={`flex-shrink-0 ${getExampleBgClass(index)} rounded border border-slate-600 ${cardPadding}`}>
+                <h3 className={`text-amber-300 ${headerSize} font-semibold mb-1.5 text-center`}>
                   EX {index + 1}
                 </h3>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <ResponsiveOfficerDisplayGrid
                     grid={example.input}
                     containerType="example"
@@ -190,7 +210,7 @@ export function TrainingExamplesSection({
                     displayMode={displayMode}
                     fixedCellSize={cellSize}
                   />
-                  <div className="text-cyan-400 text-sm font-bold">→</div>
+                  <div className={`text-cyan-400 ${arrowSize} font-bold px-0.5`}>→</div>
                   <ResponsiveOfficerDisplayGrid
                     grid={example.output}
                     containerType="example"

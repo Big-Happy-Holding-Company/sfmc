@@ -281,11 +281,13 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
   const currentDimensions = outputDimensions[currentTestIndex] || { width: 3, height: 3 };
   const hasExistingData = currentSolution.some(row => row.some(cell => cell !== 0));
 
-  // Calculate dynamic cell sizes for full screen usage
-  const calculateCellSize = (gridWidth: number, gridHeight: number) => {
-    // Use roughly 45% of viewport width for each grid (leaving space for arrow and padding)
-    const availableWidth = Math.floor(window.innerWidth * 0.45);
-    const availableHeight = Math.floor(window.innerHeight * 0.6); // 60% of viewport height
+  // Calculate dynamic cell sizes based on container context
+  const calculateCellSize = (gridWidth: number, gridHeight: number, isLargeScreen: boolean = window.innerWidth >= 1024) => {
+    // On large screens: each grid gets ~40% of viewport (3-column layout with controls in center)
+    // On smaller screens: full width for each grid (vertical stacking)
+    const widthRatio = isLargeScreen ? 0.40 : 0.85;
+    const availableWidth = Math.floor(window.innerWidth * widthRatio);
+    const availableHeight = Math.floor(window.innerHeight * 0.5); // Conservative height estimate
     
     const cellSizeByWidth = Math.floor(availableWidth / gridWidth);
     const cellSizeByHeight = Math.floor(availableHeight / gridHeight);
@@ -295,8 +297,9 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
     return Math.min(cellSize, 80); // Cap at 80px for readability
   };
 
-  const inputCellSize = calculateCellSize(testInput[0]?.length || 1, testInput.length);
-  const outputCellSize = calculateCellSize(currentDimensions.width, currentDimensions.height);
+  const isLargeScreen = window.innerWidth >= 1024;
+  const inputCellSize = calculateCellSize(testInput[0]?.length || 1, testInput.length, isLargeScreen);
+  const outputCellSize = calculateCellSize(currentDimensions.width, currentDimensions.height, isLargeScreen);
 
   // Validate puzzle with PlayFab when all tests are complete
   const validatePuzzleWithPlayFab = async () => {
@@ -609,9 +612,9 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
             </div>
           </div>
 
-          {/* Always use side-by-side layout to maximize screen usage */}
-          <div className="flex gap-4 w-full">
-            {/* Test Input - Left half */}
+          {/* Responsive layout: vertical on mobile, horizontal on larger screens */}
+          <div className="flex flex-col lg:flex-row gap-4 w-full">
+            {/* Test Input - Full width on mobile, left column on large screens */}
             <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-2">
               <h3 className="text-amber-300 text-xl font-semibold mb-2 text-center">TEST INPUT</h3>
               <ResponsiveOfficerDisplayGrid
@@ -624,8 +627,8 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
               />
             </div>
 
-            {/* Extracted Controls Panel */}
-            <div className="flex flex-col items-center justify-center px-2 space-y-3">
+            {/* Central Controls Wrapper - Full width on mobile, center column on large screens */}
+            <div className="flex flex-col items-center justify-center px-2 space-y-3 lg:max-w-sm lg:flex-shrink-0">
               
               {/* Grid Size Controls */}
               <PuzzleSolverControls
@@ -651,7 +654,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
               />
             </div>
 
-            {/* User Solution - Right half */}
+            {/* User Solution - Full width on mobile, right column on large screens */}
             <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-2">
               <h3 className="text-amber-300 text-xl font-semibold mb-2 text-center">YOUR SOLUTION</h3>
               <ResponsiveOfficerGrid
