@@ -141,14 +141,14 @@ export function TrainingExamplesSection({
     return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
   };
 
-  // Different background color shades for example cards to distinguish them
+  // Light pastel background colors for example cards - non-distracting and readable
   const getExampleBgClass = (index: number) => {
     const bgClasses = [
-      'bg-red-700',
-      'bg-blue-700',
-      'bg-green-700', 
-      'bg-purple-700',
-      'bg-orange-700'
+      'bg-rose-100',
+      'bg-sky-100',
+      'bg-emerald-100', 
+      'bg-purple-100',
+      'bg-amber-100'
     ];
     return bgClasses[index % bgClasses.length];
   };
@@ -165,21 +165,47 @@ export function TrainingExamplesSection({
         </div>
       </div>
       
-      {/* Compact Horizontal Layout for ALL grid sizes */}
+      {/* Dynamic Layout Based on Grid Complexity */}
       <div className="overflow-x-auto">
-        <div className="flex gap-4 pb-2">
+        <div className="flex gap-3 pb-2">
           {examples.map((example, index) => {
-            // Calculate cell size for training examples (smaller, more compact)
+            // Calculate optimal cell size based on grid complexity and available space
             const maxInputDim = Math.max(example.input.length, example.input[0]?.length || 1);
             const maxOutputDim = Math.max(example.output.length, example.output[0]?.length || 1);
             const maxDim = Math.max(maxInputDim, maxOutputDim);
             
-            // Use bigger cell sizes for training examples - much more visible
-            const cellSize = maxDim > 20 ? 24 : maxDim > 15 ? 32 : maxDim > 10 ? 40 : 48;
+            // More intelligent cell sizing - smaller grids get more space efficiency
+            const isSmallGrid = maxDim <= 5;
+            const isMediumGrid = maxDim <= 10;
+            const exampleCount = examples.length;
+            
+            // Base cell size calculation - ACTUALLY readable sizes
+            let cellSize: number;
+            if (isSmallGrid) {
+              // Small grids: make them properly readable - no squinting required
+              cellSize = exampleCount > 4 ? 100 : exampleCount > 2 ? 110 : 120;
+            } else if (isMediumGrid) {
+              // Medium grids: still very readable
+              cellSize = exampleCount > 3 ? 80 : exampleCount > 1 ? 90 : 100;
+            } else {
+              // Large grids: ensure visibility while fitting on screen
+              cellSize = maxDim > 20 ? 50 : maxDim > 15 ? 60 : 70;
+            }
+            
+            // Readable card styling with proper padding and text sizes
+            const cardPadding = isSmallGrid ? "p-3" : "p-4";
+            const headerSize = isSmallGrid ? "text-sm" : "text-base";
+            const arrowSize = isSmallGrid ? "text-lg" : "text-xl";
             
             return (
-              <div key={index} className={`flex-shrink-0 ${getExampleBgClass(index)} rounded border border-slate-600 p-3`}>
-                <h3 className="text-amber-300 text-xs font-semibold mb-2 text-center">
+              <div key={index} className={`flex-shrink-0 ${getExampleBgClass(index)} rounded-lg border-4 border-slate-400 shadow-lg ${cardPadding} relative overflow-hidden`}>
+                {/* Decorative corner elements */}
+                <div className="absolute top-0 left-0 w-4 h-4 border-l-4 border-t-4 border-slate-600 rounded-tl-lg"></div>
+                <div className="absolute top-0 right-0 w-4 h-4 border-r-4 border-t-4 border-slate-600 rounded-tr-lg"></div>
+                <div className="absolute bottom-0 left-0 w-4 h-4 border-l-4 border-b-4 border-slate-600 rounded-bl-lg"></div>
+                <div className="absolute bottom-0 right-0 w-4 h-4 border-r-4 border-b-4 border-slate-600 rounded-br-lg"></div>
+                
+                <h3 className={`text-slate-800 ${headerSize} font-bold mb-1.5 text-center`}>
                   EX {index + 1}
                 </h3>
                 <div className="flex items-center gap-2">
@@ -190,7 +216,7 @@ export function TrainingExamplesSection({
                     displayMode={displayMode}
                     fixedCellSize={cellSize}
                   />
-                  <div className="text-cyan-400 text-sm font-bold">→</div>
+                  <div className={`text-slate-700 ${arrowSize} font-bold px-0.5`}>→</div>
                   <ResponsiveOfficerDisplayGrid
                     grid={example.output}
                     containerType="example"

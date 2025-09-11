@@ -27,6 +27,7 @@ import { DATASET_DEFINITIONS } from '@shared/datasets';
 import { SPACE_EMOJIS } from '@/constants/spaceEmojis';
 import { loadPuzzleFromPlayFab } from '@/services/officerArcAPI';
 import { idConverter } from '@/services/idConverter';
+import { playFabRequestManager } from './playfab/requestManager';
 
 /**
  * ARC Data Service - Singleton for managing ARC puzzle data
@@ -194,7 +195,6 @@ export class ARCDataService {
    */
   private async loadPlayFabTitleData(key: string, isSinglePuzzleKey: boolean = false): Promise<any | null> {
     try {
-      const { playFabRequestManager } = await import('./playfab/requestManager');
       const result = await playFabRequestManager.makeRequest<{ Keys: string[] }, { Data?: Record<string, string> }>(
         'getTitleData',
         { Keys: [key] }

@@ -10,13 +10,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ResponsiveOfficerGrid, ResponsiveOfficerDisplayGrid } from '@/components/officer/ResponsiveOfficerGrid';
 import { TrainingExamplesSection } from '@/components/officer/TrainingExamplesSection';
-import { GridSizeSelector } from '@/components/officer/GridSizeSelector';
 import { TestCaseNavigation } from '@/components/officer/TestCaseNavigation';
-import { EmojiPaletteDivider } from '@/components/officer/EmojiPaletteDivider';
+import { PuzzleSolverControls } from '@/components/officer/PuzzleSolverControls';
+import { PuzzleTools } from '@/components/officer/PuzzleTools';
 import type { OfficerTrackPuzzle, ARCGrid } from '@/types/arcTypes';
 import type { DisplayMode, PuzzleDisplayState } from '@/types/puzzleDisplayTypes';
 import type { EmojiSet } from '@/constants/spaceEmojis';
-import { getEmojiSetOptions, getEmojiSetDropdownLabel } from '@/constants/spaceEmojis';
 import { puzzlePerformanceService } from '@/services/puzzlePerformanceService';
 import { playFabValidation } from '@/services/playfab/validation';
 import { playFabEvents } from '@/services/playfab/events';
@@ -282,22 +281,25 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
   const currentDimensions = outputDimensions[currentTestIndex] || { width: 3, height: 3 };
   const hasExistingData = currentSolution.some(row => row.some(cell => cell !== 0));
 
-  // Calculate dynamic cell sizes for full screen usage
-  const calculateCellSize = (gridWidth: number, gridHeight: number) => {
-    // Use roughly 45% of viewport width for each grid (leaving space for arrow and padding)
-    const availableWidth = Math.floor(window.innerWidth * 0.45);
-    const availableHeight = Math.floor(window.innerHeight * 0.6); // 60% of viewport height
+  // Calculate dynamic cell sizes for much better space utilization
+  const calculateCellSize = (gridWidth: number, gridHeight: number, isLargeScreen: boolean = window.innerWidth >= 1024) => {
+    // On large screens: each grid gets ~45% of viewport (leaving space for controls)
+    // On smaller screens: use most of the width for better visibility
+    const widthRatio = isLargeScreen ? 0.45 : 0.90;
+    const availableWidth = Math.floor(window.innerWidth * widthRatio);
+    const availableHeight = Math.floor(window.innerHeight * 0.6); // More generous height
     
     const cellSizeByWidth = Math.floor(availableWidth / gridWidth);
     const cellSizeByHeight = Math.floor(availableHeight / gridHeight);
     
-    // Use the smaller dimension but ensure minimum size
-    const cellSize = Math.max(12, Math.min(cellSizeByWidth, cellSizeByHeight));
-    return Math.min(cellSize, 80); // Cap at 80px for readability
+    // Use the smaller dimension but ensure much larger minimum size
+    const cellSize = Math.max(40, Math.min(cellSizeByWidth, cellSizeByHeight));
+    return Math.min(cellSize, 120); // Much higher cap for better visibility
   };
 
-  const inputCellSize = calculateCellSize(testInput[0]?.length || 1, testInput.length);
-  const outputCellSize = calculateCellSize(currentDimensions.width, currentDimensions.height);
+  const isLargeScreen = window.innerWidth >= 1024;
+  const inputCellSize = calculateCellSize(testInput[0]?.length || 1, testInput.length, isLargeScreen);
+  const outputCellSize = calculateCellSize(currentDimensions.width, currentDimensions.height, isLargeScreen);
 
   // Validate puzzle with PlayFab when all tests are complete
   const validatePuzzleWithPlayFab = async () => {
@@ -583,7 +585,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
               <h3 className="text-slate-800 text-lg font-bold flex items-center gap-2 mb-1">
                 🎯 MULTI-TEST PUZZLE - ALL {totalTests} TESTS REQUIRED
               </h3>
-              <p className="text-slate-700 text-sm">
+              <p className="text-slate-700 text-base">
                 ⚠️ You must solve ALL {totalTests} test cases to complete this puzzle. Switch between tests using the buttons below.
               </p>
             </div>
@@ -598,11 +600,11 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
 
         {/* Solving Interface - Full Screen Width */}
         <div className="w-full">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-amber-400 font-semibold text-3xl">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-amber-400 font-bold text-4xl">
               🧩 SOLVE TEST CASE {currentTestIndex + 1}
             </h2>
-            <div className="text-slate-400 text-xl">
+            <div className="text-slate-300 text-lg font-medium">
               {isValidating ? '🔄 Validating with PlayFab...' : 
                validationResult?.correct ? '🎉 PlayFab Verified!' :
                validationError ? '❌ PlayFab Validation Error' :
@@ -610,11 +612,11 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
             </div>
           </div>
 
-          {/* Always use side-by-side layout to maximize screen usage */}
-          <div className="flex gap-4 w-full">
-            {/* Test Input - Left half */}
-            <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-2">
-              <h3 className="text-amber-300 text-xl font-semibold mb-2 text-center">TEST INPUT</h3>
+          {/* Responsive layout: vertical on mobile, horizontal on larger screens */}
+          <div className="flex flex-col lg:flex-row gap-4 w-full">
+            {/* Test Input - Full width on mobile, left column on large screens */}
+            <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-4">
+              <h3 className="text-amber-300 text-2xl font-bold mb-4 text-center">TEST INPUT</h3>
               <ResponsiveOfficerDisplayGrid
                 grid={testInput}
                 containerType="solver"
@@ -625,156 +627,36 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
               />
             </div>
 
-            {/* Combined Controls Panel - Grid Size + Display + Emoji Palette */}
-            <div className="flex flex-col items-center justify-center px-2 space-y-3">
+            {/* Central Controls Wrapper - Full width on mobile, center column on large screens */}
+            <div className="flex flex-col items-center justify-center px-2 space-y-3 lg:max-w-sm lg:flex-shrink-0">
               
-              {/* Grid Size Controls - Compact */}
-              <div className="bg-slate-800 border border-slate-600 rounded-lg p-2 w-full">
-                <h4 className="text-amber-300 text-xs font-semibold mb-2 text-center">OUTPUT SIZE</h4>
-                <div className="flex items-center justify-center gap-2 text-xs">
-                  <select
-                    value={currentDimensions.width}
-                    onChange={(e) => handleSizeChange(parseInt(e.target.value), currentDimensions.height)}
-                    className="bg-slate-700 border border-slate-500 rounded px-2 py-1 text-amber-100 text-xs"
-                  >
-                    {Array.from({ length: 30 }, (_, i) => i + 1).map(size => (
-                      <option key={size} value={size}>W: {size}</option>
-                    ))}
-                  </select>
-                  <span className="text-slate-400">×</span>
-                  <select
-                    value={currentDimensions.height}
-                    onChange={(e) => handleSizeChange(currentDimensions.width, parseInt(e.target.value))}
-                    className="bg-slate-700 border border-slate-500 rounded px-2 py-1 text-amber-100 text-xs"
-                  >
-                    {Array.from({ length: 30 }, (_, i) => i + 1).map(size => (
-                      <option key={size} value={size}>H: {size}</option>
-                    ))}
-                  </select>
-                </div>
-                
-                {/* Quick Size Suggestions */}
-                {getSuggestedSizes().length > 0 && (
-                  <div className="flex flex-wrap justify-center gap-1 mt-2">
-                    {getSuggestedSizes().slice(0, 3).map((size, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleSizeChange(size.width, size.height)}
-                        className="bg-amber-700 hover:bg-amber-600 text-white text-xs px-2 py-1 rounded"
-                      >
-                        {size.width}×{size.height}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Display Mode & Emoji Set Controls - Compact */}
-              <div className="bg-slate-800 border border-slate-600 rounded-lg p-2 w-full">
-                <h4 className="text-amber-300 text-xs font-semibold mb-2 text-center">DISPLAY</h4>
-                
-                {/* Display Mode Toggle */}
-                <div className="flex justify-center gap-1 mb-2">
-                  <button
-                    onClick={() => handleDisplayModeChange('arc-colors')}
-                    className={`px-3 py-2 text-sm rounded h-10 ${displayState.displayMode === 'arc-colors' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
-                  >
-                    123
-                  </button>
-                  <button
-                    onClick={() => handleDisplayModeChange('emoji')}
-                    className={`px-3 py-2 text-sm rounded h-10 ${displayState.displayMode === 'emoji' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
-                  >
-                    🎨
-                  </button>
-                  <button
-                    onClick={() => handleDisplayModeChange('hybrid')}
-                    className={`px-3 py-2 text-sm rounded h-10 ${displayState.displayMode === 'hybrid' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
-                  >
-                    MIX
-                  </button>
-                </div>
-                
-                {/* Emoji Set Dropdown - Only show when emoji or hybrid mode */}
-                {(displayState.displayMode === 'emoji' || displayState.displayMode === 'hybrid') && (
-                  <select
-                    value={displayState.emojiSet}
-                    onChange={(e) => handleEmojiSetChange(e.target.value as any)}
-                    className="w-full bg-slate-700 border border-slate-500 rounded px-2 py-1 text-amber-100 text-xs"
-                  >
-                    {getEmojiSetOptions().map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {getEmojiSetDropdownLabel(option.value)}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-
-              {/* Action Controls - Puzzle Actions */}
-              <div className="bg-slate-800 border border-slate-600 rounded-lg p-2 w-full">
-                <h4 className="text-amber-300 text-xs font-semibold mb-2 text-center">ACTIONS</h4>
-                
-                {/* Primary Actions Row */}
-                <div className="flex flex-col gap-2">
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white text-sm px-3 py-3 h-12" 
-                    onClick={copyInput}
-                  >
-                    Copy Input
-                  </Button>
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white text-sm px-3 py-3 h-12" 
-                    onClick={resetSolution}
-                  >
-                    Reset
-                  </Button>
-                </div>
-              </div>
-
-              {/* Emoji Palette - Main Selection */}
-              <EmojiPaletteDivider
-                emojiSet={displayState.emojiSet}
-                selectedValue={displayState.selectedValue}
-                onValueSelect={handleValueSelect}
-                usedValues={getUsedValues()}
-                displayMode={displayState.displayMode}
-                className="bg-slate-800 border border-slate-600 rounded-lg p-3 w-full"
+              {/* Grid Size Controls */}
+              <PuzzleSolverControls
+                currentDimensions={currentDimensions}
+                onSizeChange={handleSizeChange}
+                getSuggestedSizes={getSuggestedSizes}
               />
 
-              {/* Validation Button - Separated with margin */}
-              <div className="mt-4">
-                <Button
-                  size="lg"
-                  className={`w-full px-3 py-3 h-12 text-sm ${
-                    completedTests.every(test => test) 
-                      ? 'bg-green-600 hover:bg-green-700 text-white' 
-                      : 'bg-gray-600 hover:bg-gray-700 text-white'
-                  }`}
-                  disabled={isValidating}
-                  onClick={() => validatePuzzleWithPlayFab()}
-                >
-                  {isValidating ? '🔄 Submitting to PlayFab...' : 
-                   completedTests.every(test => test) ? '🎯 Submit for Official Validation' : 
-                   '🎯 Submit Solution (Incomplete)'}
-                </Button>
-                
-                {/* Helper text */}
-                <div className="text-xs text-slate-400 mt-2 text-center">
-                  {completedTests.every(test => test) ? 
-                    'All tests pass locally! Submit for official verification.' :
-                    'Frontend validation checks your solution as you work.'}
-                </div>
-              </div>
+              {/* Display Controls, Actions, Palette, and Validation */}
+              <PuzzleTools
+                displayMode={displayState.displayMode}
+                emojiSet={displayState.emojiSet}
+                selectedValue={displayState.selectedValue}
+                onDisplayModeChange={handleDisplayModeChange}
+                onEmojiSetChange={handleEmojiSetChange}
+                onValueSelect={handleValueSelect}
+                onCopyInput={copyInput}
+                onResetSolution={resetSolution}
+                onValidate={() => validatePuzzleWithPlayFab()}
+                isValidating={isValidating}
+                allTestsCompleted={completedTests.every(test => test)}
+                usedValues={getUsedValues()}
+              />
             </div>
 
-            {/* User Solution - Right half */}
-            <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-2">
-              <h3 className="text-amber-300 text-xl font-semibold mb-2 text-center">YOUR SOLUTION</h3>
+            {/* User Solution - Full width on mobile, right column on large screens */}
+            <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-4">
+              <h3 className="text-amber-300 text-2xl font-bold mb-4 text-center">YOUR SOLUTION</h3>
               <ResponsiveOfficerGrid
                 initialGrid={currentSolution}
                 containerType="solver"
@@ -793,7 +675,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
           {/* Validation Status */}
           {validationError && (
             <div className="bg-red-900 border border-red-600 rounded-lg p-4 mt-4">
-              <div className="text-red-300 text-sm">
+              <div className="text-red-300 text-base">
                 <strong>❌ Validation Error:</strong> {validationError}
               </div>
             </div>
@@ -801,7 +683,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
 
           {validationResult && (
             <div className="bg-green-900 border border-green-600 rounded-lg p-4 mt-4">
-              <div className="text-green-300 text-sm">
+              <div className="text-green-300 text-base">
                 <strong>✅ PlayFab Validation Complete:</strong> 
                 {getValidationMessage()}
                 {validationResult.timeElapsed && (
@@ -815,7 +697,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
 
         {/* Pattern Analysis Tip */}
         <div className="bg-blue-900 border border-blue-600 rounded-lg p-4">
-          <div className="text-blue-300 text-sm">
+          <div className="text-blue-300 text-base">
             <strong>💡 Solving Strategy:</strong> 
             {trainingExamples.length > 0 
               ? ` Study the ${trainingExamples.length} training examples above to identify the transformation pattern, then apply it to the test input.`
