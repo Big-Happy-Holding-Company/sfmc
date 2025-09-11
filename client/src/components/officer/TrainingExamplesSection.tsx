@@ -198,7 +198,13 @@ export function TrainingExamplesSection({
             const arrowSize = isSmallGrid ? "text-lg" : "text-xl";
             
             return (
-              <div key={index} className={`flex-shrink-0 ${getExampleBgClass(index)} rounded border border-slate-300 ${cardPadding}`}>
+              <div key={index} className={`flex-shrink-0 ${getExampleBgClass(index)} rounded-lg border-4 border-slate-400 shadow-lg ${cardPadding} relative overflow-hidden`}>
+                {/* Decorative corner elements */}
+                <div className="absolute top-0 left-0 w-4 h-4 border-l-4 border-t-4 border-slate-600 rounded-tl-lg"></div>
+                <div className="absolute top-0 right-0 w-4 h-4 border-r-4 border-t-4 border-slate-600 rounded-tr-lg"></div>
+                <div className="absolute bottom-0 left-0 w-4 h-4 border-l-4 border-b-4 border-slate-600 rounded-bl-lg"></div>
+                <div className="absolute bottom-0 right-0 w-4 h-4 border-r-4 border-b-4 border-slate-600 rounded-br-lg"></div>
+                
                 <h3 className={`text-slate-800 ${headerSize} font-bold mb-1.5 text-center`}>
                   EX {index + 1}
                 </h3>
