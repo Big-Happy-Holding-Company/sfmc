@@ -44,10 +44,10 @@ export function PuzzleGrid({ puzzles, loading, onSelectPuzzle }: PuzzleGridProps
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8">
         {Array.from({ length: 6 }).map((_, i) => (
-          <Card key={i} className="bg-slate-800 border-slate-600">
-            <CardContent className="p-6">
+          <Card key={i} className="bg-slate-800 border-slate-600 min-h-[400px]">
+            <CardContent className="p-6 sm:p-8">
               <div className="animate-pulse">
                 <div className="flex justify-between mb-4">
                   <div className="space-y-2">
@@ -95,7 +95,7 @@ export function PuzzleGrid({ puzzles, loading, onSelectPuzzle }: PuzzleGridProps
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8">
       {puzzles.map((puzzle) => {
         const difficultyBadge = getDifficultyBadge(puzzle.difficulty);
         const analysisQualityBadge = getAnalysisQualityBadge(puzzle);
@@ -103,39 +103,39 @@ export function PuzzleGrid({ puzzles, loading, onSelectPuzzle }: PuzzleGridProps
         return (
           <Card 
             key={puzzle.id}
-            className="bg-slate-800 border-slate-600 hover:border-amber-500 transition-colors cursor-pointer group"
+            className="bg-slate-800 border-slate-600 hover:border-amber-500 transition-colors cursor-pointer group min-h-[400px]"
             onClick={() => onSelectPuzzle(puzzle)}
           >
-            <CardContent className="p-6">
+            <CardContent className="p-6 sm:p-8">
               {/* Header with Analysis Quality and Attempts */}
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex flex-col gap-2">
-                  <Badge className={`text-xs ${analysisQualityBadge.className} font-semibold`}>
+              <div className="flex justify-between items-start mb-6">
+                <div className="flex flex-col gap-3">
+                  <Badge className={`text-sm px-3 py-1 ${analysisQualityBadge.className} font-semibold`}>
                     🤖 {analysisQualityBadge.label}
                   </Badge>
-                  <Badge className={`text-xs ${difficultyBadge.className}`}>
+                  <Badge className={`text-sm px-3 py-1 ${difficultyBadge.className}`}>
                     💀 {difficultyBadge.label}
                   </Badge>
                 </div>
                 <div className="text-right">
-                  <div className="text-xs text-slate-400">Analysis Count</div>
-                  <div className="text-lg font-bold text-amber-400">#{puzzle.totalExplanations}</div>
+                  <div className="text-sm text-slate-400 mb-1">Analysis Count</div>
+                  <div className="text-2xl font-bold text-amber-400">#{puzzle.totalExplanations}</div>
                 </div>
               </div>
 
               {/* Puzzle ID - Larger and more prominent */}
-              <div className="mb-4">
-                <div className="text-amber-200 font-mono text-lg font-bold">
+              <div className="mb-6">
+                <div className="text-amber-200 font-mono text-xl font-bold tracking-wide">
                   {puzzle.id}
                 </div>
               </div>
 
-              {/* Rich Metadata Grid */}
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              {/* Rich Metadata Grid - Better Spacing and Sizing */}
+              <div className="grid grid-cols-2 gap-4 mb-8">
                 {/* AI Success Rate */}
-                <div className="bg-slate-700 rounded-lg p-3">
-                  <div className="text-xs text-slate-400 mb-1">Success Rate</div>
-                  <div className={`text-lg font-bold ${
+                <div className="bg-slate-700 rounded-lg p-4">
+                  <div className="text-sm text-slate-400 mb-2">Success Rate</div>
+                  <div className={`text-xl font-bold ${
                     puzzle.avgAccuracy === 0 ? 'text-red-400' :
                     puzzle.avgAccuracy <= 0.25 ? 'text-orange-400' :
                     puzzle.avgAccuracy <= 0.50 ? 'text-yellow-400' :
@@ -146,34 +146,34 @@ export function PuzzleGrid({ puzzles, loading, onSelectPuzzle }: PuzzleGridProps
                 </div>
 
                 {/* AI Confidence when Wrong */}
-                <div className="bg-slate-700 rounded-lg p-3">
-                  <div className="text-xs text-slate-400 mb-1">Confidence</div>
-                  <div className="text-lg font-bold text-cyan-400">
+                <div className="bg-slate-700 rounded-lg p-4">
+                  <div className="text-sm text-slate-400 mb-2">Confidence</div>
+                  <div className="text-xl font-bold text-cyan-400">
                     {puzzle.avgConfidence ? `${Math.round(puzzle.avgConfidence)}%` : 'N/A'}
                   </div>
                 </div>
 
                 {/* Failed Attempts */}
-                <div className="bg-slate-700 rounded-lg p-3">
-                  <div className="text-xs text-slate-400 mb-1">Failed</div>
-                  <div className="text-lg font-bold text-purple-400">
+                <div className="bg-slate-700 rounded-lg p-4">
+                  <div className="text-sm text-slate-400 mb-2">Failed</div>
+                  <div className="text-xl font-bold text-purple-400">
                     {puzzle.wrongCount?.toLocaleString() || '0'}
                   </div>
                 </div>
 
                 {/* Human Feedback */}
-                <div className="bg-slate-700 rounded-lg p-3">
-                  <div className="text-xs text-slate-400 mb-1">Feedback</div>
-                  <div className="text-lg font-bold text-pink-400">
+                <div className="bg-slate-700 rounded-lg p-4">
+                  <div className="text-sm text-slate-400 mb-2">Feedback</div>
+                  <div className="text-xl font-bold text-pink-400">
                     {puzzle.totalFeedback ? `${puzzle.negativeFeedback || 0}/${puzzle.totalFeedback}` : '0/0'}
                   </div>
                 </div>
               </div>
 
-              {/* Action Button */}
+              {/* Action Button - Larger and more prominent */}
               <Button 
-                size="sm" 
-                className="w-full bg-amber-600 hover:bg-amber-700 text-slate-900 group-hover:bg-amber-500 font-semibold"
+                size="lg" 
+                className="w-full bg-amber-600 hover:bg-amber-700 text-slate-900 group-hover:bg-amber-500 font-semibold text-base py-4"
               >
                 🎯 Accept Challenge
               </Button>
