@@ -13,6 +13,7 @@ import { TrainingExamplesSection } from '@/components/officer/TrainingExamplesSe
 import { TestCaseNavigation } from '@/components/officer/TestCaseNavigation';
 import { PuzzleSolverControls } from '@/components/officer/PuzzleSolverControls';
 import { PuzzleTools } from '@/components/officer/PuzzleTools';
+import { PermanentHintSystem } from '@/components/officer/PermanentHintSystem';
 import type { OfficerTrackPuzzle, ARCGrid } from '@/types/arcTypes';
 import type { DisplayMode, PuzzleDisplayState } from '@/types/puzzleDisplayTypes';
 import type { EmojiSet } from '@/constants/spaceEmojis';
@@ -23,9 +24,10 @@ import { playFabEvents } from '@/services/playfab/events';
 interface ResponsivePuzzleSolverProps {
   puzzle: OfficerTrackPuzzle;
   onBack: () => void;
+  tutorialMode?: boolean;
 }
 
-export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: ResponsivePuzzleSolverProps) {
+export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorialMode = false }: ResponsivePuzzleSolverProps) {
   const [puzzle, setPuzzle] = useState<OfficerTrackPuzzle>(initialPuzzle);
   // Multi-test case state
   const [currentTestIndex, setCurrentTestIndex] = useState(0);
@@ -565,6 +567,11 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
 
       <main className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
+        {/* Permanent Hint System */}
+        <PermanentHintSystem 
+          puzzle={puzzle}
+          tutorialMode={tutorialMode}
+        />
 
         {/* Training Examples Section */}
         {trainingExamples.length > 0 && (
