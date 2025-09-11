@@ -208,62 +208,62 @@ export default function OfficerTrackSimple() {
           </div>
         )}
 
-        {/* Puzzle Search & Controls */}
-        <div className="bg-slate-800 border border-slate-600 rounded-lg p-6 mb-6">
-          <h2 className="text-amber-400 font-semibold mb-4 flex items-center">
+        {/* Puzzle Search & Controls - Enhanced Responsive Layout */}
+        <div className="bg-slate-800 border border-slate-600 rounded-lg p-6 sm:p-8 mb-6">
+          <h2 className="text-amber-400 font-semibold text-xl mb-6 flex items-center">
             🔍 PUZZLE SEARCH & FILTERS
           </h2>
           
           {/* System Status Indicator */}
           {playFabInitializing && (
-            <div className="bg-blue-900 border border-blue-600 rounded-lg p-3 mb-4">
+            <div className="bg-blue-900 border border-blue-600 rounded-lg p-4 mb-6">
               <div className="flex items-center">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-400 mr-3"></div>
-                <span className="text-blue-300 text-sm">Initializing PlayFab connection for puzzle data access...</span>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-400 mr-4"></div>
+                <span className="text-blue-300 text-base">Initializing PlayFab connection for puzzle data access...</span>
               </div>
             </div>
           )}
           
           {!playFabInitializing && !playFabReady && (
-            <div className="bg-orange-900 border border-orange-600 rounded-lg p-3 mb-4">
-              <div className="text-orange-300 text-sm">
+            <div className="bg-orange-900 border border-orange-600 rounded-lg p-4 mb-6">
+              <div className="text-orange-300 text-base">
                 ⚠️ PlayFab connection failed - puzzle loading may be limited to arc-explainer data only
               </div>
             </div>
           )}
 
-          {/* Search Row */}
-          <div className="flex space-x-3 mb-4">
+          {/* Search Row - Better Mobile Layout */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <Input
               type="text"
               placeholder="Enter puzzle ID (e.g., 494ef9d7)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              className="bg-slate-700 border-slate-600 text-amber-100 flex-1"
+              className="bg-slate-700 border-slate-600 text-amber-100 flex-1 h-12 text-base px-4"
               disabled={playFabInitializing}
             />
             <Button 
               onClick={handleSearch}
               disabled={playFabInitializing || searching || !searchQuery.trim()}
-              className="bg-amber-600 hover:bg-amber-700 text-slate-900 disabled:bg-amber-800 disabled:opacity-50"
+              className="bg-amber-600 hover:bg-amber-700 text-slate-900 disabled:bg-amber-800 disabled:opacity-50 h-12 px-6 font-semibold text-base"
             >
               {playFabInitializing ? 'Initializing...' : searching ? 'Searching...' : 'Find Puzzle'}
             </Button>
           </div>
 
-          {/* Limit Controls - copied from arc-explainer */}
-          <div className="border-t border-slate-600 pt-4">
-            <div className="flex items-center gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <label htmlFor="limit-select" className="text-sm font-medium text-amber-300">
+          {/* Limit Controls - Better Responsive Layout */}
+          <div className="border-t border-slate-600 pt-6">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="flex items-center gap-3">
+                <label htmlFor="limit-select" className="text-base font-medium text-amber-300">
                   Show hardest:
                 </label>
                 <select
                   id="limit-select"
                   value={currentLimit}
                   onChange={(e) => setLimit(parseInt(e.target.value))}
-                  className="px-3 py-2 bg-slate-700 border border-slate-600 rounded-md text-sm text-amber-100"
+                  className="px-4 py-3 bg-slate-700 border border-slate-600 rounded-md text-base text-amber-100 min-w-[140px]"
                 >
                   <option value={25}>25 puzzles</option>
                   <option value={50}>50 puzzles</option>
@@ -274,25 +274,25 @@ export default function OfficerTrackSimple() {
                 </select>
               </div>
               
-              <div className="text-slate-400 text-sm">
+              <div className="text-slate-400 text-base">
                 Showing {filteredPuzzles.length} of {total} total analyzed puzzles
               </div>
             </div>
           </div>
 
-          <p className="text-slate-400 text-xs mt-3">
+          <p className="text-slate-400 text-sm mt-4">
             Search for specific puzzles by their ID or adjust the number of hardest puzzles to display
           </p>
 
         </div>
 
         {/* Rich AI Failure Analysis Overview */}
-        <div className="bg-slate-800 border border-slate-600 rounded-lg p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-cyan-400 font-semibold flex items-center">
+        <div className="bg-slate-800 border border-slate-600 rounded-lg p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
+            <h2 className="text-cyan-400 font-semibold text-xl flex items-center mb-2 sm:mb-0">
               🧠 AI FAILURE ANALYSIS - ARC-EXPLAINER DATA
             </h2>
-            <div className="text-slate-400 text-sm">
+            <div className="text-slate-400 text-base">
               Live failure patterns & trustworthiness metrics
             </div>
           </div>
