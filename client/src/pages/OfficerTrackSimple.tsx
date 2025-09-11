@@ -75,12 +75,13 @@ export default function OfficerTrackSimple() {
         
         setPlayer(playerData);
 
-        // Redirect to tutorial if the user hasn't completed it
-        if (!playerData.hasCompletedTutorial) {
-          console.log('New user detected, redirecting to tutorial.');
-          setLocation('/tutorial');
-          return; // Stop further execution
-        }
+        // DISABLED: Automatic tutorial redirect (was causing infinite loops)
+        // Tutorial is now manual-only via button click or direct /tutorial URL visit
+        // if (!playerData.hasCompletedTutorial) {
+        //   console.log('New user detected, redirecting to tutorial.');
+        //   setLocation('/tutorial');
+        //   return; // Stop further execution
+        // }
 
         setTotalTasks(tasksData.length);
         setPlayFabReady(true);
@@ -180,7 +181,7 @@ export default function OfficerTrackSimple() {
       
       <div className="bg-slate-800 border-b-2 border-amber-400 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-center items-center">
+          <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
               <h1 className="text-2xl font-bold text-amber-400">
                 🎖️ OFFICER ACADEMY
@@ -189,6 +190,14 @@ export default function OfficerTrackSimple() {
                 ARC-AGI CHALLENGES
               </Badge>
             </div>
+            
+            <Button 
+              onClick={() => setLocation('/tutorial')}
+              className="bg-cyan-400 hover:bg-blue-500 text-slate-900 font-semibold"
+              disabled={playFabInitializing}
+            >
+              🎖️ Start Officer Training
+            </Button>
           </div>
         </div>
       </div>
