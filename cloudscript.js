@@ -722,7 +722,8 @@ function findPuzzleInBatches(puzzleId) {
             const titleDataResponse = server.GetTitleData({ Keys: [batchKeys[i]] });
             
             if (titleDataResponse.Data && titleDataResponse.Data[batchKeys[i]]) {
-                const dataValue = titleDataResponse.Data[batchKeys[i]].Value;
+                // In CloudScript, GetTitleData returns Data[key] directly as a JSON string (no .Value)
+                const dataValue = titleDataResponse.Data[batchKeys[i]];
                 
                 if (dataValue && dataValue !== "undefined") {
                     const puzzles = JSON.parse(dataValue);
