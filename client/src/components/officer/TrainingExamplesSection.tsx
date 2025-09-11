@@ -167,7 +167,7 @@ export function TrainingExamplesSection({
       
       {/* Dynamic Layout Based on Grid Complexity */}
       <div className="overflow-x-auto">
-        <div className="flex gap-1.5 pb-2">
+        <div className="flex gap-3 pb-2">
           {examples.map((example, index) => {
             // Calculate optimal cell size based on grid complexity and available space
             const maxInputDim = Math.max(example.input.length, example.input[0]?.length || 1);
@@ -179,17 +179,17 @@ export function TrainingExamplesSection({
             const isMediumGrid = maxDim <= 10;
             const exampleCount = examples.length;
             
-            // Base cell size calculation
+            // Base cell size calculation - increased for better readability
             let cellSize: number;
             if (isSmallGrid) {
-              // Small grids: prioritize space efficiency
-              cellSize = exampleCount > 4 ? 20 : exampleCount > 2 ? 24 : 28;
+              // Small grids: good visibility with reasonable space efficiency
+              cellSize = exampleCount > 4 ? 32 : exampleCount > 2 ? 36 : 40;
             } else if (isMediumGrid) {
               // Medium grids: balance between visibility and space
-              cellSize = exampleCount > 3 ? 18 : exampleCount > 1 ? 22 : 26;
+              cellSize = exampleCount > 3 ? 28 : exampleCount > 1 ? 32 : 36;
             } else {
-              // Large grids: prioritize fitting on screen
-              cellSize = maxDim > 20 ? 12 : maxDim > 15 ? 16 : 20;
+              // Large grids: ensure they're still visible
+              cellSize = maxDim > 20 ? 18 : maxDim > 15 ? 24 : 28;
             }
             
             // Compact card styling with reduced padding
@@ -202,7 +202,7 @@ export function TrainingExamplesSection({
                 <h3 className={`text-amber-300 ${headerSize} font-semibold mb-1.5 text-center`}>
                   EX {index + 1}
                 </h3>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
                   <ResponsiveOfficerDisplayGrid
                     grid={example.input}
                     containerType="example"
