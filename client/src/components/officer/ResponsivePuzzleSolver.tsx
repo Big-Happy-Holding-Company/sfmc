@@ -10,13 +10,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ResponsiveOfficerGrid, ResponsiveOfficerDisplayGrid } from '@/components/officer/ResponsiveOfficerGrid';
 import { TrainingExamplesSection } from '@/components/officer/TrainingExamplesSection';
-import { GridSizeSelector } from '@/components/officer/GridSizeSelector';
 import { TestCaseNavigation } from '@/components/officer/TestCaseNavigation';
-import { EmojiPaletteDivider } from '@/components/officer/EmojiPaletteDivider';
+import { PuzzleSolverControls } from '@/components/officer/PuzzleSolverControls';
+import { PuzzleTools } from '@/components/officer/PuzzleTools';
 import type { OfficerTrackPuzzle, ARCGrid } from '@/types/arcTypes';
 import type { DisplayMode, PuzzleDisplayState } from '@/types/puzzleDisplayTypes';
 import type { EmojiSet } from '@/constants/spaceEmojis';
-import { getEmojiSetOptions, getEmojiSetDropdownLabel } from '@/constants/spaceEmojis';
 import { puzzlePerformanceService } from '@/services/puzzlePerformanceService';
 import { playFabValidation } from '@/services/playfab/validation';
 import { playFabEvents } from '@/services/playfab/events';
@@ -625,151 +624,31 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
               />
             </div>
 
-            {/* Combined Controls Panel - Grid Size + Display + Emoji Palette */}
+            {/* Extracted Controls Panel */}
             <div className="flex flex-col items-center justify-center px-2 space-y-3">
               
-              {/* Grid Size Controls - Compact */}
-              <div className="bg-slate-800 border border-slate-600 rounded-lg p-2 w-full">
-                <h4 className="text-amber-300 text-xs font-semibold mb-2 text-center">OUTPUT SIZE</h4>
-                <div className="flex items-center justify-center gap-2 text-xs">
-                  <select
-                    value={currentDimensions.width}
-                    onChange={(e) => handleSizeChange(parseInt(e.target.value), currentDimensions.height)}
-                    className="bg-slate-700 border border-slate-500 rounded px-2 py-1 text-amber-100 text-xs"
-                  >
-                    {Array.from({ length: 30 }, (_, i) => i + 1).map(size => (
-                      <option key={size} value={size}>W: {size}</option>
-                    ))}
-                  </select>
-                  <span className="text-slate-400">×</span>
-                  <select
-                    value={currentDimensions.height}
-                    onChange={(e) => handleSizeChange(currentDimensions.width, parseInt(e.target.value))}
-                    className="bg-slate-700 border border-slate-500 rounded px-2 py-1 text-amber-100 text-xs"
-                  >
-                    {Array.from({ length: 30 }, (_, i) => i + 1).map(size => (
-                      <option key={size} value={size}>H: {size}</option>
-                    ))}
-                  </select>
-                </div>
-                
-                {/* Quick Size Suggestions */}
-                {getSuggestedSizes().length > 0 && (
-                  <div className="flex flex-wrap justify-center gap-1 mt-2">
-                    {getSuggestedSizes().slice(0, 3).map((size, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleSizeChange(size.width, size.height)}
-                        className="bg-amber-700 hover:bg-amber-600 text-white text-xs px-2 py-1 rounded"
-                      >
-                        {size.width}×{size.height}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Display Mode & Emoji Set Controls - Compact */}
-              <div className="bg-slate-800 border border-slate-600 rounded-lg p-2 w-full">
-                <h4 className="text-amber-300 text-xs font-semibold mb-2 text-center">DISPLAY</h4>
-                
-                {/* Display Mode Toggle */}
-                <div className="flex justify-center gap-1 mb-2">
-                  <button
-                    onClick={() => handleDisplayModeChange('arc-colors')}
-                    className={`px-3 py-2 text-sm rounded h-10 ${displayState.displayMode === 'arc-colors' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
-                  >
-                    123
-                  </button>
-                  <button
-                    onClick={() => handleDisplayModeChange('emoji')}
-                    className={`px-3 py-2 text-sm rounded h-10 ${displayState.displayMode === 'emoji' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
-                  >
-                    🎨
-                  </button>
-                  <button
-                    onClick={() => handleDisplayModeChange('hybrid')}
-                    className={`px-3 py-2 text-sm rounded h-10 ${displayState.displayMode === 'hybrid' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300'}`}
-                  >
-                    MIX
-                  </button>
-                </div>
-                
-                {/* Emoji Set Dropdown - Only show when emoji or hybrid mode */}
-                {(displayState.displayMode === 'emoji' || displayState.displayMode === 'hybrid') && (
-                  <select
-                    value={displayState.emojiSet}
-                    onChange={(e) => handleEmojiSetChange(e.target.value as any)}
-                    className="w-full bg-slate-700 border border-slate-500 rounded px-2 py-1 text-amber-100 text-xs"
-                  >
-                    {getEmojiSetOptions().map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {getEmojiSetDropdownLabel(option.value)}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-
-              {/* Action Controls - Puzzle Actions */}
-              <div className="bg-slate-800 border border-slate-600 rounded-lg p-2 w-full">
-                <h4 className="text-amber-300 text-xs font-semibold mb-2 text-center">ACTIONS</h4>
-                
-                {/* Primary Actions Row */}
-                <div className="flex flex-col gap-2">
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white text-sm px-3 py-3 h-12" 
-                    onClick={copyInput}
-                  >
-                    Copy Input
-                  </Button>
-                  <Button 
-                    size="lg" 
-                    variant="outline" 
-                    className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white text-sm px-3 py-3 h-12" 
-                    onClick={resetSolution}
-                  >
-                    Reset
-                  </Button>
-                </div>
-              </div>
-
-              {/* Emoji Palette - Main Selection */}
-              <EmojiPaletteDivider
-                emojiSet={displayState.emojiSet}
-                selectedValue={displayState.selectedValue}
-                onValueSelect={handleValueSelect}
-                usedValues={getUsedValues()}
-                displayMode={displayState.displayMode}
-                className="bg-slate-800 border border-slate-600 rounded-lg p-3 w-full"
+              {/* Grid Size Controls */}
+              <PuzzleSolverControls
+                currentDimensions={currentDimensions}
+                onSizeChange={handleSizeChange}
+                getSuggestedSizes={getSuggestedSizes}
               />
 
-              {/* Validation Button - Separated with margin */}
-              <div className="mt-4">
-                <Button
-                  size="lg"
-                  className={`w-full px-3 py-3 h-12 text-sm ${
-                    completedTests.every(test => test) 
-                      ? 'bg-green-600 hover:bg-green-700 text-white' 
-                      : 'bg-gray-600 hover:bg-gray-700 text-white'
-                  }`}
-                  disabled={isValidating}
-                  onClick={() => validatePuzzleWithPlayFab()}
-                >
-                  {isValidating ? '🔄 Submitting to PlayFab...' : 
-                   completedTests.every(test => test) ? '🎯 Submit for Official Validation' : 
-                   '🎯 Submit Solution (Incomplete)'}
-                </Button>
-                
-                {/* Helper text */}
-                <div className="text-xs text-slate-400 mt-2 text-center">
-                  {completedTests.every(test => test) ? 
-                    'All tests pass locally! Submit for official verification.' :
-                    'Frontend validation checks your solution as you work.'}
-                </div>
-              </div>
+              {/* Display Controls, Actions, Palette, and Validation */}
+              <PuzzleTools
+                displayMode={displayState.displayMode}
+                emojiSet={displayState.emojiSet}
+                selectedValue={displayState.selectedValue}
+                onDisplayModeChange={handleDisplayModeChange}
+                onEmojiSetChange={handleEmojiSetChange}
+                onValueSelect={handleValueSelect}
+                onCopyInput={copyInput}
+                onResetSolution={resetSolution}
+                onValidate={() => validatePuzzleWithPlayFab()}
+                isValidating={isValidating}
+                allTestsCompleted={completedTests.every(test => test)}
+                usedValues={getUsedValues()}
+              />
             </div>
 
             {/* User Solution - Right half */}
