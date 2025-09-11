@@ -103,111 +103,102 @@ export function PuzzleGrid({ puzzles, loading, onSelectPuzzle }: PuzzleGridProps
         return (
           <Card 
             key={puzzle.id}
-            className="bg-slate-800 border-slate-600 hover:border-amber-500 transition-colors cursor-pointer group min-h-[400px]"
+            className="bg-slate-800 border-slate-600 hover:border-amber-500 transition-colors cursor-pointer group min-h-[320px]"
             onClick={() => onSelectPuzzle(puzzle)}
           >
-            <CardContent className="p-6 sm:p-8">
-              {/* Header with Analysis Quality and Attempts */}
-              <div className="flex justify-between items-start mb-6">
-                <div className="flex flex-col gap-2">
-                  <Badge className={`text-sm px-3 py-1 ${analysisQualityBadge.className} font-semibold`}>
-                    🤖 {analysisQualityBadge.label}
-                  </Badge>
-                  <Badge className={`text-sm px-3 py-1 ${difficultyBadge.className}`}>
-                    💀 {difficultyBadge.label}
-                  </Badge>
-                  {/* Grid Size Badge */}
-                  {puzzle.gridSize && (
-                    <Badge className="text-sm px-3 py-1 bg-blue-600 text-white">
-                      📐 {puzzle.gridSize}
-                    </Badge>
-                  )}
-                  {/* Dataset Badge */}
-                  {puzzle.dataset && (
-                    <Badge className="text-sm px-3 py-1 bg-purple-600 text-white">
-                      📊 {puzzle.dataset}
-                    </Badge>
-                  )}
-                </div>
-                <div className="text-right">
-                  <div className="text-sm text-slate-400 mb-1">AI Attempts</div>
-                  <div className="text-2xl font-bold text-amber-400">{puzzle.totalExplanations}</div>
-                </div>
-              </div>
-
-              {/* Puzzle ID - Larger and more prominent */}
-              <div className="mb-6">
+            <CardContent className="p-4">
+              {/* Puzzle ID - Most prominent */}
+              <div className="mb-3">
                 <div className="text-amber-200 font-mono text-xl font-bold tracking-wide">
                   {puzzle.id}
                 </div>
               </div>
 
-              {/* Rich Metadata Grid - Better Spacing and Sizing */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                {/* AI Success Rate */}
-                <div className="bg-slate-700 rounded-lg p-4">
-                  <div className="text-sm text-slate-400 mb-2">Success Rate</div>
-                  <div className={`text-xl font-bold ${
-                    puzzle.avgAccuracy === 0 ? 'text-red-400' :
-                    puzzle.avgAccuracy <= 0.25 ? 'text-orange-400' :
-                    puzzle.avgAccuracy <= 0.50 ? 'text-yellow-400' :
-                    'text-blue-400'
-                  }`}>
-                    {puzzle.avgAccuracy === 0 ? 'Never' : `${(puzzle.avgAccuracy * 100).toFixed(0)}%`}
-                  </div>
-                </div>
+              {/* Analysis Badges - Horizontal layout */}
+              <div className="flex flex-wrap gap-2 mb-3">
+                <Badge className={`text-xs px-2 py-1 ${analysisQualityBadge.className} font-semibold`}>
+                  🤖 {analysisQualityBadge.label}
+                </Badge>
+                <Badge className={`text-xs px-2 py-1 ${difficultyBadge.className}`}>
+                  💀 {difficultyBadge.label}
+                </Badge>
+              </div>
 
-                {/* AI Confidence when Wrong */}
-                <div className="bg-slate-700 rounded-lg p-4">
-                  <div className="text-sm text-slate-400 mb-2">Confidence</div>
-                  <div className="text-xl font-bold text-cyan-400">
-                    {puzzle.avgConfidence ? `${Math.round(puzzle.avgConfidence)}%` : 'N/A'}
-                  </div>
-                </div>
+              {/* Puzzle Structure Badges - Horizontal layout */}
+              <div className="flex flex-wrap gap-2 mb-4">
+                <Badge className="text-xs px-2 py-1 bg-blue-600 text-white">
+                  📐 {puzzle.gridSize || 'unknown'}
+                </Badge>
+                <Badge className="text-xs px-2 py-1 bg-purple-600 text-white">
+                  📊 {puzzle.dataset || 'arc-agi'}
+                </Badge>
+              </div>
 
-                {/* Failed Attempts */}
-                <div className="bg-slate-700 rounded-lg p-4">
-                  <div className="text-sm text-slate-400 mb-2">Failed</div>
-                  <div className="text-xl font-bold text-purple-400">
-                    {puzzle.wrongCount?.toLocaleString() || '0'}
+              {/* AI Performance Section */}
+              <div className="mb-3">
+                <div className="text-amber-300 text-sm font-semibold mb-2">🤖 AI Performance</div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-slate-700 rounded p-2">
+                    <div className="text-xs text-slate-400 mb-1">Success Rate</div>
+                    <div className={`text-sm font-bold ${
+                      puzzle.avgAccuracy === 0 ? 'text-red-400' :
+                      puzzle.avgAccuracy <= 0.25 ? 'text-orange-400' :
+                      puzzle.avgAccuracy <= 0.50 ? 'text-yellow-400' :
+                      'text-blue-400'
+                    }`}>
+                      {puzzle.avgAccuracy === 0 ? 'Never' : `${(puzzle.avgAccuracy * 100).toFixed(0)}%`}
+                    </div>
                   </div>
-                </div>
-
-                {/* Human Feedback */}
-                <div className="bg-slate-700 rounded-lg p-4">
-                  <div className="text-sm text-slate-400 mb-2">Feedback</div>
-                  <div className="text-xl font-bold text-pink-400">
-                    {puzzle.totalFeedback ? `${puzzle.negativeFeedback || 0}/${puzzle.totalFeedback}` : '0/0'}
+                  <div className="bg-slate-700 rounded p-2">
+                    <div className="text-xs text-slate-400 mb-1">Attempts</div>
+                    <div className="text-sm font-bold text-amber-400">
+                      {puzzle.totalExplanations}
+                    </div>
+                  </div>
+                  <div className="bg-slate-700 rounded p-2">
+                    <div className="text-xs text-slate-400 mb-1">Confidence</div>
+                    <div className="text-sm font-bold text-cyan-400">
+                      {puzzle.avgConfidence ? `${Math.round(puzzle.avgConfidence)}%` : 'N/A'}
+                    </div>
+                  </div>
+                  <div className="bg-slate-700 rounded p-2">
+                    <div className="text-xs text-slate-400 mb-1">Failures</div>
+                    <div className="text-sm font-bold text-purple-400">
+                      {puzzle.wrongCount?.toLocaleString() || '0'}
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Puzzle Structure Info */}
-              {(puzzle.testCaseCount || puzzle.trainingExampleCount) && (
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  {puzzle.testCaseCount && (
-                    <div className="bg-slate-700 rounded p-2">
-                      <div className="text-xs text-slate-400 mb-1">Test Cases</div>
-                      <div className="text-sm font-bold text-cyan-400">
-                        {puzzle.testCaseCount}
-                      </div>
+              {/* Puzzle Structure Section */}
+              <div className="mb-4">
+                <div className="text-amber-300 text-sm font-semibold mb-2">🧩 Puzzle Structure</div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="bg-slate-700 rounded p-2">
+                    <div className="text-xs text-slate-400 mb-1">Test Cases</div>
+                    <div className="text-sm font-bold text-cyan-400">
+                      {puzzle.testCaseCount || 1}
                     </div>
-                  )}
-                  {puzzle.trainingExampleCount && (
-                    <div className="bg-slate-700 rounded p-2">
-                      <div className="text-xs text-slate-400 mb-1">Examples</div>
-                      <div className="text-sm font-bold text-green-400">
-                        {puzzle.trainingExampleCount}
-                      </div>
+                  </div>
+                  <div className="bg-slate-700 rounded p-2">
+                    <div className="text-xs text-slate-400 mb-1">Examples</div>
+                    <div className="text-sm font-bold text-green-400">
+                      {puzzle.trainingExampleCount || 3}
                     </div>
-                  )}
+                  </div>
+                  <div className="bg-slate-700 rounded p-2">
+                    <div className="text-xs text-slate-400 mb-1">Feedback</div>
+                    <div className="text-sm font-bold text-pink-400">
+                      {puzzle.totalFeedback ? `${puzzle.negativeFeedback || 0}/${puzzle.totalFeedback}` : '0/0'}
+                    </div>
+                  </div>
                 </div>
-              )}
+              </div>
 
-              {/* Action Button - Larger and more prominent */}
+              {/* Action Button - Compact and prominent */}
               <Button 
-                size="lg" 
-                className="w-full bg-amber-600 hover:bg-amber-700 text-slate-900 group-hover:bg-amber-500 font-semibold text-base py-4"
+                size="sm" 
+                className="w-full bg-amber-600 hover:bg-amber-700 text-slate-900 group-hover:bg-amber-500 font-semibold text-sm py-3"
               >
                 🎯 Accept Challenge
               </Button>
