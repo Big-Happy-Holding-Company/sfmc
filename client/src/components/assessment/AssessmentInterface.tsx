@@ -275,7 +275,14 @@ export function AssessmentInterface() {
         <div className="max-w-4xl mx-auto flex justify-between items-center">
           <div>
             <h1 className="text-xl font-bold text-amber-400">ARC Assessment</h1>
-            <p className="text-slate-300 text-sm">Puzzle {currentPuzzleIndex + 1} of {puzzles.length}</p>
+            <p className="text-slate-300 text-sm">
+              Puzzle {currentPuzzleIndex + 1} of {puzzles.length}
+              {currentPuzzle && attemptCounts.get(currentPuzzle.id) && (
+                <span className="ml-2 text-amber-300">
+                  (Attempt {attemptCounts.get(currentPuzzle.id)} of 2)
+                </span>
+              )}
+            </p>
           </div>
           <div className="flex gap-2">
             <Button 

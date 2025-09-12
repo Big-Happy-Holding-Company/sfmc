@@ -98,6 +98,7 @@ interface PuzzleToolsProps {
   // Validation state
   isValidating: boolean;
   allTestsCompleted: boolean;
+  isAssessmentMode?: boolean;
   
   // Palette data
   usedValues: number[];
@@ -116,6 +117,7 @@ export function PuzzleTools({
   onValidate,
   isValidating,
   allTestsCompleted,
+  isAssessmentMode = false,
   usedValues
 }: PuzzleToolsProps) {
   return (
@@ -221,11 +223,7 @@ export function PuzzleTools({
       <div className="mt-4">
         <Button
           size="lg"
-          className={`w-full px-3 py-3 h-12 text-sm ${
-            allTestsCompleted 
-              ? 'bg-green-600 hover:bg-green-700 text-white' 
-              : 'bg-gray-600 hover:bg-gray-700 text-white'
-          }`}
+          className="w-full px-3 py-3 h-12 text-sm bg-amber-600 hover:bg-amber-700 text-white"
           disabled={false}
           onClick={onValidate}
         >
@@ -234,9 +232,9 @@ export function PuzzleTools({
         
         {/* Helper text */}
         <div className="text-sm text-slate-400 mt-2 text-center">
-          {allTestsCompleted ? 
-            'All tests pass locally! Submit for official verification.' :
-            'Frontend validation checks your solution as you work.'}
+          {isAssessmentMode ? 
+            'Submit your attempt for official assessment validation.' :
+            'Submit your solution for official PlayFab validation.'}
         </div>
       </div>
     </>

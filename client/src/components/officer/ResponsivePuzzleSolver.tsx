@@ -27,9 +27,10 @@ interface ResponsivePuzzleSolverProps {
   tutorialMode?: boolean;
   isAssessmentMode?: boolean;
   onSolve?: () => void;
+  onValidationResult?: (result: any) => void;
 }
 
-export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorialMode = false, isAssessmentMode = false, onSolve }: ResponsivePuzzleSolverProps) {
+export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorialMode = false, isAssessmentMode = false, onSolve, onValidationResult }: ResponsivePuzzleSolverProps) {
   const [, setLocation] = useLocation();
   const [puzzle, setPuzzle] = useState<OfficerTrackPuzzle>(initialPuzzle);
   // Multi-test case state
@@ -360,19 +361,15 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
       
       console.log('✅ DEBUG - PlayFab validation result:', result);
 
-      if (result?.correct && onSolve) {
-        // In assessment mode, only call onSolve when ALL tests are complete
-        // In regular mode, call onSolve on any successful validation
-        const shouldCallOnSolve = isAssessmentMode 
-          ? completedTests.every(test => test) // All tests must be completed
-          : true; // Regular mode: any successful validation
-
-        if (shouldCallOnSolve) {
-          console.log('✅ Puzzle fully solved, calling onSolve callback.');
-          onSolve();
-        } else {
-          console.log('✅ PlayFab validation successful, but not all tests completed in assessment mode.');
-        }
+      // In assessment mode, let parent handle advancement logic
+      if (isAssessmentMode && onValidationResult) {
+        onValidationResult(result);
+      }
+      
+      // In regular mode, use original onSolve logic
+      if (!isAssessmentMode && result?.correct && onSolve) {
+        console.log('✅ Puzzle solved in regular mode, calling onSolve callback.');
+        onSolve();
       }
       
       // Log validation complete event (success)
@@ -417,15 +414,16 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
     newSolutions[currentTestIndex] = newGrid;
     setSolutions(newSolutions);
 
-    // Check if solution matches expected output (FRONTEND VALIDATION ONLY)
-    if (expectedOutput.length > 0) {
+    // In assessment mode, don't do frontend validation to avoid confusion
+    // Users submit directly to PlayFab for official validation
+    if (!isAssessmentMode && expectedOutput.length > 0) {
       const matches = JSON.stringify(newGrid) === JSON.stringify(expectedOutput);
       const newCompleted = [...completedTests];
       const wasAlreadyCompleted = newCompleted[currentTestIndex];
       newCompleted[currentTestIndex] = matches;
       setCompletedTests(newCompleted);
       
-      // Log individual test case completion (only on state change)
+      // Log individual test case completion (only on state change) - regular mode only
       if (matches && !wasAlreadyCompleted) {
         logPlayerAction(
           "test_case_complete",
@@ -440,9 +438,9 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
           "won"
         );
 
-        // Auto-advance logic for assessment mode
-        if (isAssessmentMode && currentTestIndex < totalTests - 1) {
-          console.log(`✅ Test ${currentTestIndex + 1} completed in assessment mode. Auto-advancing to test ${currentTestIndex + 2}...`);
+        // Auto-advance between test cases within same puzzle (regular mode only)
+        if (currentTestIndex < totalTests - 1) {
+          console.log(`✅ Test ${currentTestIndex + 1} completed. Auto-advancing to test ${currentTestIndex + 2}...`);
           
           // Show auto-advance notification
           setIsAutoAdvancing(true);
@@ -456,9 +454,14 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
           }, 1500);
         }
       }
-      
-      // NOTE: We don't auto-validate with PlayFab anymore - user must click Submit
-      // This prevents confusion between frontend validation and server validation
+    }
+    
+    // In assessment mode, always allow test case navigation without frontend validation
+    if (isAssessmentMode) {
+      // Initialize completed state to false to avoid confusion
+      const newCompleted = [...completedTests];
+      newCompleted[currentTestIndex] = false;
+      setCompletedTests(newCompleted);
     }
   };
 
@@ -686,7 +689,7 @@ title="Training Examples - Apply what you learn from them to solve the puzzle"
               {isValidating ? '🔄 Validating with PlayFab...' : 
                validationResult?.correct ? '🎉 PlayFab Verified!' :
                validationError ? '❌ PlayFab Validation Error' :
-               completedTests[currentTestIndex] ? '✅ Frontend Check Passed - Submit Required!' : 'Apply the pattern to solve'}
+               'Apply the pattern to solve'}
             </div>
           </div>
 
@@ -728,8 +731,9 @@ title="Training Examples - Apply what you learn from them to solve the puzzle"
                 onReplayTutorial={handleReplayTutorial}
                 onValidate={() => validatePuzzleWithPlayFab()}
                 isValidating={isValidating}
-                allTestsCompleted={completedTests.every(test => test)}
+                allTestsCompleted={isAssessmentMode ? false : completedTests.every(test => test)}
                 usedValues={getUsedValues()}
+                isAssessmentMode={isAssessmentMode}
               />
             </div>
 
