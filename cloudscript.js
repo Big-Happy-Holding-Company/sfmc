@@ -344,7 +344,7 @@ function _validateAndScoreArcPuzzle(args, context, config) {
             timeElapsed,
             attemptNumber,
             sessionId: sessionId || 'unknown',
-            testCases: puzzle.test.length,
+            testCases: puzzle.test ? puzzle.test.length : 0,
             completedAt: new Date().toISOString()
         });
 
@@ -399,7 +399,7 @@ function _validateAndScoreArcPuzzle(args, context, config) {
 
     } catch (error) {
         log.error(`Error in ${config.handlerName}`, { error: error.message, stack: error.stack, args });
-        return { success: false, error: `Internal server error in ${config.handlerName}.` };
+        return { success: false, error: `DEBUG: ${error.message} | Stack: ${error.stack}` };
     }
 }
 
