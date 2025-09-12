@@ -120,38 +120,45 @@ export function PuzzleTools({
 }: PuzzleToolsProps) {
   return (
     <>
+      {/* Emoji Palette - Main Selection */}
+      <EmojiPaletteDivider
+        emojiSet={emojiSet}
+        selectedValue={selectedValue}
+        onValueSelect={onValueSelect}
+        usedValues={usedValues}
+        displayMode={displayMode}
+        className="bg-slate-800 border border-slate-600 rounded-lg p-3 w-full mb-3"
+      />
+
       {/* Display Mode & Emoji Set Controls */}
       <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 w-full">
         <h4 className="text-amber-300 text-xl font-bold mb-2 text-center">DISPLAY MODE</h4>
         <p className="text-slate-300 text-base mb-4 text-center">Choose how to visualize puzzle values</p>
         
         {/* Display Mode Toggle - Clear and Verbose */}
-        <div className="flex flex-col gap-3 mb-4">
+        <div className="flex flex-col gap-2 mb-4">
           <button
             onClick={() => onDisplayModeChange('arc-colors')}
-            className={`px-4 py-3 text-base font-bold rounded h-16 w-full flex-shrink-0 ${displayMode === 'arc-colors' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
+            className={`px-4 py-2 text-base font-bold rounded h-12 w-full flex-shrink-0 ${displayMode === 'arc-colors' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
           >
             <div className="flex flex-col items-center gap-1">
-              <span className="text-lg">🔢</span>
-              <span>Numbers Only</span>
+              <span className="text-md">🔢 Numbers Only</span>
             </div>
           </button>
           <button
             onClick={() => onDisplayModeChange('emoji')}
-            className={`px-4 py-3 text-base font-bold rounded h-16 w-full flex-shrink-0 ${displayMode === 'emoji' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
+            className={`px-4 py-2 text-base font-bold rounded h-12 w-full flex-shrink-0 ${displayMode === 'emoji' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
           >
             <div className="flex flex-col items-center gap-1">
-              <span className="text-lg">🎨</span>
-              <span>Emojis Only</span>
+              <span className="text-md">🎨 Emojis Only</span>
             </div>
           </button>
           <button
             onClick={() => onDisplayModeChange('hybrid')}
-            className={`px-4 py-3 text-base font-bold rounded h-16 w-full flex-shrink-0 ${displayMode === 'hybrid' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
+            className={`px-4 py-2 text-base font-bold rounded h-12 w-full flex-shrink-0 ${displayMode === 'hybrid' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
           >
             <div className="flex flex-col items-center gap-1">
-              <span className="text-lg">🔀</span>
-              <span>Numbers + Emojis</span>
+              <span className="text-md">🔀 Numbers + Emojis</span>
             </div>
           </button>
         </div>
@@ -209,16 +216,6 @@ export function PuzzleTools({
           )}
         </div>
       </div>
-
-      {/* Emoji Palette - Main Selection */}
-      <EmojiPaletteDivider
-        emojiSet={emojiSet}
-        selectedValue={selectedValue}
-        onValueSelect={onValueSelect}
-        usedValues={usedValues}
-        displayMode={displayMode}
-        className="bg-slate-800 border border-slate-600 rounded-lg p-3 w-full"
-      />
 
       {/* Validation Button - Separated with margin */}
       <div className="mt-4">

@@ -248,11 +248,13 @@ export class PlayFabAuthManager {
   }
 
   private getOrCreateDeviceId(): string {
-    if (!this.authState.deviceId) {
-      this.authState.deviceId = 'web_' + Math.random().toString(36).substring(2, 15);
-      localStorage.setItem(PLAYFAB_CONSTANTS.STORAGE_KEYS.DEVICE_ID, this.authState.deviceId);
+    let deviceId = this.loadDeviceId();
+    if (!deviceId) {
+      deviceId = 'web_' + Math.random().toString(36).substring(2, 15);
+      localStorage.setItem(PLAYFAB_CONSTANTS.STORAGE_KEYS.DEVICE_ID, deviceId);
     }
-    return this.authState.deviceId;
+    this.authState.deviceId = deviceId;
+    return deviceId;
   }
 
   /**

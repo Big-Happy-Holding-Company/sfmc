@@ -94,12 +94,21 @@ const Utils = {
      * @param {Array<Array<any>>} b - The second array.
      * @returns {boolean}
      */
-    arraysEqual(a, b) {
-        if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
+    arraysEqual(a, b, testIndex) {
+        if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) {
+            log.error(`[Test ${testIndex}] Array structure mismatch (level 1). A is array: ${Array.isArray(a)}, B is array: ${Array.isArray(b)}, A.length: ${a?.length}, B.length: ${b?.length}`);
+            return false;
+        }
         for (let i = 0; i < a.length; i++) {
-            if (!Array.isArray(a[i]) || !Array.isArray(b[i]) || a[i].length !== b[i].length) return false;
+            if (!Array.isArray(a[i]) || !Array.isArray(b[i]) || a[i].length !== b[i].length) {
+                log.error(`[Test ${testIndex}] Row ${i} structure mismatch. A[i] is array: ${Array.isArray(a[i])}, B[i] is array: ${Array.isArray(b[i])}, A[i].length: ${a[i]?.length}, B[i].length: ${b[i]?.length}`);
+                return false;
+            }
             for (let j = 0; j < a[i].length; j++) {
-                if (a[i][j] !== b[i][j]) return false;
+                if (a[i][j] != b[i][j]) {
+                    log.error(`[Test ${testIndex}] Value mismatch at [${i},${j}]. Expected: ${b[i][j]} (type: ${typeof b[i][j]}), Got: ${a[i][j]} (type: ${typeof a[i][j]})`);
+                    return false;
+                }
             }
         }
         return true;
@@ -277,17 +286,32 @@ const ValidationService = {
      * @returns {{allCorrect: boolean, failures: Array, error?: string}}
      */
     compareSolutions(puzzle, solutions) {
-        const failures = [];
-        if (solutions.length !== puzzle.test.length) {
-            return { allCorrect: false, failures, error: `Expected ${puzzle.test.length} solutions, got ${solutions.length}` };
+        log.info("--- Entering compareSolutions ---");
+        log.info("Puzzle ID: " + puzzle.id);
+        log.info("Received solutions count: " + solutions.length);
+        try {
+            log.info("Solutions received (stringified): " + JSON.stringify(solutions));
+            log.info("Puzzle test cases (stringified): " + JSON.stringify(puzzle.test));
+        } catch(e) {
+            log.error("Could not stringify puzzle/solution data for logging.");
         }
 
-        for (let i = 0; i < puzzle.test.length; i++) {
-            if (!Utils.arraysEqual(solutions[i], puzzle.test[i].output)) {
-                failures.push({ index: i, expected: puzzle.test[i].output, got: solutions[i] });
+        const failures = [];
+        const testCases = Array.isArray(puzzle.test) ? puzzle.test : [puzzle.test];
+
+        if (solutions.length !== testCases.length) {
+            const errorMsg = `Expected ${testCases.length} solutions, got ${solutions.length}`;
+            log.error(errorMsg);
+            return { allCorrect: false, failures, error: errorMsg };
+        }
+
+        for (let i = 0; i < testCases.length; i++) {
+            if (!Utils.arraysEqual(solutions[i], testCases[i].output, i)) { // Pass index for logging
+                failures.push({ index: i, expected: testCases[i].output, got: solutions[i] });
             }
         }
 
+        log.info("--- Exiting compareSolutions. Failures found: " + failures.length + " ---");
         return { allCorrect: failures.length === 0, failures };
     }
 };

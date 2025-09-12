@@ -3,23 +3,72 @@
  * Wrapper page for the LLM comparison selector component
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Header } from '@/components/game/Header';
 import { LLMComparisonSelector } from '@/components/officer/LLMComparisonSelector';
 import type { AIPuzzlePerformance } from '@/services/arcExplainerAPI';
+import { playFabRequestManager, playFabAuthManager, playFabUserData, playFabTasks } from '@/services/playfab';
+import type { PlayFabPlayer } from '@/types/playfab';
 
 export function LLMComparisonPage() {
   const [location, setLocation] = useLocation();
+  const [player, setPlayer] = useState<PlayFabPlayer | null>(null);
+  const [totalTasks, setTotalTasks] = useState(0);
+
+  useEffect(() => {
+    const initializePlayFab = async () => {
+      try {
+        const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
+        if (!titleId) {
+          throw new Error('VITE_PLAYFAB_TITLE_ID environment variable not found');
+        }
+        if (!playFabRequestManager.isInitialized()) {
+          await playFabRequestManager.initialize({ titleId, secretKey: import.meta.env.VITE_PLAYFAB_SECRET_KEY });
+        }
+        await playFabAuthManager.ensureAuthenticated();
+
+        const [playerData, tasksData] = await Promise.all([
+          playFabUserData.getPlayerData(),
+          playFabTasks.getAllTasks()
+        ]);
+
+        setPlayer(playerData);
+        setTotalTasks(tasksData.length);
+      } catch (err) {
+        console.error('PlayFab initialization failed:', err);
+        setPlayer({ 
+          id: 'unknown', 
+          username: 'Officer', 
+          rank: 'Cadet', 
+          rankLevel: 1, 
+          totalPoints: 0, 
+          completedMissions: 0,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        });
+      }
+    };
+
+    initializePlayFab();
+  }, []);
 
   const handlePuzzleSelect = (puzzleId: string, aiPerformance: AIPuzzlePerformance) => {
     // Navigate to solve this puzzle
     setLocation(`/officer-track/solve/${puzzleId}`);
   };
 
+  if (!player) {
+    return (
+      <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
+        <div>Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-900 text-white">
-      <Header />
+      <Header player={player} totalTasks={totalTasks} />
       
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">

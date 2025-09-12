@@ -3,6 +3,11 @@
  * =====================================
  * Displays a participant's cognitive performance score (CPS) and compares it
  * directly against AI benchmark data for the same puzzles.
+ * 
+ * 
+ * THIS PAGE SOUNDS LIKE IT WAS LARGELY HALLUCINATED BY THE AI
+ * NEEDS Audit!
+ * Cognitive Performance Score (CPS) is not a real thing and I am worried about how it is being used
  */
 
 import { useState, useEffect } from 'react';

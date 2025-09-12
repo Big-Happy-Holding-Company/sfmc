@@ -25,9 +25,10 @@ interface ResponsivePuzzleSolverProps {
   puzzle: OfficerTrackPuzzle;
   onBack: () => void;
   tutorialMode?: boolean;
+  onSolve?: () => void;
 }
 
-export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorialMode = false }: ResponsivePuzzleSolverProps) {
+export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorialMode = false, onSolve }: ResponsivePuzzleSolverProps) {
   const [, setLocation] = useLocation();
   const [puzzle, setPuzzle] = useState<OfficerTrackPuzzle>(initialPuzzle);
   // Multi-test case state
@@ -353,6 +354,11 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
       setValidationResult(result);
       
       console.log('✅ DEBUG - PlayFab validation result:', result);
+
+      if (result?.correct && onSolve) {
+        console.log('✅ Puzzle solved, calling onSolve callback.');
+        onSolve();
+      }
       
       // Log validation complete event (success)
       logPlayerAction(

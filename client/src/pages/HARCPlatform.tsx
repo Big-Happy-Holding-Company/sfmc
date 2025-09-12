@@ -53,7 +53,7 @@ export default function HARCPlatform() {
           </h2>
           <p className="text-lg text-slate-300 leading-relaxed max-w-3xl mx-auto">
             ARC-AGI is a benchmark for AI reasoning ability. It is uniquely challenging and is designed to be easy for humans, but hard for AI. The Human - ARC Platform is a research initiative that collects and analyzes human performance 
-            on the exat same abstract reasoning tasks, providing direct comparisons with AI model performance. 
+            on the exact same abstract reasoning tasks, providing direct comparisons with AI model performance. 
             Contribute to cutting-edge research while discovering your unique cognitive strengths over state of the art AI models.
           </p>
         </div>
