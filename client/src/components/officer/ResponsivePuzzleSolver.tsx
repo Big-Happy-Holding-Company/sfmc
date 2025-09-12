@@ -14,7 +14,6 @@ import { TrainingExamplesSection } from '@/components/officer/TrainingExamplesSe
 import { TestCaseNavigation } from '@/components/officer/TestCaseNavigation';
 import { PuzzleSolverControls } from '@/components/officer/PuzzleSolverControls';
 import { PuzzleTools } from '@/components/officer/PuzzleTools';
-import { PermanentHintSystem } from '@/components/officer/PermanentHintSystem';
 import type { OfficerTrackPuzzle, ARCGrid } from '@/types/arcTypes';
 import type { DisplayMode, PuzzleDisplayState } from '@/types/puzzleDisplayTypes';
 import type { EmojiSet } from '@/constants/spaceEmojis';
@@ -558,7 +557,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
               <h1 className="text-xl md:text-2xl font-bold text-amber-400">
-                🎖️ PUZZLE SOLVER
+                ARC Puzzle Solver
               </h1>
               <Badge className="bg-amber-600 text-slate-900 font-bold">
                 {puzzle.id}
@@ -578,11 +577,6 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
 
       <main className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
-        {/* Permanent Hint System */}
-        <PermanentHintSystem 
-          puzzle={puzzle}
-          tutorialMode={tutorialMode}
-        />
 
         {/* Training Examples Section */}
         {trainingExamples.length > 0 && (
@@ -590,7 +584,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
             examples={trainingExamples}
             emojiSet={displayState.emojiSet}
             displayMode={displayState.displayMode}
-            title="📚 TRAINING EXAMPLES - Apply what you learn from them to solve the puzzle"
+title="Training Examples - Apply what you learn from them to solve the puzzle"
             hasLargeGrids={hasLargeGrids}
           />
         )}
@@ -601,10 +595,10 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
           <div className="bg-gradient-to-r from-slate-200 via-gray-100 to-slate-200 border-2 border-slate-400 rounded-lg p-4 shadow-lg">
             <div className="mb-3">
               <h3 className="text-slate-800 text-lg font-bold flex items-center gap-2 mb-1">
-                🎯 MULTI-TEST PUZZLE - ALL {totalTests} TESTS REQUIRED
+                Multi-Test Puzzle - All {totalTests} Tests Required
               </h3>
               <p className="text-slate-700 text-base">
-                ⚠️ You must solve ALL {totalTests} test cases to complete this puzzle. Switch between tests using the buttons below.
+                You must solve ALL {totalTests} test cases to complete this puzzle. Switch between tests using the buttons below.
               </p>
             </div>
             <TestCaseNavigation
@@ -620,7 +614,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
         <div className="w-full">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-amber-400 font-bold text-4xl">
-              🧩 SOLVE TEST CASE {currentTestIndex + 1}
+              Test Case {currentTestIndex + 1}
             </h2>
             <div className="text-slate-300 text-lg font-medium">
               {isValidating ? '🔄 Validating with PlayFab...' : 
@@ -634,7 +628,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
           <div className="flex flex-col lg:flex-row gap-4 w-full">
             {/* Test Input - Full width on mobile, left column on large screens */}
             <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-4">
-              <h3 className="text-amber-300 text-2xl font-bold mb-4 text-center">TEST INPUT</h3>
+              <h3 className="text-amber-300 text-2xl font-bold mb-4 text-center">Test Input</h3>
               <ResponsiveOfficerDisplayGrid
                 grid={testInput}
                 containerType="solver"
@@ -675,7 +669,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
 
             {/* User Solution - Full width on mobile, right column on large screens */}
             <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-4">
-              <h3 className="text-amber-300 text-2xl font-bold mb-4 text-center">YOUR SOLUTION</h3>
+              <h3 className="text-amber-300 text-2xl font-bold mb-4 text-center">Your Solution</h3>
               <ResponsiveOfficerGrid
                 initialGrid={currentSolution}
                 containerType="solver"
@@ -714,16 +708,6 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
 
         </div>
 
-        {/* Pattern Analysis Tip */}
-        <div className="bg-blue-900 border border-blue-600 rounded-lg p-4">
-          <div className="text-blue-300 text-base">
-            <strong>💡 Solving Strategy:</strong> 
-            {trainingExamples.length > 0 
-              ? ` Study the ${trainingExamples.length} training examples above to identify the transformation pattern, then apply it to the test input.`
-              : ' Analyze the test input and determine the expected transformation pattern.'
-            }
-          </div>
-        </div>
       </main>
     </div>
   );

@@ -99,7 +99,7 @@ const Utils = {
         for (let i = 0; i < a.length; i++) {
             if (!Array.isArray(a[i]) || !Array.isArray(b[i]) || a[i].length !== b[i].length) return false;
             for (let j = 0; j < a[i].length; j++) {
-                if (a[i][j] != b[i][j]) return false;
+                if (a[i][j] !== b[i][j]) return false;
             }
         }
         return true;

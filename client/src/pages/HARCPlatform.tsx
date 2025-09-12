@@ -39,7 +39,7 @@ export default function HARCPlatform() {
               HARC Platform
             </h1>
             <p className="text-xl text-slate-300">
-              Human - ARC
+              Are you going to be replaced by a LLM?
             </p>
           </div>
         </div>
@@ -52,9 +52,9 @@ export default function HARCPlatform() {
             How Do Your Reasoning Abilities Compare to AI?
           </h2>
           <p className="text-lg text-slate-300 leading-relaxed max-w-3xl mx-auto">
-            The HARC Platform is a research initiative that collects and analyzes human performance 
-            on abstract reasoning tasks, providing direct comparisons with AI model performance. 
-            Contribute to cutting-edge research while discovering your unique cognitive strengths.
+            ARC-AGI is a benchmark for AI reasoning ability. It is uniquely challenging and is designed to be easy for humans, but hard for AI. The Human - ARC Platform is a research initiative that collects and analyzes human performance 
+            on the exat same abstract reasoning tasks, providing direct comparisons with AI model performance. 
+            Contribute to cutting-edge research while discovering your unique cognitive strengths over state of the art AI models.
           </p>
         </div>
 
@@ -66,8 +66,8 @@ export default function HARCPlatform() {
             </CardHeader>
             <CardContent>
               <p className="text-slate-300 text-center">
-                Complete curated abstract reasoning puzzles designed to measure cognitive performance 
-                across different reasoning domains.
+                We have curated a set of authentic ARC-AGI puzzles from the training and evaluation sets. 
+
               </p>
             </CardContent>
           </Card>
@@ -78,8 +78,8 @@ export default function HARCPlatform() {
             </CardHeader>
             <CardContent>
               <p className="text-slate-300 text-center">
-                View detailed comparisons of your performance against AI models, with insights into 
-                your reasoning strengths and cognitive profile.
+                View detailed comparisons of your performance against the latest state of the art AI models, with insights into 
+                how you compare to the best AI models.
               </p>
             </CardContent>
           </Card>
@@ -90,8 +90,8 @@ export default function HARCPlatform() {
             </CardHeader>
             <CardContent>
               <p className="text-slate-300 text-center">
-                Contribute to important research on human vs AI reasoning capabilities while 
-                building the world's largest human abstract reasoning dataset.
+                Contribute to research on human vs AI reasoning capabilities while 
+                building a dataset of human performance on abstract reasoning tasks.
               </p>
             </CardContent>
           </Card>
@@ -114,14 +114,14 @@ export default function HARCPlatform() {
               <div className="bg-amber-500 text-slate-900 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">2</div>
               <div>
                 <h4 className="font-bold text-amber-300 mb-1">Receive Your Cognitive Performance Score</h4>
-                <p className="text-slate-300">Get a detailed breakdown of your performance including speed bonuses, efficiency ratings, and overall cognitive performance metrics.</p>
+                <p className="text-slate-300">Get a detailed breakdown of your performance against state-of-the-art AI models and other humans!</p>
               </div>
             </div>
             <div className="flex items-start space-x-4">
               <div className="bg-amber-500 text-slate-900 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">3</div>
               <div>
-                <h4 className="font-bold text-amber-300 mb-1">Compare Against AI Benchmarks</h4>
-                <p className="text-slate-300">See exactly how your performance compares to state-of-the-art AI models on the same puzzles, discovering where humans excel.</p>
+                <h4 className="font-bold text-amber-300 mb-1">Ongoing Cognitive Training</h4>
+                <p className="text-slate-300">Fluid intelligence is the ability to solve novel problems that haven't been seen before. This is where AI breakdown and humans excel.  By regularly solving puzzles, you can improve your fluid intelligence and cognitive reasoning skills.</p>
               </div>
             </div>
           </CardContent>
