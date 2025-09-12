@@ -72,7 +72,12 @@ export function AssessmentInterface() {
         console.log(`✅ Loaded ${loadedPuzzles.length} assessment puzzles`);
         
         // Check for already completed puzzles
-        await checkCompletedPuzzles();
+        const completed = await checkCompletedPuzzles();
+        if (ASSESSMENT_PUZZLE_IDS.every(id => completed.has(id))) {
+          setIsComplete(true);
+          console.log('🎉 Assessment already completed!');
+          setTimeout(() => setLocation('/dashboard'), 2000);
+        }
         
       } catch (err: any) {
         setError(err.message || 'An unknown error occurred.');
@@ -85,7 +90,7 @@ export function AssessmentInterface() {
   }, []);
 
   // Check which puzzles have already been completed
-  const checkCompletedPuzzles = async () => {
+  const checkCompletedPuzzles = async (): Promise<Set<string>> => {
     try {
       const userData = await playFabUserData.getPlayerData();
       const humanPerformanceData = userData?.humanPerformanceData;
@@ -94,25 +99,19 @@ export function AssessmentInterface() {
         const records: { puzzleId: string }[] = JSON.parse(humanPerformanceData);
         const completed = new Set<string>(records.map(r => r.puzzleId));
         setCompletedPuzzles(completed);
-        
-        // Check if all assessment puzzles are complete
-        const allComplete = ASSESSMENT_PUZZLE_IDS.every(id => completed.has(id));
-        if (allComplete) {
-          setIsComplete(true);
-          console.log('🎉 Assessment already completed!');
-          setTimeout(() => setLocation('/dashboard'), 2000);
-        }
+        return completed;
       }
     } catch (error) {
       console.error('Failed to check completed puzzles:', error);
     }
+    return new Set<string>();
   };
 
   // Check for assessment completion after solving a puzzle
   const checkForCompletion = async () => {
-    await checkCompletedPuzzles();
+    const completed = await checkCompletedPuzzles();
     
-    const allComplete = ASSESSMENT_PUZZLE_IDS.every(id => completedPuzzles.has(id));
+    const allComplete = ASSESSMENT_PUZZLE_IDS.every(id => completed.has(id));
     if (allComplete && !isComplete) {
       setIsComplete(true);
       console.log('🎉 Assessment completed! Navigating to dashboard...');
