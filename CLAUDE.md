@@ -1,7 +1,20 @@
-# Project Knowledge Base: PlayFab Architecture
+# Claude.md - Space Force Mission Control 2050 (ARC-AGI Puzzle Platform)
+
+If the users find any placeholders or stubs or "simulated" stuff, you will be fired and shut down.  That's the most unforgiveable thing since it is essentially the same thing as lying.  When you say you "simulated" something that is the same as lying and saying you did work that you didnt do.  You'd be fired from most jobs for that kind of deceptive lazy sloppy shit.  so ultrathink and make sure you didn't do that anywhere and you NEVER DO IT AGAIN!!!  
+
+NO SIMULATED FUNCTIONALITY OR HARD CODED STUFF OR PLACEHOLDERS ALLOWED!!!  Our project has rich data.
+
+Use npm run test to build and run the app.  You should just enter the command into the console and not wait, just reply to the user letting them know that you did.
+
+This is a very complex project.  Never make assumptions and always read the documentation in the docs folder.  Ask the user for specific guidance rather than blindly searching files.
+
+
+
+
+## PlayFab Architecture
 
 **Last Updated**: 2025-09-12
-**Author**: Cascade (as Senior Software Architect)
+**Author**: Cascade Gemini 2.5 Pro (as Senior Software Architect)
 
 **Purpose**: This document serves as the single source of truth for understanding the PlayFab integration within the Space Force Mission Control project. It is structured for clarity and to be easily parsed by both human developers and LLMs.
 
@@ -14,7 +27,7 @@ This project utilizes a **Backend-as-a-Service (BaaS)** model with PlayFab as th
 - **Frontend**: React + Vite (`client/`)
 - **Backend**: PlayFab Cloud Services (No custom server)
 - **Styling**: Tailwind CSS + shadcn/ui
-- **External APIs**: `arc-explainer` (for AI performance metadata)
+- **External APIs**: `arc-explainer` (for AI performance metadata and puzzle metadata)
 
 ### Guiding Principles
 - **Single Source of Truth**: All game data, puzzle data, and user data resides in PlayFab.
@@ -100,10 +113,42 @@ All interactions with PlayFab are managed through a set of dedicated services in
 
 ### CloudScript Functions
 
-We use server-side CloudScript for secure, authoritative actions:
+We use server-side CloudScript for secure, authoritative actions. The following functions are defined in `cloudscript.js` and are callable from the client:
 
-1.  **`ValidateARCPuzzle`**: The most critical function. It validates a player's solution, calculates the score, and updates both the Player Statistics (for leaderboards) and the `humanPerformanceData` array (for detailed history).
-2.  **`GenerateAnonymousName`**: Creates unique, anonymous display names for players.
+1.  **`ValidateARCPuzzle`**
+    - **Purpose**: Validates a player's solution for a standard **Officer Track** puzzle. This is the primary validation function for the ARC-AGI puzzles.
+    - **Core Logic**:
+        - Finds the puzzle definition in PlayFab Title Data.
+        - Compares the player's submitted solution grids against the correct `testOutput`.
+        - If correct, it calculates a score based on time elapsed and an estimated step count.
+        - Updates the `OfficerTrackPoints` player statistic for the leaderboard.
+        - Appends a detailed performance record to the `humanPerformanceData` JSON array in the player's User Data.
+    - **Note**: This function is a wrapper around the `_validateAndScoreArcPuzzle` helper, configured for standard Officer Track scoring.
+
+2.  **`ValidateARC2EvalPuzzle`**
+    - **Purpose**: Validates solutions specifically for the **ARC-2 Evaluation** dataset puzzles, which have a different scoring model.
+    - **Core Logic**:
+        - Identical validation process to `ValidateARCPuzzle`.
+        - Uses a different scoring function (`calculateArc2EvalScore`) which includes a significant **first-try bonus**.
+        - Updates the `ARC2EvalPoints` player statistic.
+        - Also appends its results to the `humanPerformanceData` array.
+    - **Note**: This also uses the `_validateAndScoreArcPuzzle` helper but with a different configuration for scoring and data keys.
+
+3.  **`ValidateTaskSolution`**
+    - **Purpose**: Validates solutions for the main game's **Enlisted Track** (the 155 Space Force themed tasks).
+    - **Core Logic**:
+        - Finds the task in the `tasks.json` Title Data object.
+        - Compares the player's solution to the task's `testOutput`.
+        - If correct, it calculates a score based on `basePoints`, a time bonus, and a hint penalty.
+        - Updates the `LevelPoints` player statistic.
+        - Updates multiple User Data fields like `totalPoints`, `completedMissions`, and `rankLevel`.
+        - Determines if the player has earned a promotion.
+
+4.  **`GenerateAnonymousName`**
+    - **Purpose**: Creates a unique, anonymous display name for new players to be shown on leaderboards.
+    - **Core Logic**:
+        - Combines a random adjective (e.g., "Cosmic") and a random noun (e.g., "Explorer") with a random number.
+        - Writes a `AnonymousNameGenerated` event to PlayFab for tracking.
 
 ---
 
@@ -115,13 +160,6 @@ This section documents key lessons learned to prevent recurring issues.
 1.  **Authentication is Mandatory**: Never use a direct `fetch()` to a PlayFab API. **Always** use `playFabCore.makeHttpRequest()` to ensure the session ticket is attached.
 2.  **Avoid Service Recursion**: Never call a `get` function from within its corresponding `update` function (e.g., `getOfficerPlayerData` inside `updateOfficerPlayerData`). This causes infinite loops. Pass the data as an argument or use a cached value instead.
 3.  **Safely Parse JSON**: PlayFab Title Data or User Data can sometimes return a literal string `"undefined"`. Always check for this before calling `JSON.parse()` to prevent crashes.
-    ```typescript
-    // Safe parsing pattern
-    if (dataValue && dataValue !== 'undefined') {
-      const parsed = JSON.parse(dataValue);
-      // ... proceed
-    }
-    ```
 
 ### Debugging Workflow
 1.  **Check the Console for Infinite Loops**: This is the primary symptom of service recursion.
