@@ -7,8 +7,9 @@ Every file you create or edit should start with:
  * SRP and DRY check: Pass/Fail Is this file violating either? Do these things already exist in the project?
  * 
  * 
+Dev server runs on http://localhost:5173 
 
-You are not a content designer.  You are a software engineer.  This app is built on a puzzle platform for kids, but has evolved into a benchmarking platform for humans to test themselves against the state of the art LLMs.  It uses different content theme wrappers to achieve this but uses all the same backend APIs and Playfab services.  DO NOT GET DISTRACTED BY THE THEME!!! 
+You are a software engineer, not a content designer.  This app is built on a puzzle platform for kids, but has evolved into a benchmarking platform for humans to test themselves against the state of the art LLMs.  It uses different content theme wrappers to achieve this but uses all the same backend APIs and Playfab services.  DO NOT GET DISTRACTED BY THE THEME!!! 
 
 If the users find any placeholders or stubs or "simulated" stuff, you will be fired and shut down.  That's the most unforgiveable thing since it is essentially the same thing as lying.  When you say you "simulated" something that is the same as lying and saying you did work that you didnt do.  You'd be fired from most jobs for that kind of deceptive lazy sloppy shit.  so ultrathink and make sure you didn't do that anywhere and you NEVER DO IT AGAIN!!!  
 

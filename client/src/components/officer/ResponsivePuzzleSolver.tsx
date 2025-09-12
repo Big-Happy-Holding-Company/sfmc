@@ -30,9 +30,8 @@ interface ResponsivePuzzleSolverProps {
   onValidationResult?: (result: any) => void;
 }
 
-export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorialMode = false, isAssessmentMode = false, onSolve, onValidationResult }: ResponsivePuzzleSolverProps) {
+export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, isAssessmentMode = false, onSolve, onValidationResult }: ResponsivePuzzleSolverProps) {
   const [, setLocation] = useLocation();
-  const [puzzle, setPuzzle] = useState<OfficerTrackPuzzle>(initialPuzzle);
   // Multi-test case state
   const [currentTestIndex, setCurrentTestIndex] = useState(0);
   const [solutions, setSolutions] = useState<ARCGrid[]>([]);
@@ -73,19 +72,29 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
   const trainingExamples = puzzle.train || [];
 
 
-  // Initialize state for all test cases
+  // Reset component state when the puzzle prop changes
   useEffect(() => {
+    console.log(`[Effect] New puzzle received: ${puzzle.id}. Resetting component state.`);
+    setCurrentTestIndex(0);
+    setValidationResult(null);
+    setValidationError(null);
+    setAttemptNumber(1);
+    setSolutions([]);
+    setOutputDimensions([]);
+    setCompletedTests([]);
+    setStepIndex(0);
+    setIsValidating(false);
+    setIsAutoAdvancing(false);
+    setAutoAdvanceMessage(null);
+
     if (puzzle.test && puzzle.test.length > 0) {
       const newSolutions: ARCGrid[] = [];
       const newDimensions: Array<{width: number; height: number}> = [];
       const newCompleted: boolean[] = [];
 
-      puzzle.test.forEach((test, index) => {
-        // Default to input dimensions, but allow user override
+      puzzle.test.forEach((test) => {
         const inputHeight = test.input?.length || 3;
         const inputWidth = test.input?.[0]?.length || 3;
-        
-        // Create empty solution grid matching input size initially
         const emptyGrid = Array(inputHeight).fill(null).map(() => Array(inputWidth).fill(0));
         
         newSolutions.push(emptyGrid);
@@ -361,14 +370,19 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
       
       console.log('✅ DEBUG - PlayFab validation result:', result);
 
-      // In assessment mode, let parent handle advancement logic
-      if (isAssessmentMode && onValidationResult) {
-        onValidationResult(result);
+      // In assessment mode, use validation result callback for advancement logic
+      if (isAssessmentMode) {
+        if (onValidationResult) {
+          console.log('📝 Assessment mode: Calling onValidationResult with:', result);
+          onValidationResult(result);
+        } else {
+          console.error('⚠️ Assessment mode but no onValidationResult callback provided!');
+        }
       }
       
       // In regular mode, use original onSolve logic
       if (!isAssessmentMode && result?.correct && onSolve) {
-        console.log('✅ Puzzle solved in regular mode, calling onSolve callback.');
+        console.log('✅ Regular mode: Puzzle solved, calling onSolve callback.');
         onSolve();
       }
       

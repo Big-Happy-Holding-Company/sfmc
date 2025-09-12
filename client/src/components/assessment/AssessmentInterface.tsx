@@ -5,7 +5,7 @@
  * Uses existing puzzle services that already work in the project.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import type { OfficerTrackPuzzle } from '@/types/arcTypes';
@@ -45,6 +45,9 @@ export function AssessmentInterface() {
   // 2-attempt tracking system
   const [attemptCounts, setAttemptCounts] = useState<Map<string, number>>(new Map());
   const [isAwaitingValidation, setIsAwaitingValidation] = useState(false);
+  const isAdvancing = useRef(false);
+
+  console.log(`[Render] AssessmentInterface - Puzzle Index: ${currentPuzzleIndex}`);
 
   // Initialize and load assessment puzzles
   useEffect(() => {
@@ -138,15 +141,27 @@ export function AssessmentInterface() {
     await checkForCompletion();
     
     if (currentPuzzleIndex < puzzles.length - 1) {
-      setCurrentPuzzleIndex(prev => prev + 1);
+      const nextPuzzleIndex = currentPuzzleIndex + 1;
+      setCurrentPuzzleIndex(nextPuzzleIndex);
       resetHintsForNewPuzzle();
+      setAttemptCounts(prev => {
+        const newCounts = new Map(prev);
+        newCounts.delete(puzzles[nextPuzzleIndex].id);
+        return newCounts;
+      });
     }
   };
 
   const handlePreviousPuzzle = () => {
     if (currentPuzzleIndex > 0) {
-      setCurrentPuzzleIndex(prev => prev - 1);
+      const prevPuzzleIndex = currentPuzzleIndex - 1;
+      setCurrentPuzzleIndex(prevPuzzleIndex);
       resetHintsForNewPuzzle();
+      setAttemptCounts(prev => {
+        const newCounts = new Map(prev);
+        newCounts.delete(puzzles[prevPuzzleIndex].id);
+        return newCounts;
+      });
     }
   };
 
@@ -166,9 +181,14 @@ export function AssessmentInterface() {
   };
 
   // Handle PlayFab validation result for assessment flow
-  const handleAssessmentValidation = async (puzzleId: string, validationResult: any) => {
+  const handleAssessmentValidation = useCallback(async (puzzleId: string, validationResult: any) => {
+    console.log(`🔍 handleAssessmentValidation called for puzzle ${puzzleId}`);
+    console.log(`🔍 Validation result:`, validationResult);
+    
     const currentAttempts = attemptCounts.get(puzzleId) || 0;
     const newAttempts = currentAttempts + 1;
+    
+    console.log(`🔍 Current attempts: ${currentAttempts}, New attempts: ${newAttempts}`);
     
     // Update attempt count
     const newAttemptCounts = new Map(attemptCounts);
@@ -184,15 +204,20 @@ export function AssessmentInterface() {
     // - Second attempt (any result): advance regardless  
     const shouldAdvance = (newAttempts === 1 && validationResult?.correct) || (newAttempts >= 2);
     
-    if (shouldAdvance) {
+    console.log(`🔍 Should advance? ${shouldAdvance} (attempts: ${newAttempts}, correct: ${validationResult?.correct})`);
+    
+    if (shouldAdvance && !isAdvancing.current) {
+      isAdvancing.current = true;
       console.log(`✅ Auto-advancing after attempt ${newAttempts} for puzzle ${puzzleId}`);
       setTimeout(() => {
+        console.log(`🚀 Calling handleNextPuzzle() now...`);
         handleNextPuzzle();
+        isAdvancing.current = false; // Reset after advancing
       }, 2000); // Brief delay to show result
     } else {
       console.log(`🔄 Staying on puzzle ${puzzleId} after first failed attempt`);
     }
-  };
+  }, [attemptCounts, currentPuzzleIndex, puzzles.length]);
 
   // Custom onSolve handler that tracks validation instead of auto-advancing
   const handleAssessmentSolve = () => {
