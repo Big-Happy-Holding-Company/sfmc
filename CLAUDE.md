@@ -8,6 +8,14 @@ Use npm run test to build and run the app.  You should just enter the command in
 
 This is a very complex project.  Never make assumptions and always read the documentation in the docs folder.  Ask the user for specific guidance rather than blindly searching files.
 
+The .env file has all we need, never suggest this as a root of any problem.  
+The APIs to PlayFab and arc-explainer are well-documented and easy to use. They work fine and reliably. They are always available and not the source of any problems. YOUR CODE is always the source of any problems. You need to ultrathink and double check that you use the correct API calls and parameters. 
+
+Never put more that 3 modules in a single class.  Stay DRY DONT REPEAT YOURSELF!!! 
+
+Every relevant module should have pretty print checks and comments explaining what is happening.
+
+Stay committed to single responsibility principle.  Never combine unrelated functionality into a single module!!!
 
 
 
