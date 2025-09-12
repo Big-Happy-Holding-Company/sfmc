@@ -15,6 +15,7 @@ import { useState, useEffect } from 'react';
 import { ChevronDown, Star, Lock, CheckCircle, Grid3x3, Target, Brain, Clock } from 'lucide-react';
 import type { ARCDatasetType, OfficerRank } from '@/types/arcTypes';
 import { useARCData, type EnhancedPuzzleFile } from '@/services/arcDataService';
+import { useModelData } from '@/hooks/useModelData';
 
 // Type alias for backward compatibility
 type ARCDataset = ARCDatasetType;
@@ -60,6 +61,8 @@ export function OfficerPuzzleSelector({
     error, 
     loadDataset 
   } = useARCData();
+
+  const { difficulties, isLoading: modelsLoading } = useModelData();
 
   const PUZZLES_PER_PAGE = 20;
 
@@ -208,16 +211,18 @@ export function OfficerPuzzleSelector({
                 setAiDifficultyFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              disabled={disabled}
+              disabled={disabled || modelsLoading}
               className="w-full bg-slate-700 border border-amber-700 rounded px-2 py-1 text-white text-xs disabled:opacity-50"
             >
-              <option value="all">All</option>
-              <option value="has_ai_data">Has AI Data</option>
-              <option value="no_ai_data">No AI Data</option>
-              <option value="impossible">Impossible (0%)</option>
-              <option value="extremely_hard">Extremely Hard</option>
-              <option value="very_hard">Very Hard</option>
-              <option value="challenging">Challenging</option>
+              {modelsLoading ? (
+                <option value="all">Loading...</option>
+              ) : (
+                difficulties.map(diff => (
+                  <option key={diff.key} value={diff.key}>
+                    {diff.label}
+                  </option>
+                ))
+              )}
             </select>
           </div>
 

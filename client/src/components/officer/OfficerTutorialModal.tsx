@@ -96,15 +96,11 @@ export function OfficerTutorialModal({ open, onClose, onStartTutorial }: Officer
               
               {/* DESIGNER INPUT: Customize welcome message */}
               <div className="text-slate-200 space-y-3">
-                <p className="text-center text-lg">
-                  <strong>DESIGNER INPUT:</strong> Customize Cadet Yvonne's welcome message here.
+                <p className="text-center text-lg text-cyan-300">
+                  Welcome to the Officer Academy! I'm Cadet Yvonne, your training instructor.
+                  The Academy specializes in pattern recognition and abstract reasoning - 
+                  the core skills needed to outperform AI systems in complex problem solving.
                 </p>
-                <div className="bg-blue-900 border border-blue-600 rounded p-4">
-                  <p className="text-blue-300 text-sm">
-                    Replace this placeholder with Cadet Yvonne's introduction to the Officer Academy,
-                    explaining the purpose of the tutorial and what cadets will learn.
-                  </p>
-                </div>
                 <p>
                   I'll guide you through <strong className="text-amber-400">5 essential skills</strong> 
                   every officer needs for advanced puzzle solving:
