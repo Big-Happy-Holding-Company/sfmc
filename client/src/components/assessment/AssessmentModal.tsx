@@ -39,6 +39,9 @@ export function AssessmentModal({ open, onClose }: AssessmentModalProps) {
                 <p>
                   Take your time to analyze the training examples carefully. There are no time limits, and you can navigate between puzzles freely.
                 </p>
+                <p className="text-amber-300">
+                  <strong>Hint System Available:</strong> If you get stuck, progressive hints are available to help guide you through the puzzle-solving process.
+                </p>
                 <p className="text-green-300">
                   This assessment helps us understand how humans approach abstract reasoning tasks. Your responses contribute to important research in cognitive science and artificial intelligence.
                 </p>
