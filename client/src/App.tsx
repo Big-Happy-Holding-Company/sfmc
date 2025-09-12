@@ -30,6 +30,7 @@ import { GridSizeTest } from "@/components/officer/GridSizeTest";
 import { AssessmentInterface } from "@/components/assessment/AssessmentInterface";
 import { ParticipantDashboard } from "@/components/dashboard/ParticipantDashboard";
 import { LLMComparisonPage } from "@/pages/LLMComparisonPage";
+import HARCPlatform from "@/pages/HARCPlatform";
 import Leaderboards from "@/pages/Leaderboards";
 import Profile from "@/pages/Profile";
 import NotFound from "@/pages/not-found";
@@ -40,6 +41,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={MissionControl} />
+      <Route path="/harc" component={HARCPlatform} />
       <Route path="/fiq-test" component={FIQTest} />
       <Route path="/officer-track" component={OfficerTrackSimple} />
       <Route path="/officer-track/solve/:puzzleId" component={PuzzleSolver} />
