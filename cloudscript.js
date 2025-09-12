@@ -99,7 +99,7 @@ const Utils = {
         for (let i = 0; i < a.length; i++) {
             if (!Array.isArray(a[i]) || !Array.isArray(b[i]) || a[i].length !== b[i].length) return false;
             for (let j = 0; j < a[i].length; j++) {
-                if (a[i][j] !== b[i][j]) return false;
+                if (a[i][j] != b[i][j]) return false;
             }
         }
         return true;
@@ -278,13 +278,15 @@ const ValidationService = {
      */
     compareSolutions(puzzle, solutions) {
         const failures = [];
-        if (solutions.length !== puzzle.test.length) {
-            return { allCorrect: false, failures, error: `Expected ${puzzle.test.length} solutions, got ${solutions.length}` };
+        const testCases = Array.isArray(puzzle.test) ? puzzle.test : [puzzle.test];
+
+        if (solutions.length !== testCases.length) {
+            return { allCorrect: false, failures, error: `Expected ${testCases.length} solutions, got ${solutions.length}` };
         }
 
-        for (let i = 0; i < puzzle.test.length; i++) {
-            if (!Utils.arraysEqual(solutions[i], puzzle.test[i].output)) {
-                failures.push({ index: i, expected: puzzle.test[i].output, got: solutions[i] });
+        for (let i = 0; i < testCases.length; i++) {
+            if (!Utils.arraysEqual(solutions[i], testCases[i].output)) {
+                failures.push({ index: i, expected: testCases[i].output, got: solutions[i] });
             }
         }
 
