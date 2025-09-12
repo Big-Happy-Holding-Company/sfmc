@@ -93,7 +93,7 @@ export function useOfficerPuzzles(
       if (sortBy === 'accuracy') {
         sortedPuzzles.sort((a, b) => a.avgAccuracy - b.avgAccuracy); // Lowest accuracy first (hardest)
       } else if (sortBy === 'explanations') {
-        sortedPuzzles.sort((a, b) => a.totalExplanations - b.totalExplanations); // Fewest explanations first
+        sortedPuzzles.sort((a, b) => b.totalExplanations - a.totalExplanations); // Most explanations first (most analyzed)
       } else if (sortBy === 'composite') {
         sortedPuzzles.sort((a, b) => a.compositeScore - b.compositeScore); // Worst composite score first
       }

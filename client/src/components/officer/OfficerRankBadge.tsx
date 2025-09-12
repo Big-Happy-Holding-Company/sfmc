@@ -1,6 +1,7 @@
 /**
  * Officer Rank Badge Component
  * ============================
+ * THIS IS A HALLUCINATED COMPONENT THAT DOES NOT WORK AND PROBABLY HAS NO MEANING
  * Military rank display component for the Officer Track with progression system
  * 
  * Key Features:

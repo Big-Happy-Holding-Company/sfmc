@@ -261,11 +261,9 @@ export class ARCDataService {
         return filenames.map(name => `${basePaths[dataset]}${name}`);
       }
     } catch (error) {
-      console.warn(`Could not load manifest for ${dataset}, falling back to known files`);
+      console.error(`Could not load manifest for ${dataset}:`, error);
+      return [];
     }
-
-    // Fallback: Use hardcoded list of known files for each dataset
-    return this.getKnownFilesForDataset(dataset);
   }
 
   /**
@@ -352,37 +350,6 @@ export class ARCDataService {
     return data.train.every(validateExample) && data.test.every(validateExample);
   }
 
-  /**
-   * Get known file lists for each dataset (fallback when manifest not available)
-   * Real file names from actual directories
-   */
-  private getKnownFilesForDataset(dataset: ARCDatasetType): string[] {
-    const basePaths: Record<ARCDatasetType, string> = {
-      training: '/data/training/',
-      training2: '/data/training2/', 
-      evaluation: '/data/evaluation/',
-      evaluation2: '/data/evaluation2/'
-    };
-
-    // Emergency fallback: Only if manifests completely fail to load
-    // These are just a few real files for absolute emergency fallback
-    const emergencyFallbackFiles: Record<ARCDatasetType, string[]> = {
-      training: [
-        '007bbfb7.json', '00d62c1b.json', '017c7c7b.json', '025d127b.json', '045e512c.json'
-      ],
-      training2: [],
-      evaluation: [
-        '00576224.json', '009d5c81.json', '00dbd492.json', '03560426.json', '05a7bcf2.json'
-      ],
-      evaluation2: []
-    };
-
-    const basePath = basePaths[dataset];
-    const files = emergencyFallbackFiles[dataset];
-    
-    console.warn(`Using emergency fallback files for ${dataset} - only ${files.length} puzzles available`);
-    return files.map(filename => `${basePath}${filename}`);
-  }
 
   /**
    * Enhance raw ARC puzzle with metadata and analysis

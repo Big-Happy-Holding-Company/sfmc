@@ -121,7 +121,7 @@ export class ClientApiStrategy implements PlayFabApiStrategy {
     const clientOperations: ApiOperationType[] = [
       'getUserData', 'updateUserData', 'updateStatistics', 
       'getLeaderboard', 'executeCloudScript', 'loginWithCustomId', 'updateUserTitleDisplayName',
-      'writePlayerEvent'
+      'getPlayerProfile', 'updateAvatarUrl', 'writePlayerEvent'
     ];
     return clientOperations.includes(context.operation) && 
            (!context.requiresAuth || context.hasSessionToken);
@@ -163,9 +163,15 @@ export class ClientApiStrategy implements PlayFabApiStrategy {
       headers['X-Authorization'] = this.sessionToken;
     }
     
+    // Only add TitleId for operations that specifically require it in the request body
+    const operationsRequiringTitleId: ApiOperationType[] = ['loginWithCustomId', 'executeCloudScript'];
+    const requestBody = operationsRequiringTitleId.includes(operation) 
+      ? { ...requestData, TitleId: titleId }
+      : requestData;
+    
     return {
       endpoint,
-      data: { ...requestData, TitleId: titleId } as T,
+      data: requestBody as T,
       headers,
       requiresAuth
     };

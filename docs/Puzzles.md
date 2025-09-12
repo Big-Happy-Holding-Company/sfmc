@@ -1,5 +1,5 @@
 # Puzzle Test Cases Reference
-
+Just some puzzles I found useful
 This document contains a JSON array of test puzzles used for development and debugging.
 
 ## Available Test Cases
@@ -76,7 +76,24 @@ This document contains a JSON array of test puzzles used for development and deb
       ]
     },
 
-  }
+  
+
+  },
+  {
+    "id": "7b80bb43",
+    "name": "Gate Closing",
+    "description": "Close the gates, eliminate the noise",
+    "difficulty": "hard",
+    "gridSize": { "width": 29, "height": 17 },
+    "testCount": 1,
+    "dataPath": "data/training2/d631b094.json",
+    "tags": ["training"],
+    
+    },
+
+  
+
+
 ]
 ```
 

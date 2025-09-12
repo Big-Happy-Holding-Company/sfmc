@@ -159,12 +159,12 @@ export function GridSizeTest() {
       {/* Mobile Simulation */}
       <div className="bg-slate-800 rounded-lg p-6 mb-8">
         <h2 className="text-xl font-bold text-amber-400 mb-6">
-          Mobile Viewport Simulation (375px wide) - Fixed Implementation
+          Mobile Viewport Test (375px wide) - Fixed Implementation
         </h2>
         
         <div className="bg-slate-600 rounded-lg p-4" style={{ width: '375px', margin: '0 auto', overflow: 'auto' }}>
           <p className="text-xs text-slate-300 mb-4 text-center">
-            This simulates a mobile phone width. Notice the overflow issues with fixed sizing:
+            Mobile viewport (375px width) - Testing overflow behavior with fixed sizing:
           </p>
           
           <div className="space-y-4">

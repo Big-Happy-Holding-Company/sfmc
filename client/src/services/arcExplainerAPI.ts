@@ -41,6 +41,21 @@ export interface APIFilters {
   zeroAccuracyOnly?: boolean;
 }
 
+export interface ModelInfo {
+  name: string;
+  provider: string;
+  capabilities?: string[];
+  active: boolean;
+}
+
+export interface ModelsResponse {
+  success: boolean;
+  data: {
+    models: ModelInfo[];
+    providers: string[];
+  };
+}
+
 /**
  * HTTP API client for arc-explainer endpoints
  * All calls are made from browser to external server
@@ -312,63 +327,27 @@ export class ArcExplainerAPI {
    * This is the primary method for difficulty card data - no PlayFab dependency
    */
   public async getPerformanceStats(): Promise<{ impossible: number, extremely_hard: number, very_hard: number, challenging: number, total: number }> {
-    try {
-      console.log('🔄 Fetching performance stats from arc-explainer API...');
-      
-      // Try performance-stats endpoint first
-      try {
-        const response = await this.makeRequest('/api/puzzle/performance-stats');
-        const data = await response.json();
-        
-        if (data.success && data.data) {
-          // Extract bucket counts from performance stats response
-          const stats = data.data;
-          const result = {
-            impossible: stats.impossible || 0,
-            extremely_hard: stats.extremely_hard || stats.extremelyHard || 0,
-            very_hard: stats.very_hard || stats.veryHard || 0,
-            challenging: stats.challenging || 0,
-            total: stats.total || 0
-          };
-          
-          console.log('✅ Got performance stats:', result);
-          return result;
-        }
-      } catch (perfError) {
-        console.warn('⚠️ Performance-stats endpoint unavailable, using fallback');
-      }
-      
-      // Fallback: get worst-performing puzzles and compute buckets
-      const puzzles = await this.getWorstPerformingPuzzles({ limit: 50 });
-      
-      const buckets = {
-        impossible: 0,
-        extremely_hard: 0, 
-        very_hard: 0,
-        challenging: 0,
-        total: puzzles.length
-      };
-      
-      puzzles.forEach(puzzle => {
-        const accuracy = puzzle.avgAccuracy;
-        if (accuracy === 0) {
-          buckets.impossible++;
-        } else if (accuracy <= 0.25) {
-          buckets.extremely_hard++;
-        } else if (accuracy <= 0.50) {
-          buckets.very_hard++;
-        } else if (accuracy <= 0.75) {
-          buckets.challenging++;
-        }
-      });
-      
-      console.log('✅ Computed difficulty stats from worst-performing:', buckets);
-      return buckets;
-      
-    } catch (error) {
-      console.error('❌ Failed to get difficulty stats:', error);
-      throw error;
+    console.log('🔄 Fetching performance stats from arc-explainer API...');
+    
+    const response = await this.makeRequest('/api/puzzle/performance-stats');
+    const data = await response.json();
+    
+    if (!data.success || !data.data) {
+      throw new Error('Performance stats endpoint returned invalid data');
     }
+    
+    // Extract bucket counts from performance stats response
+    const stats = data.data;
+    const result = {
+      impossible: stats.impossible || 0,
+      extremely_hard: stats.extremely_hard || stats.extremelyHard || 0,
+      very_hard: stats.very_hard || stats.veryHard || 0,
+      challenging: stats.challenging || 0,
+      total: stats.total || 0
+    };
+    
+    console.log('✅ Got performance stats:', result);
+    return result;
   }
 
   /**
@@ -507,6 +486,66 @@ export class ArcExplainerAPI {
       data,
       timestamp: Date.now()
     });
+  }
+
+  /**
+   * Get available AI models from arc-explainer
+   * Returns current models being tracked - no hardcoded model names
+   */
+  public async getAvailableModels(): Promise<ModelInfo[]> {
+    console.log('🔄 Fetching available models from arc-explainer API...');
+    
+    const response = await this.makeRequest('/api/models');
+    const data = await response.json();
+    
+    if (!data.success || !data.data) {
+      throw new Error('Models endpoint returned invalid data');
+    }
+    
+    const models: ModelInfo[] = data.data.models || [];
+    console.log(`✅ Found ${models.length} available models:`, models.map(m => `${m.provider}/${m.name}`));
+    
+    return models;
+  }
+
+  /**
+   * Get models by provider (e.g., all OpenAI models, all Anthropic models)
+   */
+  public async getModelsByProvider(provider: string): Promise<ModelInfo[]> {
+    console.log(`🔄 Fetching ${provider} models from arc-explainer API...`);
+    
+    const response = await this.makeRequest(`/api/models/${provider}`);
+    const data = await response.json();
+    
+    if (!data.success || !data.data) {
+      throw new Error(`Models endpoint for ${provider} returned invalid data`);
+    }
+    
+    const models: ModelInfo[] = data.data.models || [];
+    console.log(`✅ Found ${models.length} ${provider} models:`, models.map(m => m.name));
+    
+    return models;
+  }
+
+  /**
+   * Get model-specific performance breakdown
+   * Uses dynamic model names from the API, not hardcoded assumptions
+   */
+  public async getModelPerformanceBreakdown(): Promise<Record<string, { solved: number, total: number, accuracy: number }>> {
+    console.log('🔄 Fetching model performance breakdown...');
+    
+    const response = await this.makeRequest('/api/puzzle/general-stats');
+    const data = await response.json();
+    
+    if (!data.success || !data.data) {
+      throw new Error('General stats endpoint returned invalid data');
+    }
+    
+    // Extract model performance data - structure may vary based on actual API response
+    const modelStats = data.data.modelStats || data.data.models || {};
+    
+    console.log('✅ Got model performance breakdown:', Object.keys(modelStats));
+    return modelStats;
   }
 
   /**

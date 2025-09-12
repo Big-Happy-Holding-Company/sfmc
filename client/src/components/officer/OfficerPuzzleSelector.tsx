@@ -15,6 +15,7 @@ import { useState, useEffect } from 'react';
 import { ChevronDown, Star, Lock, CheckCircle, Grid3x3, Target, Brain, Clock } from 'lucide-react';
 import type { ARCDatasetType, OfficerRank } from '@/types/arcTypes';
 import { useARCData, type EnhancedPuzzleFile } from '@/services/arcDataService';
+import { useModelData } from '@/hooks/useModelData';
 
 // Type alias for backward compatibility
 type ARCDataset = ARCDatasetType;
@@ -60,6 +61,8 @@ export function OfficerPuzzleSelector({
     error, 
     loadDataset 
   } = useARCData();
+
+  const { difficulties, isLoading: modelsLoading } = useModelData();
 
   const PUZZLES_PER_PAGE = 20;
 
@@ -155,14 +158,14 @@ export function OfficerPuzzleSelector({
         <h3 className="text-amber-400 font-bold text-lg">
           🎖️ Mission Selection
         </h3>
-        <div className="text-xs text-amber-300">
+        <div className="text-sm text-amber-300">
           Rank: {playerRank}
         </div>
       </div>
 
       {/* Dataset Selector */}
       <div className="mb-4">
-        <label className="block text-xs text-amber-300 mb-2">Dataset:</label>
+        <label className="block text-sm text-amber-300 mb-2">Dataset:</label>
         <div className="relative">
           <select
             value={currentDataset}
@@ -184,7 +187,7 @@ export function OfficerPuzzleSelector({
       </div>
 
       {/* Search and Filters */}
-      <div className="mb-4 space-y-3">
+      <div className="mb-3 space-y-2">
         <input
           type="text"
           placeholder="Search by puzzle ID..."
@@ -208,16 +211,18 @@ export function OfficerPuzzleSelector({
                 setAiDifficultyFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              disabled={disabled}
+              disabled={disabled || modelsLoading}
               className="w-full bg-slate-700 border border-amber-700 rounded px-2 py-1 text-white text-xs disabled:opacity-50"
             >
-              <option value="all">All</option>
-              <option value="has_ai_data">Has AI Data</option>
-              <option value="no_ai_data">No AI Data</option>
-              <option value="impossible">Impossible (0%)</option>
-              <option value="extremely_hard">Extremely Hard</option>
-              <option value="very_hard">Very Hard</option>
-              <option value="challenging">Challenging</option>
+              {modelsLoading ? (
+                <option value="all">Loading...</option>
+              ) : (
+                difficulties.map(diff => (
+                  <option key={diff.key} value={diff.key}>
+                    {diff.label}
+                  </option>
+                ))
+              )}
             </select>
           </div>
 
@@ -311,7 +316,7 @@ export function OfficerPuzzleSelector({
             {filteredPuzzles.length === 0 ? 'No puzzles match your filters' : 'No puzzles on this page'}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
             {paginatedPuzzles.map((puzzle) => {
               const { isCompleted, isAccessible } = getPuzzleStatus(puzzle);
               const isSelected = selectedPuzzle?.id === puzzle.id;
@@ -322,7 +327,7 @@ export function OfficerPuzzleSelector({
                   onClick={() => !disabled && isAccessible && onPuzzleSelect(puzzle)}
                   disabled={disabled || !isAccessible}
                   className={`
-                    p-3 rounded border text-left transition-all duration-200 min-h-[120px]
+                    p-4 rounded border text-left transition-all duration-200 min-h-[140px]
                     ${isSelected
                       ? 'bg-amber-900 border-amber-400 text-amber-100'
                       : 'bg-slate-700 border-amber-700 text-white hover:bg-slate-600 hover:border-amber-500'
@@ -336,7 +341,7 @@ export function OfficerPuzzleSelector({
                 >
                   {/* Header with puzzle ID and status */}
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-mono font-bold">
+                    <span className="text-base font-mono font-bold">
                       {puzzle.filename.replace('.json', '')}
                     </span>
                     <div className="flex items-center gap-1">
@@ -351,8 +356,8 @@ export function OfficerPuzzleSelector({
 
                   {/* Grid size information */}
                   <div className="flex items-center gap-1 mb-1">
-                    <Grid3x3 className="w-3 h-3 text-amber-400" />
-                    <span className="text-xs text-amber-300">
+                    <Grid3x3 className="w-4 h-4 text-amber-400" />
+                    <span className="text-sm text-amber-300">
                       {puzzle.gridSize.minWidth === puzzle.gridSize.maxWidth && 
                        puzzle.gridSize.minHeight === puzzle.gridSize.maxHeight
                         ? `${puzzle.gridSize.minWidth}×${puzzle.gridSize.minHeight}`
@@ -363,16 +368,16 @@ export function OfficerPuzzleSelector({
 
                   {/* Test cases and training examples */}
                   <div className="flex items-center gap-1 mb-1">
-                    <Target className="w-3 h-3 text-amber-400" />
-                    <span className="text-xs text-amber-300">
+                    <Target className="w-4 h-4 text-amber-400" />
+                    <span className="text-sm text-amber-300">
                       {puzzle.testCaseCount} test{puzzle.testCaseCount !== 1 ? 's' : ''}, {puzzle.trainingExampleCount} examples
                     </span>
                   </div>
 
                   {/* Difficulty and complexity */}
                   <div className="flex items-center gap-1 mb-1">
-                    <Star className="w-3 h-3 text-amber-400" />
-                    <span className="text-xs text-amber-300">
+                    <Star className="w-4 h-4 text-amber-400" />
+                    <span className="text-sm text-amber-300">
                       {puzzle.difficulty} • {puzzle.complexity.uniqueColors} colors • {puzzle.complexity.transformationComplexity}
                     </span>
                   </div>
@@ -380,11 +385,11 @@ export function OfficerPuzzleSelector({
                   {/* AI Performance data if available */}
                   {puzzle.aiPerformance && (
                     <div className="flex items-center gap-1 mb-1">
-                      <Brain className="w-3 h-3 text-amber-400" />
-                      <span className="text-xs text-amber-300">
+                      <Brain className="w-4 h-4 text-amber-400" />
+                      <span className="text-sm text-amber-300">
                         AI: {Math.round(puzzle.aiPerformance.avgAccuracy * 100)}% accuracy
                         {puzzle.aiPerformance.difficultyCategory && (
-                          <span className={`ml-1 px-1 rounded text-xs ${
+                          <span className={`ml-2 px-2 py-1 rounded text-xs font-medium ${
                             puzzle.aiPerformance.difficultyCategory === 'impossible' ? 'bg-red-800 text-red-200' :
                             puzzle.aiPerformance.difficultyCategory === 'extremely_hard' ? 'bg-orange-800 text-orange-200' :
                             puzzle.aiPerformance.difficultyCategory === 'very_hard' ? 'bg-yellow-800 text-yellow-200' :
@@ -398,7 +403,7 @@ export function OfficerPuzzleSelector({
                   )}
 
                   {/* Dataset info */}
-                  <div className="text-xs text-slate-400 mt-auto">
+                  <div className="text-sm text-slate-400 mt-auto">
                     Dataset: {puzzle.dataset}
                   </div>
                 </button>
@@ -411,21 +416,21 @@ export function OfficerPuzzleSelector({
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <div className="text-xs text-amber-300">
+          <div className="text-sm text-amber-300">
             Page {currentPage} of {totalPages} • {filteredPuzzles.length} puzzles
           </div>
           <div className="flex gap-1">
             <button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1 || disabled}
-              className="px-3 py-1 bg-slate-700 border border-amber-700 rounded text-xs text-amber-400 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-slate-700 border border-amber-700 rounded text-sm text-amber-400 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               ← Prev
             </button>
             <button
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages || disabled}
-              className="px-3 py-1 bg-slate-700 border border-amber-700 rounded text-xs text-amber-400 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-slate-700 border border-amber-700 rounded text-sm text-amber-400 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next →
             </button>
@@ -436,12 +441,12 @@ export function OfficerPuzzleSelector({
       {/* Selected Puzzle Info */}
       {selectedPuzzle && (
         <div className="mt-4 pt-4 border-t border-amber-700">
-          <div className="text-xs text-amber-300 mb-2">Selected Mission:</div>
+          <div className="text-sm text-amber-300 mb-2">Selected Mission:</div>
           <div className="text-sm text-white font-mono mb-2">
             {selectedPuzzle.filename.replace('.json', '')}
           </div>
           
-          <div className="grid grid-cols-2 gap-4 text-xs">
+          <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <div className="text-amber-300 mb-1">Mission Parameters:</div>
               <div className="text-slate-300">
@@ -474,7 +479,7 @@ export function OfficerPuzzleSelector({
             </div>
           </div>
           
-          <div className="text-xs text-green-400 mt-2 font-bold">
+          <div className="text-sm text-green-400 mt-2 font-bold">
             🎯 Ready for deployment
           </div>
         </div>

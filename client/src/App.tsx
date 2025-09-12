@@ -25,7 +25,12 @@ import MissionControl from "@/pages/MissionControl";
 import FIQTest from "@/pages/FIQTest";
 import OfficerTrackSimple from "@/pages/OfficerTrackSimple";
 import PuzzleSolver from "@/pages/PuzzleSolver";
+import { TutorialPage } from '@/pages/TutorialPage';
 import { GridSizeTest } from "@/components/officer/GridSizeTest";
+import { AssessmentInterface } from "@/components/assessment/AssessmentInterface";
+import { ParticipantDashboard } from "@/components/dashboard/ParticipantDashboard";
+import { LLMComparisonPage } from "@/pages/LLMComparisonPage";
+import HARCPlatform from "@/pages/HARCPlatform";
 import Leaderboards from "@/pages/Leaderboards";
 import Profile from "@/pages/Profile";
 import NotFound from "@/pages/not-found";
@@ -36,12 +41,17 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={MissionControl} />
+      <Route path="/harc" component={HARCPlatform} />
       <Route path="/fiq-test" component={FIQTest} />
       <Route path="/officer-track" component={OfficerTrackSimple} />
       <Route path="/officer-track/solve/:puzzleId" component={PuzzleSolver} />
+      <Route path="/officer-track/ai-comparison" component={LLMComparisonPage} />
+      <Route path="/assessment" component={AssessmentInterface} />
+      <Route path="/dashboard" component={ParticipantDashboard} />
       <Route path="/leaderboards" component={Leaderboards} />
       <Route path="/profile" component={Profile} />
       <Route path="/grid-test" component={GridSizeTest} />
+      <Route path="/tutorial" component={TutorialPage} />
       <Route component={NotFound} />
     </Switch>
   );

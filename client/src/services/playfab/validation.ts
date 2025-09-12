@@ -241,22 +241,22 @@ export class PlayFabValidation {
   /**
    * Validate ARC puzzle solution via CloudScript (Officer Track)
    */
-  public async validateARCPuzzle(puzzleId: string, solutions: number[][][], timeElapsed?: number): Promise<any> {
+  public async validateARCPuzzle(args: {
+    puzzleId: string;
+    solutions: number[][][];
+    timeElapsed: number;
+    attemptNumber: number;
+    sessionId: string;
+  }): Promise<any> {
     // Authentication handled automatically by requestManager
     
     const request: ExecuteCloudScriptRequest = {
       FunctionName: PLAYFAB_CONSTANTS.CLOUDSCRIPT_FUNCTIONS.VALIDATE_ARC_PUZZLE,
-      FunctionParameter: {
-        puzzleId,
-        solutions,
-        timeElapsed,
-        attemptNumber: 1,
-        sessionId: crypto.randomUUID()
-      },
+      FunctionParameter: args, // Pass the entire object
       GeneratePlayStreamEvent: true
     };
 
-    console.log(`[PlayFabValidation] Validating ARC puzzle: ${puzzleId}`);
+    console.log(`[PlayFabValidation] Validating ARC puzzle: ${args.puzzleId}`);
 
     try {
       const result = await playFabRequestManager.makeRequest<ExecuteCloudScriptRequest, ExecuteCloudScriptResponse>(
@@ -276,7 +276,7 @@ export class PlayFabValidation {
 
       return validationResult;
     } catch (error) {
-      console.error(`[PlayFabValidation] ARC puzzle validation failed for ${puzzleId}:`, error);
+      console.error(`[PlayFabValidation] ARC puzzle validation failed for ${args.puzzleId}:`, error);
       throw error;
     }
   }

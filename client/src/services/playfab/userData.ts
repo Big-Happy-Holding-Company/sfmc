@@ -63,6 +63,7 @@ export class PlayFabUserData {
         totalPoints: parseInt(userData.totalPoints?.Value || '0'),
         completedMissions: parseInt(userData.completedMissions?.Value || '0'),
         currentTask: userData.currentTask?.Value || undefined,
+        hasCompletedTutorial: userData.hasCompletedTutorial?.Value === 'true',
         createdAt: new Date(userData.createdAt?.Value || Date.now()),
         updatedAt: new Date()
       };
@@ -106,6 +107,7 @@ export class PlayFabUserData {
     if (updates.totalPoints !== undefined) dataToUpdate.totalPoints = updates.totalPoints.toString();
     if (updates.completedMissions !== undefined) dataToUpdate.completedMissions = updates.completedMissions.toString();
     if (updates.currentTask) dataToUpdate.currentTask = updates.currentTask;
+    if (updates.hasCompletedTutorial !== undefined) dataToUpdate.hasCompletedTutorial = updates.hasCompletedTutorial.toString();
     dataToUpdate.updatedAt = new Date().toISOString();
 
     try {

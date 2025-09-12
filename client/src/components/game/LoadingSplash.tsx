@@ -38,10 +38,15 @@ interface LoadingSplashProps {
 export function LoadingSplash({ onComplete, duration = 3000 }: LoadingSplashProps) {
   const [pathname] = useLocation();
 
-  if (pathname.startsWith('/officer-track/solve/')) {
-    useEffect(() => {
+  // Skip splash screen for specific pages that don't need splash
+  useEffect(() => {
+    if (pathname.startsWith('/officer-track/solve/') || pathname.startsWith('/harc') || pathname.startsWith('/assessment') || pathname.startsWith('/dashboard')) {
       onComplete();
-    }, [onComplete]);
+      return;
+    }
+  }, [pathname, onComplete]);
+
+  if (pathname.startsWith('/officer-track/solve/') || pathname.startsWith('/harc') || pathname.startsWith('/assessment') || pathname.startsWith('/dashboard')) {
     return null;
   }
   const [progress, setProgress] = useState(0);

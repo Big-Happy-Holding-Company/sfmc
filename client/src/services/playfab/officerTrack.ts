@@ -247,27 +247,96 @@ export class PlayFabOfficerTrack {
   }
 
   public async getOfficerLeaderboard(maxResults: number = 10): Promise<OfficerLeaderboardEntry[]> {
-    // This is a placeholder. A real implementation would fetch from a dedicated officer leaderboard.
-    console.warn('[PlayFabOfficerTrack] getOfficerLeaderboard is not implemented. Returning empty array.');
-    return [];
+    try {
+      const result = await playFabRequestManager.makeRequest<any, any>(
+        'getLeaderboard', 
+        { 
+          StatisticName: 'OfficerTotalScore',
+          MaxResultsCount: maxResults 
+        }
+      );
+      
+      return result.Leaderboard?.map((entry: any, index: number) => ({
+        playerId: entry.PlayFabId,
+        playerName: entry.DisplayName || `Officer ${entry.PlayFabId.substring(0, 8)}`,
+        score: entry.StatValue,
+        rank: index + 1
+      })) || [];
+    } catch (error) {
+      console.error('[PlayFabOfficerTrack] Failed to fetch officer leaderboard:', error);
+      return [];
+    }
   }
 
   public async submitOfficerScore(points: number): Promise<void> {
-    // This is a placeholder. A real implementation would update a dedicated officer statistic.
-    console.warn(`[PlayFabOfficerTrack] submitOfficerScore is not implemented. Tried to submit ${points} points.`);
-    return Promise.resolve();
+    try {
+      await playFabRequestManager.makeRequest<any, any>(
+        'updatePlayerStatistics',
+        {
+          Statistics: [{
+            StatisticName: 'OfficerTotalScore',
+            Value: points
+          }]
+        }
+      );
+    } catch (error) {
+      console.error('[PlayFabOfficerTrack] Failed to submit officer score:', error);
+      throw error;
+    }
   }
 
   public async awardAchievement(achievementId: string): Promise<void> {
-    // This is a placeholder. A real implementation would update officer achievements.
-    console.warn(`[PlayFabOfficerTrack] awardAchievement is not implemented. Tried to award ${achievementId}.`);
-    return Promise.resolve();
+    try {
+      // Store achievement in user data since PlayFab doesn't have built-in achievements
+      const userData = await playFabUserData.getPlayerData();
+      const achievements = userData?.officerAchievements ? 
+        JSON.parse(userData.officerAchievements) : [];
+      
+      if (!achievements.includes(achievementId)) {
+        achievements.push(achievementId);
+        await playFabUserData.updatePlayerData({
+          officerAchievements: JSON.stringify(achievements)
+        });
+      }
+    } catch (error) {
+      console.error('[PlayFabOfficerTrack] Failed to award achievement:', error);
+      throw error;
+    }
   }
 
   public async getOfficerPlayerRanking(): Promise<OfficerLeaderboardEntry | null> {
-    // This is a placeholder. A real implementation would fetch the player's rank from a dedicated officer leaderboard.
-    console.warn('[PlayFabOfficerTrack] getOfficerPlayerRanking is not implemented. Returning null.');
-    return Promise.resolve(null);
+    try {
+      const result = await playFabRequestManager.makeRequest<any, any>(
+        'getPlayerStatistics',
+        { StatisticNames: ['OfficerTotalScore'] }
+      );
+      
+      if (result.Statistics?.length > 0) {
+        const score = result.Statistics[0].Value;
+        // Get rank by fetching leaderboard around player
+        const leaderboardResult = await playFabRequestManager.makeRequest<any, any>(
+          'getLeaderboardAroundPlayer',
+          { 
+            StatisticName: 'OfficerTotalScore',
+            MaxResultsCount: 1
+          }
+        );
+        
+        const rank = leaderboardResult.Leaderboard?.[0]?.Position + 1 || null;
+        
+        return {
+          playerId: await playFabAuthManager.getPlayFabId() || 'unknown',
+          playerName: 'You',
+          score,
+          rank: rank || 0
+        };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('[PlayFabOfficerTrack] Failed to get player ranking:', error);
+      return null;
+    }
   }
 
   // =============================================================================

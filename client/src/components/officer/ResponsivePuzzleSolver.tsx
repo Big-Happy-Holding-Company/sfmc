@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ResponsiveOfficerGrid, ResponsiveOfficerDisplayGrid } from '@/components/officer/ResponsiveOfficerGrid';
@@ -23,9 +24,11 @@ import { playFabEvents } from '@/services/playfab/events';
 interface ResponsivePuzzleSolverProps {
   puzzle: OfficerTrackPuzzle;
   onBack: () => void;
+  tutorialMode?: boolean;
 }
 
-export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: ResponsivePuzzleSolverProps) {
+export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorialMode = false }: ResponsivePuzzleSolverProps) {
+  const [, setLocation] = useLocation();
   const [puzzle, setPuzzle] = useState<OfficerTrackPuzzle>(initialPuzzle);
   // Multi-test case state
   const [currentTestIndex, setCurrentTestIndex] = useState(0);
@@ -50,7 +53,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
   const [sessionId] = useState(() => crypto.randomUUID());
   const [sessionStartTime] = useState(() => Date.now());
   const [stepIndex, setStepIndex] = useState(0);
-  const [attemptId] = useState(1);
+  const [attemptNumber, setAttemptNumber] = useState(1);
 
   if (!puzzle) {
     return <div className="min-h-screen bg-slate-900 text-amber-50 flex items-center justify-center">No puzzle data.</div>;
@@ -96,7 +99,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
         await playFabEvents.logPuzzleEvent(
           "SFMC",                    // eventName
           sessionId,                 // sessionId
-          attemptId,                 // attemptId
+          attemptNumber,             // attemptNumber
           puzzle.id,                 // game_id (puzzle ID)
           stepIndex,                 // stepIndex (starts at 0)
           0,                         // positionX
@@ -129,7 +132,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
           await playFabEvents.logPuzzleEvent(
             "SFMC",                    // eventName
             sessionId,                 // sessionId
-            attemptId,                 // attemptId
+            attemptNumber,             // attemptNumber
             puzzle.id,                 // game_id (puzzle ID)
             stepIndex + 1,             // stepIndex (increment for final step)
             0,                         // positionX
@@ -154,7 +157,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
 
       logSessionEnd();
     };
-  }, [sessionId, attemptId, puzzle.id, stepIndex, totalTests, trainingExamples.length, sessionStartTime]);
+  }, [sessionId, attemptNumber, puzzle.id, stepIndex, totalTests, trainingExamples.length, sessionStartTime]);
 
   // Determine if grids are large (need special layout)
   const isLargeGrid = (grid: ARCGrid) => {
@@ -204,7 +207,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
       await playFabEvents.logPuzzleEvent(
         "SFMC",                    // eventName
         sessionId,                 // sessionId
-        attemptId,                 // attemptId
+        attemptNumber,             // attemptNumber
         puzzle.id,                 // game_id (puzzle ID)
         stepIndex,                 // stepIndex (current step)
         positionX,                 // positionX
@@ -335,11 +338,16 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
     
     try {
       const validationStartTime = Date.now();
-      const result = await playFabValidation.validateARCPuzzle(
-        puzzle.id,
-        solutions, // number[][][]
-        Date.now() - sessionStartTime // Time elapsed since session start
-      );
+      const result = await playFabValidation.validateARCPuzzle({
+        puzzleId: puzzle.id,
+        solutions: solutions,
+        timeElapsed: Date.now() - sessionStartTime,
+        attemptNumber: attemptNumber,
+        sessionId: sessionId
+      });
+      
+      // Increment attempt number for the next try
+      setAttemptNumber(prev => prev + 1);
       
       const validationDuration = Date.now() - validationStartTime;
       setValidationResult(result);
@@ -531,6 +539,10 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
   };
 
   // Reset solution to empty
+  const handleReplayTutorial = () => {
+    setLocation('/tutorial');
+  };
+
   const resetSolution = () => {
     const { width, height } = currentDimensions;
     const emptyGrid = Array(height).fill(null).map(() => Array(width).fill(0));
@@ -545,7 +557,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
               <h1 className="text-xl md:text-2xl font-bold text-amber-400">
-                🎖️ PUZZLE SOLVER
+                ARC Puzzle Solver
               </h1>
               <Badge className="bg-amber-600 text-slate-900 font-bold">
                 {puzzle.id}
@@ -572,7 +584,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
             examples={trainingExamples}
             emojiSet={displayState.emojiSet}
             displayMode={displayState.displayMode}
-            title="📚 TRAINING EXAMPLES - Apply what you learn from them to solve the puzzle"
+title="Training Examples - Apply what you learn from them to solve the puzzle"
             hasLargeGrids={hasLargeGrids}
           />
         )}
@@ -583,10 +595,10 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
           <div className="bg-gradient-to-r from-slate-200 via-gray-100 to-slate-200 border-2 border-slate-400 rounded-lg p-4 shadow-lg">
             <div className="mb-3">
               <h3 className="text-slate-800 text-lg font-bold flex items-center gap-2 mb-1">
-                🎯 MULTI-TEST PUZZLE - ALL {totalTests} TESTS REQUIRED
+                Multi-Test Puzzle - All {totalTests} Tests Required
               </h3>
               <p className="text-slate-700 text-base">
-                ⚠️ You must solve ALL {totalTests} test cases to complete this puzzle. Switch between tests using the buttons below.
+                You must solve ALL {totalTests} test cases to complete this puzzle. Switch between tests using the buttons below.
               </p>
             </div>
             <TestCaseNavigation
@@ -602,7 +614,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
         <div className="w-full">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-amber-400 font-bold text-4xl">
-              🧩 SOLVE TEST CASE {currentTestIndex + 1}
+              Test Case {currentTestIndex + 1}
             </h2>
             <div className="text-slate-300 text-lg font-medium">
               {isValidating ? '🔄 Validating with PlayFab...' : 
@@ -616,7 +628,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
           <div className="flex flex-col lg:flex-row gap-4 w-full">
             {/* Test Input - Full width on mobile, left column on large screens */}
             <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-4">
-              <h3 className="text-amber-300 text-2xl font-bold mb-4 text-center">TEST INPUT</h3>
+              <h3 className="text-amber-300 text-2xl font-bold mb-4 text-center">Test Input</h3>
               <ResponsiveOfficerDisplayGrid
                 grid={testInput}
                 containerType="solver"
@@ -647,6 +659,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
                 onValueSelect={handleValueSelect}
                 onCopyInput={copyInput}
                 onResetSolution={resetSolution}
+                onReplayTutorial={handleReplayTutorial}
                 onValidate={() => validatePuzzleWithPlayFab()}
                 isValidating={isValidating}
                 allTestsCompleted={completedTests.every(test => test)}
@@ -656,7 +669,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
 
             {/* User Solution - Full width on mobile, right column on large screens */}
             <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-4">
-              <h3 className="text-amber-300 text-2xl font-bold mb-4 text-center">YOUR SOLUTION</h3>
+              <h3 className="text-amber-300 text-2xl font-bold mb-4 text-center">Your Solution</h3>
               <ResponsiveOfficerGrid
                 initialGrid={currentSolution}
                 containerType="solver"
@@ -695,16 +708,6 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack }: Respon
 
         </div>
 
-        {/* Pattern Analysis Tip */}
-        <div className="bg-blue-900 border border-blue-600 rounded-lg p-4">
-          <div className="text-blue-300 text-base">
-            <strong>💡 Solving Strategy:</strong> 
-            {trainingExamples.length > 0 
-              ? ` Study the ${trainingExamples.length} training examples above to identify the transformation pattern, then apply it to the test input.`
-              : ' Analyze the test input and determine the expected transformation pattern.'
-            }
-          </div>
-        </div>
       </main>
     </div>
   );

@@ -92,6 +92,7 @@ interface PuzzleToolsProps {
   // Action handlers
   onCopyInput: () => void;
   onResetSolution: () => void;
+  onReplayTutorial?: () => void;
   onValidate: () => void;
   
   // Validation state
@@ -111,6 +112,7 @@ export function PuzzleTools({
   onValueSelect,
   onCopyInput,
   onResetSolution,
+  onReplayTutorial,
   onValidate,
   isValidating,
   allTestsCompleted,
@@ -195,6 +197,16 @@ export function PuzzleTools({
           >
             Reset
           </Button>
+          {onReplayTutorial && (
+            <Button 
+              size="lg" 
+              variant="outline" 
+              className="border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white text-lg font-bold px-6 py-4 h-16 flex-1 sm:flex-none min-w-[120px]"
+              onClick={onReplayTutorial}
+            >
+              Replay Tutorial
+            </Button>
+          )}
         </div>
       </div>
 
@@ -217,12 +229,10 @@ export function PuzzleTools({
               ? 'bg-green-600 hover:bg-green-700 text-white' 
               : 'bg-gray-600 hover:bg-gray-700 text-white'
           }`}
-          disabled={isValidating}
+          disabled={false}
           onClick={onValidate}
         >
-          {isValidating ? '🔄 Submitting to PlayFab...' : 
-           allTestsCompleted ? '🎯 Submit for Official Validation' : 
-           '🎯 Submit Solution (Incomplete)'}
+          {isValidating ? '🔄 Submitting to PlayFab...' : '🎯 Submit for Official Validation'}
         </Button>
         
         {/* Helper text */}
