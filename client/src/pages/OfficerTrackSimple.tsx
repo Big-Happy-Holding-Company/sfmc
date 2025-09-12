@@ -191,13 +191,22 @@ export default function OfficerTrackSimple() {
               </Badge>
             </div>
             
-            <Button 
-              onClick={() => setLocation('/tutorial')}
-              className="bg-cyan-400 hover:bg-blue-500 text-slate-900 font-semibold"
-              disabled={playFabInitializing}
-            >
-              🎖️ Start Officer Training
-            </Button>
+            <div className="flex space-x-3">
+              <Button 
+                onClick={() => setLocation('/officer-track/ai-comparison')}
+                className="bg-red-600 hover:bg-red-700 text-white font-semibold"
+                disabled={playFabInitializing}
+              >
+                🤖 AI vs Human Challenge
+              </Button>
+              <Button 
+                onClick={() => setLocation('/tutorial')}
+                className="bg-cyan-400 hover:bg-blue-500 text-slate-900 font-semibold"
+                disabled={playFabInitializing}
+              >
+                🎖️ Start Officer Training
+              </Button>
+            </div>
           </div>
         </div>
       </div>

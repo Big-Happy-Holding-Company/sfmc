@@ -29,6 +29,7 @@ import { TutorialPage } from '@/pages/TutorialPage';
 import { GridSizeTest } from "@/components/officer/GridSizeTest";
 import { AssessmentInterface } from "@/components/assessment/AssessmentInterface";
 import { ParticipantDashboard } from "@/components/dashboard/ParticipantDashboard";
+import { LLMComparisonPage } from "@/pages/LLMComparisonPage";
 import Leaderboards from "@/pages/Leaderboards";
 import Profile from "@/pages/Profile";
 import NotFound from "@/pages/not-found";
@@ -42,6 +43,7 @@ function Router() {
       <Route path="/fiq-test" component={FIQTest} />
       <Route path="/officer-track" component={OfficerTrackSimple} />
       <Route path="/officer-track/solve/:puzzleId" component={PuzzleSolver} />
+      <Route path="/officer-track/ai-comparison" component={LLMComparisonPage} />
       <Route path="/assessment" component={AssessmentInterface} />
       <Route path="/dashboard" component={ParticipantDashboard} />
       <Route path="/leaderboards" component={Leaderboards} />
