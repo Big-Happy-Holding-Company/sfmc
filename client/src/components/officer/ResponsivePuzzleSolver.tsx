@@ -54,7 +54,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
   const [sessionId] = useState(() => crypto.randomUUID());
   const [sessionStartTime] = useState(() => Date.now());
   const [stepIndex, setStepIndex] = useState(0);
-  const [attemptId] = useState(1);
+  const [attemptNumber, setAttemptNumber] = useState(1);
 
   if (!puzzle) {
     return <div className="min-h-screen bg-slate-900 text-amber-50 flex items-center justify-center">No puzzle data.</div>;
@@ -100,7 +100,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
         await playFabEvents.logPuzzleEvent(
           "SFMC",                    // eventName
           sessionId,                 // sessionId
-          attemptId,                 // attemptId
+          attemptNumber,             // attemptNumber
           puzzle.id,                 // game_id (puzzle ID)
           stepIndex,                 // stepIndex (starts at 0)
           0,                         // positionX
@@ -133,7 +133,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
           await playFabEvents.logPuzzleEvent(
             "SFMC",                    // eventName
             sessionId,                 // sessionId
-            attemptId,                 // attemptId
+            attemptNumber,             // attemptNumber
             puzzle.id,                 // game_id (puzzle ID)
             stepIndex + 1,             // stepIndex (increment for final step)
             0,                         // positionX
@@ -158,7 +158,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
 
       logSessionEnd();
     };
-  }, [sessionId, attemptId, puzzle.id, stepIndex, totalTests, trainingExamples.length, sessionStartTime]);
+  }, [sessionId, attemptNumber, puzzle.id, stepIndex, totalTests, trainingExamples.length, sessionStartTime]);
 
   // Determine if grids are large (need special layout)
   const isLargeGrid = (grid: ARCGrid) => {
@@ -208,7 +208,7 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
       await playFabEvents.logPuzzleEvent(
         "SFMC",                    // eventName
         sessionId,                 // sessionId
-        attemptId,                 // attemptId
+        attemptNumber,             // attemptNumber
         puzzle.id,                 // game_id (puzzle ID)
         stepIndex,                 // stepIndex (current step)
         positionX,                 // positionX
@@ -339,11 +339,16 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
     
     try {
       const validationStartTime = Date.now();
-      const result = await playFabValidation.validateARCPuzzle(
-        puzzle.id,
-        solutions, // number[][][]
-        Date.now() - sessionStartTime // Time elapsed since session start
-      );
+      const result = await playFabValidation.validateARCPuzzle({
+        puzzleId: puzzle.id,
+        solutions: solutions,
+        timeElapsed: Date.now() - sessionStartTime,
+        attemptNumber: attemptNumber,
+        sessionId: sessionId
+      });
+      
+      // Increment attempt number for the next try
+      setAttemptNumber(prev => prev + 1);
       
       const validationDuration = Date.now() - validationStartTime;
       setValidationResult(result);

@@ -103,7 +103,7 @@ function getBaseURL(): string {
 /**
  * Make API call to arc-explainer with retry logic for Windows/certificate issues
  */
-async function makeAPICall(endpoint: string): Promise<any> {
+export async function makeAPICall(endpoint: string): Promise<any> {
   const url = `${getBaseURL()}${endpoint}`;
   
   const makeRequest = async (): Promise<Response> => {

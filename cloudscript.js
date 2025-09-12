@@ -207,6 +207,34 @@ const PlayFabService = {
 
 const ScoringService = {
     /**
+     * Retrieves the number of steps (cell_change events) for a given session.
+     * @param {string} playFabId - The player's PlayFab ID.
+     * @param {string} sessionId - The session ID to query events for.
+     * @returns {number} - The number of steps, or a default if none are found.
+     */
+    getStepCountFromEvents(playFabId, sessionId) {
+        const events = server.GetPlayerEvents({
+            PlayFabId: playFabId,
+            EventNamespace: "custom.SFMC"
+        });
+
+        let stepCount = 0;
+        if (events && events.History) {
+            for (let event of events.History) {
+                if (event.EventName === "SFMC" && 
+                    event.Body && 
+                    event.Body.sessionId === sessionId &&
+                    event.Body.event_type === "cell_change") {
+                    stepCount++;
+                }
+            }
+        }
+
+        // Return a default value if no steps are found to avoid breaking scoring
+        return stepCount > 0 ? stepCount : 100; 
+    },
+
+    /**
      * Calculates a speed bonus based on time elapsed.
      * @param {{time: number, perMinute: number, underMinutes: number}} params - Scoring parameters.
      * @returns {number}
@@ -325,16 +353,28 @@ function _validateAndScoreArcPuzzle(args, context, config) {
         }
 
         // --- On Success: Calculate Score & Update Player Data ---
-        const stepCount = 100; // Placeholder until step counting is refactored
+        const stepCount = ScoringService.getStepCountFromEvents(currentPlayerId, sessionId);
         const scoreData = config.scoringFunction({ timeElapsed, stepCount, attemptNumber });
 
-        const playerData = PlayFabService.getPlayerData(currentPlayerId, [config.completedPuzzlesKey, config.pointsKey]);
+        const keysToFetch = [config.completedPuzzlesKey, config.pointsKey, 'humanPerformanceData'];
+        const playerData = PlayFabService.getPlayerData(currentPlayerId, keysToFetch);
         const currentPoints = parseInt(playerData.Data[config.pointsKey]?.Value || '0');
         const completedPuzzles = Utils.safeParseJSON(playerData.Data[config.completedPuzzlesKey]?.Value, []);
+        const humanPerformanceData = Utils.safeParseJSON(playerData.Data.humanPerformanceData?.Value, []);
 
         if (!completedPuzzles.includes(puzzleId)) {
             completedPuzzles.push(puzzleId);
         }
+
+        // Add new detailed performance record
+        humanPerformanceData.push({
+            puzzleId,
+            timestamp: new Date().toISOString(),
+            ...scoreData,
+            timeElapsed,
+            stepCount,
+            attemptNumber
+        });
 
         const newTotalPoints = currentPoints + scoreData.finalScore;
 
@@ -344,7 +384,8 @@ function _validateAndScoreArcPuzzle(args, context, config) {
 
         PlayFabService.updatePlayerData(currentPlayerId, {
             [config.completedPuzzlesKey]: JSON.stringify(completedPuzzles),
-            [config.pointsKey]: newTotalPoints.toString()
+            [config.pointsKey]: newTotalPoints.toString(),
+            'humanPerformanceData': JSON.stringify(humanPerformanceData) // Save the detailed metrics
         });
 
         PlayFabService.writePlayerEvent(currentPlayerId, config.highScoreEventName, {
