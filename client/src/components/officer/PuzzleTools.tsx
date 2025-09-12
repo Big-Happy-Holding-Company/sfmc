@@ -229,12 +229,10 @@ export function PuzzleTools({
               ? 'bg-green-600 hover:bg-green-700 text-white' 
               : 'bg-gray-600 hover:bg-gray-700 text-white'
           }`}
-          disabled={isValidating}
+          disabled={false}
           onClick={onValidate}
         >
-          {isValidating ? '🔄 Submitting to PlayFab...' : 
-           allTestsCompleted ? '🎯 Submit for Official Validation' : 
-           '🎯 Submit Solution (Incomplete)'}
+          {isValidating ? '🔄 Submitting to PlayFab...' : '🎯 Submit for Official Validation'}
         </Button>
         
         {/* Helper text */}

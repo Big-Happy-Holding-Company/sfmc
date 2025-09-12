@@ -213,25 +213,9 @@ const ScoringService = {
      * @returns {number} - The number of steps, or a default if none are found.
      */
     getStepCountFromEvents(playFabId, sessionId) {
-        const events = server.GetPlayerEvents({
-            PlayFabId: playFabId,
-            EventNamespace: "custom.SFMC"
-        });
-
-        let stepCount = 0;
-        if (events && events.History) {
-            for (let event of events.History) {
-                if (event.EventName === "SFMC" && 
-                    event.Body && 
-                    event.Body.sessionId === sessionId &&
-                    event.Body.event_type === "cell_change") {
-                    stepCount++;
-                }
-            }
-        }
-
-        // Return a default value if no steps are found to avoid breaking scoring
-        return stepCount > 0 ? stepCount : 100; 
+        // GetPlayerEvents API is not available in CloudScript
+        // Return default step count to avoid breaking scoring
+        return 100; 
     },
 
     /**
@@ -325,7 +309,7 @@ function _validateAndScoreArcPuzzle(args, context, config) {
     try {
         Utils.assertArgs(args, ['puzzleId', 'solutions', 'timeElapsed', 'attemptNumber']);
         const { puzzleId, solutions, timeElapsed, attemptNumber, sessionId } = args;
-        const { currentPlayerId } = context;
+        const playerId = currentPlayerId;
 
         const puzzleData = PlayFabService.getPuzzleById(puzzleId);
         if (!puzzleData) {
@@ -338,26 +322,18 @@ function _validateAndScoreArcPuzzle(args, context, config) {
             return { success: false, error: validationResult.error };
         }
 
-        PlayFabService.writePlayerEvent(currentPlayerId, config.attemptEventName, {
-            puzzleId,
-            correct: validationResult.allCorrect,
-            timeElapsed,
-            attemptNumber,
-            sessionId: sessionId || 'unknown',
-            testCases: puzzle.test ? puzzle.test.length : 0,
-            completedAt: new Date().toISOString()
-        });
+        // Event logging is handled by the client - CloudScript focuses on validation only
 
         if (!validationResult.allCorrect) {
             return { success: true, correct: false, failures: validationResult.failures };
         }
 
         // --- On Success: Calculate Score & Update Player Data ---
-        const stepCount = ScoringService.getStepCountFromEvents(currentPlayerId, sessionId);
+        const stepCount = ScoringService.getStepCountFromEvents(playerId, sessionId);
         const scoreData = config.scoringFunction({ timeElapsed, stepCount, attemptNumber });
 
         const keysToFetch = [config.completedPuzzlesKey, config.pointsKey, 'humanPerformanceData'];
-        const playerData = PlayFabService.getPlayerData(currentPlayerId, keysToFetch);
+        const playerData = PlayFabService.getPlayerData(playerId, keysToFetch);
         const currentPoints = parseInt(playerData.Data[config.pointsKey]?.Value || '0');
         const completedPuzzles = Utils.safeParseJSON(playerData.Data[config.completedPuzzlesKey]?.Value, []);
         const humanPerformanceData = Utils.safeParseJSON(playerData.Data.humanPerformanceData?.Value, []);
@@ -378,28 +354,23 @@ function _validateAndScoreArcPuzzle(args, context, config) {
 
         const newTotalPoints = currentPoints + scoreData.finalScore;
 
-        PlayFabService.updatePlayerStats(currentPlayerId, [
+        PlayFabService.updatePlayerStats(playerId, [
             { StatisticName: config.statisticName, Value: newTotalPoints }
         ]);
 
-        PlayFabService.updatePlayerData(currentPlayerId, {
+        PlayFabService.updatePlayerData(playerId, {
             [config.completedPuzzlesKey]: JSON.stringify(completedPuzzles),
             [config.pointsKey]: newTotalPoints.toString(),
             'humanPerformanceData': JSON.stringify(humanPerformanceData) // Save the detailed metrics
         });
 
-        PlayFabService.writePlayerEvent(currentPlayerId, config.highScoreEventName, {
-            puzzleId,
-            ...scoreData,
-            newTotalPoints,
-            sessionId: sessionId || 'unknown'
-        });
+        // High score event logging is handled by the client
 
         return { success: true, correct: true, ...scoreData };
 
     } catch (error) {
         log.error(`Error in ${config.handlerName}`, { error: error.message, stack: error.stack, args });
-        return { success: false, error: `DEBUG: ${error.message} | Stack: ${error.stack}` };
+        return { success: false, error: `DEBUG: ${error.message} | Args: ${JSON.stringify(args)} | Context: ${JSON.stringify(context)} | Stack: ${error.stack}` };
     }
 }
 
@@ -435,7 +406,7 @@ handlers.GenerateAnonymousName = function(args, context) {
     const number = Math.floor(Math.random() * 999) + 1;
     const generatedName = `${adjective}${noun}${number}`;
 
-    PlayFabService.writePlayerEvent(context.currentPlayerId, "AnonymousNameGenerated", {
+    PlayFabService.writePlayerEvent(context.playerId, "AnonymousNameGenerated", {
         generatedName,
         timestamp: new Date().toISOString()
     });
@@ -460,7 +431,7 @@ handlers.ValidateTaskSolution = function(args, context) {
     try {
         Utils.assertArgs(args, ['taskId', 'solution']);
         const { taskId, solution, timeElapsed = 0, hintsUsed = 0, sessionId = 'unknown', attemptId = 1 } = args;
-        const { currentPlayerId } = context;
+        const playerId = currentPlayerId;
 
         const tasks = PlayFabService.getTitleDataJSON("tasks.json");
         if (!tasks) {
@@ -474,7 +445,7 @@ handlers.ValidateTaskSolution = function(args, context) {
 
         const isCorrect = Utils.arraysEqual(solution, task.testOutput);
 
-        PlayFabService.writePlayerEvent(currentPlayerId, "TaskValidation", {
+        PlayFabService.writePlayerEvent(playerId, "TaskValidation", {
             taskId,
             result: isCorrect ? "correct" : "incorrect",
             sessionId, attemptId, timeElapsed, hintsUsed
@@ -490,7 +461,7 @@ handlers.ValidateTaskSolution = function(args, context) {
         const hintPenalty = hintsUsed * 5;
         pointsEarned = Math.max(0, pointsEarned + timeBonus - hintPenalty);
 
-        const playerData = PlayFabService.getPlayerData(currentPlayerId, ["totalPoints", "completedMissions", "rankLevel"]);
+        const playerData = PlayFabService.getPlayerData(playerId, ["totalPoints", "completedMissions", "rankLevel"]);
         const currentTotalPoints = parseInt(playerData.Data.totalPoints?.Value || "0");
         const currentCompletedMissions = parseInt(playerData.Data.completedMissions?.Value || "0");
         const currentRankLevel = parseInt(playerData.Data.rankLevel?.Value || "1");
@@ -500,7 +471,7 @@ handlers.ValidateTaskSolution = function(args, context) {
         const newRank = Utils.getRankName(newRankLevel);
         const rankUp = newRankLevel > currentRankLevel;
 
-        PlayFabService.updatePlayerData(currentPlayerId, {
+        PlayFabService.updatePlayerData(playerId, {
             totalPoints: newTotalPoints.toString(),
             completedMissions: (currentCompletedMissions + 1).toString(),
             rankLevel: newRankLevel.toString(),
@@ -509,7 +480,7 @@ handlers.ValidateTaskSolution = function(args, context) {
             lastCompletionTime: new Date().toISOString()
         });
 
-        PlayFabService.updatePlayerStats(currentPlayerId, [
+        PlayFabService.updatePlayerStats(playerId, [
             { StatisticName: CONSTANTS.STATS.LEVEL_POINTS, Value: newTotalPoints }
         ]);
 
