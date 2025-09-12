@@ -1,7 +1,7 @@
 /**
  * HARC Platform Landing Page
  * ==========================
- * Human Abstract Reasoning Corpus (HARC) Platform
+ * Human - ARC (HARC) Platform
  * A research platform for collecting and analyzing human performance on abstract reasoning tasks
  * compared directly against AI benchmark data.
  * 
@@ -39,7 +39,7 @@ export default function HARCPlatform() {
               HARC Platform
             </h1>
             <p className="text-xl text-slate-300">
-              Human Abstract Reasoning Corpus
+              Human - ARC
             </p>
           </div>
         </div>
