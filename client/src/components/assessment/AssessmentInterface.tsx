@@ -19,7 +19,8 @@ const ASSESSMENT_PUZZLE_IDS = [
   '87ab05b8',
   'be03b35f',
   '27a28665',
-  'd35bdbdc'
+  '7b80bb43',
+  '32e9702f'
 ];
 
 export function AssessmentInterface() {
