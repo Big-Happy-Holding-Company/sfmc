@@ -7,10 +7,10 @@
 
 import { useState, useEffect } from 'react';
 import { ComparisonCard } from './ComparisonCard';
-
 import { playFabAuthManager } from '@/services/playfab/authManager';
 import { playFabRequestManager } from '@/services/playfab/requestManager';
-import { searchPuzzleById, type OfficerPuzzle } from '@/services/officerArcAPI';
+import { playFabUserData } from '@/services/playfab/userData';
+import { arcExplainerAPI, type AIPuzzlePerformance } from '@/services/arcExplainerAPI';
 
 // Defines the structure of a single performance record
 interface HumanPerformanceRecord {
@@ -26,76 +26,94 @@ interface HumanPerformanceRecord {
   attemptNumber: number;
 }
 
-type AiBenchmarkRecord = OfficerPuzzle; // Use the type from the API service
 
 interface ComparisonData {
   human: HumanPerformanceRecord;
-  ai: AiBenchmarkRecord;
+  ai: AIPuzzlePerformance | null;
 }
 
 // Fetches the detailed human performance data from PlayFab user data.
 const fetchHumanPerformanceData = async (): Promise<HumanPerformanceRecord[]> => {
-  console.log('Fetching human performance data from PlayFab...');
-  await playFabAuthManager.ensureAuthenticated();
-  const playFabId = playFabAuthManager.getPlayFabId();
-
-  if (!playFabId) {
-    throw new Error('User is not authenticated. Cannot fetch performance data.');
-  }
-
-  const response = await playFabRequestManager.makeRequest('getUserData', {
-    PlayFabId: playFabId,
-    Keys: ['humanPerformanceData'],
-  });
-
-  const data = response.Data?.humanPerformanceData?.Value;
-  if (!data) {
-    console.log('No human performance data found for this user.');
-    return [];
-  }
-
   try {
+    console.log('Fetching human performance data from PlayFab...');
+    
+    // Get player data using existing service
+    const playerData = await playFabUserData.getPlayerData();
+    const data = playerData?.humanPerformanceData;
+    
+    if (!data) {
+      console.log('No human performance data found for this user.');
+      return [];
+    }
+
     const performanceRecords: HumanPerformanceRecord[] = JSON.parse(data);
+    console.log(`Found ${performanceRecords.length} performance records`);
     return performanceRecords;
+    
   } catch (error) {
-    console.error('Failed to parse human performance data:', error);
-    return []; // Return empty array on parsing error
+    console.error('Failed to fetch human performance data:', error);
+    return [];
   }
 };
 
-const fetchAiBenchmarkData = async (puzzleIds: string[]): Promise<AiBenchmarkRecord[]> => {
-  console.log('Fetching AI benchmark data for puzzles:', puzzleIds);
-  const benchmarkPromises = puzzleIds.map(id => searchPuzzleById(id));
-  const results = await Promise.all(benchmarkPromises);
-  return results.filter((r): r is AiBenchmarkRecord => r !== null);
+const fetchAiBenchmarkData = async (puzzleIds: string[]): Promise<Map<string, AIPuzzlePerformance>> => {
+  try {
+    console.log('Fetching AI benchmark data for puzzles:', puzzleIds);
+    // Use existing arc-explainer API service
+    const performanceMap = await arcExplainerAPI.getBatchPuzzlePerformance(puzzleIds);
+    console.log(`Got AI performance data for ${performanceMap.size} puzzles`);
+    return performanceMap;
+  } catch (error) {
+    console.error('Failed to fetch AI benchmark data:', error);
+    return new Map();
+  }
 };
 
 export function ParticipantDashboard() {
   const [humanData, setHumanData] = useState<HumanPerformanceRecord[]>([]);
-    const [aiData, setAiData] = useState<AiBenchmarkRecord[]>([]);
   const [comparisonData, setComparisonData] = useState<ComparisonData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadDashboardData = async () => {
+    const initializeAndLoadData = async () => {
       try {
         setIsLoading(true);
+        
+        // Initialize PlayFab if needed
+        const titleId = import.meta.env.VITE_PLAYFAB_TITLE_ID;
+        if (!titleId) {
+          throw new Error('VITE_PLAYFAB_TITLE_ID environment variable not found');
+        }
+        if (!playFabRequestManager.isInitialized()) {
+          await playFabRequestManager.initialize({ titleId, secretKey: import.meta.env.VITE_PLAYFAB_SECRET_KEY });
+        }
+        await playFabAuthManager.ensureAuthenticated();
+        
+        // Load human performance data
         const humanPerformance = await fetchHumanPerformanceData();
         setHumanData(humanPerformance);
 
         if (humanPerformance.length > 0) {
-          const puzzleIds = humanPerformance.map(record => record.puzzleId);
-          const aiBenchmarks = await fetchAiBenchmarkData(puzzleIds);
-          setAiData(aiBenchmarks);
+          // Get unique puzzle IDs
+          const uniquePuzzleIds = [...new Set(humanPerformance.map(record => record.puzzleId))];
+          
+          // Fetch AI benchmark data
+          const aiPerformanceMap = await fetchAiBenchmarkData(uniquePuzzleIds);
 
-          // Merge human and AI data for comparison
-          const mergedData: ComparisonData[] = humanPerformance
-            .map(humanRecord => {
-              const aiRecord = aiBenchmarks.find(ai => ai.id === humanRecord.puzzleId);
-              return aiRecord ? { human: humanRecord, ai: aiRecord } : null;
-            })
-            .filter((item): item is ComparisonData => item !== null);
+          // Create comparison data - take latest record for each puzzle
+          const latestRecords = new Map<string, HumanPerformanceRecord>();
+          humanPerformance.forEach(record => {
+            const existing = latestRecords.get(record.puzzleId);
+            if (!existing || new Date(record.timestamp) > new Date(existing.timestamp)) {
+              latestRecords.set(record.puzzleId, record);
+            }
+          });
+
+          const mergedData: ComparisonData[] = Array.from(latestRecords.values()).map(humanRecord => ({
+            human: humanRecord,
+            ai: aiPerformanceMap.get(humanRecord.puzzleId) || null
+          }));
 
           setComparisonData(mergedData);
         }
@@ -107,7 +125,7 @@ export function ParticipantDashboard() {
       }
     };
 
-    loadDashboardData();
+    initializeAndLoadData();
   }, []);
 
   if (isLoading) {
