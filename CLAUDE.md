@@ -17,7 +17,9 @@ Every relevant module should have pretty print checks and comments explaining wh
 
 Stay committed to single responsibility principle.  Never combine unrelated functionality into a single module!!!
 
+Always think step by step and break down the problem into smaller parts.  Never try to solve the entire problem at once.
 
+Create plans in the /docs folder.  Never try to solve an entire complex problem at once without a plan approved by the user. The plan should be free of code snippet and only include high level steps and logic and task lists for a junior developer to follow. NO TIME ESTIMATES ALLOWED!!!
 
 ## PlayFab Architecture
 
