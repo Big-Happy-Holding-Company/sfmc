@@ -91,8 +91,8 @@ export function AssessmentInterface() {
       const humanPerformanceData = userData?.humanPerformanceData;
       
       if (humanPerformanceData) {
-        const records = JSON.parse(humanPerformanceData);
-        const completed = new Set(records.map((r: any) => String(r.puzzleId)));
+        const records: { puzzleId: string }[] = JSON.parse(humanPerformanceData);
+        const completed = new Set<string>(records.map(r => r.puzzleId));
         setCompletedPuzzles(completed);
         
         // Check if all assessment puzzles are complete
