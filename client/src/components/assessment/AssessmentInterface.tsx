@@ -233,6 +233,7 @@ export function AssessmentInterface() {
       <ResponsivePuzzleSolver 
         puzzle={currentPuzzle} 
         onBack={handleBackToLanding}
+        isAssessmentMode={true}
         onSolve={handleNextPuzzle}
       />
 

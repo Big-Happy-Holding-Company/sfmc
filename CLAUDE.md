@@ -13,7 +13,7 @@ The APIs to PlayFab and arc-explainer are well-documented and easy to use. They 
 
 Never put more that 3 modules in a single class.  Stay DRY DONT REPEAT YOURSELF!!! 
 
-Every relevant module should have pretty print checks and comments explaining what is happening.
+Every module should have pretty print checks and comments explaining what is happening.
 
 Stay committed to single responsibility principle.  Never combine unrelated functionality into a single module!!!
 

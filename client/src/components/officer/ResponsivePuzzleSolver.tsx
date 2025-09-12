@@ -25,10 +25,11 @@ interface ResponsivePuzzleSolverProps {
   puzzle: OfficerTrackPuzzle;
   onBack: () => void;
   tutorialMode?: boolean;
+  isAssessmentMode?: boolean;
   onSolve?: () => void;
 }
 
-export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorialMode = false, onSolve }: ResponsivePuzzleSolverProps) {
+export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorialMode = false, isAssessmentMode = false, onSolve }: ResponsivePuzzleSolverProps) {
   const [, setLocation] = useLocation();
   const [puzzle, setPuzzle] = useState<OfficerTrackPuzzle>(initialPuzzle);
   // Multi-test case state
@@ -55,6 +56,10 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
   const [sessionStartTime] = useState(() => Date.now());
   const [stepIndex, setStepIndex] = useState(0);
   const [attemptNumber, setAttemptNumber] = useState(1);
+
+  // Auto-advance state for assessment mode
+  const [isAutoAdvancing, setIsAutoAdvancing] = useState(false);
+  const [autoAdvanceMessage, setAutoAdvanceMessage] = useState<string | null>(null);
 
   if (!puzzle) {
     return <div className="min-h-screen bg-slate-900 text-amber-50 flex items-center justify-center">No puzzle data.</div>;
@@ -356,8 +361,18 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
       console.log('✅ DEBUG - PlayFab validation result:', result);
 
       if (result?.correct && onSolve) {
-        console.log('✅ Puzzle solved, calling onSolve callback.');
-        onSolve();
+        // In assessment mode, only call onSolve when ALL tests are complete
+        // In regular mode, call onSolve on any successful validation
+        const shouldCallOnSolve = isAssessmentMode 
+          ? completedTests.every(test => test) // All tests must be completed
+          : true; // Regular mode: any successful validation
+
+        if (shouldCallOnSolve) {
+          console.log('✅ Puzzle fully solved, calling onSolve callback.');
+          onSolve();
+        } else {
+          console.log('✅ PlayFab validation successful, but not all tests completed in assessment mode.');
+        }
       }
       
       // Log validation complete event (success)
@@ -424,6 +439,22 @@ export function ResponsivePuzzleSolver({ puzzle: initialPuzzle, onBack, tutorial
           },
           "won"
         );
+
+        // Auto-advance logic for assessment mode
+        if (isAssessmentMode && currentTestIndex < totalTests - 1) {
+          console.log(`✅ Test ${currentTestIndex + 1} completed in assessment mode. Auto-advancing to test ${currentTestIndex + 2}...`);
+          
+          // Show auto-advance notification
+          setIsAutoAdvancing(true);
+          setAutoAdvanceMessage(`Test ${currentTestIndex + 1} of ${totalTests} complete! Moving to Test ${currentTestIndex + 2}...`);
+          
+          // Auto-advance to next test after a brief delay for user feedback
+          setTimeout(() => {
+            setCurrentTestIndex(prevIndex => prevIndex + 1);
+            setIsAutoAdvancing(false);
+            setAutoAdvanceMessage(null);
+          }, 1500);
+        }
       }
       
       // NOTE: We don't auto-validate with PlayFab anymore - user must click Submit
@@ -596,8 +627,8 @@ title="Training Examples - Apply what you learn from them to solve the puzzle"
         )}
 
 
-        {/* Test Case Navigation - SILVER THEME */}
-        {totalTests > 1 && (
+        {/* Test Case Navigation - SILVER THEME (Hidden in Assessment Mode) */}
+        {totalTests > 1 && !isAssessmentMode && (
           <div className="bg-gradient-to-r from-slate-200 via-gray-100 to-slate-200 border-2 border-slate-400 rounded-lg p-4 shadow-lg">
             <div className="mb-3">
               <h3 className="text-slate-800 text-lg font-bold flex items-center gap-2 mb-1">
@@ -616,11 +647,40 @@ title="Training Examples - Apply what you learn from them to solve the puzzle"
           </div>
         )}
 
+        {/* Assessment Mode Multi-Test Indicator */}
+        {totalTests > 1 && isAssessmentMode && (
+          <div className="bg-slate-800 border border-amber-400 rounded-lg p-4 mb-6">
+            <div className="text-center">
+              <h3 className="text-amber-400 text-lg font-bold mb-2">
+                Multi-Test Puzzle
+              </h3>
+              <p className="text-slate-300 text-sm">
+                This puzzle has {totalTests} test cases. Complete each test to proceed automatically.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Solving Interface - Full Screen Width */}
         <div className="w-full">
+          {/* Auto-advance notification for assessment mode */}
+          {isAutoAdvancing && autoAdvanceMessage && (
+            <div className="bg-green-900 border border-green-600 rounded-lg p-4 mb-4 animate-pulse">
+              <div className="text-green-300 text-center font-semibold flex items-center justify-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-300"></div>
+                {autoAdvanceMessage}
+              </div>
+            </div>
+          )}
+
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-amber-400 font-bold text-4xl">
               Test Case {currentTestIndex + 1}
+              {isAssessmentMode && totalTests > 1 && (
+                <span className="text-slate-400 text-2xl font-normal ml-2">
+                  of {totalTests}
+                </span>
+              )}
             </h2>
             <div className="text-slate-300 text-lg font-medium">
               {isValidating ? '🔄 Validating with PlayFab...' : 
