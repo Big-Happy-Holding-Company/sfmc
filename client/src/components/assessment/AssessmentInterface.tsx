@@ -5,21 +5,31 @@
  * Uses existing puzzle services that already work in the project.
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import type { OfficerTrackPuzzle } from '@/types/arcTypes';
 import { ResponsivePuzzleSolver } from '@/components/officer/ResponsivePuzzleSolver';
+import { PermanentHintSystem } from '@/components/officer/PermanentHintSystem';
 import { AssessmentModal } from '@/components/assessment/AssessmentModal';
 import { puzzlePerformanceService } from '@/services/puzzlePerformanceService';
 import { playFabRequestManager, playFabAuthManager, playFabUserData } from '@/services/playfab';
 
 // Curated assessment puzzle IDs
 const ASSESSMENT_PUZZLE_IDS = [
-  '87ab05b8',
-  'be03b35f',
-  '27a28665',
-  'd35bdbdc'
+  
+  'e7dd8335',    //  Easy answer, fill the bottom half of the symmetrical shape
+  'fc754716',    //  Make the outline whatever the dot is
+  'a699fb00',    //  Connect the dots
+  'ea786f4a',    //  Make an X
+  'e7639916',    //  Connect the dots
+  '66e6c45b',    //  Expand!
+  '32e9702f',    //  Easy answer, everything pulled to the left and change 0 to 5 
+
+  //  '27a28665',
+ //   '7b80bb43',
+ //   '87ab05b8',
+
 ];
 
 export function AssessmentInterface() {
@@ -31,6 +41,13 @@ export function AssessmentInterface() {
   const [isComplete, setIsComplete] = useState(false);
   const [completedPuzzles, setCompletedPuzzles] = useState<Set<string>>(new Set());
   const [showModal, setShowModal] = useState(true);
+  const [hintsUsedForCurrentPuzzle, setHintsUsedForCurrentPuzzle] = useState(0);
+  // 2-attempt tracking system
+  const [attemptCounts, setAttemptCounts] = useState<Map<string, number>>(new Map());
+  const [isAwaitingValidation, setIsAwaitingValidation] = useState(false);
+  const isAdvancing = useRef(false);
+
+  console.log(`[Render] AssessmentInterface - Puzzle Index: ${currentPuzzleIndex}`);
 
   // Initialize and load assessment puzzles
   useEffect(() => {
@@ -124,18 +141,89 @@ export function AssessmentInterface() {
     await checkForCompletion();
     
     if (currentPuzzleIndex < puzzles.length - 1) {
-      setCurrentPuzzleIndex(prev => prev + 1);
+      const nextPuzzleIndex = currentPuzzleIndex + 1;
+      setCurrentPuzzleIndex(nextPuzzleIndex);
+      resetHintsForNewPuzzle();
+      setAttemptCounts(prev => {
+        const newCounts = new Map(prev);
+        newCounts.delete(puzzles[nextPuzzleIndex].id);
+        return newCounts;
+      });
     }
   };
 
   const handlePreviousPuzzle = () => {
     if (currentPuzzleIndex > 0) {
-      setCurrentPuzzleIndex(prev => prev - 1);
+      const prevPuzzleIndex = currentPuzzleIndex - 1;
+      setCurrentPuzzleIndex(prevPuzzleIndex);
+      resetHintsForNewPuzzle();
+      setAttemptCounts(prev => {
+        const newCounts = new Map(prev);
+        newCounts.delete(puzzles[prevPuzzleIndex].id);
+        return newCounts;
+      });
     }
   };
 
   const handleBackToLanding = () => {
     setLocation('/');
+  };
+
+  // Handle hint usage for current puzzle
+  const handleHintUsed = (hintLevel: number, totalHintsUsed: number) => {
+    setHintsUsedForCurrentPuzzle(totalHintsUsed);
+    console.log(`🔍 Hint level ${hintLevel} used. Total hints for this puzzle: ${totalHintsUsed}`);
+  };
+
+  // Reset hints when moving to next puzzle
+  const resetHintsForNewPuzzle = () => {
+    setHintsUsedForCurrentPuzzle(0);
+  };
+
+  // Handle PlayFab validation result for assessment flow
+  const handleAssessmentValidation = useCallback(async (puzzleId: string, validationResult: any) => {
+    console.log(`🔍 handleAssessmentValidation called for puzzle ${puzzleId}`);
+    console.log(`🔍 Validation result:`, validationResult);
+    
+    const currentAttempts = attemptCounts.get(puzzleId) || 0;
+    const newAttempts = currentAttempts + 1;
+    
+    console.log(`🔍 Current attempts: ${currentAttempts}, New attempts: ${newAttempts}`);
+    
+    // Update attempt count
+    const newAttemptCounts = new Map(attemptCounts);
+    newAttemptCounts.set(puzzleId, newAttempts);
+    setAttemptCounts(newAttemptCounts);
+    
+    setIsAwaitingValidation(false);
+    
+    console.log(`📝 Assessment validation for ${puzzleId}: attempt ${newAttempts}, result:`, validationResult);
+    
+    // Assessment advancement logic: 
+    // - First attempt success: advance immediately
+    // - Second attempt (any result): advance regardless  
+    const shouldAdvance = (newAttempts === 1 && validationResult?.correct) || (newAttempts >= 2);
+    
+    console.log(`🔍 Should advance? ${shouldAdvance} (attempts: ${newAttempts}, correct: ${validationResult?.correct})`);
+    
+    if (shouldAdvance && !isAdvancing.current) {
+      isAdvancing.current = true;
+      console.log(`✅ Auto-advancing after attempt ${newAttempts} for puzzle ${puzzleId}`);
+      setTimeout(() => {
+        console.log(`🚀 Calling handleNextPuzzle() now...`);
+        handleNextPuzzle();
+        isAdvancing.current = false; // Reset after advancing
+      }, 2000); // Brief delay to show result
+    } else {
+      console.log(`🔄 Staying on puzzle ${puzzleId} after first failed attempt`);
+    }
+  }, [attemptCounts, currentPuzzleIndex, puzzles.length]);
+
+  // Custom onSolve handler that tracks validation instead of auto-advancing
+  const handleAssessmentSolve = () => {
+    // In assessment mode, onSolve is called after successful PlayFab validation
+    // But we handle advancement in handleAssessmentValidation based on attempt count
+    console.log('🎯 Assessment solve callback triggered - validation successful');
   };
 
   if (isLoading) {
@@ -212,7 +300,14 @@ export function AssessmentInterface() {
         <div className="max-w-4xl mx-auto flex justify-between items-center">
           <div>
             <h1 className="text-xl font-bold text-amber-400">ARC Assessment</h1>
-            <p className="text-slate-300 text-sm">Puzzle {currentPuzzleIndex + 1} of {puzzles.length}</p>
+            <p className="text-slate-300 text-sm">
+              Puzzle {currentPuzzleIndex + 1} of {puzzles.length}
+              {currentPuzzle && attemptCounts.get(currentPuzzle.id) && (
+                <span className="ml-2 text-amber-300">
+                  (Attempt {attemptCounts.get(currentPuzzle.id)} of 2)
+                </span>
+              )}
+            </p>
           </div>
           <div className="flex gap-2">
             <Button 
@@ -233,8 +328,19 @@ export function AssessmentInterface() {
       <ResponsivePuzzleSolver 
         puzzle={currentPuzzle} 
         onBack={handleBackToLanding}
-        onSolve={handleNextPuzzle}
+        isAssessmentMode={true}
+        onSolve={handleAssessmentSolve}
+        onValidationResult={(result) => handleAssessmentValidation(currentPuzzle.id, result)}
       />
+
+      {/* Hint System - positioned adjacent to puzzle grids */}
+      <div className="max-w-4xl mx-auto px-4 pb-4">
+        <PermanentHintSystem
+          puzzle={currentPuzzle}
+          onHintUsed={handleHintUsed}
+          className="mx-auto max-w-2xl"
+        />
+      </div>
 
       {/* Navigation controls */}
       <div className="bg-slate-800 p-4">

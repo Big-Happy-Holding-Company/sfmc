@@ -1,275 +1,268 @@
 /**
- * Permanent Hint System
- * =====================
- * Character-based hint system that provides helpful guidance during puzzle solving
- * Features rotating characters and always-available output size hints
+ * 
+ * Author: Claude Code using Sonnet 4
+ * Date: 2025-09-12
+ * PURPOSE: Clean hint system providing progressive 3-level hints for ARC puzzles. 
+ * Integrates with PlayFab hint scoring system and arc-explainer API. 
+ * Designed for HARC assessment but reusable across officer track.
+ * SRP and DRY check: Pass - Single responsibility (hints only), reusable component
+ * 
  */
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import type { OfficerTrackPuzzle } from '@/types/arcTypes';
 
 interface PermanentHintSystemProps {
   puzzle: OfficerTrackPuzzle;
-  tutorialMode?: boolean;
+  onHintUsed?: (hintLevel: number, hintsUsedTotal: number) => void;
   className?: string;
 }
 
-// =============================================================================
-// DESIGNER INPUT: CHARACTER CONFIGURATION
-// =============================================================================
-// Add or modify characters and their hint specialties here
-
-interface HintCharacter {
-  name: string;
-  rank: string;
-  image: string;
-  specialty: string;
-  hintTypes: string[];
+interface HintState {
+  level1Revealed: boolean;
+  level2Revealed: boolean;  
+  level3Revealed: boolean;
+  level3Content: string | null;
+  level3Loading: boolean;
+  level3Error: string | null;
+  totalHintsUsed: number;
 }
 
-const HINT_CHARACTERS: HintCharacter[] = [
-  {
-    name: "Yvonne",
-    rank: "Cadet",
-    image: "/Cadet-Yvonne.PNG",
-    specialty: "Pattern Recognition",
-    hintTypes: ["pattern", "basic", "tutorial"]
-  },
-  {
-    name: "Wyatt", 
-    rank: "Master Chief",
-    image: "/master-chief-wyatt.png",
-    specialty: "Grid Analysis",
-    hintTypes: ["size", "structure", "advanced"]
-  },
-  {
-    name: "Divyapriya",
-    rank: "Captain", 
-    image: "/captain-divyapriya.PNG",
-    specialty: "Strategic Thinking",
-    hintTypes: ["strategy", "multi-test", "validation"]
-  },
-  {
-    name: "Kim",
-    rank: "Colonel",
-    image: "/col-kim.png", 
-    specialty: "Problem Solving",
-    hintTypes: ["logic", "complex", "troubleshooting"]
-  },
-  {
-    name: "Luz",
-    rank: "Lt. Colonel",
-    image: "/ltcol-Luz.png",
-    specialty: "Training & Development", 
-    hintTypes: ["learning", "progression", "motivation"]
-  }
-];
+export function PermanentHintSystem({ 
+  puzzle, 
+  onHintUsed,
+  className = "" 
+}: PermanentHintSystemProps) {
+  const [hintState, setHintState] = useState<HintState>({
+    level1Revealed: false,
+    level2Revealed: false,
+    level3Revealed: false,
+    level3Content: null,
+    level3Loading: false,
+    level3Error: null,
+    totalHintsUsed: 0
+  });
 
-export function PermanentHintSystem({ puzzle, tutorialMode = false, className = "" }: PermanentHintSystemProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [currentCharacterIndex, setCurrentCharacterIndex] = useState(0);
-  const [showOutputSizeHint, setShowOutputSizeHint] = useState(true);
-
-  const currentCharacter = HINT_CHARACTERS[currentCharacterIndex];
-
-  // Rotate character every 30 seconds when expanded
+  // Reset hints when puzzle changes
   useEffect(() => {
-    if (!isExpanded) return;
+    setHintState({
+      level1Revealed: false,
+      level2Revealed: false,
+      level3Revealed: false,
+      level3Content: null,
+      level3Loading: false,
+      level3Error: null,
+      totalHintsUsed: 0
+    });
+  }, [puzzle.id]);
 
-    const interval = setInterval(() => {
-      setCurrentCharacterIndex(prev => (prev + 1) % HINT_CHARACTERS.length);
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [isExpanded]);
-
-  // =============================================================================
-  // HINT GENERATION FUNCTIONS
-  // =============================================================================
-
-  // Always available: Output size hint from puzzle data
-  const getOutputSizeHint = (): string => {
-    if (!puzzle.test || puzzle.test.length === 0) return "";
+  // Level 1 Hint: Output Grid Size
+  const revealLevel1Hint = () => {
+    if (hintState.level1Revealed) return;
     
-    const testCase = puzzle.test[0];
-    if (!testCase?.output) return "";
+    const newHintsUsed = hintState.totalHintsUsed + 1;
+    setHintState(prev => ({ 
+      ...prev, 
+      level1Revealed: true, 
+      totalHintsUsed: newHintsUsed 
+    }));
     
-    const height = testCase.output.length;
-    const width = testCase.output[0]?.length || 0;
-    
-    return `💡 **Output Size Hint**: The solution grid should be ${width}×${height} (${width} columns, ${height} rows)`;
+    onHintUsed?.(1, newHintsUsed);
   };
 
-  // DESIGNER INPUT: Add more hint types here
-  const getPatternHints = (): string[] => {
-    const hints: string[] = [];
+  // Level 2 Hint: Transformation Types (will show TypesModal when created)
+  const revealLevel2Hint = () => {
+    if (hintState.level2Revealed) return;
     
-    if (puzzle.train && puzzle.train.length > 0) {
-      hints.push(`🔍 **Pattern Analysis**: Study all ${puzzle.train.length} training examples to identify the transformation rule`);
+    const newHintsUsed = hintState.totalHintsUsed + 1;
+    setHintState(prev => ({ 
+      ...prev, 
+      level2Revealed: true, 
+      totalHintsUsed: newHintsUsed 
+    }));
+    
+    onHintUsed?.(2, newHintsUsed);
+  };
+
+  // Level 3 Hint: Solution Explanation from arc-explainer API
+  const revealLevel3Hint = async () => {
+    if (hintState.level3Revealed) return;
+    
+    const newHintsUsed = hintState.totalHintsUsed + 1;
+    setHintState(prev => ({ 
+      ...prev, 
+      level3Revealed: true, 
+      level3Loading: true,
+      totalHintsUsed: newHintsUsed 
+    }));
+    
+    onHintUsed?.(3, newHintsUsed);
+    
+    try {
+      // Extract puzzle ID for arc-explainer API call
+      // Convert from ARC-TR-007bbfb7 format to 007bbfb7 format
+      const cleanPuzzleId = puzzle.id.replace(/^ARC-TR-/, '');
       
-      // Check for size changes
-      const inputSizes = puzzle.train.map(ex => `${ex.input[0]?.length || 0}×${ex.input.length}`);
-      const outputSizes = puzzle.train.map(ex => `${ex.output[0]?.length || 0}×${ex.output.length}`);
+      const response = await fetch(
+        `https://arc-explainer-production.up.railway.app/api/puzzle/${cleanPuzzleId}/explanations`
+      );
       
-      if (inputSizes[0] !== outputSizes[0]) {
-        hints.push(`📏 **Size Changes**: Notice how the grid size changes from input to output`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch explanation: ${response.status}`);
       }
+      
+      const data = await response.json();
+      
+      // Extract the most relevant explanation
+      let explanation = "No explanation available for this puzzle.";
+      if (data && data.length > 0) {
+        // Look for explanations with good ratings or take the first available
+        const bestExplanation = data.find((exp: any) => exp.rating >= 4) || data[0];
+        explanation = bestExplanation.explanation || bestExplanation.content || explanation;
+      }
+      
+      setHintState(prev => ({ 
+        ...prev, 
+        level3Loading: false,
+        level3Content: explanation 
+      }));
+      
+    } catch (error: any) {
+      console.error('Failed to fetch hint explanation:', error);
+      setHintState(prev => ({ 
+        ...prev, 
+        level3Loading: false,
+        level3Error: error.message || 'Failed to load explanation'
+      }));
+    }
+  };
+
+  // Get output dimensions from training examples
+  const getExpectedOutputDimensions = () => {
+    if (!puzzle.train || puzzle.train.length === 0) {
+      return "Unable to determine from training examples.";
     }
     
-    return hints;
-  };
-
-  const getStrategicHints = (): string[] => {
-    const hints: string[] = [];
+    const dimensions = puzzle.train.map(example => {
+      const height = example.output?.length || 0;
+      const width = example.output?.[0]?.length || 0;
+      return `${width}×${height}`;
+    });
     
-    if (puzzle.test && puzzle.test.length > 1) {
-      hints.push(`🎯 **Multi-Test Strategy**: This puzzle has ${puzzle.test.length} test cases - solve them systematically`);
-      hints.push(`✅ **Validation Tip**: Complete all test cases before submitting for PlayFab validation`);
+    const uniqueDimensions = Array.from(new Set(dimensions));
+    
+    if (uniqueDimensions.length === 1) {
+      return `All training examples show ${uniqueDimensions[0]} output grids.`;
+    } else {
+      return `Training examples show varying sizes: ${uniqueDimensions.join(', ')}`;
     }
-    
-    return hints;
   };
 
-  const getToolHints = (): string[] => {
-    return [
-      `🎨 **Tools Available**: Use Copy Input to start, or create from scratch`,
-      `🔄 **Display Modes**: Switch between Number, Emoji, or Hybrid view for better pattern recognition`,
-      `📐 **Grid Sizing**: Use suggested sizes from training examples when changing output dimensions`
-    ];
-  };
-
-  // DESIGNER INPUT: Customize hint selection based on character specialty
-  const getCurrentHints = (): string[] => {
-    const allHints: string[] = [];
-    
-    // Always include output size hint
-    const sizeHint = getOutputSizeHint();
-    if (sizeHint) allHints.push(sizeHint);
-    
-    // Add hints based on character specialty
-    switch (currentCharacter.specialty) {
-      case "Pattern Recognition":
-        allHints.push(...getPatternHints());
-        break;
-      case "Strategic Thinking":
-        allHints.push(...getStrategicHints());
-        break;
-      case "Grid Analysis":
-        allHints.push(...getToolHints());
-        break;
-      default:
-        // Mix of all hint types
-        allHints.push(...getPatternHints().slice(0, 1));
-        allHints.push(...getStrategicHints().slice(0, 1));
-        allHints.push(...getToolHints().slice(0, 1));
-    }
-    
-    return allHints.slice(0, 3); // Limit to 3 hints at a time
-  };
-
-  const toggleExpanded = () => {
-    setIsExpanded(!isExpanded);
-  };
-
-  const rotateCharacter = () => {
-    setCurrentCharacterIndex(prev => (prev + 1) % HINT_CHARACTERS.length);
-  };
+  if (!puzzle) {
+    return null;
+  }
 
   return (
-    <div className={`bg-slate-800 border border-slate-600 rounded-lg ${className}`}>
-      {/* Compact Hint Bar - Always Visible */}
-      <div className="flex items-center justify-between p-3 cursor-pointer" onClick={toggleExpanded}>
-        <div className="flex items-center space-x-3">
-          <img 
-            src={currentCharacter.image}
-            alt={`${currentCharacter.rank} ${currentCharacter.name}`}
-            className="w-8 h-8 rounded-full border-2 border-amber-400"
-          />
-          <div className="text-amber-400 text-sm font-medium">
-            💡 Hints Available ({getCurrentHints().length})
-          </div>
-          {showOutputSizeHint && (
-            <div className="text-slate-300 text-xs truncate max-w-xs">
-              {getOutputSizeHint()}
-            </div>
-          )}
+    <Card className={`bg-slate-800 border-amber-400 ${className}`}>
+      <CardContent className="p-4">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-amber-400 font-bold text-lg">Puzzle Hints</h3>
+          <Badge variant="outline" className="border-slate-500 text-slate-300">
+            {hintState.totalHintsUsed} used
+          </Badge>
         </div>
         
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="ghost" 
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              rotateCharacter();
-            }}
-            className="text-amber-400 hover:text-amber-300 text-xs"
-          >
-            🔄 Change Helper
-          </Button>
-          <div className="text-amber-400">
-            {isExpanded ? '▼' : '▶'}
-          </div>
-        </div>
-      </div>
-
-      {/* Expanded Hint Panel */}
-      {isExpanded && (
-        <Card className="bg-slate-900 border-slate-600 m-3">
-          <CardContent className="p-4">
-            {/* Character Header */}
-            <div className="flex items-center space-x-4 mb-4 pb-3 border-b border-slate-600">
-              <img 
-                src={currentCharacter.image}
-                alt={`${currentCharacter.rank} ${currentCharacter.name}`}
-                className="w-16 h-16 rounded-full border-4 border-amber-400"
-              />
-              <div>
-                <h3 className="text-amber-400 font-bold text-lg">
-                  {currentCharacter.rank} {currentCharacter.name}
-                </h3>
-                <p className="text-slate-300 text-sm">
-                  🎯 Specialty: {currentCharacter.specialty}
-                </p>
-              </div>
+        <div className="space-y-3">
+          {/* Level 1 Hint: Grid Size */}
+          <div className="border border-slate-600 rounded-lg p-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-amber-300 font-semibold">Level 1: Output Grid Size</span>
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={revealLevel1Hint}
+                disabled={hintState.level1Revealed}
+                className="text-xs border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900"
+              >
+                {hintState.level1Revealed ? 'Revealed' : 'Reveal'}
+              </Button>
             </div>
-
-            {/* Hints List */}
-            <div className="space-y-3">
-              <h4 className="text-amber-300 font-semibold">Helpful Hints:</h4>
-              {getCurrentHints().map((hint, index) => (
-                <div key={index} className="bg-slate-800 p-3 rounded border-l-4 border-amber-400">
-                  <p className="text-slate-200 text-sm leading-relaxed">
-                    {hint}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            {/* DESIGNER INPUT: Tutorial Mode Special Messages */}
-            {tutorialMode && (
-              <div className="mt-4 pt-3 border-t border-slate-600">
-                <div className="bg-blue-900 border border-blue-600 rounded p-3">
-                  <p className="text-blue-300 text-sm">
-                    🎓 <strong>Tutorial Mode:</strong> DESIGNER INPUT - Add special tutorial guidance here.
-                    This message appears only during the tutorial and can provide context-specific help.
-                  </p>
-                </div>
+            {hintState.level1Revealed && (
+              <div className="text-slate-200 text-sm bg-slate-700 p-2 rounded">
+                <strong>Grid Size Hint:</strong> {getExpectedOutputDimensions()}
               </div>
             )}
+          </div>
 
-            {/* Character Rotation Info */}
-            <div className="mt-4 pt-3 border-t border-slate-600">
-              <p className="text-slate-400 text-xs">
-                💭 Different characters provide different perspectives. 
-                Hints rotate automatically every 30 seconds, or click "Change Helper" above.
-              </p>
+          {/* Level 2 Hint: Transformation Types */}
+          <div className="border border-slate-600 rounded-lg p-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-amber-300 font-semibold">Level 2: ARC Transformations</span>
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={revealLevel2Hint}
+                disabled={hintState.level2Revealed}
+                className="text-xs border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900"
+              >
+                {hintState.level2Revealed ? 'Revealed' : 'Reveal'}
+              </Button>
             </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+            {hintState.level2Revealed && (
+              <div className="text-slate-200 text-sm bg-slate-700 p-2 rounded">
+                <strong>Transformation Types:</strong> This puzzle likely involves one of the 40 common ARC-AGI transformation patterns such as rotation, reflection, pattern completion, object counting, or conditional rules.
+                <br />
+                <em>(TypesModal with full list will be available in next update)</em>
+              </div>
+            )}
+          </div>
+
+          {/* Level 3 Hint: Solution Explanation */}
+          <div className="border border-slate-600 rounded-lg p-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-amber-300 font-semibold">Level 3: Solution Explanation</span>
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={revealLevel3Hint}
+                disabled={hintState.level3Revealed}
+                className="text-xs border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900"
+              >
+                {hintState.level3Revealed ? 'Revealed' : 'Reveal'}
+              </Button>
+            </div>
+            {hintState.level3Revealed && (
+              <div className="text-slate-200 text-sm bg-slate-700 p-2 rounded">
+                {hintState.level3Loading && (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-amber-400"></div>
+                    Loading explanation from arc-explainer API...
+                  </div>
+                )}
+                {hintState.level3Error && (
+                  <div className="text-red-400">
+                    <strong>Error:</strong> {hintState.level3Error}
+                  </div>
+                )}
+                {hintState.level3Content && (
+                  <div>
+                    <strong>Solution Approach:</strong> {hintState.level3Content}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {hintState.totalHintsUsed > 0 && (
+          <div className="mt-4 text-xs text-slate-400 text-center">
+            Hint penalty: -{hintState.totalHintsUsed * 5} points
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
