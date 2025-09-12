@@ -234,6 +234,7 @@ export function AssessmentInterface() {
       <ResponsivePuzzleSolver 
         puzzle={currentPuzzle} 
         onBack={handleBackToLanding}
+        onSolve={handleNextPuzzle}
       />
 
       {/* Navigation controls */}
