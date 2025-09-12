@@ -11,8 +11,8 @@ interface OnboardingModalProps {
 export function OnboardingModal({ open, onClose }: OnboardingModalProps) {
   const [pathname] = useLocation();
 
-  // Disable the onboarding modal on any officer track pages
-  if (pathname.startsWith('/officer-track')) {
+  // Disable the onboarding modal on specific pages that don't need onboarding
+  if (pathname.startsWith('/officer-track') || pathname.startsWith('/harc') || pathname.startsWith('/assessment') || pathname.startsWith('/dashboard')) {
     return null;
   }
   const trainer = getRandomTrainer();
