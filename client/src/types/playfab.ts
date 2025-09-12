@@ -42,6 +42,7 @@ export interface PlayFabPlayer {
   completedMissions: number;
   currentTask?: string;
   hasCompletedTutorial?: boolean;
+  humanPerformanceData?: string;
   createdAt: Date;
   updatedAt: Date;
 }
