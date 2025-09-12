@@ -169,8 +169,8 @@ This section documents key lessons learned to prevent recurring issues.
 ---
 
 ## 5. External API: `arc-explainer`
-
-While PlayFab is our backend, we use the external `arc-explainer` API for one specific purpose: **enriching the Officer Track puzzle selection**.
+- Documentation: `docs/api-guide.md` and `docs/arc-explainer-api-investigation.md`
+While PlayFab is our backend, we use the external `arc-explainer` API for a specific purpose: **enriching the Officer Track puzzle selection** and for the HARC assessment puzzle selection.
 
 - **URL**: `https://arc-explainer-production.up.railway.app`
 - **Purpose**: To identify puzzles that are particularly interesting for human players, specifically those where AI models performed poorly, were overconfident in wrong answers, or generated untrustworthy explanations.
