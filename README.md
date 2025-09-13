@@ -28,10 +28,18 @@ https://learn.microsoft.com/en-us/rest/api/playfab/server/?view=playfab-rest - P
 - **Batch Architecture**: Efficient loading of large puzzle collections from PlayFab
 - **Officer Ranks**: LIEUTENANT → CAPTAIN → MAJOR → COLONEL progression
 
-### Accessibility & Design
+### Assessment Platform
+- **Human vs AI Benchmarking**: Compare performance against LLM accuracy data at `/assessment`
+- **2-Attempt System**: Progressive assessment with auto-advancement logic (`AssessmentInterface.tsx`)
+- **Hint System**: 3-tier progressive hints integrated with arc-explainer API (`PermanentHintSystem.tsx`)
+- **Success Feedback**: User-controlled progression with success modal requiring interaction (`SuccessModal.tsx`)
+
+### UI/UX Features
+- **Responsive Design**: Complete mobile/tablet support via `ResponsiveOfficerGrid.tsx`
+- **Grid Customization**: Separate input/output size controls via `SizeSlider.tsx` (50-100px range)
+- **Visual Integration**: Painting tools show actual ARC colors in Numbers Only mode
+- **Dynamic Metadata**: Navbar displays puzzle performance data from arc-explainer API
 - **Colorblind Friendly**: Multiple emoji sets with clear visual distinctions
-- **Responsive UI**: Works on desktop, tablet, and mobile devices
-- **Real-time Feedback**: Immediate validation and hints system
 
 ## Technical Stack
 
@@ -61,23 +69,31 @@ PlayFab Cloud Backend (Single Source of Truth)          arc-explainer API
     ↓                                                              ↓
 Static React App (client/) ←------ HTTP API Calls ----------------┘
 ├── components/    # Game UI + AI difficulty cards
-├── constants/     # Emoji sets and game constants  
+│   ├── assessment/      # Human vs AI assessment platform
+│   ├── officer/         # Officer track puzzle solver
+│   ├── ui/             # Reusable components (SuccessModal, SizeSlider)
+│   └── layout/         # Navigation (Navbar with dynamic metadata)
+├── constants/     # Emoji sets and game constants
 ├── services/      # Pure HTTP integrations
-│   ├── playfab/   # Core PlayFab services
-│   ├── arcDataService.ts     # Officer track batch loading
-│   └── arcExplainerAPI.ts    # AI performance data integration
+│   ├── playfab/         # Core PlayFab services
+│   ├── arcDataService.ts       # Officer track batch loading
+│   └── arcExplainerService.ts  # AI performance metadata integration
+├── types/         # TypeScript definitions
 └── pages/         # Route components with AI-curated filtering
 
 ### Data Flow
 1. **Enlisted Tasks**: Loaded from `AllTasks` PlayFab Title Data key
-2. **Officer Tasks**: Batch-loaded from multiple Title Data keys per dataset  
+2. **Officer Tasks**: Batch-loaded from multiple Title Data keys per dataset
 3. **AI Performance**: Real-time HTTP calls to arc-explainer API for difficulty curation
-4. **Authentication**: Anonymous PlayFab login with persistent device ID
-5. **Progress**: Stored separately for enlisted vs officer tracks in User Data
-6. **Validation**: Client-side logic with PlayFab progress updates
-7. **Leaderboards**: Separate leaderboards for enlisted and officer tracks
-8. **AI Filtering**: Cross-reference PlayFab puzzle IDs with arc-explainer performance data
-9. **Deployment**: Static files served from CDN (Railway)
+4. **Assessment Flow**: 2-attempt system with auto-advancement via `AssessmentInterface.tsx`
+5. **Authentication**: Anonymous PlayFab login with persistent device ID
+6. **Progress**: Stored separately for enlisted vs officer tracks in User Data
+7. **Validation**: Client-side logic with PlayFab progress updates
+8. **Hints**: Progressive 3-tier system integrated with arc-explainer API
+9. **Success Feedback**: User-controlled progression via `SuccessModal.tsx`
+10. **Leaderboards**: Separate leaderboards for enlisted and officer tracks
+11. **AI Filtering**: Cross-reference PlayFab puzzle IDs with arc-explainer performance data
+12. **Deployment**: Static files served from CDN (Railway)
 
 
 
@@ -178,6 +194,31 @@ Players advance through Space Force enlisted ranks by earning points from solvin
    VITE_ARC_EXPLAINER_URL="https://arc-explainer-production.up.railway.app"
    ```
 4. Start development server: `npm run test` (builds + runs dev server)
+
+### Key File Organization for Development
+
+```
+client/src/
+├── components/
+│   ├── assessment/          # Assessment platform (/assessment route)
+│   │   ├── AssessmentInterface.tsx    # Main 2-attempt assessment flow
+│   │   └── AssessmentModal.tsx        # User onboarding modal
+│   ├── officer/             # Officer track puzzle solver
+│   │   ├── ResponsivePuzzleSolver.tsx # Main solver interface
+│   │   ├── PermanentHintSystem.tsx    # 3-tier progressive hints
+│   │   └── EmojiPaletteDivider.tsx    # Painting tools with ARC colors
+│   ├── ui/                  # Reusable components
+│   │   ├── SuccessModal.tsx           # Success feedback (user-controlled)
+│   │   └── SizeSlider.tsx             # Grid size controls (50-100px)
+│   └── layout/
+│       └── Navbar.tsx                 # Dynamic metadata display
+├── services/
+│   ├── playfab/             # Backend integration
+│   └── arcExplainerService.ts         # AI metadata from arc-explainer API
+└── types/                   # TypeScript definitions
+    ├── arcTypes.ts                    # ARC puzzle types
+    └── puzzleDisplayTypes.ts          # UI state types
+```
 
 ### Officer Track Setup
 The Officer Track with AI-curated difficulty requires:

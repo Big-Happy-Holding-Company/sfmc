@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## Recent Commits (Latest First)
 
+**2025-09-13**: 🔧 SUCCESS MODAL & UI IMPROVEMENTS - User-Controlled Progression
+- **SUCCESS MODAL FIX**: Fixed auto-closing modal, now requires OK button click (`SuccessModal.tsx`, `ResponsivePuzzleSolver.tsx`)
+- **GRID SIZING CONTROLS**: Added separate input/output grid size sliders, 50-100px range (`SizeSlider.tsx`, `ResponsivePuzzleSolver.tsx`)
+- **ARC COLOR INTEGRATION**: Painting tools now show actual ARC colors in Numbers Only mode (`EmojiPaletteDivider.tsx`)
+- **NAVBAR OVERHAUL**: Dynamic puzzle metadata from arc-explainer API (`Navbar.tsx`, `arcExplainerService.ts`)
+- **ASSESSMENT FLOW**: 2-attempt validation system with auto-advancement logic (`AssessmentInterface.tsx`)
+- **STATE MANAGEMENT**: Fixed React stale prop issues with proper useEffect dependencies (`ResponsivePuzzleSolver.tsx`)
+- **RESPONSIVE IMPROVEMENTS**: Training examples resizing, better mobile layouts (`TrainingExamplesSection.tsx`, `ResizableBox.tsx`)
+- **HINT SYSTEM**: 3-tier progressive hints with arc-explainer integration (`PermanentHintSystem.tsx`)
+- **ARCHITECTURE DOCS**: Added senior developer gotchas and platform wrapper concepts (`CLAUDE.md`)
+
 **2025-09-12**: 🎓 ASSESSMENT PAGE CLEANUP - Remove Space Force Theme and Hints
 - **SPACE FORCE THEMING REMOVED**: 
   - Stripped military emojis (🎖️) and terminology from puzzle solver headers
