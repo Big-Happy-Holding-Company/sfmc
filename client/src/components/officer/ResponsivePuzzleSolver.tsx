@@ -19,7 +19,6 @@ import { PuzzleTools } from '@/components/officer/PuzzleTools';
 import type { OfficerTrackPuzzle, ARCGrid } from '@/types/arcTypes';
 import type { DisplayMode, PuzzleDisplayState } from '@/types/puzzleDisplayTypes';
 import type { EmojiSet } from '@/constants/spaceEmojis';
-import { puzzlePerformanceService } from '@/services/puzzlePerformanceService';
 import { playFabValidation } from '@/services/playfab/validation';
 import { playFabEvents } from '@/services/playfab/events';
 import { SizeSlider } from '@/components/ui/SizeSlider';

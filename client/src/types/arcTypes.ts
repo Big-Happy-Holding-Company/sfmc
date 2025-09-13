@@ -76,6 +76,27 @@ export enum OfficerRank {
 /** Officer rank requirements for puzzle access */
 export type OfficerRankRequirement = keyof typeof OfficerRank;
 
+/** Officer Puzzle with AI performance data (used in simplified contexts) */
+export interface OfficerPuzzle {
+  id: string;                    // ARC ID (e.g., "007bbfb7")
+  playFabId: string;            // PlayFab format (e.g., "ARC-TR-007bbfb7")
+  avgAccuracy: number;          // 0.0 to 1.0
+  difficulty: 'practically_impossible' | 'most_llms_fail' | 'unreliable';
+  totalExplanations: number;
+  compositeScore: number;
+  // Rich failure metadata
+  avgConfidence?: number;       // AI confidence when failing (0-100)
+  wrongCount?: number;          // Total wrong attempts
+  totalFeedback?: number;       // Human feedback attempts
+  negativeFeedback?: number;    // Negative human feedback count
+  latestAnalysis?: string;      // ISO date of last analysis
+  // Puzzle structure metadata
+  gridSize?: string;            // e.g., "3x3", "5x5", "variable"
+  dataset?: string;             // e.g., "training", "evaluation", "evaluation2"
+  testCaseCount?: number;       // Number of test cases
+  trainingExampleCount?: number; // Number of training examples
+}
+
 /** Officer Track player data (separate from main game) */
 export interface OfficerTrackPlayer {
   /** PlayFab player ID */

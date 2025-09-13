@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button';
 import { AlertTriangle, ArrowLeft } from 'lucide-react';
 import { ResponsivePuzzleSolver } from '@/components/officer/ResponsivePuzzleSolver';
 import { playFabRequestManager, playFabAuthManager } from '@/services/playfab';
-import { puzzlePerformanceService } from '@/services/puzzlePerformanceService'; // Use the correct service
+import { puzzleRepository } from '@/services/core/puzzleRepository';
 import type { OfficerTrackPuzzle } from '@/types/arcTypes';
 
 export default function PuzzleSolver() {
@@ -67,7 +67,7 @@ export default function PuzzleSolver() {
         setPlayFabReady(true);
 
         // Use the centralized service to find the puzzle
-        const puzzleData = await puzzlePerformanceService.findPuzzleById(puzzleId);
+        const puzzleData = await puzzleRepository.findById(puzzleId, true);
         
         if (puzzleData) {
           setPuzzle(puzzleData);
