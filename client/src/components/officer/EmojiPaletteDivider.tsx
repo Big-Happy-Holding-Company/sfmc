@@ -11,7 +11,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { SPACE_EMOJIS, type EmojiSet } from '@/constants/spaceEmojis';
+import { SPACE_EMOJIS, type EmojiSet, getARCColorCSS } from '@/constants/spaceEmojis';
 import type { DisplayMode } from '@/types/puzzleDisplayTypes';
 
 interface EmojiPaletteDividerProps {
@@ -53,7 +53,7 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
   const renderValueButton = ({ emoji, value }: { emoji: string; value: number }) => {
     const isSelected = value === selectedValue;
     const isUsed = usedValues.includes(value);
-    
+
     // Determine what to display based on mode
     let displayContent: string;
     if (displayMode === 'arc-colors') {
@@ -63,22 +63,59 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
     } else {
       displayContent = emoji;
     }
-    
+
+    // Get ARC color background for arc-colors and hybrid modes
+    const getBackgroundColor = () => {
+      if (displayMode === 'arc-colors' || displayMode === 'hybrid') {
+        return getARCColorCSS(value);
+      }
+      // For emoji mode, use existing logic
+      if (isSelected) return 'rgb(251, 191, 36)'; // amber-400
+      return 'transparent';
+    };
+
+    // Get text color with proper contrast for ARC colors
+    const getTextColor = () => {
+      if (displayMode === 'arc-colors' || displayMode === 'hybrid') {
+        // Calculate contrast based on ARC color - same logic as EnhancedGridCell
+        const isDarkBackground = value === 0 || value === 5 || value === 9; // Black, Grey, Maroon
+        return isDarkBackground ? 'white' : 'black';
+      }
+      // For emoji mode, use existing logic
+      if (isSelected) return 'rgb(51, 65, 85)'; // slate-700
+      return 'rgb(203, 213, 225)'; // slate-300
+    };
+
+    // Get border color
+    const getBorderColor = () => {
+      if (isSelected) return 'rgb(251, 191, 36)'; // amber-400
+      if (isUsed) return 'rgb(34, 211, 238)'; // cyan-400
+      if (displayMode === 'arc-colors' || displayMode === 'hybrid') {
+        return 'rgb(100, 116, 139)'; // slate-500
+      }
+      return 'rgb(100, 116, 139)'; // slate-500
+    };
+
+    const buttonStyle: React.CSSProperties = {
+      backgroundColor: getBackgroundColor(),
+      color: getTextColor(),
+      borderColor: getBorderColor(),
+      borderWidth: isSelected ? '2px' : '1px',
+    };
+
     return (
       <Button
         key={value}
-        variant={isSelected ? "default" : "outline"}
+        variant="outline"
         size="sm"
         onClick={() => handleValueSelect(value)}
+        style={buttonStyle}
         className={`
           h-24 w-20 p-0 text-2xl font-bold flex-shrink-0 transition-all duration-300
           ${!hasInteracted ? 'animate-pulse [animation-duration:3s] ring-1 ring-amber-400/60 shadow-md shadow-amber-400/30' : ''}
-          ${isSelected 
-            ? 'bg-amber-600 text-slate-900 hover:bg-amber-700 ring-2 ring-amber-400' 
-            : isUsed
-              ? 'border-cyan-400 text-cyan-300 hover:bg-cyan-600 hover:text-white border-2'
-              : 'border-slate-500 text-slate-300 hover:bg-slate-600'
-          }
+          ${isSelected ? 'ring-2 ring-amber-400 shadow-lg shadow-amber-400/30' : ''}
+          ${isUsed && !isSelected ? 'ring-1 ring-cyan-400' : ''}
+          hover:scale-105 hover:shadow-lg
         `}
         title={`Value ${value}: ${emoji} ${isUsed ? '(used in puzzle)' : ''}`}
       >
