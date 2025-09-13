@@ -299,6 +299,33 @@ export class PlayFabUserData {
   /**
    * Get player statistics summary
    */
+  /**
+   * Get human performance data for assessment comparison
+   */
+  public async getHumanPerformanceData(): Promise<any[]> {
+    const playFabId = playFabAuthManager.getPlayFabId();
+    if (!playFabId) {
+      throw new Error('No PlayFab ID available for fetching performance data');
+    }
+
+    try {
+      const result = await playFabRequestManager.makeRequest<{ Keys: string[] }, GetUserDataResponse>(
+        'getUserData',
+        { Keys: ['humanPerformanceData'] }
+      );
+
+      const performanceDataString = result?.Data?.humanPerformanceData?.Value;
+      if (performanceDataString) {
+        // The data is stored as a JSON string, so it needs to be parsed.
+        return JSON.parse(performanceDataString);
+      }
+      return []; // Return an empty array if no data is found.
+    } catch (error) {
+      console.error('[PlayFabUserData] Failed to get human performance data:', error);
+      throw error;
+    }
+  }
+
   public getPlayerStats(): {
     totalPoints: number;
     completedMissions: number;

@@ -33,6 +33,7 @@ import { LLMComparisonPage } from "@/pages/LLMComparisonPage";
 import HARCPlatform from "@/pages/HARCPlatform";
 import Leaderboards from "@/pages/Leaderboards";
 import Profile from "@/pages/Profile";
+import HumanVsAiComparison from "@/pages/HumanVsAiComparison";
 import NotFound from "@/pages/not-found";
 import { LoadingSplash } from "@/components/game/LoadingSplash";
 import { OnboardingModal } from "@/components/game/OnboardingModal";
@@ -52,6 +53,7 @@ function Router() {
       <Route path="/profile" component={Profile} />
       <Route path="/grid-test" component={GridSizeTest} />
       <Route path="/tutorial" component={TutorialPage} />
+      <Route path="/assessment/comparison" component={HumanVsAiComparison} />
       <Route component={NotFound} />
     </Switch>
   );
