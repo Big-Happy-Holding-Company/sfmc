@@ -40,7 +40,10 @@ export const SPACE_EMOJIS = {
   weather_climate: ['⬛', '🌞', '🌝', '🌛', '🌜', '🌧️', '⛈️', '🌩️', '🌨️', '❄️'],
 
   // Status - Human Crew and Coworkers
-  status_emojis: ['⬛', '😂', '😶', '😐', '🙄', '😴', '😵', '🤗', '🤔', '😣'],
+  status_emojis: ['⬛', '😂', '😎', '🤪', '🙄', '😴', '😵', '🤗', '🤔', '😍'],
+
+  // People - Human Crew and Coworkers 2
+  people_emojis: ['⬛', '👩‍⚕️', '👨‍🔬', '👨‍🚒', '👷‍♂️', '👩‍🏫', '👮‍♂️', '👨‍💼', '👨‍🔧', '👩‍🏭'],
 
   // Status - AI and Computer Systems
   ai_emojis: ['⬛', '🤖', '💡', '🧠', '🔗', '⚙️', '🔧', '🔄', '⚡', '🚫'],
@@ -52,7 +55,7 @@ export const SPACE_EMOJIS = {
   alien_language: ['⬛', '👽', '👤', '🪐', '🌍', '🛸', '☄️', '♥️', '⚠️', '🛰'],
 
   // Big & Wild Mammals
-  big_mammals: ['⬛','🐯','🦁','🐺','🐗','🐴','🦄','🐐','🐑','🦌'],
+  big_mammals: ['⬛','🐯','🐑','🐺','🐗','🐴','🦄','🐐','🦌','🦁'], 
 
   // Reptiles & Amphibians
   reptiles_amphibians: ['⬛','🐢','🐍','🦎','🦖','🦕','🐊','🐸','🐌','🐲'],
@@ -136,6 +139,11 @@ export const EMOJI_SET_INFO = {
     theme: 'Environmental'
   },
   status_emojis: {
+    name: 'Human Crew and Coworkers',
+    description: 'Human crew and coworkers',
+    theme: 'Mission Safety'
+  },
+  people_emojis: {
     name: 'Human Crew and Coworkers',
     description: 'Human crew and coworkers',
     theme: 'Mission Safety'

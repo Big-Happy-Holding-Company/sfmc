@@ -57,7 +57,7 @@ export function SuccessModal({
   // Generate new random emojis each time modal opens
   useEffect(() => {
     if (open) {
-      setCelebrationEmojis(getRandomEmojis(6));
+      setCelebrationEmojis(getRandomEmojis(5));
       setIsVisible(true);
 
       // Only auto close if delay is explicitly set
@@ -78,7 +78,7 @@ export function SuccessModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent 
         className={`
-          max-w-md mx-auto bg-gradient-to-br from-slate-800 to-slate-900 
+          max-w-lg mx-auto bg-gradient-to-br from-slate-800 to-slate-900 
           border-2 border-amber-400 text-white text-center p-8
           transform transition-all duration-500 ease-out
           ${isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'}
@@ -88,7 +88,7 @@ export function SuccessModal({
         }}
       >
         {/* Large celebration emojis */}
-        <div className="flex justify-center space-x-2 mb-6 text-6xl">
+        <div className="flex justify-center space-x-2 mb-6 text-5xl">
           {celebrationEmojis.map((emoji, index) => (
             <span 
               key={index}

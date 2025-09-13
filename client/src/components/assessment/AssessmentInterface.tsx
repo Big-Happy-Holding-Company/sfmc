@@ -48,6 +48,7 @@ export function AssessmentInterface() {
   const [attemptCounts, setAttemptCounts] = useState<Map<string, number>>(new Map());
   const [isAwaitingValidation, setIsAwaitingValidation] = useState(false);
   const isAdvancing = useRef(false);
+  const [, navigate] = useLocation();
 
   console.log(`[Render] AssessmentInterface - Puzzle Index: ${currentPuzzleIndex}`);
 
@@ -95,7 +96,6 @@ export function AssessmentInterface() {
         if (ASSESSMENT_PUZZLE_IDS.every(id => completed.has(id))) {
           setIsComplete(true);
           console.log('🎉 Assessment already completed!');
-          setTimeout(() => setLocation('/dashboard'), 2000);
         }
         
       } catch (err: any) {
@@ -108,21 +108,36 @@ export function AssessmentInterface() {
     initializeAndLoadPuzzles();
   }, []);
 
+  // Automatically navigate when assessment is complete
+  useEffect(() => {
+    if (isComplete) {
+      console.log('Navigating to comparison page...');
+      // Navigate after a short delay to allow user to see the completion message
+      const timer = setTimeout(() => {
+        navigate('/assessment/comparison');
+      }, 3000); // 3-second delay
+
+      return () => clearTimeout(timer);
+    }
+  }, [isComplete, navigate]);
+
   // Check which puzzles have already been completed
   const checkCompletedPuzzles = async (): Promise<Set<string>> => {
     try {
-      const userData = await playFabUserData.getPlayerData();
-      const humanPerformanceData = userData?.humanPerformanceData;
+      // Directly fetch only the performance data needed
+      const humanPerformanceData = await playFabUserData.getHumanPerformanceData();
       
-      if (humanPerformanceData) {
-        const records: { puzzleId: string }[] = JSON.parse(humanPerformanceData);
-        const completed = new Set<string>(records.map(r => r.puzzleId));
+      if (humanPerformanceData && humanPerformanceData.length > 0) {
+        // The data is already parsed as an array of objects
+        const completed = new Set<string>(humanPerformanceData.map(r => r.puzzleId));
         setCompletedPuzzles(completed);
+        console.log('Checked completed puzzles, found:', completed);
         return completed;
       }
     } catch (error) {
       console.error('Failed to check completed puzzles:', error);
     }
+    console.log('No completed puzzles found.');
     return new Set<string>();
   };
 
@@ -256,25 +271,20 @@ export function AssessmentInterface() {
     );
   }
 
-  // Show completion screen
+  // Show completion screen and auto-navigate
   if (isComplete) {
     return (
       <div className="min-h-screen bg-slate-900 text-white flex items-center justify-center">
         <div className="text-center max-w-md">
           <div className="text-6xl mb-4">🎉</div>
           <h1 className="text-3xl font-bold text-amber-400 mb-4">Assessment Complete!</h1>
-          <p className="text-slate-300 mb-8">
-            Congratulations! You've completed all assessment puzzles. 
-            Your performance data has been recorded. See how you stack up against the leading AI models.
+          <p className="text-slate-300 mb-6">
+            Congratulations! You've completed all assessment puzzles.
           </p>
-          <div className="flex justify-center gap-4">
-            <Link href="/assessment/comparison">
-              <Button size="lg" className="bg-amber-600 hover:bg-amber-700">View Performance vs. AI</Button>
-            </Link>
-            <Link href="/dashboard">
-              <Button size="lg" variant="outline">Go to Dashboard</Button>
-            </Link>
-          </div>
+          <p className="text-slate-300 mb-8">
+            Redirecting you to the performance comparison page...
+          </p>
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-amber-400 mx-auto"></div>
         </div>
       </div>
     );
