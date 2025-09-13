@@ -5,7 +5,9 @@
  * Handles multiple examples with proper input/output pairing and mobile optimization
  */
 
+import { useState } from 'react';
 import { ResponsiveOfficerDisplayGrid } from '@/components/officer/ResponsiveOfficerGrid';
+import { SizeSlider } from '@/components/ui/SizeSlider';
 import type { ARCGrid } from '@/types/arcTypes';
 import type { DisplayMode } from '@/types/puzzleDisplayTypes';
 import type { EmojiSet } from '@/constants/spaceEmojis';
@@ -30,6 +32,7 @@ export function TrainingExamplesSection({
   className = '',
   displayMode = 'emoji'
 }: TrainingExamplesSectionProps) {
+  const [cellSize, setCellSize] = useState(20);
   
   if (!examples || examples.length === 0) {
     return (
@@ -57,15 +60,14 @@ export function TrainingExamplesSection({
           <h2 className="text-amber-400 text-2xl font-bold flex items-center">
             {title}
           </h2>
-          <div className="text-slate-400 text-base">
-            {examples.length} example{examples.length !== 1 ? 's' : ''}
+          <div className="flex items-center gap-4 w-1/3">
+            <SizeSlider value={cellSize} onChange={setCellSize} min={10} max={40} />
           </div>
         </div>
         
         <div className="overflow-x-auto flex-grow">
           <div className="flex gap-4 pb-4">
             {examples.map((example, index) => {
-              const cellSize = 16; // A consistent, smaller size for all examples
               const cardPadding = "p-2";
               const headerSize = "text-xs font-bold";
               const arrowSize = "text-sm";

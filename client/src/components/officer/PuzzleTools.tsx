@@ -12,7 +12,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { EmojiPaletteDivider } from '@/components/officer/EmojiPaletteDivider';
-import { SizingLogicControl, SizingLogic } from '@/components/officer/SizingLogicControl';
 import type { DisplayMode } from '@/types/puzzleDisplayTypes';
 import type { EmojiSet } from '@/constants/spaceEmojis';
 import { getEmojiSetOptions, getEmojiSetDropdownLabel } from '@/constants/spaceEmojis';
@@ -41,8 +40,6 @@ interface PuzzleToolsProps {
   
   // Palette data
   usedValues: number[];
-  sizingLogic: SizingLogic;
-  onSizingLogicChange: (sizing: SizingLogic) => void;
 }
 
 export function PuzzleTools({
@@ -59,9 +56,7 @@ export function PuzzleTools({
   isValidating,
   allTestsCompleted,
   isAssessmentMode = false,
-  usedValues,
-  sizingLogic,
-  onSizingLogicChange
+  usedValues
 }: PuzzleToolsProps) {
   // Track user interaction to control glowing pulse effect
   const [hasInteractedWithDisplayMode, setHasInteractedWithDisplayMode] = useState(false);
@@ -212,14 +207,6 @@ export function PuzzleTools({
             'Submit your attempt for official assessment validation.' :
             'Submit your solution for official PlayFab validation.'}
         </div>
-      </div>
-
-      {/* Sizing Logic Control */}
-      <div className="mt-4">
-        <SizingLogicControl
-          currentSizing={sizingLogic}
-          onSizingChange={onSizingLogicChange}
-        />
       </div>
     </>
   );

@@ -46,7 +46,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
     displayMode: 'hybrid',
     emojiSet: 'savory_foods',
     selectedValue: 1,
-    showControls: true
+    showControls: true,
   });
 
   // Validation state
