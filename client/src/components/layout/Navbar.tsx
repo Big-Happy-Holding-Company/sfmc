@@ -54,7 +54,7 @@ export function Navbar({ title = 'SFMC ARC-GPT', badges, showBackButton = false,
                   By 82deutschmark
                 </a>
                 <a 
-                  href="https://github.com/neoneye/ARC-Interactive-History-Dataset"
+                  href="https://github.com/neoneye/ARC-Interactive"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-lg font-medium text-slate-300 hover:text-amber-400 transition-colors"
