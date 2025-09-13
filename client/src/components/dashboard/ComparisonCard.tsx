@@ -1,4 +1,8 @@
 /**
+ * AUTHOR:
+ * Date:
+ * PURPOSE:
+ * SRP and DRY check?  
  * HARC Platform - Comparison Card
  * ===============================
  * A card that displays a side-by-side comparison of human vs. AI performance

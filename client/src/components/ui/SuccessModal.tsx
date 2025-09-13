@@ -27,7 +27,7 @@ interface SuccessModalProps {
  * @param count Number of emojis to select
  * @returns Array of random emojis
  */
-function getRandomEmojis(count: number = 4): string[] {
+function getRandomEmojis(count: number = 6): string[] {
   const emojiSetKeys = Object.keys(SPACE_EMOJIS) as EmojiSet[];
   const selectedEmojis: string[] = [];
   
@@ -57,7 +57,7 @@ export function SuccessModal({
   // Generate new random emojis each time modal opens
   useEffect(() => {
     if (open) {
-      setCelebrationEmojis(getRandomEmojis(4));
+      setCelebrationEmojis(getRandomEmojis(6));
       setIsVisible(true);
 
       // Only auto close if delay is explicitly set
@@ -136,7 +136,7 @@ export function SuccessModal({
         )}
 
         {/* Custom CSS for entrance animation */}
-        <style jsx>{`
+        <style>{`
           @keyframes successModalEntrance {
             0% {
               transform: scale(0.8) translateY(-20px);
