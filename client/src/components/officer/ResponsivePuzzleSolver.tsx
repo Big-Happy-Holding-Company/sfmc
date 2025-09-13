@@ -734,7 +734,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
             </div>
 
             {/* Central Controls Wrapper - Full width on mobile, center column on large screens */}
-            <div className="flex flex-col items-center justify-center px-2 space-y-3 lg:max-w-sm lg:flex-shrink-0">
+            <div className="flex flex-col items-center justify-center px-2 space-y-4 lg:max-w-md lg:flex-shrink-0">
               
               {/* Grid Size Controls */}
               <PuzzleSolverControls

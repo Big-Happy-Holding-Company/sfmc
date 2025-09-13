@@ -75,23 +75,23 @@ export function PuzzleTools({
         onValueSelect={onValueSelect}
         usedValues={usedValues}
         displayMode={displayMode}
-        className="bg-slate-800 border border-slate-600 rounded-lg p-3 w-full mb-3"
+        className="bg-slate-800 border border-slate-600 rounded-lg p-5 w-full mb-4"
       />
 
       {/* Display Mode & Emoji Set Controls */}
       <div className={`
-        bg-slate-800 border border-slate-600 rounded-lg p-4 w-full transition-all duration-300
+        bg-slate-800 border border-slate-600 rounded-lg p-5 w-full transition-all duration-300
         ${!hasInteractedWithDisplayMode ? 'ring-2 ring-amber-400 shadow-lg shadow-amber-400/30' : ''}
       `}>
         <h4 className={`
           text-amber-300 text-2xl font-bold mb-3 text-center transition-all duration-300
-          ${!hasInteractedWithDisplayMode ? 'animate-pulse text-amber-200' : ''}
+          ${!hasInteractedWithDisplayMode ? 'animate-pulse [animation-duration:4s] text-amber-200' : ''}
         `}>
           DISPLAY MODE
         </h4>
         <p className={`
           text-slate-300 text-lg mb-4 text-center transition-all duration-300
-          ${!hasInteractedWithDisplayMode ? 'animate-pulse text-slate-200' : ''}
+          ${!hasInteractedWithDisplayMode ? 'animate-pulse [animation-duration:4s] text-slate-200' : ''}
         `}>
           Choose how to visualize puzzle values
         </p>
@@ -102,7 +102,7 @@ export function PuzzleTools({
             onClick={() => handleDisplayModeChange('arc-colors')}
             className={`
               px-6 py-4 text-lg font-bold rounded h-16 w-full flex-shrink-0 transition-all duration-300
-              ${!hasInteractedWithDisplayMode ? 'animate-pulse ring-1 ring-amber-400' : ''}
+              ${!hasInteractedWithDisplayMode ? 'animate-pulse [animation-duration:4s] ring-1 ring-amber-400/60' : ''}
               ${displayMode === 'arc-colors' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}
             `}
           >
@@ -114,7 +114,7 @@ export function PuzzleTools({
             onClick={() => handleDisplayModeChange('emoji')}
             className={`
               px-6 py-4 text-lg font-bold rounded h-16 w-full flex-shrink-0 transition-all duration-300
-              ${!hasInteractedWithDisplayMode ? 'animate-pulse ring-1 ring-amber-400' : ''}
+              ${!hasInteractedWithDisplayMode ? 'animate-pulse [animation-duration:4s] ring-1 ring-amber-400/60' : ''}
               ${displayMode === 'emoji' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}
             `}
           >
@@ -126,7 +126,7 @@ export function PuzzleTools({
             onClick={() => handleDisplayModeChange('hybrid')}
             className={`
               px-6 py-4 text-lg font-bold rounded h-16 w-full flex-shrink-0 transition-all duration-300
-              ${!hasInteractedWithDisplayMode ? 'animate-pulse ring-1 ring-amber-400' : ''}
+              ${!hasInteractedWithDisplayMode ? 'animate-pulse [animation-duration:4s] ring-1 ring-amber-400/60' : ''}
               ${displayMode === 'hybrid' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}
             `}
           >
@@ -156,7 +156,7 @@ export function PuzzleTools({
       </div>
 
       {/* Action Controls - Puzzle Actions */}
-      <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 w-full">
+      <div className="bg-slate-800 border border-slate-600 rounded-lg p-5 w-full">
         <h4 className="text-amber-300 text-xl font-bold mb-4 text-center">PUZZLE ACTIONS</h4>
         
         {/* Primary Actions Row */}

@@ -90,15 +90,6 @@ export const SPACE_EMOJIS = {
   // Void Dwellers
   void_dwellers: ['⬛', '🐙', '🦑', '🦐', '🦀', '🐡', '🐠', '🐟', '🐬', '🐋'],
 
-  // Characters / "Man" suit (1-9)
-  characters: ['⬛','🀇','🀈','🀉','🀊','🀋','🀌','🀍','🀎','🀏'],
-
- // Bamboos / "Sou" suit (1-9)
-  bamboos: ['⬛','🀐','🀑','🀒','🀓','🀔','🀕','🀖','🀗','🀘'],
-  
- // Circles / "Pin" suit (1-9)
-    circles: ['⬛','🀙','🀚','🀛','🀜','🀝','🀞','🀟','🀠','🀡'],
-
  // Birds 
     birds: ['⬛','🐤','🦜','🦩','🦚','🦢','🕊️','🦃','🐦','🐔'],
 
@@ -228,21 +219,6 @@ export const EMOJI_SET_INFO = {
     name: 'Void Dwellers',
     description: 'Deep sea creatures and oceanic life forms',
     theme: 'Oceanic Depths'
-  },
-  characters: {
-    name: 'Characters / Man Suit',
-    description: 'Mahjong man suit tiles (1-9)',
-    theme: 'Mahjong Suits'
-  },
-  bamboos: {
-    name: 'Bamboos / Sou Suit', 
-    description: 'Mahjong bamboo suit tiles (1-9)',
-    theme: 'Mahjong Suits'
-  },
-  circles: {
-    name: 'Circles / Pin Suit',
-    description: 'Mahjong circle suit tiles (1-9)', 
-    theme: 'Mahjong Suits'
   },
   birds: {
     name: 'Birds',

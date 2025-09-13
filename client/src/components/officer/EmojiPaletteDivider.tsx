@@ -72,7 +72,7 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
         onClick={() => handleValueSelect(value)}
         className={`
           h-24 w-20 p-0 text-2xl font-bold flex-shrink-0 transition-all duration-300
-          ${!hasInteracted ? 'animate-pulse ring-2 ring-amber-400 shadow-lg shadow-amber-400/50' : ''}
+          ${!hasInteracted ? 'animate-pulse [animation-duration:3s] ring-1 ring-amber-400/60 shadow-md shadow-amber-400/30' : ''}
           ${isSelected 
             ? 'bg-amber-600 text-slate-900 hover:bg-amber-700 ring-2 ring-amber-400' 
             : isUsed
@@ -90,22 +90,22 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
   return (
     <div className={`
       flex flex-col items-center justify-center gap-4 transition-all duration-300
-      ${!hasInteracted ? 'ring-2 ring-amber-400 shadow-lg shadow-amber-400/30' : ''}
+      ${!hasInteracted ? 'ring-2 ring-amber-400 shadow-lg shadow-amber-400/30 animate-pulse [animation-duration:4s]' : ''}
       ${className}
     `}>
       {/* Header with clear description */}
       <div className="text-center">
         <h4 className={`
           text-amber-300 text-2xl font-bold mb-2 transition-all duration-300
-          ${!hasInteracted ? 'animate-pulse text-amber-200' : ''}
+          ${!hasInteracted ? 'animate-pulse [animation-duration:3s] text-amber-200' : ''}
         `}>
-          VALUE PALETTE
+          PAINTING TOOLS
         </h4>
         <p className={`
           text-slate-300 text-lg transition-all duration-300
-          ${!hasInteracted ? 'animate-pulse text-slate-200' : ''}
+          ${!hasInteracted ? 'animate-pulse [animation-duration:3s] text-slate-200' : ''}
         `}>
-          Click to select painting tool
+          Select a value, then click on the output grid to paint
         </p>
       </div>
       

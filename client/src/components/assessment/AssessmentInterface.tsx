@@ -26,10 +26,9 @@ const ASSESSMENT_PUZZLE_IDS = [
   '66e6c45b',    //  Expand!
   '0bb8deee',    //  Corral the shapes
   '32e9702f',    //  Easy answer, everything pulled to the left and change 0 to 5 
-
-  //  '27a28665',
- //   '7b80bb43',
- //   '87ab05b8',
+  '27a28665',    // 7 Examples, 3 Tests!
+ //   '7b80bb43', //  Close the gates!
+ //   '87ab05b8', //
 
 ];
 
