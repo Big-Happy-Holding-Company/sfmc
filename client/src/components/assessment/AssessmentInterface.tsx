@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import type { OfficerTrackPuzzle } from '@/types/arcTypes';
 import { ResponsivePuzzleSolver } from '@/components/officer/ResponsivePuzzleSolver';
@@ -132,8 +132,7 @@ export function AssessmentInterface() {
     const allComplete = ASSESSMENT_PUZZLE_IDS.every(id => completed.has(id));
     if (allComplete && !isComplete) {
       setIsComplete(true);
-      console.log('🎉 Assessment completed! Navigating to dashboard...');
-      setTimeout(() => setLocation('/dashboard'), 3000);
+      console.log('🎉 Assessment completed!');
     }
   };
 
@@ -260,12 +259,17 @@ export function AssessmentInterface() {
         <div className="text-center max-w-md">
           <div className="text-6xl mb-4">🎉</div>
           <h1 className="text-3xl font-bold text-amber-400 mb-4">Assessment Complete!</h1>
-          <p className="text-slate-300 mb-6">
+          <p className="text-slate-300 mb-8">
             Congratulations! You've completed all assessment puzzles. 
-            Your performance data has been recorded and you'll be redirected to view your results.
+            Your performance data has been recorded. See how you stack up against the leading AI models.
           </p>
-          <div className="text-slate-400 text-sm">
-            Redirecting to dashboard in 3 seconds...
+          <div className="flex justify-center gap-4">
+            <Link href="/assessment/comparison">
+              <Button size="lg" className="bg-amber-600 hover:bg-amber-700">View Performance vs. AI</Button>
+            </Link>
+            <Link href="/dashboard">
+              <Button size="lg" variant="outline">Go to Dashboard</Button>
+            </Link>
           </div>
         </div>
       </div>
