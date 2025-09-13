@@ -74,7 +74,7 @@ export function AssessmentInterface() {
         
         for (const puzzleId of ASSESSMENT_PUZZLE_IDS) {
           console.log(`Loading puzzle ${puzzleId}...`);
-          const puzzleData = await puzzleRepository.findById(puzzleId, true);
+          const puzzleData = await puzzleRepository.findById(puzzleId, true, true);
 
           if (puzzleData) {
             loadedPuzzles.push(puzzleData);
@@ -200,14 +200,15 @@ export function AssessmentInterface() {
     
     console.log(`📝 Assessment validation for ${puzzleId}: attempt ${newAttempts}, result:`, validationResult);
     
-    // Assessment advancement logic: 
-    // - First attempt success: advance immediately
-    // - Second attempt (any result): advance regardless  
-    const shouldAdvance = (newAttempts === 1 && validationResult?.correct) || (newAttempts >= 2);
-    
-    console.log(`🔍 Should advance? ${shouldAdvance} (attempts: ${newAttempts}, correct: ${validationResult?.correct})`);
-    
-    if (shouldAdvance && !isAdvancing.current) {
+    // Assessment advancement logic:
+    // - First attempt success: advancement controlled by success modal "OK" button
+    // - First attempt fail: stay on puzzle for second attempt
+    // - Second attempt (any result): auto-advance after delay
+    const shouldAutoAdvance = (newAttempts >= 2);
+
+    console.log(`🔍 Should auto-advance? ${shouldAutoAdvance} (attempts: ${newAttempts}, correct: ${validationResult?.correct})`);
+
+    if (shouldAutoAdvance && !isAdvancing.current) {
       isAdvancing.current = true;
       console.log(`✅ Auto-advancing after attempt ${newAttempts} for puzzle ${puzzleId}`);
       setTimeout(() => {
@@ -215,6 +216,8 @@ export function AssessmentInterface() {
         handleNextPuzzle();
         isAdvancing.current = false; // Reset after advancing
       }, 2000); // Brief delay to show result
+    } else if (newAttempts === 1 && validationResult?.correct) {
+      console.log(`🎉 First attempt success! Advancement will be controlled by success modal.`);
     } else {
       console.log(`🔄 Staying on puzzle ${puzzleId} after first failed attempt`);
     }
@@ -328,12 +331,13 @@ export function AssessmentInterface() {
       </Navbar>
 
       {/* The ResponsivePuzzleSolver */}
-      <ResponsivePuzzleSolver 
-        puzzle={currentPuzzle} 
+      <ResponsivePuzzleSolver
+        puzzle={currentPuzzle}
         onBack={handleBackToLanding}
         isAssessmentMode={true}
         onSolve={handleAssessmentSolve}
         onValidationResult={(result) => handleAssessmentValidation(currentPuzzle.id, result)}
+        onAssessmentAdvance={handleNextPuzzle}
       />
 
       {/* Hint System - positioned adjacent to puzzle grids */}

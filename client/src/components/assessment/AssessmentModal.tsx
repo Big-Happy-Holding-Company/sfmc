@@ -51,7 +51,7 @@ export function AssessmentModal({ open, onClose }: AssessmentModalProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div className="bg-slate-900 border border-slate-600 rounded p-3">
                 <h4 className="text-amber-400 font-semibold text-sm mb-1">Assessment Type</h4>
-                <p className="text-slate-400 text-xs">Pattern Recognition & Logic</p>
+                <p className="text-slate-400 text-xs">ARC-AGI Benchmark Tests for AI Systems</p>
               </div>
               <div className="bg-slate-900 border border-slate-600 rounded p-3">
                 <h4 className="text-amber-400 font-semibold text-sm mb-1">Duration</h4>
@@ -64,7 +64,7 @@ export function AssessmentModal({ open, onClose }: AssessmentModalProps) {
             onClick={onClose}
             className="w-full max-w-xs mx-auto bg-amber-400 hover:bg-amber-500 text-slate-900 font-semibold py-3 px-6 text-sm sm:text-base"
           >
-            BEGIN ASSESSMENT
+            See how you compare to state of the art LLMs
           </Button>
         </div>
       </DialogContent>

@@ -62,12 +62,16 @@ export class PuzzleRepository {
 
   /**
    * Find a single puzzle by ID with optional performance enhancement
+   * @param puzzleId - Puzzle identifier
+   * @param includePerformance - Whether to fetch AI performance data
+   * @param preferArcExplainer - If true, tries arc-explainer first, PlayFab as fallback (for assessment)
    */
   async findById(
     puzzleId: string,
-    includePerformance: boolean = true
+    includePerformance: boolean = true,
+    preferArcExplainer: boolean = false
   ): Promise<EnhancedPuzzle | null> {
-    const cacheKey = CacheManager.createKey('enhanced-puzzle', puzzleId, includePerformance);
+    const cacheKey = CacheManager.createKey('enhanced-puzzle', puzzleId, includePerformance, preferArcExplainer);
 
     // Check cache first
     const cached = metadataCache.get(cacheKey);
@@ -77,12 +81,31 @@ export class PuzzleRepository {
     }
 
     try {
-      console.log(`🔍 Finding puzzle: ${puzzleId}`);
+      console.log(`🔍 Finding puzzle: ${puzzleId} (prefer arc-explainer: ${preferArcExplainer})`);
 
-      // Step 1: Get authoritative puzzle data from PlayFab
-      const puzzleData = await playfabPuzzleClient.findPuzzleById(puzzleId);
+      let puzzleData: OfficerTrackPuzzle | null = null;
+
+      if (preferArcExplainer) {
+        // Step 1a: Try arc-explainer first (for assessment)
+        console.log(`🌐 Trying arc-explainer first for puzzle: ${puzzleId}`);
+        const arcData = await arcExplainerClient.getPuzzleById(puzzleId);
+
+        if (arcData) {
+          // Convert arc-explainer format to OfficerTrackPuzzle format
+          puzzleData = this.convertArcExplainerToOfficerTrack(arcData, puzzleId);
+          console.log(`✅ Got puzzle from arc-explainer: ${puzzleId}`);
+        } else {
+          console.log(`⚠️  Puzzle ${puzzleId} not found in arc-explainer, falling back to PlayFab`);
+          // Fallback to PlayFab
+          puzzleData = await playfabPuzzleClient.findPuzzleById(puzzleId);
+        }
+      } else {
+        // Step 1b: Get authoritative puzzle data from PlayFab (default behavior)
+        puzzleData = await playfabPuzzleClient.findPuzzleById(puzzleId);
+      }
+
       if (!puzzleData) {
-        console.log(`❌ Puzzle ${puzzleId} not found in PlayFab`);
+        console.log(`❌ Puzzle ${puzzleId} not found in ${preferArcExplainer ? 'arc-explainer or PlayFab' : 'PlayFab'}`);
         return null;
       }
 
@@ -105,7 +128,7 @@ export class PuzzleRepository {
       // Cache the result
       metadataCache.set(cacheKey, enhanced);
 
-      console.log(`✅ Found enhanced puzzle: ${puzzleId} (performance: ${enhanced.hasPerformanceData})`);
+      console.log(`✅ Found enhanced puzzle: ${puzzleId} (performance: ${enhanced.hasPerformanceData}, source: ${preferArcExplainer ? 'arc-explainer' : 'playfab'})`);
       return enhanced;
 
     } catch (error) {
@@ -378,6 +401,37 @@ export class PuzzleRepository {
     }
 
     return filtered;
+  }
+
+  /**
+   * Private: Apply sorting
+   */
+  /**
+   * Private: Convert data from arc-explainer to OfficerTrackPuzzle format
+   */
+  private convertArcExplainerToOfficerTrack(arcData: any, puzzleId: string): OfficerTrackPuzzle {
+    const puzzleContent = arcData.puzzle || arcData; // Handle both nested and flat structures
+
+    return {
+      id: puzzleId,
+      filename: puzzleContent.name || puzzleId,
+      dataset: idConverter.getDatasetFromPlayFabId(puzzleId) || 'evaluation',
+      difficulty: puzzleContent.difficulty || 'UNKNOWN',
+      gridSize: {
+        minWidth: puzzleContent.grid_size_min_width || 0,
+        maxWidth: puzzleContent.grid_size_max_width || 0,
+        minHeight: puzzleContent.grid_size_min_height || 0,
+        maxHeight: puzzleContent.grid_size_max_height || 0,
+      },
+      complexity: {
+        trainingExamples: puzzleContent.training_examples || 0,
+        uniqueColors: puzzleContent.number_of_colors || 0,
+        transformationComplexity: puzzleContent.transformation_complexity || 'basic',
+      },
+      loadedAt: new Date(),
+      train: puzzleContent.train || [],
+      test: puzzleContent.test || [],
+    };
   }
 
   /**

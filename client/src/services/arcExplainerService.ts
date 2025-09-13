@@ -1,12 +1,14 @@
 /**
- * @deprecated Use @/services/core/arcExplainerClient instead
+ * @deprecated THIS SERVICE IS DEPRECATED AND SHOULD NOT BE USED.
+ * This service provided direct access to the arc-explainer API but has been replaced
+ * by a more robust client in the new core service architecture.
  *
- * Arc-Explainer API Service
- * Integrates with the arc-explainer production API for AI performance metadata
+ * MIGRATION PATH:
+ * - For all arc-explainer API calls, use `arcExplainerClient` from `@/services/core/arcExplainerClient`.
+ *   It includes unified caching, retry logic, and standardized request handling.
  *
- * DEPRECATION NOTICE: This service is deprecated in favor of the new
- * unified service architecture. Use arcExplainerClient from @/services/core/arcExplainerClient
- * which provides the same functionality with better performance and caching.
+ * @author Gemini 2.5 Pro
+ * @see arcExplainerClient
  */
 
 const API_BASE_URL = import.meta.env.VITE_ARC_EXPLAINER_URL || 'https://arc-explainer-production.up.railway.app';

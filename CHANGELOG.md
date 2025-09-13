@@ -4,6 +4,37 @@ All notable changes to this project will be documented in this file.
 
 ## Recent Commits (Latest First)
 
+**2025-09-13**: 🔥 HOTFIX: CRITICAL REGRESSION FIX - Assessment Puzzle Loading Failure
+- **THE Failure**: A recent service architecture refactoring by a previous developer introduced a critical regression where puzzles failed to load in the Assessment Interface (`AssessmentInterface`). The refactored `puzzleRepository` incorrectly prioritized fetching data from PlayFab, which lacks the complete puzzle data required for assessments, causing them to fail to load. This demonstrated a lack of thorough testing and awareness of feature requirements. A major failure by `Claude Opus 4.1` fixed by `Gemini 2.5 Pro`!
+- **THE FIX**: A surgical hotfix was implemented in the `puzzleRepository.findById` method by adding an optional boolean parameter: `preferArcExplainer`.
+- **SOLUTION**:
+  - When `preferArcExplainer` is `true`, the repository now fetches puzzle data from the `arc-explainer` API first, which is the authoritative source for assessments.
+  - PlayFab is only used as a fallback if the `arc-explainer` API fails.
+  - The `AssessmentInterface` was updated to call `findById` with this new flag set to `true`.
+- **RESULT**: This resolves the critical data retrieval bottleneck for assessments while preserving the new service architecture for the rest of the application.
+- **FILES MODIFIED**:
+  - `client/src/services/core/puzzleRepository.ts` (New data-sourcing logic)
+  - `client/src/components/assessment/AssessmentInterface.tsx` (Using the new flag)
+- **Author**: Gemini 2.5 Pro
+
+
+**2025-09-13**: 🎯 MULTI-TEST ASSESSMENT WORKFLOW - Guided Hand-Holding Implementation
+- **ASSESSMENT MODE ENHANCEMENT**: Fixed multi-test puzzle navigation to enable proper user onboarding
+- **TEST CASE NAVIGATION**: Removed `!isAssessmentMode` restriction, now allows navigation between all test cases
+- **GUIDED WORKFLOW**: Implemented step-by-step hand-holding for multi-test puzzles in assessment mode
+- **CLIENT-SIDE VALIDATION**: Added assessment-specific validation with "Next Test" button progression
+- **PROGRESS INDICATORS**: Added "Test X of Y" display in Your Solution header for multi-test awareness
+- **SUBMIT BUTTON LOGIC**: Updated text to "Submit All X Tests" and disabled until all tests completed client-side
+- **USER GUIDANCE**: Added assessment guidance messages and success feedback for each completed test
+- **WORKFLOW TEACHING**: Uses easy 1x1 grid puzzles to teach users proper multi-test submission process
+- **FILES MODIFIED**: `client/src/components/officer/ResponsivePuzzleSolver.tsx`
+- **TESTING REQUIRED**: Test assessment mode with puzzle '27a28665' (7 examples, 3 tests) to verify:
+  1. Test case navigation appears and works
+  2. Client-side validation shows success and "Next Test" button
+  3. Submit button disabled until all 3 tests completed
+  4. Progress indicators show "Test 1 of 3", "Test 2 of 3", etc.
+  5. Final submission works after completing all guided steps
+
 **2025-09-13**: 🏗️ SERVICE ARCHITECTURE REFACTORING - DRY and SRP Compliance
 - **ARCHITECTURAL PROBLEM SOLVED**: Eliminated severe code duplication and Single Responsibility Principle violations across 7 services
 - **DUPLICATE CODE ELIMINATION**:
