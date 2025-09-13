@@ -1,4 +1,7 @@
-/**
+/**AUTHOR: Claude Sonnet 4
+ * DATE: 2025-09-12
+ * PURPOSE: TOTALLY UNKNOWN!!!!  
+ * SRP and DRY check: ????
  * HARC Platform - Participant Dashboard
  * =====================================
  * Displays a participant's cognitive performance score (CPS) and compares it
