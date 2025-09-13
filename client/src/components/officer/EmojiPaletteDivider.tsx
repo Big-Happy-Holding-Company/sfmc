@@ -1,13 +1,17 @@
 /**
- * EmojiPaletteDivider Component
- * =============================
- * Compact 2x5 emoji palette that acts as a visual divider between
- * TEST INPUT and YOUR SOLUTION in the solver interface
+ * 
+ * Author: Claude Code using Sonnet 4
+ * Date: 2025-09-12
+ * PURPOSE: Enhanced emoji palette with glowing pulse effects to guide user interaction.
+ * Compact 2x5 emoji palette that acts as a visual divider between TEST INPUT and YOUR SOLUTION.
+ * Features pulsing glow effect until user first interacts, making controls more discoverable.
+ * SRP and DRY check: Pass - Single responsibility (value selection), enhanced with UX improvements
+ * 
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { SPACE_EMOJIS, type EmojiSet } from '@/constants/spaceEmojis';
+import { SPACE_EMOJIS, type EmojiSet, getARCColorCSS } from '@/constants/spaceEmojis';
 import type { DisplayMode } from '@/types/puzzleDisplayTypes';
 
 interface EmojiPaletteDividerProps {
@@ -27,6 +31,14 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
   className = '',
   displayMode = 'emoji'
 }) => {
+  // Track user interaction to control glowing pulse effect
+  const [hasInteracted, setHasInteracted] = useState(false);
+
+  // Handle value selection with interaction tracking
+  const handleValueSelect = (value: number) => {
+    setHasInteracted(true);
+    onValueSelect(value);
+  };
   const getAllEmojis = () => {
     const emojis = SPACE_EMOJIS[emojiSet];
     return emojis.map((emoji, index) => ({ emoji, value: index }));
@@ -41,7 +53,7 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
   const renderValueButton = ({ emoji, value }: { emoji: string; value: number }) => {
     const isSelected = value === selectedValue;
     const isUsed = usedValues.includes(value);
-    
+
     // Determine what to display based on mode
     let displayContent: string;
     if (displayMode === 'arc-colors') {
@@ -51,21 +63,59 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
     } else {
       displayContent = emoji;
     }
-    
+
+    // Get ARC color background for arc-colors and hybrid modes
+    const getBackgroundColor = () => {
+      if (displayMode === 'arc-colors' || displayMode === 'hybrid') {
+        return getARCColorCSS(value);
+      }
+      // For emoji mode, use existing logic
+      if (isSelected) return 'rgb(251, 191, 36)'; // amber-400
+      return 'transparent';
+    };
+
+    // Get text color with proper contrast for ARC colors
+    const getTextColor = () => {
+      if (displayMode === 'arc-colors' || displayMode === 'hybrid') {
+        // Calculate contrast based on ARC color - same logic as EnhancedGridCell
+        const isDarkBackground = value === 0 || value === 5 || value === 9; // Black, Grey, Maroon
+        return isDarkBackground ? 'white' : 'black';
+      }
+      // For emoji mode, use existing logic
+      if (isSelected) return 'rgb(51, 65, 85)'; // slate-700
+      return 'rgb(203, 213, 225)'; // slate-300
+    };
+
+    // Get border color
+    const getBorderColor = () => {
+      if (isSelected) return 'rgb(251, 191, 36)'; // amber-400
+      if (isUsed) return 'rgb(34, 211, 238)'; // cyan-400
+      if (displayMode === 'arc-colors' || displayMode === 'hybrid') {
+        return 'rgb(100, 116, 139)'; // slate-500
+      }
+      return 'rgb(100, 116, 139)'; // slate-500
+    };
+
+    const buttonStyle: React.CSSProperties = {
+      backgroundColor: getBackgroundColor(),
+      color: getTextColor(),
+      borderColor: getBorderColor(),
+      borderWidth: isSelected ? '2px' : '1px',
+    };
+
     return (
       <Button
         key={value}
-        variant={isSelected ? "default" : "outline"}
+        variant="outline"
         size="sm"
-        onClick={() => onValueSelect(value)}
+        onClick={() => handleValueSelect(value)}
+        style={buttonStyle}
         className={`
-          h-20 w-16 p-0 text-xl font-bold flex-shrink-0
-          ${isSelected 
-            ? 'bg-amber-600 text-slate-900 hover:bg-amber-700 ring-2 ring-amber-400' 
-            : isUsed
-              ? 'border-cyan-400 text-cyan-300 hover:bg-cyan-600 hover:text-white border-2'
-              : 'border-slate-500 text-slate-300 hover:bg-slate-600'
-          }
+          h-24 w-20 p-0 text-2xl font-bold flex-shrink-0 transition-all duration-300
+          ${!hasInteracted ? 'animate-pulse [animation-duration:3s] ring-1 ring-amber-400/60 shadow-md shadow-amber-400/30' : ''}
+          ${isSelected ? 'ring-2 ring-amber-400 shadow-lg shadow-amber-400/30' : ''}
+          ${isUsed && !isSelected ? 'ring-1 ring-cyan-400' : ''}
+          hover:scale-105 hover:shadow-lg
         `}
         title={`Value ${value}: ${emoji} ${isUsed ? '(used in puzzle)' : ''}`}
       >
@@ -75,11 +125,25 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
   };
 
   return (
-    <div className={`flex flex-col items-center justify-center gap-3 ${className}`}>
+    <div className={`
+      flex flex-col items-center justify-center gap-4 transition-all duration-300
+      ${!hasInteracted ? 'ring-2 ring-amber-400 shadow-lg shadow-amber-400/30 animate-pulse [animation-duration:4s]' : ''}
+      ${className}
+    `}>
       {/* Header with clear description */}
       <div className="text-center">
-        <h4 className="text-amber-300 text-lg font-bold mb-1">VALUE PALETTE</h4>
-        <p className="text-slate-300 text-base">Click to select painting tool</p>
+        <h4 className={`
+          text-amber-300 text-2xl font-bold mb-2 transition-all duration-300
+          ${!hasInteracted ? 'animate-pulse [animation-duration:3s] text-amber-200' : ''}
+        `}>
+          PAINTING TOOLS
+        </h4>
+        <p className={`
+          text-slate-300 text-lg transition-all duration-300
+          ${!hasInteracted ? 'animate-pulse [animation-duration:3s] text-slate-200' : ''}
+        `}>
+          Select a value, then click on the output grid to paint
+        </p>
       </div>
       
       {/* Top row (0-4) */}
@@ -93,7 +157,7 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
       </div>
       
       {/* Selected value indicator - more prominent */}
-      <div className="bg-amber-600 text-white px-4 py-2 rounded-lg font-bold text-base">
+      <div className="bg-amber-600 text-white px-6 py-3 rounded-lg font-bold text-lg shadow-lg">
         Selected: Value {selectedValue}
       </div>
       

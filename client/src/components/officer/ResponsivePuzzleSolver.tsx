@@ -5,10 +5,12 @@
  * Replaces SimplePuzzleSolver with full responsive design implementation
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
-import { Button } from '@/components/ui/button';
+import { Navbar } from '@/components/layout/Navbar';
 import { Badge } from '@/components/ui/badge';
+import { getPuzzlePerformanceStats, PuzzlePerformanceStats } from '@/services/arcExplainerService';
+import { SuccessModal } from '@/components/ui/SuccessModal';
 import { ResponsiveOfficerGrid, ResponsiveOfficerDisplayGrid } from '@/components/officer/ResponsiveOfficerGrid';
 import { TrainingExamplesSection } from '@/components/officer/TrainingExamplesSection';
 import { TestCaseNavigation } from '@/components/officer/TestCaseNavigation';
@@ -20,6 +22,7 @@ import type { EmojiSet } from '@/constants/spaceEmojis';
 import { puzzlePerformanceService } from '@/services/puzzlePerformanceService';
 import { playFabValidation } from '@/services/playfab/validation';
 import { playFabEvents } from '@/services/playfab/events';
+import { SizeSlider } from '@/components/ui/SizeSlider';
 
 interface ResponsivePuzzleSolverProps {
   puzzle: OfficerTrackPuzzle;
@@ -43,7 +46,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
     displayMode: 'hybrid',
     emojiSet: 'savory_foods',
     selectedValue: 1,
-    showControls: true
+    showControls: true,
   });
 
   // Validation state
@@ -60,6 +63,15 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
   // Auto-advance state for assessment mode
   const [isAutoAdvancing, setIsAutoAdvancing] = useState(false);
   const [autoAdvanceMessage, setAutoAdvanceMessage] = useState<string | null>(null);
+
+  // Success modal state
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  // Performance stats state
+  const [performanceStats, setPerformanceStats] = useState<PuzzlePerformanceStats | null>(null);
+
+  const [inputCellSize, setInputCellSize] = useState(50);
+  const [outputCellSize, setOutputCellSize] = useState(50);
 
   if (!puzzle) {
     return <div className="min-h-screen bg-slate-900 text-amber-50 flex items-center justify-center">No puzzle data.</div>;
@@ -86,6 +98,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
     setIsValidating(false);
     setIsAutoAdvancing(false);
     setAutoAdvanceMessage(null);
+    setShowSuccessModal(false);
 
     if (puzzle.test && puzzle.test.length > 0) {
       const newSolutions: ARCGrid[] = [];
@@ -106,7 +119,15 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
       setOutputDimensions(newDimensions);
       setCompletedTests(newCompleted);
     }
-  }, [puzzle]);
+
+    // Fetch performance stats for the new puzzle
+    const fetchStats = async () => {
+      const stats = await getPuzzlePerformanceStats(puzzle.id);
+      setPerformanceStats(stats);
+    };
+
+    fetchStats();
+  }, [puzzle.id]);
 
   // Initialize session and log puzzle start event
   useEffect(() => {
@@ -175,15 +196,6 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
     };
   }, [sessionId, attemptNumber, puzzle.id, stepIndex, totalTests, trainingExamples.length, sessionStartTime]);
 
-  // Determine if grids are large (need special layout)
-  const isLargeGrid = (grid: ARCGrid) => {
-    const height = grid.length;
-    const width = grid[0]?.length || 0;
-    return height > 10 || width > 10;
-  };
-
-  const hasLargeGrids = testInput.length > 10 || (testInput[0]?.length || 0) > 10 || 
-                        trainingExamples.some(ex => isLargeGrid(ex.input) || isLargeGrid(ex.output));
 
   // Get suggested sizes from training examples
   const getSuggestedSizes = () => {
@@ -300,25 +312,6 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
   const currentDimensions = outputDimensions[currentTestIndex] || { width: 3, height: 3 };
   const hasExistingData = currentSolution.some(row => row.some(cell => cell !== 0));
 
-  // Calculate dynamic cell sizes for much better space utilization
-  const calculateCellSize = (gridWidth: number, gridHeight: number, isLargeScreen: boolean = window.innerWidth >= 1024) => {
-    // On large screens: each grid gets ~45% of viewport (leaving space for controls)
-    // On smaller screens: use most of the width for better visibility
-    const widthRatio = isLargeScreen ? 0.45 : 0.90;
-    const availableWidth = Math.floor(window.innerWidth * widthRatio);
-    const availableHeight = Math.floor(window.innerHeight * 0.6); // More generous height
-    
-    const cellSizeByWidth = Math.floor(availableWidth / gridWidth);
-    const cellSizeByHeight = Math.floor(availableHeight / gridHeight);
-    
-    // Use the smaller dimension but ensure much larger minimum size
-    const cellSize = Math.max(40, Math.min(cellSizeByWidth, cellSizeByHeight));
-    return Math.min(cellSize, 120); // Much higher cap for better visibility
-  };
-
-  const isLargeScreen = window.innerWidth >= 1024;
-  const inputCellSize = calculateCellSize(testInput[0]?.length || 1, testInput.length, isLargeScreen);
-  const outputCellSize = calculateCellSize(currentDimensions.width, currentDimensions.height, isLargeScreen);
 
   // Validate puzzle with PlayFab when all tests are complete
   const validatePuzzleWithPlayFab = async () => {
@@ -369,6 +362,11 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
       setValidationResult(result);
       
       console.log('✅ DEBUG - PlayFab validation result:', result);
+
+      // Show success modal for correct answers
+      if (result?.correct) {
+        setShowSuccessModal(true);
+      }
 
       // In assessment mode, use validation result callback for advancement logic
       if (isAssessmentMode) {
@@ -603,31 +601,50 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
     updateCurrentSolution(emptyGrid);
   };
 
+  const renderBadges = () => {
+    if (!performanceStats) return [];
+
+    const badges = [
+      <Badge key="dataset" variant="outline" className="border-sky-400 text-sky-300">
+        Dataset: {performanceStats.dataset}
+      </Badge>,
+      <Badge key="accuracy" variant="outline" className="border-green-400 text-green-300">
+        AI Accuracy: {performanceStats.avgAccuracy.toFixed(1)}%
+      </Badge>,
+      <Badge key="attempts" variant="outline" className="border-purple-400 text-purple-300">
+        AI Attempts: {performanceStats.totalAttempts}
+      </Badge>,
+    ];
+
+    // Add dangerous overconfidence warning if detected
+    if (performanceStats.dangerousOverconfidence) {
+      badges.push(
+        <Badge key="warning" variant="outline" className="border-red-400 text-red-300 animate-pulse">
+          🚨 AI Overconfident
+        </Badge>
+      );
+    }
+
+    // Add composite difficulty score
+    if (performanceStats.compositeScore > 0) {
+      badges.push(
+        <Badge key="difficulty" variant="outline" className="border-amber-400 text-amber-300">
+          Difficulty: {performanceStats.compositeScore.toFixed(1)}
+        </Badge>
+      );
+    }
+
+    return badges;
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 text-amber-50">
-      {/* Header */}
-      <header className="bg-slate-800 border-b-2 border-amber-400 shadow-lg sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-xl md:text-2xl font-bold text-amber-400">
-                ARC Puzzle Solver
-              </h1>
-              <Badge className="bg-amber-600 text-slate-900 font-bold">
-                {puzzle.id}
-              </Badge>
-            </div>
-            
-            <Button 
-              variant="outline" 
-              className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900"
-              onClick={onBack}
-            >
-              <span className="hidden sm:inline">←</span> Back
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Navbar 
+        title="ARC Puzzles for People" 
+        badges={renderBadges()} 
+        showBackButton={true} 
+        onBack={onBack}
+      />
 
       <main className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
@@ -638,8 +655,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
             examples={trainingExamples}
             emojiSet={displayState.emojiSet}
             displayMode={displayState.displayMode}
-title="Training Examples - Apply what you learn from them to solve the puzzle"
-            hasLargeGrids={hasLargeGrids}
+            title="Training Examples - Apply what you learn from them to solve the puzzle"
           />
         )}
 
@@ -691,7 +707,7 @@ title="Training Examples - Apply what you learn from them to solve the puzzle"
           )}
 
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-amber-400 font-bold text-4xl">
+            <h2 className="text-amber-400 font-bold text-5xl">
               Test Case {currentTestIndex + 1}
               {isAssessmentMode && totalTests > 1 && (
                 <span className="text-slate-400 text-2xl font-normal ml-2">
@@ -699,7 +715,7 @@ title="Training Examples - Apply what you learn from them to solve the puzzle"
                 </span>
               )}
             </h2>
-            <div className="text-slate-300 text-lg font-medium">
+            <div className="text-slate-300 text-xl font-medium">
               {isValidating ? '🔄 Validating with PlayFab...' : 
                validationResult?.correct ? '🎉 PlayFab Verified!' :
                validationError ? '❌ PlayFab Validation Error' :
@@ -711,7 +727,12 @@ title="Training Examples - Apply what you learn from them to solve the puzzle"
           <div className="flex flex-col lg:flex-row gap-4 w-full">
             {/* Test Input - Full width on mobile, left column on large screens */}
             <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-4">
-              <h3 className="text-amber-300 text-2xl font-bold mb-4 text-center">Test Input</h3>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-amber-300 text-3xl font-bold text-center">Test Input</h3>
+                <div className="w-1/2">
+                  <SizeSlider value={inputCellSize} onChange={setInputCellSize} min={50} max={100} label="Grid Size" />
+                </div>
+              </div>
               <ResponsiveOfficerDisplayGrid
                 grid={testInput}
                 containerType="solver"
@@ -723,7 +744,7 @@ title="Training Examples - Apply what you learn from them to solve the puzzle"
             </div>
 
             {/* Central Controls Wrapper - Full width on mobile, center column on large screens */}
-            <div className="flex flex-col items-center justify-center px-2 space-y-3 lg:max-w-sm lg:flex-shrink-0">
+            <div className="flex flex-col items-center justify-center px-2 space-y-4 lg:max-w-md lg:flex-shrink-0">
               
               {/* Grid Size Controls */}
               <PuzzleSolverControls
@@ -753,7 +774,44 @@ title="Training Examples - Apply what you learn from them to solve the puzzle"
 
             {/* User Solution - Full width on mobile, right column on large screens */}
             <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-4">
-              <h3 className="text-amber-300 text-2xl font-bold mb-4 text-center">Your Solution</h3>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-amber-300 text-3xl font-bold text-center">Your Solution</h3>
+                <div className="w-1/2">
+                  <SizeSlider value={outputCellSize} onChange={setOutputCellSize} min={50} max={100} label="Grid Size" />
+                </div>
+              </div>
+
+              {/* Copy Input Button with Glow - Positioned right under "Your Solution" */}
+              <div className="mb-4 flex justify-center">
+                <button
+                  onClick={copyInput}
+                  className="
+                    px-6 py-3 text-lg font-bold rounded-lg h-12 transition-all duration-300
+                    border-2 border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white
+                    bg-slate-700 hover:scale-105 hover:shadow-lg
+                    ring-2 ring-blue-400 shadow-lg shadow-blue-400/30 animate-pulse [animation-duration:3s]
+                  "
+                  title="Copy the test input as a starting point for your solution"
+                >
+                  📋 Copy Input to Start
+                </button>
+              </div>
+
+              {/* Submit Button with Glow - Right below Copy Input */}
+              <div className="mb-4 flex justify-center">
+                <button
+                  onClick={() => validatePuzzleWithPlayFab()}
+                  disabled={isValidating}
+                  className="
+                    px-6 py-4 text-xl font-bold rounded-lg h-16 w-full transition-all duration-300
+                    bg-amber-600 hover:bg-amber-700 text-white
+                    ring-2 ring-amber-400 shadow-lg shadow-amber-400/30 animate-pulse [animation-duration:4s]
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                  "
+                >
+                  {isValidating ? '🔄 Submitting to PlayFab...' : '🎯 Submit for Official Validation'}
+                </button>
+              </div>
               <ResponsiveOfficerGrid
                 initialGrid={currentSolution}
                 containerType="solver"
@@ -793,6 +851,15 @@ title="Training Examples - Apply what you learn from them to solve the puzzle"
         </div>
 
       </main>
+
+      {/* Success Modal */}
+      <SuccessModal
+        open={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        title="Excellent Work!"
+        message="Puzzle solved successfully! Click OK to continue to the next challenge..."
+        showDesignerNotes={true}
+      />
     </div>
   );
 }

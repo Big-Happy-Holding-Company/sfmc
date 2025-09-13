@@ -10,6 +10,7 @@ import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import type { OfficerTrackPuzzle } from '@/types/arcTypes';
 import { ResponsivePuzzleSolver } from '@/components/officer/ResponsivePuzzleSolver';
+import { Navbar } from '@/components/layout/Navbar';
 import { PermanentHintSystem } from '@/components/officer/PermanentHintSystem';
 import { AssessmentModal } from '@/components/assessment/AssessmentModal';
 import { puzzlePerformanceService } from '@/services/puzzlePerformanceService';
@@ -24,11 +25,11 @@ const ASSESSMENT_PUZZLE_IDS = [
   'ea786f4a',    //  Make an X
   'e7639916',    //  Connect the dots
   '66e6c45b',    //  Expand!
+  '0bb8deee',    //  Corral the shapes
   '32e9702f',    //  Easy answer, everything pulled to the left and change 0 to 5 
-
-  //  '27a28665',
- //   '7b80bb43',
- //   '87ab05b8',
+  '27a28665',    // 7 Examples, 3 Tests!
+ //   '7b80bb43', //  Close the gates!  Very Large and unusual size
+ //   '87ab05b8', //
 
 ];
 
@@ -295,34 +296,31 @@ export function AssessmentInterface() {
         onClose={() => setShowModal(false)} 
       />
 
-      {/* Header with progress */}
-      <div className="bg-slate-800 border-b-2 border-amber-400 p-4">
-        <div className="max-w-4xl mx-auto flex justify-between items-center">
-          <div>
-            <h1 className="text-xl font-bold text-amber-400">ARC Assessment</h1>
-            <p className="text-slate-300 text-sm">
-              Puzzle {currentPuzzleIndex + 1} of {puzzles.length}
-              {currentPuzzle && attemptCounts.get(currentPuzzle.id) && (
-                <span className="ml-2 text-amber-300">
-                  (Attempt {attemptCounts.get(currentPuzzle.id)} of 2)
-                </span>
-              )}
-            </p>
-          </div>
-          <div className="flex gap-2">
+      <Navbar title="Human - ARC Assessment">
+        <div className="flex items-center gap-8">
+          <p className="text-slate-300 text-base">
+            Puzzle {currentPuzzleIndex + 1} of {puzzles.length}
+            {currentPuzzle && attemptCounts.get(currentPuzzle.id) && (
+              <span className="ml-2 text-amber-300">
+                (Attempt {attemptCounts.get(currentPuzzle.id)} of 2)
+              </span>
+            )}
+          </p>
+          <div className="flex gap-4">
             <Button 
               onClick={() => setShowModal(true)} 
               variant="outline" 
-              size="sm"
+              size="lg"
+              className="border-sky-400 text-sky-400 hover:bg-sky-400 hover:text-slate-900"
             >
               About Assessment
             </Button>
-            <Button onClick={handleBackToLanding} variant="outline" size="sm">
+            <Button onClick={handleBackToLanding} variant="outline" size="lg" className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900">
               Exit Assessment
             </Button>
           </div>
         </div>
-      </div>
+      </Navbar>
 
       {/* The ResponsivePuzzleSolver */}
       <ResponsivePuzzleSolver 
@@ -349,17 +347,19 @@ export function AssessmentInterface() {
             onClick={handlePreviousPuzzle} 
             disabled={currentPuzzleIndex === 0}
             variant="outline"
+            size="lg"
           >
             ← Previous
           </Button>
           
-          <div className="text-slate-300">
+          <div className="text-slate-300 text-lg">
             {currentPuzzleIndex + 1} / {puzzles.length}
           </div>
           
           <Button 
             onClick={handleNextPuzzle} 
             className="bg-amber-600 hover:bg-amber-700"
+            size="lg"
           >
             {currentPuzzleIndex === puzzles.length - 1 ? 'Finish Assessment' : 'Next →'}
           </Button>

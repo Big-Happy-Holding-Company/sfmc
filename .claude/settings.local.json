@@ -6,7 +6,10 @@
       "Read(d:\\1Projects\\sfmc-app\\Assets/**)",
       "Read(D:\\1Projects\\sfmc-app/**)",
       "Read(D:\\1Projects\\sfmc-app/**)",
-      "Read(D:\\1Projects\\sfmc-app/**)"
+      "Read(D:\\1Projects\\sfmc-app/**)",
+      "Read(D:\\1Projects\\arc-explainer/**)",
+      "Read(D:\\1Projects\\arc-interactive/**)",
+      "Write(D:\\1Projects\\arc-interactive/**)"
     ],
     "deny": [],
     "ask": []
