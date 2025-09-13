@@ -1,16 +1,18 @@
 /**
- * @deprecated Use @/services/core/puzzleRepository and @/services/core/arcExplainerClient instead
+ * @deprecated THIS SERVICE IS DEPRECATED AND SHOULD NOT BE USED.
+ * This 675-line service violated the Single Responsibility Principle by mixing API calls,
+ * data transformation, caching, and business logic. Its functionality has been
+ * refactored into specialized, maintainable core services.
  *
- * Simple Officer Track API Service
+ * MIGRATION PATH:
+ * - For unified puzzle data access: Use `puzzleRepository` from `@/services/core/puzzleRepository`.
+ * - For direct arc-explainer API calls: Use `arcExplainerClient` from `@/services/core/arcExplainerClient`.
+ * - For PlayFab operations: Use `playfabPuzzleClient` from `@/services/core/playfabPuzzleClient`.
+ * - For ID conversions: Use `idConverter` from `@/services/idConverter`.
  *
- * Focused service for getting puzzle difficulty data from arc-explainer API
- * No overengineering - just the basics needed for the new Officer Track
- *
- * DEPRECATION NOTICE: This 667-line service violates SRP by mixing multiple
- * responsibilities. Use the new core services instead:
- * - puzzleRepository for unified puzzle data access
- * - arcExplainerClient for arc-explainer API calls
- * - playfabPuzzleClient for PlayFab operations
+ * @author Gemini 2.5 Pro
+ * @see puzzleRepository
+ * @see arcExplainerClient
  */
 
 import { arcDataService } from '@/services/arcDataService';

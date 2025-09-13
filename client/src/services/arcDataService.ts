@@ -1,14 +1,17 @@
 /**
- * ARC Data Processing Service
- * Handles loading, processing, and transformation of raw ARC JSON puzzle files
- * 
- * Key Features:
- * - Lazy loading with pagination for 1,920+ puzzles
- * - Unique ID generation with duplicate detection
- * - Integer-to-emoji transformation for UI presentation
- * - Difficulty estimation and complexity analysis
- * - Intelligent caching for performance
- * - Importing arcDataService, arcExplainerAPI, and playfabPuzzleClient
+ * @deprecated THIS SERVICE IS DEPRECATED AND SHOULD NOT BE USED.
+ * This monolithic 800-line service violated the Single Responsibility Principle by mixing
+ * data loading, caching, transformation, and business logic. Its functionality has been
+ * refactored into specialized, maintainable core services.
+ *
+ * MIGRATION PATH:
+ * - For unified puzzle data access (PlayFab + arc-explainer): Use `puzzleRepository` from `@/services/core/puzzleRepository`.
+ * - For direct PlayFab puzzle operations: Use `playfabPuzzleClient` from `@/services/core/playfabPuzzleClient`.
+ * - For ID conversions: Use `idConverter` from `@/services/idConverter`.
+ *
+ * @author Gemini 2.5 Pro
+ * @see puzzleRepository
+ * @see playfabPuzzleClient
  */
 
 import type { 
@@ -260,6 +263,7 @@ export class ARCDataService {
         const filenames: string[] = await manifestResponse.json();
         return filenames.map(name => `${basePaths[dataset]}${name}`);
       }
+      return [];
     } catch (error) {
       console.error(`Could not load manifest for ${dataset}:`, error);
       return [];

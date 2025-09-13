@@ -74,7 +74,7 @@ export function AssessmentInterface() {
         
         for (const puzzleId of ASSESSMENT_PUZZLE_IDS) {
           console.log(`Loading puzzle ${puzzleId}...`);
-          const puzzleData = await puzzleRepository.findById(puzzleId, true);
+          const puzzleData = await puzzleRepository.findById(puzzleId, true, true);
 
           if (puzzleData) {
             loadedPuzzles.push(puzzleData);

@@ -1,16 +1,14 @@
 /**
- * @deprecated Use @/services/core/puzzleRepository instead
+ * @deprecated THIS SERVICE IS DEPRECATED AND SHOULD NOT BE USED.
+ * This service attempted to merge data from multiple sources but has been superseded
+ * by a more robust and efficient implementation in the new core service architecture.
  *
- * Unified Puzzle Performance Service
+ * MIGRATION PATH:
+ * - All functionality is now handled by `puzzleRepository` from `@/services/core/puzzleRepository`.
+ *   It provides unified data access with integrated caching and performance enhancement.
  *
- * Merges PlayFab puzzle data with arc-explainer AI performance metadata
- * Provides single source of truth for Officer Track difficulty filtering
- *
- * DEPRECATION NOTICE: This service is deprecated in favor of the new
- * puzzleRepository which provides the same functionality with better
- * performance, unified caching, and cleaner architecture.
- *
- * Architecture: PlayFab (authoritative) + arc-explainer (metadata overlay)
+ * @author Gemini 2.5 Pro
+ * @see puzzleRepository
  */
 
 import { arcDataService } from '@/services/arcDataService';
