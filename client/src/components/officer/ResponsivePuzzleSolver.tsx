@@ -9,7 +9,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { Navbar } from '@/components/layout/Navbar';
 import { Badge } from '@/components/ui/badge';
-import { getPuzzlePerformanceStats, PuzzlePerformanceStats } from '@/services/arcExplainerService';
+import { arcExplainerClient, type PerformanceData } from '@/services/core/arcExplainerClient';
 import { SuccessModal } from '@/components/ui/SuccessModal';
 import { ResponsiveOfficerGrid, ResponsiveOfficerDisplayGrid } from '@/components/officer/ResponsiveOfficerGrid';
 import { TrainingExamplesSection } from '@/components/officer/TrainingExamplesSection';
@@ -68,7 +68,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // Performance stats state
-  const [performanceStats, setPerformanceStats] = useState<PuzzlePerformanceStats | null>(null);
+  const [performanceStats, setPerformanceStats] = useState<PerformanceData | null>(null);
 
   const [inputCellSize, setInputCellSize] = useState(50);
   const [outputCellSize, setOutputCellSize] = useState(50);
@@ -122,7 +122,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
 
     // Fetch performance stats for the new puzzle
     const fetchStats = async () => {
-      const stats = await getPuzzlePerformanceStats(puzzle.id);
+      const stats = await arcExplainerClient.getPuzzlePerformance(puzzle.id);
       setPerformanceStats(stats);
     };
 

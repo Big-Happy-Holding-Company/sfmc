@@ -13,7 +13,7 @@ import { ResponsivePuzzleSolver } from '@/components/officer/ResponsivePuzzleSol
 import { Navbar } from '@/components/layout/Navbar';
 import { PermanentHintSystem } from '@/components/officer/PermanentHintSystem';
 import { AssessmentModal } from '@/components/assessment/AssessmentModal';
-import { puzzlePerformanceService } from '@/services/puzzlePerformanceService';
+import { puzzleRepository } from '@/services/core/puzzleRepository';
 import { playFabRequestManager, playFabAuthManager, playFabUserData } from '@/services/playfab';
 
 // Curated assessment puzzle IDs
@@ -23,12 +23,13 @@ const ASSESSMENT_PUZZLE_IDS = [
   'fc754716',    //  Make the outline whatever the dot is
   'a699fb00',    //  Connect the dots
   'ea786f4a',    //  Make an X
-  'e7639916',    //  Connect the dots
+  'e7639916',    //  Connect the dots! Large!
   '66e6c45b',    //  Expand!
   '0bb8deee',    //  Corral the shapes
   '32e9702f',    //  Easy answer, everything pulled to the left and change 0 to 5 
   '27a28665',    // 7 Examples, 3 Tests!
  //   '7b80bb43', //  Close the gates!  Very Large and unusual size
+ //   '1caeab9d', //  Line them up!
  //   '87ab05b8', //
 
 ];
@@ -73,8 +74,8 @@ export function AssessmentInterface() {
         
         for (const puzzleId of ASSESSMENT_PUZZLE_IDS) {
           console.log(`Loading puzzle ${puzzleId}...`);
-          const puzzleData = await puzzlePerformanceService.findPuzzleById(puzzleId);
-          
+          const puzzleData = await puzzleRepository.findById(puzzleId, true);
+
           if (puzzleData) {
             loadedPuzzles.push(puzzleData);
           } else {
