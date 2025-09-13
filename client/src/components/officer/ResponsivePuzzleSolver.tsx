@@ -9,6 +9,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { Navbar } from '@/components/layout/Navbar';
 import { Badge } from '@/components/ui/badge';
+import { getPuzzlePerformanceStats, PuzzlePerformanceStats } from '@/services/arcExplainerService';
 import { SuccessModal } from '@/components/ui/SuccessModal';
 import { ResponsiveOfficerGrid, ResponsiveOfficerDisplayGrid } from '@/components/officer/ResponsiveOfficerGrid';
 import { TrainingExamplesSection } from '@/components/officer/TrainingExamplesSection';
@@ -66,6 +67,9 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
   // Success modal state
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+  // Performance stats state
+  const [performanceStats, setPerformanceStats] = useState<PuzzlePerformanceStats | null>(null);
+
   // Refs for grid containers to enable dynamic width calculation
   const inputContainerRef = useRef<HTMLDivElement>(null);
   const outputContainerRef = useRef<HTMLDivElement>(null);
@@ -119,7 +123,15 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
       setOutputDimensions(newDimensions);
       setCompletedTests(newCompleted);
     }
-  }, [puzzle]);
+
+    // Fetch performance stats for the new puzzle
+    const fetchStats = async () => {
+      const stats = await getPuzzlePerformanceStats(puzzle.id);
+      setPerformanceStats(stats);
+    };
+
+    fetchStats();
+  }, [puzzle.id]);
 
   // Initialize session and log puzzle start event
   useEffect(() => {
@@ -615,18 +627,23 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
     updateCurrentSolution(emptyGrid);
   };
 
+  const renderBadges = () => {
+    if (!performanceStats) return [];
+    return [
+      <Badge key="dataset" variant="outline" className="border-sky-400 text-sky-300">Dataset: {performanceStats.dataset}</Badge>,
+      <Badge key="attempts" variant="outline" className="border-purple-400 text-purple-300">AI Attempts: {performanceStats.totalAttempts}</Badge>,
+      <Badge key="accuracy" variant="outline" className="border-green-400 text-green-300">AI Accuracy: {performanceStats.accuracy.toFixed(1)}%</Badge>,
+    ];
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 text-amber-50">
-      <Navbar showBackButton={true} onBack={onBack}>
-        <div className="flex items-center space-x-4">
-          <h1 className="text-2xl md:text-3xl font-bold text-amber-400">
-            ARC Puzzle Solver
-          </h1>
-          <Badge className="bg-amber-600 text-slate-900 font-bold text-lg px-3 py-1">
-            {puzzle.id}
-          </Badge>
-        </div>
-      </Navbar>
+      <Navbar 
+        title="ARC Puzzles for People" 
+        badges={renderBadges()} 
+        showBackButton={true} 
+        onBack={onBack}
+      />
 
       <main className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         

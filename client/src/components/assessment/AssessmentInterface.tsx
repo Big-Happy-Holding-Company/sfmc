@@ -296,19 +296,16 @@ export function AssessmentInterface() {
         onClose={() => setShowModal(false)} 
       />
 
-      <Navbar>
+      <Navbar title="Human - ARC Assessment">
         <div className="flex items-center gap-8">
-          <div>
-            <h1 className="text-2xl font-bold text-amber-400">ARC Assessment</h1>
-            <p className="text-slate-300 text-base">
-              Puzzle {currentPuzzleIndex + 1} of {puzzles.length}
-              {currentPuzzle && attemptCounts.get(currentPuzzle.id) && (
-                <span className="ml-2 text-amber-300">
-                  (Attempt {attemptCounts.get(currentPuzzle.id)} of 2)
-                </span>
-              )}
-            </p>
-          </div>
+          <p className="text-slate-300 text-base">
+            Puzzle {currentPuzzleIndex + 1} of {puzzles.length}
+            {currentPuzzle && attemptCounts.get(currentPuzzle.id) && (
+              <span className="ml-2 text-amber-300">
+                (Attempt {attemptCounts.get(currentPuzzle.id)} of 2)
+              </span>
+            )}
+          </p>
           <div className="flex gap-4">
             <Button 
               onClick={() => setShowModal(true)} 
