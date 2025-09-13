@@ -603,11 +603,38 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
 
   const renderBadges = () => {
     if (!performanceStats) return [];
-    return [
-      <Badge key="dataset" variant="outline" className="border-sky-400 text-sky-300">Dataset: {performanceStats.dataset}</Badge>,
-      <Badge key="attempts" variant="outline" className="border-purple-400 text-purple-300">AI Attempts: {performanceStats.totalAttempts}</Badge>,
-      <Badge key="accuracy" variant="outline" className="border-green-400 text-green-300">AI Accuracy: {performanceStats.accuracy.toFixed(1)}%</Badge>,
+
+    const badges = [
+      <Badge key="dataset" variant="outline" className="border-sky-400 text-sky-300">
+        Dataset: {performanceStats.dataset}
+      </Badge>,
+      <Badge key="accuracy" variant="outline" className="border-green-400 text-green-300">
+        AI Accuracy: {performanceStats.avgAccuracy.toFixed(1)}%
+      </Badge>,
+      <Badge key="attempts" variant="outline" className="border-purple-400 text-purple-300">
+        AI Attempts: {performanceStats.totalAttempts}
+      </Badge>,
     ];
+
+    // Add dangerous overconfidence warning if detected
+    if (performanceStats.dangerousOverconfidence) {
+      badges.push(
+        <Badge key="warning" variant="outline" className="border-red-400 text-red-300 animate-pulse">
+          🚨 AI Overconfident
+        </Badge>
+      );
+    }
+
+    // Add composite difficulty score
+    if (performanceStats.compositeScore > 0) {
+      badges.push(
+        <Badge key="difficulty" variant="outline" className="border-amber-400 text-amber-300">
+          Difficulty: {performanceStats.compositeScore.toFixed(1)}
+        </Badge>
+      );
+    }
+
+    return badges;
   };
 
   return (

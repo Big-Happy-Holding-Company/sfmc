@@ -1,48 +1,110 @@
-// src/services/arcExplainerService.ts
+/**
+ * Arc-Explainer API Service
+ * Integrates with the arc-explainer production API for AI performance metadata
+ */
 
-const API_BASE_URL = 'http://127.0.0.1:3000/api'; // Assuming local dev server
+const API_BASE_URL = import.meta.env.VITE_ARC_EXPLAINER_URL || 'https://arc-explainer-production.up.railway.app';
 
 export interface PuzzlePerformanceStats {
   puzzleId: string;
-  dataset: string; // Assuming the API provides this
+  dataset: string;
+  avgAccuracy: number;
+  wrongCount: number;
   totalAttempts: number;
-  correctAttempts: number;
-  accuracy: number;
+  compositeScore: number;
+  explanationCount: number;
+  feedbackCount: number;
+  dangerousOverconfidence: boolean;
 }
 
 /**
- * Fetches performance statistics for a given puzzle ID.
- * The API endpoint for a single puzzle's stats isn't explicitly defined in the docs,
- * so this is a hypothetical implementation based on the available information.
- * We might need to fetch all stats and then filter by puzzleId on the client-side.
+ * Converts PlayFab puzzle ID format to arc-explainer format
+ * ARC-TR-007bbfb7 -> 007bbfb7
+ * ARC-E2-11852cab -> 11852cab
+ */
+function convertToArcExplainerFormat(puzzleId: string): string {
+  if (puzzleId.includes('-')) {
+    return puzzleId.split('-').pop() || puzzleId;
+  }
+  return puzzleId;
+}
+
+/**
+ * Determines dataset from PlayFab puzzle ID prefix
+ */
+function getDatasetFromPuzzleId(puzzleId: string): string {
+  if (puzzleId.startsWith('ARC-TR-')) return 'Training';
+  if (puzzleId.startsWith('ARC-T2-')) return 'Training 2';
+  if (puzzleId.startsWith('ARC-EV-')) return 'Evaluation';
+  if (puzzleId.startsWith('ARC-E2-')) return 'Evaluation 2';
+  return 'Unknown';
+}
+
+/**
+ * Fetches performance statistics for a specific puzzle from arc-explainer API
  */
 export const getPuzzlePerformanceStats = async (puzzleId: string): Promise<PuzzlePerformanceStats | null> => {
   try {
-    // The docs don't specify an endpoint for a single puzzle's performance.
-    // We'll use `/api/puzzle/performance-stats` and filter, assuming it returns an array.
-    // This is not efficient and should be improved with a dedicated API endpoint.
-    const response = await fetch(`${API_BASE_URL}/puzzle/performance-stats`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    const cleanPuzzleId = convertToArcExplainerFormat(puzzleId);
+    const dataset = getDatasetFromPuzzleId(puzzleId);
+
+    // Try individual puzzle performance endpoint first
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/puzzle/performance-stats/${cleanPuzzleId}`);
+      if (response.ok) {
+        const data = await response.json();
+        return {
+          puzzleId: cleanPuzzleId,
+          dataset,
+          avgAccuracy: data.avgAccuracy || 0,
+          wrongCount: data.wrongCount || 0,
+          totalAttempts: data.totalAttempts || 0,
+          compositeScore: data.compositeScore || 0,
+          explanationCount: data.explanationCount || 0,
+          feedbackCount: data.feedbackCount || 0,
+          dangerousOverconfidence: (data.avgAccuracy < 25 && data.avgConfidenceWhenWrong > 75) || false
+        };
+      }
+    } catch (e) {
+      // Fall through to batch approach
     }
-    const allStats: any[] = await response.json();
 
-    // The puzzle ID in the main app might be like 'ARC-EV-e7dd8335' or just 'e7dd8335'
-    const cleanPuzzleId = puzzleId.split('-').pop() || puzzleId;
+    // Fallback: search in worst-performing batch
+    const batchResponse = await fetch(`${API_BASE_URL}/api/puzzle/worst-performing?limit=50`);
+    if (!batchResponse.ok) {
+      throw new Error(`HTTP error! status: ${batchResponse.status}`);
+    }
 
-    const puzzleStats = allStats.find(stat => stat.puzzle_id === cleanPuzzleId);
+    const batchData = await batchResponse.json();
+    const puzzleData = batchData.find((p: any) => p.puzzle_id === cleanPuzzleId);
 
-    if (puzzleStats) {
+    if (puzzleData) {
       return {
-        puzzleId: puzzleStats.puzzle_id,
-        dataset: puzzleStats.dataset || 'N/A', // Placeholder for dataset
-        totalAttempts: puzzleStats.solver_attempts || 0,
-        correctAttempts: puzzleStats.correct_predictions || 0,
-        accuracy: puzzleStats.solver_accuracy_percentage || 0,
+        puzzleId: cleanPuzzleId,
+        dataset,
+        avgAccuracy: puzzleData.avgAccuracy || 0,
+        wrongCount: puzzleData.wrongCount || 0,
+        totalAttempts: puzzleData.totalAttempts || 0,
+        compositeScore: puzzleData.compositeScore || 0,
+        explanationCount: puzzleData.explanationCount || 0,
+        feedbackCount: puzzleData.feedbackCount || 0,
+        dangerousOverconfidence: (puzzleData.avgAccuracy < 25 && puzzleData.avgConfidenceWhenWrong > 75) || false
       };
     }
 
-    return null;
+    // Return default values if not found
+    return {
+      puzzleId: cleanPuzzleId,
+      dataset,
+      avgAccuracy: 0,
+      wrongCount: 0,
+      totalAttempts: 0,
+      compositeScore: 0,
+      explanationCount: 0,
+      feedbackCount: 0,
+      dangerousOverconfidence: false
+    };
+
   } catch (error) {
     console.error('Failed to fetch puzzle performance stats:', error);
     return null;
