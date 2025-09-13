@@ -199,3 +199,39 @@ While PlayFab is our backend, we use the external `arc-explainer` API for a spec
     - `/api/puzzle/worst-performing`: To find puzzles where AI failed.
     - `/api/puzzle/confidence-stats`: To find puzzles where AI was overconfident in a wrong answer.
     - `/api/puzzle/performance-stats`: To get trustworthiness scores.
+
+---
+
+## 6. Senior Developer Gotchas & Critical Insights
+
+**Author**: Cascade
+**Date**: 2025-09-12
+
+This section contains critical insights for developers to avoid common pitfalls and adhere to the project's architectural patterns.
+
+### Architectural Overview: A Platform of Wrappers
+
+It is essential to understand that this project is not a single, monolithic application. It is a **platform** that provides a rich dataset of ARC puzzles and a core set of backend services. The different user experiences (`HARCPlatform`, `AssessmentInterface`, `OfficerTrackSimple`, `MissionControl`) are best understood as **themed wrappers** or **lenses** through which this core data is presented.
+
+- **The Core**: The puzzle data stored in PlayFab Title Data and the validation logic in `cloudscript.js`.
+- **The Wrappers**: The various React components and pages (`/assessment`, `/harc`, etc.) that provide a specific context, UI, and rule set for interacting with the core data.
+
+This means that when building a new feature, the first question should always be: "Is this a new wrapper, or an enhancement to the core services?"
+
+### Critical Gotchas & Best Practices
+
+1.  **React State Management: The Stale Prop Problem**
+    -   **Gotcha**: A child component that receives an object or array as a prop (e.g., a `puzzle` object) and copies it into its own local state using `useState` will **not** automatically update if the parent passes a new version of that prop. The component will continue to use its old, stale state.
+    -   **Solution**: Always use a `useEffect` hook that is dependent on the incoming prop (`useEffect(() => { ... }, [props.puzzle])`). Inside this hook, reset all of the component's internal state to reflect the new prop. This is the pattern now used in `ResponsivePuzzleSolver.tsx` and is the required approach for any component that needs to react to changing data from a parent.
+
+2.  **PlayFab Service Interaction: The Singleton Pattern**
+    -   **Gotcha**: The services in `client/src/services/playfab/` are designed as **singletons**. Do not attempt to instantiate them with `new PlayFabAuthManager()`. 
+    -   **Solution**: Always import and use the pre-initialized singleton instance (e.g., `import { playFabAuthManager } from '@/services/playfab'`). This ensures a single, consistent state for authentication and API requests across the entire application.
+
+3.  **API Requests: Never Use Raw `fetch`**
+    -   **Gotcha**: Making a direct `fetch` call to a PlayFab API endpoint will fail with an authentication error.
+    -   **Solution**: All PlayFab API calls **must** go through the `playFabRequestManager`. This singleton automatically handles attaching the necessary `X-Authentication` session ticket, provides robust retry logic with exponential backoff, and standardizes error handling.
+
+4.  **Data Integrity: CloudScript is the Single Source of Truth**
+    -   **Gotcha**: Replicating validation or scoring logic on the client side. This is a major security vulnerability and violates the core architecture.
+    -   **Solution**: The client's role is to collect the user's input (the `solutions` array) and submit it to the appropriate CloudScript function (`ValidateARCPuzzle`, `ValidateTaskSolution`, etc.). The server is the **only** authority on correctness, scoring, and data updates. The client simply displays the result returned by the server.
