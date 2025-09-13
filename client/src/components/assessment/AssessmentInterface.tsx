@@ -24,6 +24,7 @@ const ASSESSMENT_PUZZLE_IDS = [
   'ea786f4a',    //  Make an X
   'e7639916',    //  Connect the dots
   '66e6c45b',    //  Expand!
+  '0bb8deee',    //  Corral the shapes
   '32e9702f',    //  Easy answer, everything pulled to the left and change 0 to 5 
 
   //  '27a28665',
