@@ -7,8 +7,8 @@
  * - Arc-explainer format: same as raw ARC IDs
  */
 
-import { arcIdToPlayFab, playFabToArcId } from '@/services/officerArcAPI';
-import { arcExplainerAPI } from '@/services/arcExplainerAPI';
+import { idConverter } from '@/services/idConverter';
+import { arcExplainerClient } from '@/services/core/arcExplainerClient';
 
 export interface IDValidationResult {
   success: boolean;
@@ -68,7 +68,7 @@ export function validateIDConversions(): IDValidationResult {
   // Test arcIdToPlayFab function
   testCases.forEach(testCase => {
     try {
-      const actual = arcIdToPlayFab(testCase.arcId, testCase.dataset);
+      const actual = idConverter.arcToPlayFab(testCase.arcId, testCase.dataset);
       const passed = actual === testCase.expectedPlayFab;
       
       result.testResults[`${testCase.name} - arcIdToPlayFab`] = {
@@ -97,7 +97,7 @@ export function validateIDConversions(): IDValidationResult {
   // Test playFabToArcId function (reverse conversion)
   testCases.forEach(testCase => {
     try {
-      const actual = playFabToArcId(testCase.expectedPlayFab);
+      const actual = idConverter.playFabToArc(testCase.expectedPlayFab);
       const passed = actual === testCase.arcId;
       
       result.testResults[`${testCase.name} - playFabToArcId`] = {
@@ -126,7 +126,7 @@ export function validateIDConversions(): IDValidationResult {
   // Test arc-explainer API conversion functions
   testCases.forEach(testCase => {
     try {
-      const actual = arcExplainerAPI.convertArcIdToPlayFabId(testCase.arcId, testCase.dataset);
+      const actual = idConverter.arcToPlayFab(testCase.arcId, testCase.dataset);
       const passed = actual === testCase.expectedPlayFab;
       
       result.testResults[`${testCase.name} - arcExplainerAPI.convertArcIdToPlayFabId`] = {
@@ -155,7 +155,7 @@ export function validateIDConversions(): IDValidationResult {
   // Test reverse conversion for arc-explainer API
   testCases.forEach(testCase => {
     try {
-      const actual = arcExplainerAPI.convertPlayFabIdToArcId(testCase.expectedPlayFab);
+      const actual = idConverter.playFabToArc(testCase.expectedPlayFab);
       const passed = actual === testCase.arcId;
       
       result.testResults[`${testCase.name} - arcExplainerAPI.convertPlayFabIdToArcId`] = {
@@ -184,7 +184,7 @@ export function validateIDConversions(): IDValidationResult {
   // Test validation function
   testCases.forEach(testCase => {
     try {
-      const validationResult = arcExplainerAPI.validatePuzzleId(testCase.expectedPlayFab);
+      const validationResult = idConverter.validateId(testCase.expectedPlayFab);
       const passed = validationResult.valid && validationResult.format === 'playfab' && validationResult.dataset === testCase.dataset;
       
       result.testResults[`${testCase.name} - arcExplainerAPI.validatePuzzleId`] = {

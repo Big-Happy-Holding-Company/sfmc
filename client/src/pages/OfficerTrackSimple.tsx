@@ -20,7 +20,7 @@ import {
   playFabUserData,
   playFabTasks
 } from '@/services/playfab';
-import type { OfficerPuzzle } from '@/services/officerArcAPI';
+import type { OfficerPuzzle } from '@/types/arcTypes';
 import type { PlayFabPlayer } from '@/services/playfab';
 
 export default function OfficerTrackSimple() {

@@ -1,8 +1,16 @@
 /**
+ * @deprecated Use @/services/core/puzzleRepository and @/services/core/arcExplainerClient instead
+ *
  * Simple Officer Track API Service
- * 
+ *
  * Focused service for getting puzzle difficulty data from arc-explainer API
  * No overengineering - just the basics needed for the new Officer Track
+ *
+ * DEPRECATION NOTICE: This 667-line service violates SRP by mixing multiple
+ * responsibilities. Use the new core services instead:
+ * - puzzleRepository for unified puzzle data access
+ * - arcExplainerClient for arc-explainer API calls
+ * - playfabPuzzleClient for PlayFab operations
  */
 
 import { arcDataService } from '@/services/arcDataService';

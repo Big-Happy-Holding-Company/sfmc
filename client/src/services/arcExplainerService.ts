@@ -1,6 +1,12 @@
 /**
+ * @deprecated Use @/services/core/arcExplainerClient instead
+ *
  * Arc-Explainer API Service
  * Integrates with the arc-explainer production API for AI performance metadata
+ *
+ * DEPRECATION NOTICE: This service is deprecated in favor of the new
+ * unified service architecture. Use arcExplainerClient from @/services/core/arcExplainerClient
+ * which provides the same functionality with better performance and caching.
  */
 
 const API_BASE_URL = import.meta.env.VITE_ARC_EXPLAINER_URL || 'https://arc-explainer-production.up.railway.app';

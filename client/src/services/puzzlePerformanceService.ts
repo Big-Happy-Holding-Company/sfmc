@@ -1,9 +1,15 @@
 /**
+ * @deprecated Use @/services/core/puzzleRepository instead
+ *
  * Unified Puzzle Performance Service
- * 
+ *
  * Merges PlayFab puzzle data with arc-explainer AI performance metadata
  * Provides single source of truth for Officer Track difficulty filtering
- * 
+ *
+ * DEPRECATION NOTICE: This service is deprecated in favor of the new
+ * puzzleRepository which provides the same functionality with better
+ * performance, unified caching, and cleaner architecture.
+ *
  * Architecture: PlayFab (authoritative) + arc-explainer (metadata overlay)
  */
 
