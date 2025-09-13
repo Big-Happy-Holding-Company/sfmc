@@ -7,7 +7,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
-import { Button } from '@/components/ui/button';
+import { Navbar } from '@/components/layout/Navbar';
 import { Badge } from '@/components/ui/badge';
 import { SuccessModal } from '@/components/ui/SuccessModal';
 import { ResponsiveOfficerGrid, ResponsiveOfficerDisplayGrid } from '@/components/officer/ResponsiveOfficerGrid';
@@ -617,29 +617,16 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
 
   return (
     <div className="min-h-screen bg-slate-900 text-amber-50">
-      {/* Header */}
-      <header className="bg-slate-800 border-b-2 border-amber-400 shadow-lg sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl md:text-3xl font-bold text-amber-400">
-                ARC Puzzle Solver
-              </h1>
-              <Badge className="bg-amber-600 text-slate-900 font-bold">
-                {puzzle.id}
-              </Badge>
-            </div>
-            
-            <Button 
-              variant="outline" 
-              className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900"
-              onClick={onBack}
-            >
-              <span className="hidden sm:inline">←</span> Back
-            </Button>
-          </div>
+      <Navbar showBackButton={true} onBack={onBack}>
+        <div className="flex items-center space-x-4">
+          <h1 className="text-2xl md:text-3xl font-bold text-amber-400">
+            ARC Puzzle Solver
+          </h1>
+          <Badge className="bg-amber-600 text-slate-900 font-bold text-lg px-3 py-1">
+            {puzzle.id}
+          </Badge>
         </div>
-      </header>
+      </Navbar>
 
       <main className="w-full px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         

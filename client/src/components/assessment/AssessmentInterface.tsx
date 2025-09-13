@@ -10,6 +10,7 @@ import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import type { OfficerTrackPuzzle } from '@/types/arcTypes';
 import { ResponsivePuzzleSolver } from '@/components/officer/ResponsivePuzzleSolver';
+import { Navbar } from '@/components/layout/Navbar';
 import { PermanentHintSystem } from '@/components/officer/PermanentHintSystem';
 import { AssessmentModal } from '@/components/assessment/AssessmentModal';
 import { puzzlePerformanceService } from '@/services/puzzlePerformanceService';
@@ -295,9 +296,8 @@ export function AssessmentInterface() {
         onClose={() => setShowModal(false)} 
       />
 
-      {/* Header with progress */}
-      <div className="bg-slate-800 border-b-2 border-amber-400 p-4">
-        <div className="max-w-4xl mx-auto flex justify-between items-center">
+      <Navbar>
+        <div className="flex items-center gap-8">
           <div>
             <h1 className="text-2xl font-bold text-amber-400">ARC Assessment</h1>
             <p className="text-slate-300 text-base">
@@ -309,20 +309,21 @@ export function AssessmentInterface() {
               )}
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-4">
             <Button 
               onClick={() => setShowModal(true)} 
               variant="outline" 
               size="lg"
+              className="border-sky-400 text-sky-400 hover:bg-sky-400 hover:text-slate-900"
             >
               About Assessment
             </Button>
-            <Button onClick={handleBackToLanding} variant="outline" size="lg">
+            <Button onClick={handleBackToLanding} variant="outline" size="lg" className="border-amber-400 text-amber-400 hover:bg-amber-400 hover:text-slate-900">
               Exit Assessment
             </Button>
           </div>
         </div>
-      </div>
+      </Navbar>
 
       {/* The ResponsivePuzzleSolver */}
       <ResponsivePuzzleSolver 
