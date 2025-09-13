@@ -21,6 +21,8 @@ export interface PuzzlePerformanceStats {
  * Converts PlayFab puzzle ID format to arc-explainer format
  * ARC-TR-007bbfb7 -> 007bbfb7
  * ARC-E2-11852cab -> 11852cab
+ * 
+ *DOES IT ALSO DO IT THE OTHER WAY????
  */
 function convertToArcExplainerFormat(puzzleId: string): string {
   if (puzzleId.includes('-')) {
