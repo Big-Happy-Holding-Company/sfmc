@@ -96,7 +96,6 @@ export function AssessmentInterface() {
         if (ASSESSMENT_PUZZLE_IDS.every(id => completed.has(id))) {
           setIsComplete(true);
           console.log('🎉 Assessment already completed!');
-          setTimeout(() => setLocation('/dashboard'), 2000);
         }
         
       } catch (err: any) {
@@ -125,18 +124,20 @@ export function AssessmentInterface() {
   // Check which puzzles have already been completed
   const checkCompletedPuzzles = async (): Promise<Set<string>> => {
     try {
-      const userData = await playFabUserData.getPlayerData();
-      const humanPerformanceData = userData?.humanPerformanceData;
+      // Directly fetch only the performance data needed
+      const humanPerformanceData = await playFabUserData.getHumanPerformanceData();
       
-      if (humanPerformanceData) {
-        const records: { puzzleId: string }[] = JSON.parse(humanPerformanceData);
-        const completed = new Set<string>(records.map(r => r.puzzleId));
+      if (humanPerformanceData && humanPerformanceData.length > 0) {
+        // The data is already parsed as an array of objects
+        const completed = new Set<string>(humanPerformanceData.map(r => r.puzzleId));
         setCompletedPuzzles(completed);
+        console.log('Checked completed puzzles, found:', completed);
         return completed;
       }
     } catch (error) {
       console.error('Failed to check completed puzzles:', error);
     }
+    console.log('No completed puzzles found.');
     return new Set<string>();
   };
 
