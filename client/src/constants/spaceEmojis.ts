@@ -243,6 +243,16 @@ export interface EmojiSetOption {
 }
 
 /**
+ * Gets a random emoji set for puzzle variety
+ * @returns Random EmojiSet key
+ */
+export function getRandomEmojiSet(): EmojiSet {
+  const emojiSetKeys = Object.keys(SPACE_EMOJIS) as EmojiSet[];
+  const randomIndex = Math.floor(Math.random() * emojiSetKeys.length);
+  return emojiSetKeys[randomIndex];
+}
+
+/**
  * Generate dropdown options dynamically from SPACE_EMOJIS and EMOJI_SET_INFO
  * This ensures new emoji sets automatically appear in all UI dropdowns
  */

@@ -19,6 +19,7 @@ import { PuzzleTools } from '@/components/officer/PuzzleTools';
 import type { OfficerTrackPuzzle, ARCGrid } from '@/types/arcTypes';
 import type { DisplayMode, PuzzleDisplayState } from '@/types/puzzleDisplayTypes';
 import type { EmojiSet } from '@/constants/spaceEmojis';
+import { getRandomEmojiSet } from '@/constants/spaceEmojis';
 import { playFabValidation } from '@/services/playfab/validation';
 import { playFabEvents } from '@/services/playfab/events';
 import { SizeSlider } from '@/components/ui/SizeSlider';
@@ -30,9 +31,10 @@ interface ResponsivePuzzleSolverProps {
   isAssessmentMode?: boolean;
   onSolve?: () => void;
   onValidationResult?: (result: any) => void;
+  onAssessmentAdvance?: () => void;
 }
 
-export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, isAssessmentMode = false, onSolve, onValidationResult }: ResponsivePuzzleSolverProps) {
+export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, isAssessmentMode = false, onSolve, onValidationResult, onAssessmentAdvance }: ResponsivePuzzleSolverProps) {
   const [, setLocation] = useLocation();
   // Multi-test case state
   const [currentTestIndex, setCurrentTestIndex] = useState(0);
@@ -40,10 +42,10 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
   const [outputDimensions, setOutputDimensions] = useState<Array<{width: number; height: number}>>([]);
   const [completedTests, setCompletedTests] = useState<boolean[]>([]);
   
-  // Enhanced display state
+  // Enhanced display state - randomize emoji set for variety
   const [displayState, setDisplayState] = useState<PuzzleDisplayState>({
     displayMode: 'hybrid',
-    emojiSet: 'savory_foods',
+    emojiSet: getRandomEmojiSet(),
     selectedValue: 1,
     showControls: true,
   });
@@ -98,6 +100,12 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
     setIsAutoAdvancing(false);
     setAutoAdvanceMessage(null);
     setShowSuccessModal(false);
+
+    // Randomize emoji set for each new puzzle
+    setDisplayState(prev => ({
+      ...prev,
+      emojiSet: getRandomEmojiSet()
+    }));
 
     if (puzzle.test && puzzle.test.length > 0) {
       const newSolutions: ARCGrid[] = [];
@@ -854,7 +862,13 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
       {/* Success Modal */}
       <SuccessModal
         open={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
+        onClose={() => {
+          setShowSuccessModal(false);
+          // In assessment mode, trigger advancement when user clicks OK
+          if (isAssessmentMode && onAssessmentAdvance) {
+            onAssessmentAdvance();
+          }
+        }}
         title="Excellent Work!"
         message="Puzzle solved successfully! Click OK to continue to the next challenge..."
         showDesignerNotes={true}
