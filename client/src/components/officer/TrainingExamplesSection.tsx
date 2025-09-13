@@ -5,7 +5,7 @@
  * Handles multiple examples with proper input/output pairing and mobile optimization
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ResponsiveOfficerDisplayGrid } from '@/components/officer/ResponsiveOfficerGrid';
 import { SizeSlider } from '@/components/ui/SizeSlider';
 import type { ARCGrid } from '@/types/arcTypes';
@@ -32,7 +32,14 @@ export function TrainingExamplesSection({
   className = '',
   displayMode = 'emoji'
 }: TrainingExamplesSectionProps) {
-  const [cellSize, setCellSize] = useState(20);
+  const [cellSize, setCellSize] = useState(() => {
+    const savedSize = localStorage.getItem('trainingExampleCellSize');
+    return savedSize ? Number(savedSize) : 50;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('trainingExampleCellSize', String(cellSize));
+  }, [cellSize]);
   
   if (!examples || examples.length === 0) {
     return (
@@ -61,7 +68,7 @@ export function TrainingExamplesSection({
             {title}
           </h2>
           <div className="flex items-center gap-4 w-1/3">
-            <SizeSlider value={cellSize} onChange={setCellSize} min={10} max={40} />
+            <SizeSlider value={cellSize} onChange={setCellSize} min={10} max={75} />
           </div>
         </div>
         
