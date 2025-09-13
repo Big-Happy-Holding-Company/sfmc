@@ -74,6 +74,11 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
   const [inputCellSize, setInputCellSize] = useState(50);
   const [outputCellSize, setOutputCellSize] = useState(50);
 
+  // Assessment mode guidance state
+  const [assessmentTestsCompleted, setAssessmentTestsCompleted] = useState<boolean[]>([]);
+  const [showNextTestButton, setShowNextTestButton] = useState(false);
+  const [assessmentGuidanceMessage, setAssessmentGuidanceMessage] = useState<string>('');
+
   if (!puzzle) {
     return <div className="min-h-screen bg-slate-900 text-amber-50 flex items-center justify-center">No puzzle data.</div>;
   }
@@ -101,6 +106,11 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
     setAutoAdvanceMessage(null);
     setShowSuccessModal(false);
 
+    // Reset assessment mode guidance state
+    setAssessmentTestsCompleted([]);
+    setShowNextTestButton(false);
+    setAssessmentGuidanceMessage('');
+
     // Randomize emoji set for each new puzzle
     setDisplayState(prev => ({
       ...prev,
@@ -125,6 +135,11 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
       setSolutions(newSolutions);
       setOutputDimensions(newDimensions);
       setCompletedTests(newCompleted);
+
+      // Initialize assessment mode tracking
+      if (isAssessmentMode) {
+        setAssessmentTestsCompleted(new Array(puzzle.test.length).fill(false));
+      }
     }
 
     // Fetch performance stats for the new puzzle
@@ -433,15 +448,38 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
     newSolutions[currentTestIndex] = newGrid;
     setSolutions(newSolutions);
 
-    // In assessment mode, don't do frontend validation to avoid confusion
-    // Users submit directly to PlayFab for official validation
-    if (!isAssessmentMode && expectedOutput.length > 0) {
+    // Assessment mode: guided hand-holding with client-side validation
+    if (isAssessmentMode && expectedOutput.length > 0 && totalTests > 1) {
+      const matches = JSON.stringify(newGrid) === JSON.stringify(expectedOutput);
+      const newAssessmentCompleted = [...assessmentTestsCompleted];
+      const wasAlreadyCompleted = newAssessmentCompleted[currentTestIndex];
+      newAssessmentCompleted[currentTestIndex] = matches;
+      setAssessmentTestsCompleted(newAssessmentCompleted);
+
+      if (matches && !wasAlreadyCompleted) {
+        // Show success message and next test button
+        if (currentTestIndex < totalTests - 1) {
+          setAssessmentGuidanceMessage(`✅ Great! Test ${currentTestIndex + 1} completed. Click 'Next Test' to continue.`);
+          setShowNextTestButton(true);
+        } else {
+          // Last test completed
+          setAssessmentGuidanceMessage(`🎉 Excellent! All ${totalTests} tests completed. You can now submit.`);
+          setShowNextTestButton(false);
+        }
+      } else if (!matches) {
+        // Reset guidance if solution becomes incorrect
+        setAssessmentGuidanceMessage('');
+        setShowNextTestButton(false);
+      }
+    }
+    // Regular mode: existing frontend validation logic
+    else if (!isAssessmentMode && expectedOutput.length > 0) {
       const matches = JSON.stringify(newGrid) === JSON.stringify(expectedOutput);
       const newCompleted = [...completedTests];
       const wasAlreadyCompleted = newCompleted[currentTestIndex];
       newCompleted[currentTestIndex] = matches;
       setCompletedTests(newCompleted);
-      
+
       // Log individual test case completion (only on state change) - regular mode only
       if (matches && !wasAlreadyCompleted) {
         logPlayerAction(
@@ -460,11 +498,11 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
         // Auto-advance between test cases within same puzzle (regular mode only)
         if (currentTestIndex < totalTests - 1) {
           console.log(`✅ Test ${currentTestIndex + 1} completed. Auto-advancing to test ${currentTestIndex + 2}...`);
-          
+
           // Show auto-advance notification
           setIsAutoAdvancing(true);
           setAutoAdvanceMessage(`Test ${currentTestIndex + 1} of ${totalTests} complete! Moving to Test ${currentTestIndex + 2}...`);
-          
+
           // Auto-advance to next test after a brief delay for user feedback
           setTimeout(() => {
             setCurrentTestIndex(prevIndex => prevIndex + 1);
@@ -473,14 +511,6 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
           }, 1500);
         }
       }
-    }
-    
-    // In assessment mode, always allow test case navigation without frontend validation
-    if (isAssessmentMode) {
-      // Initialize completed state to false to avoid confusion
-      const newCompleted = [...completedTests];
-      newCompleted[currentTestIndex] = false;
-      setCompletedTests(newCompleted);
     }
   };
 
@@ -597,6 +627,15 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
     }
   };
 
+  // Handle Next Test button for assessment mode
+  const handleNextTest = () => {
+    if (currentTestIndex < totalTests - 1) {
+      setCurrentTestIndex(currentTestIndex + 1);
+      setShowNextTestButton(false);
+      setAssessmentGuidanceMessage('');
+    }
+  };
+
   // Reset solution to empty
   const handleReplayTutorial = () => {
     setLocation('/tutorial');
@@ -667,15 +706,18 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
         )}
 
 
-        {/* Test Case Navigation - SILVER THEME (Hidden in Assessment Mode) */}
-        {totalTests > 1 && !isAssessmentMode && (
+        {/* Test Case Navigation - SILVER THEME */}
+        {totalTests > 1 && (
           <div className="bg-gradient-to-r from-slate-200 via-gray-100 to-slate-200 border-2 border-slate-400 rounded-lg p-4 shadow-lg">
             <div className="mb-3">
               <h3 className="text-slate-800 text-lg font-bold flex items-center gap-2 mb-1">
                 Multi-Test Puzzle - All {totalTests} Tests Required
               </h3>
               <p className="text-slate-700 text-base">
-                You must solve ALL {totalTests} test cases to complete this puzzle. Switch between tests using the buttons below.
+                {isAssessmentMode
+                  ? `Complete each test step-by-step. Switch between tests using the buttons below.`
+                  : `You must solve ALL ${totalTests} test cases to complete this puzzle. Switch between tests using the buttons below.`
+                }
               </p>
             </div>
             <TestCaseNavigation
@@ -687,19 +729,6 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
           </div>
         )}
 
-        {/* Assessment Mode Multi-Test Indicator */}
-        {totalTests > 1 && isAssessmentMode && (
-          <div className="bg-slate-800 border border-amber-400 rounded-lg p-4 mb-6">
-            <div className="text-center">
-              <h3 className="text-amber-400 text-lg font-bold mb-2">
-                Multi-Test Puzzle
-              </h3>
-              <p className="text-slate-300 text-sm">
-                This puzzle has {totalTests} test cases. Complete each test to proceed automatically.
-              </p>
-            </div>
-          </div>
-        )}
 
         {/* Solving Interface - Full Screen Width */}
         <div className="w-full">
@@ -782,11 +811,42 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
             {/* User Solution - Full width on mobile, right column on large screens */}
             <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-4">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-amber-300 text-3xl font-bold text-center">Your Solution</h3>
+                <h3 className="text-amber-300 text-3xl font-bold text-center">
+                  Your Solution
+                  {isAssessmentMode && totalTests > 1 && (
+                    <span className="text-slate-400 text-xl font-normal ml-2">
+                      - Test {currentTestIndex + 1} of {totalTests}
+                    </span>
+                  )}
+                </h3>
                 <div className="w-1/2">
                   <SizeSlider value={outputCellSize} onChange={setOutputCellSize} min={50} max={100} label="Grid Size" />
                 </div>
               </div>
+
+              {/* Assessment Mode Guidance */}
+              {isAssessmentMode && totalTests > 1 && (
+                <div className="mb-4 p-3 bg-slate-700 border border-slate-500 rounded-lg">
+                  <p className="text-slate-300 text-center">
+                    Complete each test step-by-step to learn the multi-test workflow.
+                  </p>
+                  {assessmentGuidanceMessage && (
+                    <div className="mt-2 p-2 bg-green-900 border border-green-600 rounded text-green-300 text-center">
+                      {assessmentGuidanceMessage}
+                    </div>
+                  )}
+                  {showNextTestButton && (
+                    <div className="mt-3 flex justify-center">
+                      <button
+                        onClick={handleNextTest}
+                        className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-all duration-300 ring-2 ring-blue-400 shadow-lg animate-pulse [animation-duration:2s]"
+                      >
+                        Next Test →
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Copy Input Button with Glow - Positioned right under "Your Solution" */}
               <div className="mb-4 flex justify-center">
@@ -808,7 +868,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
               <div className="mb-4 flex justify-center">
                 <button
                   onClick={() => validatePuzzleWithPlayFab()}
-                  disabled={isValidating}
+                  disabled={isValidating || (isAssessmentMode && totalTests > 1 && !assessmentTestsCompleted.every(test => test))}
                   className="
                     px-6 py-4 text-xl font-bold rounded-lg h-16 w-full transition-all duration-300
                     bg-amber-600 hover:bg-amber-700 text-white
@@ -816,7 +876,9 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
                     disabled:opacity-50 disabled:cursor-not-allowed
                   "
                 >
-                  {isValidating ? '🔄 Submitting to PlayFab...' : '🎯 Submit for Official Validation'}
+                  {isValidating ? '🔄 Submitting to PlayFab...' :
+                   isAssessmentMode && totalTests > 1 ? `🎯 Submit All ${totalTests} Tests` :
+                   '🎯 Submit for Official Validation'}
                 </button>
               </div>
               <ResponsiveOfficerGrid
