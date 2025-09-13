@@ -43,12 +43,12 @@ function getRandomEmojis(count: number = 4): string[] {
   return selectedEmojis;
 }
 
-export function SuccessModal({ 
-  open, 
-  onClose, 
-  title = "Success!", 
+export function SuccessModal({
+  open,
+  onClose,
+  title = "Success!",
   message = "Great work! Moving to the next challenge...",
-  autoCloseDelay = 2500,
+  autoCloseDelay = 0, // Default to no auto-close
   showDesignerNotes = true
 }: SuccessModalProps) {
   const [celebrationEmojis, setCelebrationEmojis] = useState<string[]>([]);
@@ -59,14 +59,14 @@ export function SuccessModal({
     if (open) {
       setCelebrationEmojis(getRandomEmojis(4));
       setIsVisible(true);
-      
-      // Auto close if delay is set
+
+      // Only auto close if delay is explicitly set
       if (autoCloseDelay > 0) {
         const timer = setTimeout(() => {
           setIsVisible(false);
           setTimeout(onClose, 300); // Wait for fade out animation
         }, autoCloseDelay);
-        
+
         return () => clearTimeout(timer);
       }
     } else {
@@ -113,9 +113,24 @@ export function SuccessModal({
           {message}
         </p>
 
+        {/* OK Button */}
+        <div className="mt-6">
+          <button
+            onClick={onClose}
+            className="
+              px-8 py-3 text-lg font-bold rounded-lg
+              bg-amber-600 hover:bg-amber-700 text-white
+              transition-all duration-200 hover:scale-105
+              border-2 border-amber-400 shadow-lg
+            "
+          >
+            OK
+          </button>
+        </div>
+
         {/* Designer notes placeholder */}
         {showDesignerNotes && (
-          <p className="text-slate-500 text-sm italic border-t border-slate-700 pt-4">
+          <p className="text-slate-500 text-sm italic border-t border-slate-700 pt-4 mt-4">
             DESIGNER NOTES HERE TO BE FILLED IN
           </p>
         )}

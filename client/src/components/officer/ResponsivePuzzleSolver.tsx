@@ -753,6 +753,38 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
                   <SizeSlider value={outputCellSize} onChange={setOutputCellSize} min={50} max={100} label="Grid Size" />
                 </div>
               </div>
+
+              {/* Copy Input Button with Glow - Positioned right under "Your Solution" */}
+              <div className="mb-4 flex justify-center">
+                <button
+                  onClick={copyInput}
+                  className="
+                    px-6 py-3 text-lg font-bold rounded-lg h-12 transition-all duration-300
+                    border-2 border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white
+                    bg-slate-700 hover:scale-105 hover:shadow-lg
+                    ring-2 ring-blue-400 shadow-lg shadow-blue-400/30 animate-pulse [animation-duration:3s]
+                  "
+                  title="Copy the test input as a starting point for your solution"
+                >
+                  📋 Copy Input to Start
+                </button>
+              </div>
+
+              {/* Submit Button with Glow - Right below Copy Input */}
+              <div className="mb-4 flex justify-center">
+                <button
+                  onClick={() => validatePuzzleWithPlayFab()}
+                  disabled={isValidating}
+                  className="
+                    px-6 py-4 text-xl font-bold rounded-lg h-16 w-full transition-all duration-300
+                    bg-amber-600 hover:bg-amber-700 text-white
+                    ring-2 ring-amber-400 shadow-lg shadow-amber-400/30 animate-pulse [animation-duration:4s]
+                    disabled:opacity-50 disabled:cursor-not-allowed
+                  "
+                >
+                  {isValidating ? '🔄 Submitting to PlayFab...' : '🎯 Submit for Official Validation'}
+                </button>
+              </div>
               <ResponsiveOfficerGrid
                 initialGrid={currentSolution}
                 containerType="solver"
@@ -798,8 +830,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
         open={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
         title="Excellent Work!"
-        message="Puzzle solved successfully! Moving to the next challenge..."
-        autoCloseDelay={2500}
+        message="Puzzle solved successfully! Click OK to continue to the next challenge..."
         showDesignerNotes={true}
       />
     </div>
