@@ -1,11 +1,15 @@
 /**
- * EmojiPaletteDivider Component
- * =============================
- * Compact 2x5 emoji palette that acts as a visual divider between
- * TEST INPUT and YOUR SOLUTION in the solver interface
+ * 
+ * Author: Claude Code using Sonnet 4
+ * Date: 2025-09-12
+ * PURPOSE: Enhanced emoji palette with glowing pulse effects to guide user interaction.
+ * Compact 2x5 emoji palette that acts as a visual divider between TEST INPUT and YOUR SOLUTION.
+ * Features pulsing glow effect until user first interacts, making controls more discoverable.
+ * SRP and DRY check: Pass - Single responsibility (value selection), enhanced with UX improvements
+ * 
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { SPACE_EMOJIS, type EmojiSet } from '@/constants/spaceEmojis';
 import type { DisplayMode } from '@/types/puzzleDisplayTypes';
@@ -27,6 +31,14 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
   className = '',
   displayMode = 'emoji'
 }) => {
+  // Track user interaction to control glowing pulse effect
+  const [hasInteracted, setHasInteracted] = useState(false);
+
+  // Handle value selection with interaction tracking
+  const handleValueSelect = (value: number) => {
+    setHasInteracted(true);
+    onValueSelect(value);
+  };
   const getAllEmojis = () => {
     const emojis = SPACE_EMOJIS[emojiSet];
     return emojis.map((emoji, index) => ({ emoji, value: index }));
@@ -57,9 +69,10 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
         key={value}
         variant={isSelected ? "default" : "outline"}
         size="sm"
-        onClick={() => onValueSelect(value)}
+        onClick={() => handleValueSelect(value)}
         className={`
-          h-20 w-16 p-0 text-xl font-bold flex-shrink-0
+          h-24 w-20 p-0 text-2xl font-bold flex-shrink-0 transition-all duration-300
+          ${!hasInteracted ? 'animate-pulse ring-2 ring-amber-400 shadow-lg shadow-amber-400/50' : ''}
           ${isSelected 
             ? 'bg-amber-600 text-slate-900 hover:bg-amber-700 ring-2 ring-amber-400' 
             : isUsed
@@ -75,11 +88,25 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
   };
 
   return (
-    <div className={`flex flex-col items-center justify-center gap-3 ${className}`}>
+    <div className={`
+      flex flex-col items-center justify-center gap-4 transition-all duration-300
+      ${!hasInteracted ? 'ring-2 ring-amber-400 shadow-lg shadow-amber-400/30' : ''}
+      ${className}
+    `}>
       {/* Header with clear description */}
       <div className="text-center">
-        <h4 className="text-amber-300 text-lg font-bold mb-1">VALUE PALETTE</h4>
-        <p className="text-slate-300 text-base">Click to select painting tool</p>
+        <h4 className={`
+          text-amber-300 text-2xl font-bold mb-2 transition-all duration-300
+          ${!hasInteracted ? 'animate-pulse text-amber-200' : ''}
+        `}>
+          VALUE PALETTE
+        </h4>
+        <p className={`
+          text-slate-300 text-lg transition-all duration-300
+          ${!hasInteracted ? 'animate-pulse text-slate-200' : ''}
+        `}>
+          Click to select painting tool
+        </p>
       </div>
       
       {/* Top row (0-4) */}
@@ -93,7 +120,7 @@ export const EmojiPaletteDivider: React.FC<EmojiPaletteDividerProps> = ({
       </div>
       
       {/* Selected value indicator - more prominent */}
-      <div className="bg-amber-600 text-white px-4 py-2 rounded-lg font-bold text-base">
+      <div className="bg-amber-600 text-white px-6 py-3 rounded-lg font-bold text-lg shadow-lg">
         Selected: Value {selectedValue}
       </div>
       

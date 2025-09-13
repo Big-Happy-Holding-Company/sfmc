@@ -9,6 +9,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { SuccessModal } from '@/components/ui/SuccessModal';
 import { ResponsiveOfficerGrid, ResponsiveOfficerDisplayGrid } from '@/components/officer/ResponsiveOfficerGrid';
 import { TrainingExamplesSection } from '@/components/officer/TrainingExamplesSection';
 import { TestCaseNavigation } from '@/components/officer/TestCaseNavigation';
@@ -62,6 +63,9 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
   const [isAutoAdvancing, setIsAutoAdvancing] = useState(false);
   const [autoAdvanceMessage, setAutoAdvanceMessage] = useState<string | null>(null);
 
+  // Success modal state
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
   // Refs for grid containers to enable dynamic width calculation
   const inputContainerRef = useRef<HTMLDivElement>(null);
   const outputContainerRef = useRef<HTMLDivElement>(null);
@@ -94,6 +98,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
     setIsValidating(false);
     setIsAutoAdvancing(false);
     setAutoAdvanceMessage(null);
+    setShowSuccessModal(false);
 
     if (puzzle.test && puzzle.test.length > 0) {
       const newSolutions: ARCGrid[] = [];
@@ -371,6 +376,11 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
       setValidationResult(result);
       
       console.log('✅ DEBUG - PlayFab validation result:', result);
+
+      // Show success modal for correct answers
+      if (result?.correct) {
+        setShowSuccessModal(true);
+      }
 
       // In assessment mode, use validation result callback for advancement logic
       if (isAssessmentMode) {
@@ -794,6 +804,16 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
         </div>
 
       </main>
+
+      {/* Success Modal */}
+      <SuccessModal
+        open={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        title="Excellent Work!"
+        message="Puzzle solved successfully! Moving to the next challenge..."
+        autoCloseDelay={2500}
+        showDesignerNotes={true}
+      />
     </div>
   );
 }

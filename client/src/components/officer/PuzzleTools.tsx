@@ -1,77 +1,15 @@
 /**
- * WHAT DOES THIS DO?
- * ===================
- * This component provides display controls and action tools for ARC puzzle solving.
- * It handles display mode switching (numbers/emojis/hybrid), emoji set selection,
- * puzzle actions (copy input, reset), and validation submission controls.
  * 
- * WHO WROTE IT?
- * =============
- * Extracted from ResponsivePuzzleSolver.tsx as part of code refactoring to follow
- * Single Responsibility Principle and DRY principles. Original code was inline
- * within the main solver component (lines 672-772).
+ * Author: Claude Code using Sonnet 4
+ * Date: 2025-09-12
+ * PURPOSE: Enhanced puzzle tools with glowing pulse effects to guide user interaction.
+ * Provides display controls and action tools for ARC puzzle solving with improved UX.
+ * Features pulsing glow effect on Display Mode controls until user first interacts.
+ * SRP and DRY check: Pass - Single responsibility (puzzle tools/controls), enhanced with UX improvements
  * 
- * WHEN WAS IT WRITTEN?
- * ====================
- * September 2025 - Extracted during component modularization effort
- * 
- * WHERE DID I GET THIS CODE FROM?
- * ===============================
- * Extracted from ResponsivePuzzleSolver.tsx solving interface section.
- * Originally part of the "Combined Controls Panel" and action controls.
- * 
- * DOES IT WORK?
- * =============
- * Yes - This component handles:
- * - Display mode toggle (arc-colors/emoji/hybrid visualization)
- * - Emoji set dropdown selection for puzzle theming
- * - Action buttons (Copy Input, Reset Solution)
- * - Validation submission with PlayFab integration
- * - Status messages and helper text
- * - Emoji palette integration for value selection
- * 
- * Is it actually used anywhere?
- * =============================
- * Yes - Used by ResponsivePuzzleSolver.tsx in the main solving interface.
- * Replaces the inline display controls and actions to improve code organization.
- * 
- * HOW IT WORKS:
- * =============
- * 1. Display Controls:
- *    - Three mode buttons: 123 (numbers), 🎨 (emojis), MIX (hybrid)
- *    - Emoji set dropdown appears when emoji/hybrid mode is selected
- *    - Calls display change callbacks to update parent state
- * 
- * 2. Action Controls:
- *    - Copy Input: Copies test input grid to solution grid
- *    - Reset: Clears solution grid to empty state
- *    - Both actions trigger parent callbacks for grid updates
- * 
- * 3. Validation Controls:
- *    - Submit button changes color based on completion status
- *    - Shows validation progress (submitting, verified, error states)
- *    - Helper text provides guidance on validation requirements
- * 
- * 4. Emoji Palette Integration:
- *    - Displays compact 2x5 palette for value selection
- *    - Highlights values used in current puzzle
- *    - Updates selected value for painting on grid
- * 
- * DEPENDENCIES:
- * =============
- * - @/components/ui/button (consistent button styling)
- * - @/components/officer/EmojiPaletteDivider (value selection palette)
- * - @/constants/spaceEmojis (emoji set options and labels)
- * - @/types/puzzleDisplayTypes (DisplayMode type definition)
- * 
- * STYLING:
- * ========
- * - Space Force theme: slate-800 backgrounds, amber-300 headings
- * - Large interactive elements (h-14) for better accessibility
- * - Color-coded validation states (green=ready, gray=incomplete)
- * - Responsive layout with proper spacing and alignment
  */
 
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { EmojiPaletteDivider } from '@/components/officer/EmojiPaletteDivider';
 import type { DisplayMode } from '@/types/puzzleDisplayTypes';
@@ -120,6 +58,14 @@ export function PuzzleTools({
   isAssessmentMode = false,
   usedValues
 }: PuzzleToolsProps) {
+  // Track user interaction to control glowing pulse effect
+  const [hasInteractedWithDisplayMode, setHasInteractedWithDisplayMode] = useState(false);
+
+  // Handle display mode change with interaction tracking
+  const handleDisplayModeChange = (mode: DisplayMode) => {
+    setHasInteractedWithDisplayMode(true);
+    onDisplayModeChange(mode);
+  };
   return (
     <>
       {/* Emoji Palette - Main Selection */}
@@ -133,34 +79,59 @@ export function PuzzleTools({
       />
 
       {/* Display Mode & Emoji Set Controls */}
-      <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 w-full">
-        <h4 className="text-amber-300 text-xl font-bold mb-2 text-center">DISPLAY MODE</h4>
-        <p className="text-slate-300 text-base mb-4 text-center">Choose how to visualize puzzle values</p>
+      <div className={`
+        bg-slate-800 border border-slate-600 rounded-lg p-4 w-full transition-all duration-300
+        ${!hasInteractedWithDisplayMode ? 'ring-2 ring-amber-400 shadow-lg shadow-amber-400/30' : ''}
+      `}>
+        <h4 className={`
+          text-amber-300 text-2xl font-bold mb-3 text-center transition-all duration-300
+          ${!hasInteractedWithDisplayMode ? 'animate-pulse text-amber-200' : ''}
+        `}>
+          DISPLAY MODE
+        </h4>
+        <p className={`
+          text-slate-300 text-lg mb-4 text-center transition-all duration-300
+          ${!hasInteractedWithDisplayMode ? 'animate-pulse text-slate-200' : ''}
+        `}>
+          Choose how to visualize puzzle values
+        </p>
         
         {/* Display Mode Toggle - Clear and Verbose */}
-        <div className="flex flex-col gap-2 mb-4">
+        <div className="flex flex-col gap-3 mb-4">
           <button
-            onClick={() => onDisplayModeChange('arc-colors')}
-            className={`px-4 py-2 text-base font-bold rounded h-12 w-full flex-shrink-0 ${displayMode === 'arc-colors' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
+            onClick={() => handleDisplayModeChange('arc-colors')}
+            className={`
+              px-6 py-4 text-lg font-bold rounded h-16 w-full flex-shrink-0 transition-all duration-300
+              ${!hasInteractedWithDisplayMode ? 'animate-pulse ring-1 ring-amber-400' : ''}
+              ${displayMode === 'arc-colors' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}
+            `}
           >
             <div className="flex flex-col items-center gap-1">
-              <span className="text-md">🔢 Numbers Only</span>
+              <span className="text-lg">🔢 Numbers Only</span>
             </div>
           </button>
           <button
-            onClick={() => onDisplayModeChange('emoji')}
-            className={`px-4 py-2 text-base font-bold rounded h-12 w-full flex-shrink-0 ${displayMode === 'emoji' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
+            onClick={() => handleDisplayModeChange('emoji')}
+            className={`
+              px-6 py-4 text-lg font-bold rounded h-16 w-full flex-shrink-0 transition-all duration-300
+              ${!hasInteractedWithDisplayMode ? 'animate-pulse ring-1 ring-amber-400' : ''}
+              ${displayMode === 'emoji' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}
+            `}
           >
             <div className="flex flex-col items-center gap-1">
-              <span className="text-md">🎨 Emojis Only</span>
+              <span className="text-lg">🎨 Emojis Only</span>
             </div>
           </button>
           <button
-            onClick={() => onDisplayModeChange('hybrid')}
-            className={`px-4 py-2 text-base font-bold rounded h-12 w-full flex-shrink-0 ${displayMode === 'hybrid' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
+            onClick={() => handleDisplayModeChange('hybrid')}
+            className={`
+              px-6 py-4 text-lg font-bold rounded h-16 w-full flex-shrink-0 transition-all duration-300
+              ${!hasInteractedWithDisplayMode ? 'animate-pulse ring-1 ring-amber-400' : ''}
+              ${displayMode === 'hybrid' ? 'bg-amber-600 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}
+            `}
           >
             <div className="flex flex-col items-center gap-1">
-              <span className="text-md">🔀 Numbers + Emojis</span>
+              <span className="text-lg">🔀 Numbers + Emojis</span>
             </div>
           </button>
         </div>
