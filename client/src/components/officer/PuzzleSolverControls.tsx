@@ -68,13 +68,13 @@ export function PuzzleSolverControls({
   getSuggestedSizes 
 }: PuzzleSolverControlsProps) {
   return (
-    <div className="bg-slate-800 border border-slate-600 rounded-lg p-4 w-full">
-      <h4 className="text-amber-300 text-lg font-semibold mb-4 text-center">OUTPUT SIZE</h4>
-      <div className="flex flex-wrap items-center justify-center gap-3 text-lg">
+    <div className="bg-slate-800 border border-slate-600 rounded-lg p-5 w-full">
+      <h4 className="text-amber-300 text-2xl font-bold mb-4 text-center">OUTPUT SIZE</h4>
+      <div className="flex flex-wrap items-center justify-center gap-3 text-xl">
         <select
           value={currentDimensions.width}
           onChange={(e) => onSizeChange(parseInt(e.target.value), currentDimensions.height)}
-          className="bg-slate-700 border border-slate-500 rounded px-4 py-3 text-amber-100 text-lg h-14 min-w-[100px] flex-shrink-0"
+          className="bg-slate-700 border border-slate-500 rounded px-4 py-3 text-amber-100 text-xl h-16 min-w-[110px] flex-shrink-0"
         >
           {Array.from({ length: 30 }, (_, i) => i + 1).map(size => (
             <option key={size} value={size}>W: {size}</option>
@@ -84,7 +84,7 @@ export function PuzzleSolverControls({
         <select
           value={currentDimensions.height}
           onChange={(e) => onSizeChange(currentDimensions.width, parseInt(e.target.value))}
-          className="bg-slate-700 border border-slate-500 rounded px-4 py-3 text-amber-100 text-lg h-14 min-w-[100px] flex-shrink-0"
+          className="bg-slate-700 border border-slate-500 rounded px-4 py-3 text-amber-100 text-xl h-16 min-w-[110px] flex-shrink-0"
         >
           {Array.from({ length: 30 }, (_, i) => i + 1).map(size => (
             <option key={size} value={size}>H: {size}</option>
@@ -99,7 +99,7 @@ export function PuzzleSolverControls({
             <button
               key={index}
               onClick={() => onSizeChange(size.width, size.height)}
-              className="bg-amber-700 hover:bg-amber-600 text-white text-lg font-bold px-4 py-3 h-14 rounded min-w-[80px]"
+              className="bg-amber-700 hover:bg-amber-600 text-white text-xl font-bold px-4 py-3 h-16 rounded min-w-[90px]"
             >
               {size.width}×{size.height}
             </button>

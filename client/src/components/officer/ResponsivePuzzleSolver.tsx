@@ -622,7 +622,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-4">
-              <h1 className="text-xl md:text-2xl font-bold text-amber-400">
+              <h1 className="text-2xl md:text-3xl font-bold text-amber-400">
                 ARC Puzzle Solver
               </h1>
               <Badge className="bg-amber-600 text-slate-900 font-bold">
@@ -702,7 +702,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
           )}
 
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-amber-400 font-bold text-4xl">
+            <h2 className="text-amber-400 font-bold text-5xl">
               Test Case {currentTestIndex + 1}
               {isAssessmentMode && totalTests > 1 && (
                 <span className="text-slate-400 text-2xl font-normal ml-2">
@@ -710,7 +710,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
                 </span>
               )}
             </h2>
-            <div className="text-slate-300 text-lg font-medium">
+            <div className="text-slate-300 text-xl font-medium">
               {isValidating ? '🔄 Validating with PlayFab...' : 
                validationResult?.correct ? '🎉 PlayFab Verified!' :
                validationError ? '❌ PlayFab Validation Error' :
@@ -722,7 +722,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
           <div className="flex flex-col lg:flex-row gap-4 w-full">
             {/* Test Input - Full width on mobile, left column on large screens */}
             <div ref={inputContainerRef} className="flex-1 bg-slate-800 border border-slate-600 rounded p-4">
-              <h3 className="text-amber-300 text-2xl font-bold mb-4 text-center">Test Input</h3>
+              <h3 className="text-amber-300 text-3xl font-bold mb-4 text-center">Test Input</h3>
               <ResponsiveOfficerDisplayGrid
                 grid={testInput}
                 containerType="solver"
@@ -764,7 +764,7 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
 
             {/* User Solution - Full width on mobile, right column on large screens */}
             <div ref={outputContainerRef} className="flex-1 bg-slate-800 border border-slate-600 rounded p-4">
-              <h3 className="text-amber-300 text-2xl font-bold mb-4 text-center">Your Solution</h3>
+              <h3 className="text-amber-300 text-3xl font-bold mb-4 text-center">Your Solution</h3>
               <ResponsiveOfficerGrid
                 initialGrid={currentSolution}
                 containerType="solver"

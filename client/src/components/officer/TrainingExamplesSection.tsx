@@ -55,10 +55,10 @@ export function TrainingExamplesSection({
     <div className={`bg-slate-800 border border-slate-600 rounded-lg p-6 ${className}`}>
       {/* Section Header */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-amber-400 font-semibold flex items-center">
+        <h2 className="text-amber-400 text-2xl font-bold flex items-center">
           {title}
         </h2>
-        <div className="text-slate-400 text-sm">
+        <div className="text-slate-400 text-base">
           {examples.length} example{examples.length !== 1 ? 's' : ''}
         </div>
       </div>
@@ -84,7 +84,7 @@ export function TrainingExamplesSection({
                 <div className="absolute bottom-0 left-0 w-3 h-3 border-l-2 border-b-2 border-slate-600 rounded-bl-md"></div>
                 <div className="absolute bottom-0 right-0 w-3 h-3 border-r-2 border-b-2 border-slate-600 rounded-br-md"></div>
                 
-                <h3 className="text-slate-800 text-sm font-bold mb-2 text-center">
+                <h3 className="text-slate-800 text-base font-bold mb-2 text-center">
                   EX {index + 1}
                 </h3>
                 <div className="flex items-center gap-3">
@@ -95,7 +95,7 @@ export function TrainingExamplesSection({
                     displayMode={displayMode}
                     fixedCellSize={inputCellSize}
                   />
-                  <div className="text-slate-700 text-xl font-bold">→</div>
+                  <div className="text-slate-700 text-2xl font-bold">→</div>
                   <ResponsiveOfficerDisplayGrid
                     grid={example.output}
                     containerType="example"
@@ -113,7 +113,7 @@ export function TrainingExamplesSection({
       {/* Pattern Analysis Hint (if many examples) */}
       {examples.length >= 3 && (
         <div className="mt-6 bg-blue-900 border border-blue-600 rounded-lg p-4">
-          <div className="text-blue-300 text-sm">
+          <div className="text-blue-300 text-base">
             <strong>💡 Pattern Analysis:</strong> Study these {examples.length} examples to identify the transformation pattern. 
             Look for consistent rules that apply across all input → output pairs.
           </div>

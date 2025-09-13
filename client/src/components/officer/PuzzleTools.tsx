@@ -84,13 +84,13 @@ export function PuzzleTools({
         ${!hasInteractedWithDisplayMode ? 'ring-2 ring-amber-400 shadow-lg shadow-amber-400/30' : ''}
       `}>
         <h4 className={`
-          text-amber-300 text-2xl font-bold mb-3 text-center transition-all duration-300
+          text-amber-300 text-3xl font-bold mb-3 text-center transition-all duration-300
           ${!hasInteractedWithDisplayMode ? 'animate-pulse [animation-duration:4s] text-amber-200' : ''}
         `}>
           DISPLAY MODE
         </h4>
         <p className={`
-          text-slate-300 text-lg mb-4 text-center transition-all duration-300
+          text-slate-300 text-xl mb-4 text-center transition-all duration-300
           ${!hasInteractedWithDisplayMode ? 'animate-pulse [animation-duration:4s] text-slate-200' : ''}
         `}>
           Choose how to visualize puzzle values
@@ -107,7 +107,7 @@ export function PuzzleTools({
             `}
           >
             <div className="flex flex-col items-center gap-1">
-              <span className="text-lg">🔢 Numbers Only</span>
+              <span className="text-xl">🔢 Numbers Only</span>
             </div>
           </button>
           <button
@@ -119,7 +119,7 @@ export function PuzzleTools({
             `}
           >
             <div className="flex flex-col items-center gap-1">
-              <span className="text-lg">🎨 Emojis Only</span>
+              <span className="text-xl">🎨 Emojis Only</span>
             </div>
           </button>
           <button
@@ -131,7 +131,7 @@ export function PuzzleTools({
             `}
           >
             <div className="flex flex-col items-center gap-1">
-              <span className="text-lg">🔀 Numbers + Emojis</span>
+              <span className="text-xl">🔀 Numbers + Emojis</span>
             </div>
           </button>
         </div>
@@ -139,11 +139,11 @@ export function PuzzleTools({
         {/* Emoji Set Dropdown - Only show when emoji or hybrid mode */}
         {(displayMode === 'emoji' || displayMode === 'hybrid') && (
           <div>
-            <label className="text-slate-300 text-base font-semibold mb-2 block">Emoji Theme:</label>
+            <label className="text-slate-300 text-lg font-semibold mb-2 block">Emoji Theme:</label>
             <select
               value={emojiSet}
               onChange={(e) => onEmojiSetChange(e.target.value as EmojiSet)}
-              className="w-full bg-slate-700 border border-slate-500 rounded px-4 py-3 text-amber-100 text-base h-12"
+              className="w-full bg-slate-700 border border-slate-500 rounded px-4 py-3 text-amber-100 text-lg h-14"
             >
               {getEmojiSetOptions().map((option) => (
                 <option key={option.value} value={option.value}>
@@ -157,14 +157,14 @@ export function PuzzleTools({
 
       {/* Action Controls - Puzzle Actions */}
       <div className="bg-slate-800 border border-slate-600 rounded-lg p-5 w-full">
-        <h4 className="text-amber-300 text-xl font-bold mb-4 text-center">PUZZLE ACTIONS</h4>
+        <h4 className="text-amber-300 text-2xl font-bold mb-4 text-center">PUZZLE ACTIONS</h4>
         
         {/* Primary Actions Row */}
         <div className="flex flex-wrap gap-3 justify-center">
           <Button 
             size="lg" 
             variant="outline" 
-            className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white text-lg font-bold px-6 py-4 h-16 flex-1 sm:flex-none min-w-[120px]" 
+            className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white text-xl font-bold px-6 py-4 h-16 flex-1 sm:flex-none min-w-[140px]" 
             onClick={onCopyInput}
           >
             Copy Input
@@ -172,7 +172,7 @@ export function PuzzleTools({
           <Button 
             size="lg" 
             variant="outline" 
-            className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white text-lg font-bold px-6 py-4 h-16 flex-1 sm:flex-none min-w-[120px]" 
+            className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white text-xl font-bold px-6 py-4 h-16 flex-1 sm:flex-none min-w-[140px]" 
             onClick={onResetSolution}
           >
             Reset
@@ -181,7 +181,7 @@ export function PuzzleTools({
             <Button 
               size="lg" 
               variant="outline" 
-              className="border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white text-lg font-bold px-6 py-4 h-16 flex-1 sm:flex-none min-w-[120px]"
+              className="border-purple-600 text-purple-400 hover:bg-purple-600 hover:text-white text-xl font-bold px-6 py-4 h-16 flex-1 sm:flex-none min-w-[140px]"
               onClick={onReplayTutorial}
             >
               Replay Tutorial
@@ -194,7 +194,7 @@ export function PuzzleTools({
       <div className="mt-4">
         <Button
           size="lg"
-          className="w-full px-3 py-3 h-12 text-sm bg-amber-600 hover:bg-amber-700 text-white"
+          className="w-full px-4 py-4 h-16 text-xl bg-amber-600 hover:bg-amber-700 text-white"
           disabled={false}
           onClick={onValidate}
         >
@@ -202,7 +202,7 @@ export function PuzzleTools({
         </Button>
         
         {/* Helper text */}
-        <div className="text-sm text-slate-400 mt-2 text-center">
+        <div className="text-base text-slate-400 mt-3 text-center">
           {isAssessmentMode ? 
             'Submit your attempt for official assessment validation.' :
             'Submit your solution for official PlayFab validation.'}

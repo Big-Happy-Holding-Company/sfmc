@@ -27,7 +27,7 @@ const ASSESSMENT_PUZZLE_IDS = [
   '0bb8deee',    //  Corral the shapes
   '32e9702f',    //  Easy answer, everything pulled to the left and change 0 to 5 
   '27a28665',    // 7 Examples, 3 Tests!
- //   '7b80bb43', //  Close the gates!
+ //   '7b80bb43', //  Close the gates!  Very Large and unusual size
  //   '87ab05b8', //
 
 ];
@@ -299,8 +299,8 @@ export function AssessmentInterface() {
       <div className="bg-slate-800 border-b-2 border-amber-400 p-4">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
           <div>
-            <h1 className="text-xl font-bold text-amber-400">ARC Assessment</h1>
-            <p className="text-slate-300 text-sm">
+            <h1 className="text-2xl font-bold text-amber-400">ARC Assessment</h1>
+            <p className="text-slate-300 text-base">
               Puzzle {currentPuzzleIndex + 1} of {puzzles.length}
               {currentPuzzle && attemptCounts.get(currentPuzzle.id) && (
                 <span className="ml-2 text-amber-300">
@@ -313,11 +313,11 @@ export function AssessmentInterface() {
             <Button 
               onClick={() => setShowModal(true)} 
               variant="outline" 
-              size="sm"
+              size="lg"
             >
               About Assessment
             </Button>
-            <Button onClick={handleBackToLanding} variant="outline" size="sm">
+            <Button onClick={handleBackToLanding} variant="outline" size="lg">
               Exit Assessment
             </Button>
           </div>
@@ -349,17 +349,19 @@ export function AssessmentInterface() {
             onClick={handlePreviousPuzzle} 
             disabled={currentPuzzleIndex === 0}
             variant="outline"
+            size="lg"
           >
             ← Previous
           </Button>
           
-          <div className="text-slate-300">
+          <div className="text-slate-300 text-lg">
             {currentPuzzleIndex + 1} / {puzzles.length}
           </div>
           
           <Button 
             onClick={handleNextPuzzle} 
             className="bg-amber-600 hover:bg-amber-700"
+            size="lg"
           >
             {currentPuzzleIndex === puzzles.length - 1 ? 'Finish Assessment' : 'Next →'}
           </Button>
