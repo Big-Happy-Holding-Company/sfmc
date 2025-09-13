@@ -21,6 +21,7 @@ import { useState } from 'react';
 import { Switch, Route } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { useDocumentMeta } from "@/utils/useDocumentMeta";
 import MissionControl from "@/pages/MissionControl";
 import FIQTest from "@/pages/FIQTest";
 import OfficerTrackSimple from "@/pages/OfficerTrackSimple";
@@ -39,6 +40,9 @@ import { LoadingSplash } from "@/components/game/LoadingSplash";
 import { OnboardingModal } from "@/components/game/OnboardingModal";
 
 function Router() {
+  // Apply dynamic document metadata based on current route
+  useDocumentMeta();
+
   return (
     <Switch>
       <Route path="/" component={MissionControl} />
