@@ -64,7 +64,7 @@ export function AssessmentModal({ open, onClose }: AssessmentModalProps) {
             onClick={onClose}
             className="w-full max-w-xs mx-auto bg-amber-400 hover:bg-amber-500 text-slate-900 font-semibold py-3 px-6 text-sm sm:text-base"
           >
-            See how you compare!
+            See how you compare!!
           </Button>
         </div>
       </DialogContent>
