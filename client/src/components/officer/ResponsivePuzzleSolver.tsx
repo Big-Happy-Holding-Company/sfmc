@@ -22,7 +22,7 @@ import type { EmojiSet } from '@/constants/spaceEmojis';
 import { puzzlePerformanceService } from '@/services/puzzlePerformanceService';
 import { playFabValidation } from '@/services/playfab/validation';
 import { playFabEvents } from '@/services/playfab/events';
-import { useContainerWidth } from '@/hooks/useContainerWidth';
+import { SizeSlider } from '@/components/ui/SizeSlider';
 
 interface ResponsivePuzzleSolverProps {
   puzzle: OfficerTrackPuzzle;
@@ -70,12 +70,8 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
   // Performance stats state
   const [performanceStats, setPerformanceStats] = useState<PuzzlePerformanceStats | null>(null);
 
-  // Refs for grid containers to enable dynamic width calculation
-  const inputContainerRef = useRef<HTMLDivElement>(null);
-  const outputContainerRef = useRef<HTMLDivElement>(null);
-
-  const inputContainerWidth = useContainerWidth(inputContainerRef);
-  const outputContainerWidth = useContainerWidth(outputContainerRef);
+  const [inputCellSize, setInputCellSize] = useState(50);
+  const [outputCellSize, setOutputCellSize] = useState(50);
 
   if (!puzzle) {
     return <div className="min-h-screen bg-slate-900 text-amber-50 flex items-center justify-center">No puzzle data.</div>;
@@ -316,28 +312,6 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
   const currentDimensions = outputDimensions[currentTestIndex] || { width: 3, height: 3 };
   const hasExistingData = currentSolution.some(row => row.some(cell => cell !== 0));
 
-  // Calculate dynamic cell sizes for much better space utilization
-  const calculateCellSize = (gridWidth: number, gridHeight: number, containerWidth: number) => {
-    if (!containerWidth || !gridWidth || !gridHeight) {
-      return 24; // A reasonable default cell size
-    }
-
-    // Account for padding within the container (e.g., p-4 -> 1rem on each side)
-    const availableWidth = containerWidth - 32; 
-    const availableHeight = Math.floor(window.innerHeight * 0.45); // Limit height to 45% of viewport
-
-    const cellSizeByWidth = Math.floor(availableWidth / gridWidth);
-    const cellSizeByHeight = Math.floor(availableHeight / gridHeight);
-
-    // Use the smaller of the two calculated sizes to ensure the grid fits
-    const cellSize = Math.min(cellSizeByWidth, cellSizeByHeight);
-
-    // Set practical limits for cell size
-    return Math.max(16, Math.min(cellSize, 50)); // Min 16px, Max 50px
-  };
-
-  const inputCellSize = calculateCellSize(testInput[0]?.length || 1, testInput.length, inputContainerWidth);
-  const outputCellSize = calculateCellSize(currentDimensions.width, currentDimensions.height, outputContainerWidth);
 
   // Validate puzzle with PlayFab when all tests are complete
   const validatePuzzleWithPlayFab = async () => {
@@ -725,8 +699,13 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
           {/* Responsive layout: vertical on mobile, horizontal on larger screens */}
           <div className="flex flex-col lg:flex-row gap-4 w-full">
             {/* Test Input - Full width on mobile, left column on large screens */}
-            <div ref={inputContainerRef} className="flex-1 bg-slate-800 border border-slate-600 rounded p-4">
-              <h3 className="text-amber-300 text-3xl font-bold mb-4 text-center">Test Input</h3>
+            <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-4">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-amber-300 text-3xl font-bold text-center">Test Input</h3>
+                <div className="w-1/2">
+                  <SizeSlider value={inputCellSize} onChange={setInputCellSize} min={50} max={100} label="Grid Size" />
+                </div>
+              </div>
               <ResponsiveOfficerDisplayGrid
                 grid={testInput}
                 containerType="solver"
@@ -767,8 +746,13 @@ export function ResponsivePuzzleSolver({ puzzle, onBack, tutorialMode = false, i
             </div>
 
             {/* User Solution - Full width on mobile, right column on large screens */}
-            <div ref={outputContainerRef} className="flex-1 bg-slate-800 border border-slate-600 rounded p-4">
-              <h3 className="text-amber-300 text-3xl font-bold mb-4 text-center">Your Solution</h3>
+            <div className="flex-1 bg-slate-800 border border-slate-600 rounded p-4">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-amber-300 text-3xl font-bold text-center">Your Solution</h3>
+                <div className="w-1/2">
+                  <SizeSlider value={outputCellSize} onChange={setOutputCellSize} min={50} max={100} label="Grid Size" />
+                </div>
+              </div>
               <ResponsiveOfficerGrid
                 initialGrid={currentSolution}
                 containerType="solver"
