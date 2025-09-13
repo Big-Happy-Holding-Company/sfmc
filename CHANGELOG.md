@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 ## Recent Commits (Latest First)
 
 **2025-09-13**: 🔥 HOTFIX: CRITICAL REGRESSION FIX - Assessment Puzzle Loading Failure
-- **THE FUCKUP**: A recent service architecture refactoring by a previous developer introduced a critical regression where puzzles failed to load in the Assessment Interface (`AssessmentInterface`). The refactored `puzzleRepository` incorrectly prioritized fetching data from PlayFab, which lacks the complete puzzle data required for assessments, causing them to fail to load. This demonstrated a lack of thorough testing and awareness of feature requirements.
+- **THE Failure**: A recent service architecture refactoring by a previous developer introduced a critical regression where puzzles failed to load in the Assessment Interface (`AssessmentInterface`). The refactored `puzzleRepository` incorrectly prioritized fetching data from PlayFab, which lacks the complete puzzle data required for assessments, causing them to fail to load. This demonstrated a lack of thorough testing and awareness of feature requirements. A major failure by `Claude Opus 4.1` fixed by `Gemini 2.5 Pro`!
 - **THE FIX**: A surgical hotfix was implemented in the `puzzleRepository.findById` method by adding an optional boolean parameter: `preferArcExplainer`.
 - **SOLUTION**:
   - When `preferArcExplainer` is `true`, the repository now fetches puzzle data from the `arc-explainer` API first, which is the authoritative source for assessments.
